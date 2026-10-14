@@ -119,9 +119,6 @@ if config_entries is not None:
     class CamperTravelJournalOptionsFlow(config_entries.OptionsFlow):
         """Edit all runtime settings without reinstalling the entry."""
 
-        def __init__(self, config_entry):
-            self.config_entry = config_entry
-
         async def async_step_init(self, user_input: dict[str, Any] | None = None):
             errors: dict[str, str] = {}
             if user_input is not None:
