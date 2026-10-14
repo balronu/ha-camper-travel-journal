@@ -1,0 +1,17 @@
+title: Reisetagebuch
+path: reisetagebuch
+icon: mdi:book-open-page-variant
+type: sections
+max_columns: 2
+sections:
+  - type: grid
+    cards:
+      - type: custom:camper-travel-journal-summary-card
+        vehicle_id: REPLACE_WITH_CONFIG_ENTRY_ID
+  - type: grid
+    cards:
+      - type: custom:camper-travel-journal-manager-card
+        vehicle_id: REPLACE_WITH_CONFIG_ENTRY_ID
+
+# Resource registration is performed by the integration. Do not add a second
+# manual resource entry. This example is intentionally not applied to HA.

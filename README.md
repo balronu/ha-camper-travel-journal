@@ -14,7 +14,7 @@ Eine frühe Home-Assistant-Custom-Integration für ein datenschutzbewusstes
 digitales Wohnmobil-Reisetagebuch. Langfristig sind GPS-Aufzeichnung,
 Fahrtenbuch, Reisen, Ausgaben, Karten, Statistiken und Exporte vorgesehen.
 
-> **Status: `v0.1.0-beta.1` Entwickler-Beta.** Nicht produktionsreif. Die
+> **Status: `v0.1.0-beta.2` Entwickler-Beta.** Nicht produktionsreif. Die
 > aktuelle Version wurde noch nicht in einer produktiven Home-Assistant-
 > Instanz validiert.
 
@@ -31,8 +31,9 @@ Fahrtenbuch, Reisen, Ausgaben, Karten, Statistiken und Exporte vorgesehen.
 | Eigene SQLite-Datenbank | Implementiert und synthetisch getestet |
 | Neustart-Wiederherstellung | Implementiert mit begrenztem Replay; HA-Neustart wird in CI geprüft |
 | Aufbewahrung | Nur Dry-Run; keine destruktive Löschung in der Beta |
-| Reise-/Ausgabenoberfläche | Nicht verfügbar; nur Schema-Grundlage |
-| Karten, Statistiken, Exporte | Geplant |
+| Reise-/Ausgabenoberfläche | Summary-/Manager-Card implementiert; CI getestet, produktiver Pilot offen |
+| Reisezuordnung, Zwischenstopps, Reisekosten | Backend/API implementiert; UI-Grundfunktionen vorhanden |
+| Karten, Statistiken, Exporte | Kartenansicht und Exporte geplant; Kostenübersicht teilweise vorhanden |
 
 ## Installation
 
@@ -107,19 +108,21 @@ Siehe [Architektur](docs/architecture.md), [Datenbankschema](docs/database-schem
 
 ## Lovelace-Frontend und Cache
 
-Die Beta enthält noch keine Lovelace-Karte und registriert keine Frontend-
-Resource. Für die spätere Karte sind versionsgebundene `?v=`-URLs, einmalige
-HA-Registrierung, idempotente Custom Elements und Cleanup verbindlich. Bei
-veralteter Anzeige zuerst die Resource-Version prüfen und die Karte neu laden;
-manuelles Cache-Leeren ist nur die letzte Maßnahme. Details und die noch nicht
-ausgeführten Browser-/HA-Tests stehen in [Frontend-Cache-Standard](docs/frontend-cache.md).
+Die Beta enthält eine kompakte Summary Card und eine breite Manager Card. Das
+Bundle wird automatisch über die Integration mit der versionsgebundenen URL
+`/camper_travel_journal/camper-travel-journal.js?v=0.1.0-beta.2` registriert.
+Eine zweite manuelle Resource darf nicht angelegt werden. Bei veralteter
+Anzeige zuerst Resource-Version prüfen und Dashboard neu laden; manuelles
+Cache-Leeren ist letzte Maßnahme. Eine installierbare, aber nicht produktiv
+angewendete Unterseitenvorlage steht in
+[dashboard-wohnmobil-reisetagebuch.yaml](docs/examples/dashboard-wohnmobil-reisetagebuch.yaml).
+Details: [Frontend-Cache-Standard](docs/frontend-cache.md).
 
 ## Roadmap
 
 - `v0.1.x`: GPS-Grundlage und kontrollierte Beta-Validierung
-- `v0.2.x`: Reiseverwaltung
-- `v0.3.x`: Reisekosten
-- `v0.4.x`: Karten und Dashboard
+- `v0.1.x`: GPS-Grundlage, Reiseverwaltung und kontrollierte Beta-Validierung
+- `v0.2.x`: Kartenansicht, Statistiken und Datenexporte
 - `v1.0.0`: stabile Version nach produktiver Validierung
 
 ## Support

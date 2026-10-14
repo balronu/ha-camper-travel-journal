@@ -2,6 +2,15 @@
 
 🇩🇪 Deutsch | 🇬🇧 [English](README.en.md)
 
+## 0.1.0-beta.2 – Reiseverwaltung und Lovelace-Karten
+
+- Reiseverwaltung mit Statusmodell, Fahrtzuordnung, Zwischenstopps und
+  Reisekosten-Grundfunktionen.
+- Authentifizierte WebSocket-API und SQLite-Schema-Migration auf Version 3.
+- Kompakte Summary Card und Reiseverwaltungs-Card mit gemeinsamem API-Modul.
+- Versionsgebundenes Frontend-Bundle für Cache-Updates.
+- Frühe Entwickler-Beta; kein produktiver Dashboard-Pilot.
+
 ## 0.1.0-beta.1 – Frühe Entwickler-Beta
 
 - Config Flow und Options Flow für mehrere Fahrzeuge hinzugefügt.

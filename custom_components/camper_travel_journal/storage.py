@@ -7,12 +7,13 @@ SQLite connection may be used directly from an event-loop callback.
 
 import asyncio
 import sqlite3
+import uuid
 from collections.abc import Iterator
 from contextlib import contextmanager
 from datetime import datetime, timezone
 from pathlib import Path
 
-SCHEMA_VERSION = 2
+SCHEMA_VERSION = 3
 SCHEMA_SQL = """
 PRAGMA foreign_keys = ON;
 CREATE TABLE IF NOT EXISTS schema_meta (key TEXT PRIMARY KEY, value TEXT NOT NULL);
@@ -39,7 +40,8 @@ CREATE TABLE IF NOT EXISTS stays (
 );
 CREATE TABLE IF NOT EXISTS trips (
   id TEXT PRIMARY KEY, vehicle_id TEXT NOT NULL REFERENCES vehicles(id), title TEXT NOT NULL,
-  started_at TEXT NOT NULL, ended_at TEXT, status TEXT NOT NULL, created_at TEXT NOT NULL, updated_at TEXT NOT NULL
+  started_at TEXT NOT NULL, ended_at TEXT, status TEXT NOT NULL, created_at TEXT NOT NULL, updated_at TEXT NOT NULL,
+  description TEXT NOT NULL DEFAULT '', destination TEXT NOT NULL DEFAULT ''
 );
 CREATE TABLE IF NOT EXISTS trip_drives (
   trip_id TEXT NOT NULL REFERENCES trips(id) ON DELETE CASCADE,
@@ -49,9 +51,17 @@ CREATE TABLE IF NOT EXISTS trip_drives (
 CREATE TABLE IF NOT EXISTS expenses (
   id TEXT PRIMARY KEY, trip_id TEXT REFERENCES trips(id) ON DELETE SET NULL, occurred_at TEXT NOT NULL,
   category TEXT NOT NULL, amount_minor INTEGER NOT NULL, currency TEXT NOT NULL,
-  note TEXT, created_at TEXT NOT NULL
+  note TEXT, created_at TEXT NOT NULL, odometer_km REAL, stay_id TEXT REFERENCES stops(id) ON DELETE SET NULL
 );
 CREATE INDEX IF NOT EXISTS idx_expenses_trip_time ON expenses(trip_id, occurred_at);
+CREATE TABLE IF NOT EXISTS stops (
+  id TEXT PRIMARY KEY, vehicle_id TEXT NOT NULL REFERENCES vehicles(id), trip_id TEXT REFERENCES trips(id) ON DELETE SET NULL,
+  name TEXT NOT NULL, occurred_at TEXT NOT NULL, arrived_at TEXT, departed_at TEXT,
+  latitude REAL, longitude REAL, description TEXT NOT NULL DEFAULT '', stop_type TEXT NOT NULL,
+  automatic INTEGER NOT NULL DEFAULT 1, created_at TEXT NOT NULL
+);
+CREATE INDEX IF NOT EXISTS idx_stops_vehicle_time ON stops(vehicle_id, occurred_at);
+CREATE INDEX IF NOT EXISTS idx_stops_trip_time ON stops(trip_id, occurred_at);
 CREATE TABLE IF NOT EXISTS runtime_state (
   vehicle_id TEXT PRIMARY KEY REFERENCES vehicles(id) ON DELETE CASCADE,
   state_json TEXT NOT NULL, updated_at TEXT NOT NULL
@@ -83,11 +93,39 @@ class SQLiteStore:
             current = self.connection.execute("SELECT value FROM schema_meta WHERE key='version'").fetchone()
             if current is not None and int(current[0]) > SCHEMA_VERSION:
                 raise RuntimeError(f"database schema {current[0]} is newer than supported {SCHEMA_VERSION}")
+            previous = int(current[0]) if current is not None else 0
+            if previous < 3:
+                self._migrate_v3()
             self.connection.execute("INSERT OR REPLACE INTO schema_meta(key, value) VALUES('version', ?)", (str(SCHEMA_VERSION),))
             self.connection.commit()
         except Exception:
             self.close()
             raise
+
+    def _migrate_v3(self) -> None:
+        """Add Phase 2 fields without touching recorder or existing GPS rows."""
+        if self.connection is None:
+            raise RuntimeError("store is not open")
+        columns = {row[1] for row in self.connection.execute("PRAGMA table_info(trips)")}
+        if "description" not in columns:
+            self.connection.execute("ALTER TABLE trips ADD COLUMN description TEXT NOT NULL DEFAULT ''")
+        if "destination" not in columns:
+            self.connection.execute("ALTER TABLE trips ADD COLUMN destination TEXT NOT NULL DEFAULT ''")
+        columns = {row[1] for row in self.connection.execute("PRAGMA table_info(expenses)")}
+        if "odometer_km" not in columns:
+            self.connection.execute("ALTER TABLE expenses ADD COLUMN odometer_km REAL")
+        if "stay_id" not in columns:
+            self.connection.execute("ALTER TABLE expenses ADD COLUMN stay_id TEXT REFERENCES stops(id) ON DELETE SET NULL")
+        self.connection.executescript("""
+        CREATE TABLE IF NOT EXISTS stops (
+          id TEXT PRIMARY KEY, vehicle_id TEXT NOT NULL REFERENCES vehicles(id), trip_id TEXT REFERENCES trips(id) ON DELETE SET NULL,
+          name TEXT NOT NULL, occurred_at TEXT NOT NULL, arrived_at TEXT, departed_at TEXT,
+          latitude REAL, longitude REAL, description TEXT NOT NULL DEFAULT '', stop_type TEXT NOT NULL,
+          automatic INTEGER NOT NULL DEFAULT 1, created_at TEXT NOT NULL
+        );
+        CREATE INDEX IF NOT EXISTS idx_stops_vehicle_time ON stops(vehicle_id, occurred_at);
+        CREATE INDEX IF NOT EXISTS idx_stops_trip_time ON stops(trip_id, occurred_at);
+        """)
 
     def close(self) -> None:
         if self.connection is not None:
@@ -151,6 +189,97 @@ class SQLiteStore:
         rows = self.connection.execute("SELECT id FROM gps_points WHERE recorded_at < ? AND NOT EXISTS (SELECT 1 FROM drives d JOIN trip_drives td ON td.drive_id=d.id WHERE d.vehicle_id=gps_points.vehicle_id AND d.started_at <= gps_points.recorded_at AND d.ended_at >= gps_points.recorded_at) ORDER BY id LIMIT ?", (utc_iso(cutoff), limit)).fetchall()
         return [row[0] for row in rows]
 
+    def create_trip(self, vehicle_id: str, title: str, started_at: datetime, now: datetime, *, description: str = "", destination: str = "", status: str = "planned") -> str:
+        trip_id = str(uuid.uuid4())
+        with self.transaction() as connection:
+            stamp = utc_iso(now)
+            connection.execute("INSERT INTO trips(id,vehicle_id,title,started_at,status,created_at,updated_at,description,destination) VALUES(?,?,?,?,?,?,?,?,?)", (trip_id, vehicle_id, title.strip(), utc_iso(started_at), status, stamp, stamp, description.strip(), destination.strip()))
+        return trip_id
+
+    def list_trips(self, vehicle_id: str | None = None) -> list[dict]:
+        if self.connection is None: raise RuntimeError("store is not open")
+        query = "SELECT * FROM trips"
+        args: tuple = ()
+        if vehicle_id:
+            query += " WHERE vehicle_id=?"; args = (vehicle_id,)
+        rows = self.connection.execute(query + " ORDER BY started_at DESC", args).fetchall()
+        return [dict(row) for row in rows]
+
+    def update_trip(self, trip_id: str, now: datetime, **fields) -> None:
+        allowed = {"title", "description", "destination", "started_at", "ended_at", "status"}
+        changes = {key: value for key, value in fields.items() if key in allowed and value is not None}
+        if not changes: return
+        if "started_at" in changes and isinstance(changes["started_at"], datetime): changes["started_at"] = utc_iso(changes["started_at"])
+        if "ended_at" in changes and isinstance(changes["ended_at"], datetime): changes["ended_at"] = utc_iso(changes["ended_at"])
+        changes["updated_at"] = utc_iso(now)
+        assignments = ",".join(f"{key}=?" for key in changes)
+        with self.transaction() as connection:
+            cursor = connection.execute(f"UPDATE trips SET {assignments} WHERE id=?", (*changes.values(), trip_id))
+            if cursor.rowcount != 1: raise ValueError("trip_not_found")
+
+    def delete_trip(self, trip_id: str) -> None:
+        with self.transaction() as connection:
+            connection.execute("DELETE FROM trips WHERE id=?", (trip_id,))
+
+    def link_drives(self, trip_id: str, drive_ids: list[str], now: datetime) -> None:
+        with self.transaction() as connection:
+            trip = connection.execute("SELECT vehicle_id FROM trips WHERE id=?", (trip_id,)).fetchone()
+            if trip is None: raise ValueError("trip_not_found")
+            for drive_id in drive_ids:
+                drive = connection.execute("SELECT vehicle_id FROM drives WHERE id=?", (drive_id,)).fetchone()
+                if drive is None: raise ValueError("drive_not_found")
+                if drive[0] != trip[0]: raise ValueError("vehicle_mismatch")
+                try:
+                    connection.execute("INSERT INTO trip_drives(trip_id,drive_id,linked_at) VALUES(?,?,?)", (trip_id, drive_id, utc_iso(now)))
+                except sqlite3.IntegrityError as err:
+                    raise ValueError("drive_already_assigned") from err
+
+    def unlink_drive(self, trip_id: str, drive_id: str) -> None:
+        with self.transaction() as connection:
+            connection.execute("DELETE FROM trip_drives WHERE trip_id=? AND drive_id=?", (trip_id, drive_id))
+
+    def list_drives(self, vehicle_id: str, *, trip_id: str | None = None) -> list[dict]:
+        if self.connection is None: raise RuntimeError("store is not open")
+        query = "SELECT d.*, td.trip_id FROM drives d LEFT JOIN trip_drives td ON td.drive_id=d.id WHERE d.vehicle_id=?"
+        args: list = [vehicle_id]
+        if trip_id: query += " AND td.trip_id=?"; args.append(trip_id)
+        return [dict(row) for row in self.connection.execute(query + " ORDER BY d.started_at DESC", args).fetchall()]
+
+    def create_stop(self, stop, now: datetime) -> str:
+        stop_id = stop.id or str(uuid.uuid4())
+        with self.transaction() as connection:
+            connection.execute("INSERT INTO stops(id,vehicle_id,trip_id,name,occurred_at,arrived_at,departed_at,latitude,longitude,description,stop_type,automatic,created_at) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?)", (stop_id, stop.vehicle_id, stop.trip_id, stop.name.strip(), utc_iso(stop.occurred_at), utc_iso(stop.arrived_at) if stop.arrived_at else None, utc_iso(stop.departed_at) if stop.departed_at else None, stop.latitude, stop.longitude, stop.description.strip(), stop.stop_type, int(stop.automatic), utc_iso(now)))
+        return stop_id
+
+    def list_stops(self, vehicle_id: str, trip_id: str | None = None) -> list[dict]:
+        if self.connection is None: raise RuntimeError("store is not open")
+        query = "SELECT * FROM stops WHERE vehicle_id=?"; args: list = [vehicle_id]
+        if trip_id: query += " AND trip_id=?"; args.append(trip_id)
+        return [dict(row) for row in self.connection.execute(query + " ORDER BY occurred_at", args).fetchall()]
+
+    def delete_stop(self, stop_id: str) -> None:
+        with self.transaction() as connection: connection.execute("DELETE FROM stops WHERE id=?", (stop_id,))
+
+    def create_expense(self, expense, now: datetime) -> str:
+        expense_id = expense.id or str(uuid.uuid4())
+        if expense.amount_minor < 0: raise ValueError("amount_invalid")
+        with self.transaction() as connection:
+            connection.execute("INSERT INTO expenses(id,trip_id,occurred_at,category,amount_minor,currency,note,created_at,odometer_km,stay_id) VALUES(?,?,?,?,?,?,?,?,?,?)", (expense_id, expense.trip_id, utc_iso(expense.occurred_at), expense.category, expense.amount_minor, expense.currency.upper(), expense.note, utc_iso(now), expense.odometer_km, expense.stay_id))
+        return expense_id
+
+    def list_expenses(self, trip_id: str) -> list[dict]:
+        if self.connection is None: raise RuntimeError("store is not open")
+        return [dict(row) for row in self.connection.execute("SELECT * FROM expenses WHERE trip_id=? ORDER BY occurred_at DESC", (trip_id,)).fetchall()]
+
+    def delete_expense(self, expense_id: str) -> None:
+        with self.transaction() as connection: connection.execute("DELETE FROM expenses WHERE id=?", (expense_id,))
+
+    def expense_summary(self, trip_id: str) -> dict:
+        if self.connection is None: raise RuntimeError("store is not open")
+        rows = self.connection.execute("SELECT currency, SUM(amount_minor) total, category FROM expenses WHERE trip_id=? GROUP BY currency, category", (trip_id,)).fetchall()
+        currencies = {row[0] for row in rows}
+        return {"currency": next(iter(currencies)) if len(currencies) == 1 else None, "total_minor": sum(row[1] for row in rows) if len(currencies) <= 1 else None, "by_category": {row[2]: row[1] for row in rows} if len(currencies) <= 1 else {}, "mixed_currency": len(currencies) > 1}
+
 
 class AsyncSQLiteWorker:
     """Executor-backed SQLite boundary with serialized calls and ordered close."""
@@ -174,6 +303,13 @@ class AsyncSQLiteWorker:
         if self._closed: raise RuntimeError("database worker is closed")
         async with self._lock:
             return await asyncio.to_thread(getattr(self.store, method), *args)
+
+    async def async_call(self, method: str, *args, **kwargs):
+        """Run a repository method off the event loop."""
+        if kwargs:
+            async with self._lock:
+                return await asyncio.to_thread(lambda: getattr(self.store, method)(*args, **kwargs))
+        return await self._call(method, *args)
 
     async def async_insert_point(self, point): return await self._call("insert_point", point)
     async def async_insert_drive(self, drive): return await self._call("insert_drive", drive)

@@ -22,6 +22,17 @@ Overlapping trip dates are allowed because they are user records; the UI/API
 must warn and require an explicit choice when selecting already-assigned
 drives.
 
+## Phase 2 schema additions (version 3)
+
+Migration 3 adds trip descriptions/destinations, `stops`, and optional expense
+references to stops. Existing GPS rows are preserved. `trip_drives` remains
+transactional and its unique `drive_id` constraint prevents silent
+multi-assignment. Mixed expense currencies are reported rather than summed.
+
+All changes run through the serialized executor worker. A database newer than
+the supported version fails closed. No Recorder tables or migrations are
+touched, and retention remains non-destructive in this beta.
+
 ## Schema versioning and recovery
 
 `schema_meta.version` is checked during startup. A newer unsupported version

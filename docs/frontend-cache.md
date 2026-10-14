@@ -2,19 +2,18 @@
 
 ## Aktueller Stand
 
-`v0.1.0-beta.1` enthält **keine** Lovelace-Karte, kein JavaScript-Bundle und
-keine automatische Resource-Registrierung. Es gibt deshalb aktuell keine
-Frontend-URL, die ein Browser cachen könnte. Eine Kartenfunktion wird nicht als
-bereits vorhanden dargestellt.
+`v0.1.0-beta.2` enthält die Phase-2-Lovelace-Karten und registriert das Bundle
+über den öffentlichen HA-Mechanismus. Der historische Tag `v0.1.0-beta.1`
+enthielt **keine** Lovelace-Karte.
 
-## Verbindlicher zukünftiger Vertrag
+## Bundle- und Cache-Vertrag
 
 Wenn die Karte entwickelt wird, müssen Bundle, Backend-Manifest und npm-
 Metadaten dieselbe veröffentlichte Version tragen. Die Resource-URL folgt dann
 diesem Muster:
 
 ```text
-/camper_travel_journal/camper-travel-journal-card.js?v=<VERSION>
+/camper_travel_journal/camper-travel-journal.js?v=0.1.0-beta.2
 ```
 
 `<VERSION>` wird bei jeder Bundle-Änderung erhöht, auch zwischen stabilen
@@ -23,17 +22,17 @@ den eingebetteten/abgeleiteten Cache-Identifier vergleichen.
 
 ## Home-Assistant-Registrierung
 
-Die spätere Integration soll ausschließlich die zu Home Assistant passende,
-öffentliche Registrierung verwenden: einen statischen Pfad über
+Die Integration verwendet ausschließlich die zu Home Assistant passende,
+öffentliche Registrierung: einen statischen Pfad über
 `hass.http.async_register_static_paths` und eine einmalige Lovelace-Resource-
 Registrierung über den unterstützten Helper. Die Resource-URL muss
 versionsgebunden sein und darf nicht durch direkte Änderungen an
 `.storage/lovelace.resources` gepflegt werden.
 
-Die genaue API-Signatur wird gegen die dann unterstützte HA-Version in einer
-isolierten Fixture geprüft. Cache-Control-Header werden nur verwendet, wenn die
-öffentliche HA-HTTP-Schnittstelle sie kontrollieren lässt; es werden keine
-privaten HTTP-/Recorder-Interna angenommen. Die Referenzimplementierung von
+Die API-Signatur wird in der HA-Fixture geprüft. Cache-Control-Header werden nur
+verwendet, wenn die öffentliche HA-HTTP-Schnittstelle sie kontrollieren lässt;
+es werden keine privaten HTTP-/Recorder-Interna angenommen. Die
+Referenzimplementierung von
 Mobile Fuel Stations nutzt für das statische Bundle `cache_headers=False` und
 registriert den Extra-JS-URL-Helper integrationweit genau einmal; diese
 Eigenschaften sind der Prüfmaßstab, keine Änderung am Referenzprojekt.
@@ -57,8 +56,8 @@ Nach einem Update wird die neue `?v=`-URL registriert. Bei einer veralteten
 Darstellung zuerst die Lovelace-Resource-Liste und die Bundle-Version prüfen,
 dann die Karte neu laden und erst als letzte Maßnahme den Browser-Cache leeren.
 iOS/WebKit und Windows-Browser werden in getrennten isolierten Browser-Tests
-geprüft, sobald ein Bundle existiert. Ein echter HA-/Browser-Test ist im
-aktuellen Beta-Tag noch nicht ausgeführt.
+geprüft, sobald die CI-Browserumgebung aktiviert ist. Ein produktiver
+HA-/Browser-Test wurde nicht ausgeführt.
 
 ## CI-Anforderungen
 
@@ -71,5 +70,6 @@ Gates erforderlich:
 4. isolierte HA-Fixture für Registrierung ohne Duplikate,
 5. Browser-Tests für Update/Reload, iOS/WebKit und Windows Chromium.
 
-Bis diese Dateien und Tests existieren, bleiben die Punkte ausdrücklich
-`nicht implementiert` und `nicht getestet`.
+Die Browser- und echte Dashboard-Verifikation bleibt für diese Beta offen;
+die statische Registrierung, Versionskennung und idempotente Elementdefinition
+sind durch Code- und CI-Tests abzusichern.

@@ -1,0 +1,13 @@
+import { html } from "lit";
+import { TravelCard, defineOnce } from "./base-card";
+import { list, transition, type Snapshot } from "./api";
+
+export class SummaryCard extends TravelCard {
+  private snapshot?: Snapshot; private loading = false; private error = "";
+  connectedCallback() { super.connectedCallback(); void this.refresh(); }
+  disconnectedCallback() { super.disconnectedCallback(); }
+  private async refresh() { if (!this.hass || !this.vehicleId) return; this.loading = true; this.requestUpdate(); try { this.snapshot = await list(this.hass, this.vehicleId); } catch { this.error = "Reisedaten konnten nicht geladen werden."; } finally { this.loading = false; this.requestUpdate(); } }
+  private async setStatus(status: "active" | "paused" | "completed") { const trip = this.snapshot?.trips[0]; if (!this.hass || !trip) return; try { await transition(this.hass, this.vehicleId, trip.id, status); await this.refresh(); } catch { this.error = "Reisestatus konnte nicht geändert werden."; this.requestUpdate(); } }
+  render() { const trip = this.snapshot?.trips[0]; const km = (this.snapshot?.drives ?? []).reduce((sum, drive) => sum + drive.distance_m, 0) / 1000; return html`<ha-card><h2>${trip?.title ?? "Reisetagebuch"}</h2>${this.error ? html`<p class="error">${this.error}</p>` : trip ? html`<p class="muted">${trip.destination || "Kein Reiseziel"} · ${trip.status}</p><div class="grid"><div class="metric"><span class="muted">Strecke</span><span class="value">${km.toFixed(1)} km</span></div><div class="metric"><span class="muted">Fahrten</span><span class="value">${this.snapshot?.drives.length ?? 0}</span></div><div class="metric"><span class="muted">Zwischenstopps</span><span class="value">${this.snapshot?.stops.length ?? 0}</span></div></div><div class="actions">${trip.status === "planned" || trip.status === "paused" ? html`<button @click=${() => this.setStatus("active")}>Reise fortsetzen</button>` : ""}${trip.status === "active" ? html`<button class="secondary" @click=${() => this.setStatus("paused")}>Pausieren</button><button @click=${() => this.setStatus("completed")}>Abschließen</button>` : ""}</div>` : html`<p class="muted">Noch keine Reise angelegt.</p>`}${this.loading ? html`<p class="muted">Lade Reisedaten …</p>` : ""}</ha-card>`; }
+}
+defineOnce("camper-travel-journal-summary-card", SummaryCard);

@@ -61,6 +61,10 @@ class Trip:
     started_at: datetime
     ended_at: datetime | None
     status: str
+    description: str = ""
+    destination: str = ""
+    created_at: datetime | None = None
+    updated_at: datetime | None = None
 
 
 @dataclass(frozen=True, slots=True)
@@ -72,6 +76,24 @@ class Expense:
     amount_minor: int
     currency: str
     note: str | None = None
+    odometer_km: float | None = None
+    stay_id: str | None = None
+
+
+@dataclass(frozen=True, slots=True)
+class Stop:
+    id: str
+    vehicle_id: str
+    name: str
+    occurred_at: datetime
+    arrived_at: datetime | None = None
+    departed_at: datetime | None = None
+    latitude: float | None = None
+    longitude: float | None = None
+    description: str = ""
+    stop_type: str = "other"
+    automatic: bool = True
+    trip_id: str | None = None
 
 
 @dataclass(frozen=True, slots=True)
@@ -79,4 +101,3 @@ class TripDriveLink:
     trip_id: str
     drive_id: str
     linked_at: datetime
-
