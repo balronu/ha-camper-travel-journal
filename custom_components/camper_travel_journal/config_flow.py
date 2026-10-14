@@ -114,7 +114,7 @@ if config_entries is not None:
         @staticmethod
         @callback
         def async_get_options_flow(config_entry):
-            return CamperTravelJournalOptionsFlow(config_entry)
+            return CamperTravelJournalOptionsFlow()
 
     class CamperTravelJournalOptionsFlow(config_entries.OptionsFlow):
         """Edit all runtime settings without reinstalling the entry."""
