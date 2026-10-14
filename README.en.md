@@ -18,7 +18,7 @@ An early Home Assistant custom integration for a privacy-conscious digital
 camper travel journal: GPS recording, drive detection, trips, expenses, maps,
 statistics and exports are the long-term goal.
 
-> **Status: `v0.1.0-beta.7` development beta.** Not production-ready. The
+> **Status: `v0.1.0-beta.8` diagnostic development beta.** Not production-ready. The
 > current release has not yet been validated in a live Home Assistant instance.
 
 ## Current feature matrix
@@ -49,7 +49,7 @@ exists.
 
 1. Open **HACS → Integrations → Custom repositories**.
 2. Add `https://github.com/balronu/ha-camper-travel-journal` as an **Integration**.
-3. For the development build, select the `v0.1.0-beta.7` pre-release; do not select the development `main` ref.
+3. For the development build, select the `v0.1.0-beta.8` pre-release; do not select the development `main` ref.
 4. Restart Home Assistant.
 5. Add **Camper Travel Journal** under **Settings → Devices & services**.
 
@@ -132,7 +132,7 @@ See [the Phase 1C report](docs/phase-1c-report.md), [architecture](docs/architec
 
 This beta includes a compact summary card and a full-width manager card. The
 integration registers the versioned bundle URL
-`/camper_travel_journal/camper-travel-journal.js?v=0.1.0-beta.7` automatically.
+`/camper_travel_journal/camper-travel-journal.js?v=0.1.0-beta.8` automatically.
 Do not add a second manual resource. For a stale display, check the resource
 version and reload the dashboard first; clearing the browser cache is a last
 resort. An installable but intentionally unapplied subview example is in
@@ -141,7 +141,7 @@ See the [frontend/cache standard](docs/frontend-cache.md).
 
 ### Controlled first installation
 
-After selecting the `v0.1.0-beta.7` pre-release in HACS, restarting Home
+After selecting the `v0.1.0-beta.8` pre-release in HACS, restarting Home
 Assistant and completing the config flow, add a test view to the camper
 dashboard with both cards:
 
@@ -161,6 +161,15 @@ is a template only and is not installed automatically.
 Both cards are also available in the visual card picker. After choosing a card,
 the configured camper can be selected in the graphical editor; when exactly one
 hub exists, it is selected automatically.
+
+### Beta 8 diagnostic card
+
+For targeted analysis, temporarily add a separate Lovelace card of type
+`custom:camper-travel-journal-diagnostics-card`. It never starts automatically.
+On the iPhone, select **Diagnose starten** and, if needed, the one-time
+**Diagnose wiederholen**, then use **Bericht kopieren** to provide the sanitized
+report. The report contains no tokens, cookies, coordinates, routes or private
+trip content.
 
 ## Roadmap
 

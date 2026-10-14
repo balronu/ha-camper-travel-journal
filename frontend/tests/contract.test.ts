@@ -12,7 +12,7 @@ const bundle = resolve(root, "../custom_components/camper_travel_journal/fronten
 
 describe("frontend release contract", () => {
   it("keeps backend, npm metadata and beta bundle aligned", () => {
-    expect(manifest.version).toBe("0.1.0-beta.7");
+    expect(manifest.version).toBe("0.1.0-beta.8");
     expect(pkg.version).toBe(manifest.version);
     expect(existsSync(bundle)).toBe(true);
   });
@@ -22,6 +22,8 @@ describe("frontend release contract", () => {
     expect(readFileSync(resolve(root, "src/base-card.ts"), "utf8")).toContain("customElements.get");
     expect(source).toContain("camper-travel-journal-summary-card");
     expect(source).toContain("camper-travel-journal-manager-card");
+    expect(source).toContain("camper-travel-journal-diagnostics-card");
+    expect(source).toContain("Diagnose");
     expect(source).toContain("Reiseübersicht");
     expect(source).toContain("Reiseverwaltung");
     const init = readFileSync(resolve(root, "../custom_components/camper_travel_journal/__init__.py"), "utf8");

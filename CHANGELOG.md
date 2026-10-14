@@ -2,6 +2,15 @@
 
 🇩🇪 Deutsch | 🇬🇧 [English](README.en.md)
 
+## 0.1.0-beta.8 – Read-only-WebSocket-Diagnose
+
+- Ergänzt eine manuell startbare Diagnosekarte für authentifizierte
+  `list_vehicles`- und `list`-Abfragen ohne Schreiboperationen.
+- Maskiert IDs und gibt ausschließlich Status, Zeiten, Struktur und Zähler aus.
+- Trennt Lade- und Aktionsfehler und entfernt veraltete Ladefehler nach einem
+  erfolgreichen Refresh.
+- Die Ursache der iOS-WebSocket-RSV-Fehler bleibt ausdrücklich offen.
+
 ## 0.1.0-beta.7 – Karteneditor-Lifecycle-Hotfix
 
 - Liefert das korrigierte Frontend-Bundle tatsächlich aus.

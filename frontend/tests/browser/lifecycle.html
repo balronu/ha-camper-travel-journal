@@ -3,13 +3,19 @@
 <title>Camper Travel Journal lifecycle test</title>
 <div id="editor-host"></div>
 <div id="summary-host"></div>
+<div id="diagnostic-host"></div>
 <pre id="result">starting</pre>
 <script type="module">
 const result = document.querySelector("#result");
 let vehicleCalls = 0;
 let dataCalls = 0;
+let authCalls = 0;
 const connection = {
   async sendMessagePromise(message) {
+    if (message.type === "auth/current_user") {
+      authCalls += 1;
+      return { authenticated: true };
+    }
     if (message.type === "camper_travel_journal/list_vehicles") {
       vehicleCalls += 1;
       return { vehicles: [{ vehicle_id: "entry-wohnmobil", name: "Wohnmobil", title: "Camper Travel Journal" }] };
@@ -31,6 +37,17 @@ editor.setConfig({ type: "custom:camper-travel-journal-summary-card" });
 editor.hass = hass;
 for (let i = 0; i < 8; i += 1) editor.hass = { ...hass };
 await new Promise((resolve) => setTimeout(resolve, 50));
+
+const diagnostic = document.createElement("camper-travel-journal-diagnostics-card");
+diagnostic.setConfig({ vehicle_id: "entry-wohnmobil" });
+diagnostic.hass = hass;
+document.querySelector("#diagnostic-host").append(diagnostic);
+await new Promise((resolve) => setTimeout(resolve, 50));
+const diagnosticCallsBefore = vehicleCalls + dataCalls + authCalls;
+const diagnosticButton = diagnostic.shadowRoot.querySelector("button");
+const diagnosticStarted = Boolean(diagnosticButton);
+diagnosticButton?.click();
+await new Promise((resolve) => setTimeout(resolve, 100));
 const select = editor.shadowRoot.querySelector("select");
 
 const summary = document.createElement("camper-travel-journal-summary-card");
@@ -47,5 +64,10 @@ result.textContent = JSON.stringify({
   selectedVehicle: select?.value ?? null,
   optionCount: select?.options.length ?? 0,
   noTripMessage: summary.shadowRoot.textContent.includes("Noch keine Reise angelegt."),
+  diagnosticStarted,
+  diagnosticCallsBefore,
+  diagnosticCallsAfter: vehicleCalls + dataCalls + authCalls,
+  authCalls,
+  diagnosticReport: diagnostic.shadowRoot.textContent.includes("Authentifizierung"),
 }, null, 2);
 </script>

@@ -41,11 +41,15 @@ jobs:
           const match = html.match(/<pre id="result">([\s\S]*?)<\/pre>/);
           if (!match) throw new Error('lifecycle harness returned no result');
           const result = JSON.parse(match[1]);
-          if (result.vehicleCalls !== 1) throw new Error(`expected one vehicle query, got ${result.vehicleCalls}`);
-          if (result.dataCalls !== 1) throw new Error(`expected one preview query, got ${result.dataCalls}`);
+          if (result.vehicleCalls !== 2) throw new Error(`expected editor plus diagnostic vehicle queries, got ${result.vehicleCalls}`);
+          if (result.dataCalls !== 2) throw new Error(`expected preview plus diagnostic data queries, got ${result.dataCalls}`);
           if (result.configEvents !== 1) throw new Error(`expected one config-changed event, got ${result.configEvents}`);
           if (result.selectedVehicle !== 'entry-wohnmobil') throw new Error(`unexpected selected vehicle: ${result.selectedVehicle}`);
           if (result.optionCount !== 2) throw new Error(`unexpected option count: ${result.optionCount}`);
           if (!result.noTripMessage) throw new Error('empty preview did not remain stable');
+          if (!result.diagnosticStarted) throw new Error('diagnostic card did not render a start button');
+          if (result.diagnosticCallsBefore !== 1) throw new Error(`diagnostic ran automatically: ${result.diagnosticCallsBefore}`);
+          if (result.diagnosticCallsAfter !== 5) throw new Error(`expected three diagnostic calls, got ${result.diagnosticCallsAfter}`);
+          if (!result.diagnosticReport) throw new Error('diagnostic report did not render');
           console.log(JSON.stringify(result));
           NODE
