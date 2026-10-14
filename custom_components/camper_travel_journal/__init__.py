@@ -4,6 +4,8 @@ from __future__ import annotations
 
 from pathlib import Path
 
+from homeassistant.helpers import config_validation as cv
+
 from .const import DOMAIN
 from .runtime import Runtime
 from .storage import AsyncSQLiteWorker
@@ -11,6 +13,7 @@ from .storage import AsyncSQLiteWorker
 VERSION = "0.1.0"
 
 PLATFORMS: list[str] = []
+CONFIG_SCHEMA = cv.config_entry_only_config_schema(DOMAIN)
 
 
 async def async_setup(hass, config):
