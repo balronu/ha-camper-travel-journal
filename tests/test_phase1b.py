@@ -50,6 +50,12 @@ class Phase1BTests(unittest.TestCase):
         fields = set(de["config"]["step"]["user"]["data"])
         self.assertEqual(fields, set(de["config"]["step"]["user"]["data"]))
         self.assertEqual(fields, set(en["config"]["step"]["user"]["data"]))
+        self.assertEqual(fields, set(de["config"]["step"]["user"]["data_description"]))
+        self.assertEqual(fields, set(en["config"]["step"]["user"]["data_description"]))
+        self.assertEqual(fields, set(de["options"]["step"]["init"]["data"]))
+        self.assertEqual(fields, set(de["options"]["step"]["init"]["data_description"]))
+        self.assertEqual(fields, set(en["options"]["step"]["init"]["data"]))
+        self.assertEqual(fields, set(en["options"]["step"]["init"]["data_description"]))
 
     def test_sqlite_write_transaction_and_migration(self):
         with tempfile.TemporaryDirectory() as directory:

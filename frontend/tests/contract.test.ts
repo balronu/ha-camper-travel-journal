@@ -1,6 +1,7 @@
 import { existsSync, readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { describe, expect, it } from "vitest";
+import { categoryLabel, messages, statusLabel } from "../src/i18n";
 
 const root = resolve(import.meta.dirname, "..");
 const manifest = JSON.parse(readFileSync(resolve(root, "../custom_components/camper_travel_journal/manifest.json"), "utf8"));
@@ -9,7 +10,7 @@ const bundle = resolve(root, "../custom_components/camper_travel_journal/fronten
 
 describe("frontend release contract", () => {
   it("keeps backend, npm metadata and beta bundle aligned", () => {
-    expect(manifest.version).toBe("0.1.0-beta.3");
+    expect(manifest.version).toBe("0.1.0-beta.4");
     expect(pkg.version).toBe(manifest.version);
     expect(existsSync(bundle)).toBe(true);
   });
@@ -34,13 +35,27 @@ describe("frontend release contract", () => {
   it("exposes CRUD, assignment and error-state UI contracts", () => {
     const api = readFileSync(resolve(root, "src/api.ts"), "utf8");
     const manager = readFileSync(resolve(root, "src/manager-card.ts"), "utf8");
+    const i18n = readFileSync(resolve(root, "src/i18n.ts"), "utf8");
     expect(api).toContain("updateTrip");
     expect(api).toContain("deleteTrip");
     expect(api).toContain("linkDrives");
     expect(api).toContain("updateExpense");
     expect(manager).toContain("window.confirm");
     expect(manager).toContain("role=\"alert\"");
-    expect(manager).toContain("Bearbeiten");
-    expect(manager).toContain("Zuordnen");
+    expect(manager).toContain("statusLabel");
+    expect(manager).toContain("categoryLabel");
+    expect(i18n).toContain("const de");
+    expect(i18n).toContain("const en");
+    expect(i18n).toContain("language");
+  });
+  it("localizes visible status and category labels for German and English", () => {
+    const german = { locale: { language: "de-DE" } } as any;
+    const english = { locale: { language: "en-US" } } as any;
+    expect(messages(german).manager).toBe("Reiseverwaltung");
+    expect(messages(english).manager).toBe("Trip management");
+    expect(statusLabel("paused", german)).toBe("pausiert");
+    expect(statusLabel("paused", english)).toBe("paused");
+    expect(categoryLabel("fuel", german)).toBe("Kraftstoff");
+    expect(categoryLabel("fuel", english)).toBe("Fuel");
   });
 });

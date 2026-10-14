@@ -1,4 +1,4 @@
-export type Hass = { connection: { sendMessagePromise<T>(message: Record<string, unknown>): Promise<T> } };
+export type Hass = { connection: { sendMessagePromise<T>(message: Record<string, unknown>): Promise<T> }; locale?: { language?: string } };
 export type Trip = { id: string; title: string; description: string; destination: string; status: "planned" | "active" | "paused" | "completed"; started_at: string; ended_at?: string };
 export type Drive = { id: string; started_at: string; ended_at: string; distance_m: number; trip_id?: string };
 export type Stop = { id: string; trip_id?: string; name: string; description: string; occurred_at: string; stop_type: string };
