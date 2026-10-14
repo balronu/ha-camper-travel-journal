@@ -69,6 +69,19 @@ class Phase2Tests(unittest.TestCase):
         self.assertIn("expenses", tables)
         self.assertIn("trip_drives", tables)
 
+    def test_reversible_trip_stop_and_expense_operations(self):
+        trip_id = self.store.create_trip("v1", "Alpen", self.now, self.now)
+        self.store.update_trip(trip_id, self.now, title="Alpen neu", description="Test", destination="Tal")
+        self.assertEqual(self.store.list_trips("v1")[0]["title"], "Alpen neu")
+        stop_id = self.store.create_stop(Stop("", "v1", "Parkplatz", self.now, trip_id=trip_id, automatic=False), self.now)
+        self.store.delete_stop(stop_id)
+        expense_id = self.store.create_expense(Expense("", trip_id, self.now, "other", 100, "EUR"), self.now)
+        self.assertEqual(len(self.store.list_expenses(trip_id)), 1)
+        self.store.delete_expense(expense_id)
+        self.assertEqual(self.store.list_expenses(trip_id), [])
+        self.store.delete_trip(trip_id)
+        self.assertEqual(self.store.list_trips("v1"), [])
+
 
 if __name__ == "__main__":
     unittest.main()
