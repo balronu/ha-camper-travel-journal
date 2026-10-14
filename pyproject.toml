@@ -7,7 +7,7 @@ license = {file = "LICENSE"}
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
-pythonpath = ["custom_components"]
+pythonpath = [".", "custom_components"]
 asyncio_mode = "auto"
 addopts = "--cov=custom_components/camper_travel_journal --cov-report=term-missing --cov-report=xml --cov-fail-under=85"
 
