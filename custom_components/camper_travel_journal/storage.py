@@ -76,14 +76,18 @@ class SQLiteStore:
         # AsyncSQLiteWorker serializes all calls with its lock; allowing the
         # executor to use different worker threads is therefore safe here.
         self.connection = sqlite3.connect(self.path, check_same_thread=False)
-        self.connection.row_factory = sqlite3.Row
-        self.connection.execute("PRAGMA foreign_keys = ON")
-        self.connection.executescript(SCHEMA_SQL)
-        current = self.connection.execute("SELECT value FROM schema_meta WHERE key='version'").fetchone()
-        if current is not None and int(current[0]) > SCHEMA_VERSION:
-            raise RuntimeError(f"database schema {current[0]} is newer than supported {SCHEMA_VERSION}")
-        self.connection.execute("INSERT OR REPLACE INTO schema_meta(key, value) VALUES('version', ?)", (str(SCHEMA_VERSION),))
-        self.connection.commit()
+        try:
+            self.connection.row_factory = sqlite3.Row
+            self.connection.execute("PRAGMA foreign_keys = ON")
+            self.connection.executescript(SCHEMA_SQL)
+            current = self.connection.execute("SELECT value FROM schema_meta WHERE key='version'").fetchone()
+            if current is not None and int(current[0]) > SCHEMA_VERSION:
+                raise RuntimeError(f"database schema {current[0]} is newer than supported {SCHEMA_VERSION}")
+            self.connection.execute("INSERT OR REPLACE INTO schema_meta(key, value) VALUES('version', ?)", (str(SCHEMA_VERSION),))
+            self.connection.commit()
+        except Exception:
+            self.close()
+            raise
 
     def close(self) -> None:
         if self.connection is not None:
