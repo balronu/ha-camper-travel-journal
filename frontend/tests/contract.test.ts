@@ -2,7 +2,8 @@ import { existsSync, readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { describe, expect, it } from "vitest";
 import { categoryLabel, messages, statusLabel } from "../src/i18n";
-import { autoSelectVehicle } from "../src/card-editor";
+import { autoSelectVehicle, sameCardConfig } from "../src/card-editor";
+import { listVehicles } from "../src/api";
 
 const root = resolve(import.meta.dirname, "..");
 const manifest = JSON.parse(readFileSync(resolve(root, "../custom_components/camper_travel_journal/manifest.json"), "utf8"));
@@ -45,9 +46,34 @@ describe("frontend release contract", () => {
       { vehicle_id: "entry-2", name: "Zwei", title: "Zwei" },
     ])).toEqual({});
   });
+  it("covers vehicle discovery, empty/error responses and stable editor configs", async () => {
+    const vehicle = { vehicle_id: "entry-1", name: "Wohnmobil", title: "Camper Travel Journal" };
+    expect(autoSelectVehicle({}, [vehicle])).toEqual({ vehicle_id: "entry-1" });
+    expect(autoSelectVehicle({}, [vehicle, { ...vehicle, vehicle_id: "entry-2", name: "Zweitfahrzeug" }])).toEqual({});
+    expect(autoSelectVehicle({}, [])).toEqual({});
+    expect(sameCardConfig({ vehicle_id: "entry-1" }, { vehicle_id: "entry-1" })).toBe(true);
+    expect(sameCardConfig({ vehicle_id: "entry-1" }, { vehicle_id: "entry-2" })).toBe(false);
+    const hass = { connection: { sendMessagePromise: async () => ({ vehicles: [vehicle] }) } } as any;
+    await expect(listVehicles(hass)).resolves.toEqual([vehicle]);
+    const empty = { connection: { sendMessagePromise: async () => ({}) } } as any;
+    await expect(listVehicles(empty)).resolves.toEqual([]);
+    const broken = { connection: { sendMessagePromise: async () => { throw new Error("websocket failed"); } } } as any;
+    await expect(listVehicles(broken)).rejects.toThrow("websocket failed");
+  });
   it("keeps the hub editor texts in German and English", () => {
     expect(messages({ locale: { language: "de-DE" } } as any).editorChooseVehicle).toBe("Wohnmobil auswählen");
     expect(messages({ locale: { language: "en-US" } } as any).editorChooseVehicle).toBe("Select camper");
+  });
+  it("guards reload loops and repeated state updates in card sources", () => {
+    const editor = readFileSync(resolve(root, "src/card-editor.ts"), "utf8");
+    const base = readFileSync(resolve(root, "src/base-card.ts"), "utf8");
+    const summary = readFileSync(resolve(root, "src/summary-card.ts"), "utf8");
+    expect(editor).toContain("this._hass?.connection !== value?.connection");
+    expect(editor).toContain("if (this.loadingPromise) return this.loadingPromise");
+    expect(editor).toContain("sameCardConfig(this._config, config)");
+    expect(base).toContain("this._hass?.connection !== value?.connection");
+    expect(base).toContain("if (this.config.vehicle_id === config.vehicle_id) return");
+    expect(summary).toContain("protected onHassConnectionChanged");
   });
   it("contains no location data and exposes the versioned resource contract", () => {
     const source = readFileSync(bundle, "utf8");

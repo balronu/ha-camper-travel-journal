@@ -2,7 +2,7 @@ import { LitElement, css } from "lit";
 import type { Hass } from "./api";
 
 export abstract class TravelCard extends LitElement {
-  hass?: Hass;
+  private _hass?: Hass;
   config: { vehicle_id?: string } = {};
   static styles = css`
     :host { display:block; color:var(--primary-text-color); } ha-card { padding:16px; background:var(--ha-card-background,var(--card-background-color)); }
@@ -13,7 +13,21 @@ export abstract class TravelCard extends LitElement {
     .value { display:block; font-size:1.25rem; font-weight:600; } input { min-height:38px; box-sizing:border-box; border:1px solid var(--divider-color); border-radius:6px; padding:8px; background:var(--card-background-color); color:var(--primary-text-color); }
     @media (max-width:500px) { ha-card { padding:12px; } }
   `;
-  setConfig(config: { vehicle_id?: string }) { this.config = config; }
+  get hass() { return this._hass; }
+  set hass(value: Hass | undefined) {
+    const connectionChanged = this._hass?.connection !== value?.connection;
+    this._hass = value;
+    if (connectionChanged) this.onHassConnectionChanged();
+    this.requestUpdate();
+  }
+  setConfig(config: { vehicle_id?: string }) {
+    if (this.config.vehicle_id === config.vehicle_id) return;
+    this.config = { ...config };
+    this.onConfigChanged();
+    this.requestUpdate();
+  }
+  protected onHassConnectionChanged() {}
+  protected onConfigChanged() {}
   static getConfigElement() { return document.createElement("camper-travel-journal-card-editor"); }
   static getStubConfig() { return { vehicle_id: "" }; }
   protected get vehicleId() { return this.config.vehicle_id ?? ""; }

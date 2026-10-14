@@ -10,6 +10,10 @@ export function autoSelectVehicle(config: CardConfig, vehicles: Vehicle[]): Card
   return { ...config, vehicle_id: vehicles[0].vehicle_id };
 }
 
+export function sameCardConfig(left: CardConfig, right: CardConfig): boolean {
+  return left.type === right.type && left.vehicle_id === right.vehicle_id;
+}
+
 export class TravelCardEditor extends LitElement {
   static styles = css`
     :host { display: block; color: var(--primary-text-color); }
@@ -25,38 +29,51 @@ export class TravelCardEditor extends LitElement {
   private vehicles: Vehicle[] = [];
   private loading = false;
   private error = "";
+  private loadedConnection?: Hass["connection"];
+  private loadingPromise?: Promise<void>;
 
   set hass(value: Hass | undefined) {
-    const changed = this._hass !== value;
+    const changed = this._hass?.connection !== value?.connection;
     this._hass = value;
     if (changed && value) void this.loadVehicles();
+    this.requestUpdate();
   }
 
   get hass() { return this._hass; }
 
   setConfig(config: CardConfig) {
+    if (sameCardConfig(this._config, config)) return;
     this._config = { ...config };
-    if (this._hass) void this.loadVehicles();
+    if (this._hass && !this.loadedConnection) void this.loadVehicles();
+    this.requestUpdate();
   }
 
   private async loadVehicles() {
     if (!this._hass) return;
+    if (this.loadingPromise) return this.loadingPromise;
+    if (this.loadedConnection === this._hass.connection) return;
     this.loading = true;
     this.error = "";
     this.requestUpdate();
-    try {
-      this.vehicles = await listVehicles(this._hass);
-      const selected = autoSelectVehicle(this._config, this.vehicles);
-      if (selected.vehicle_id !== this._config.vehicle_id) {
-        this._config = selected;
-        this.fireConfigChanged();
+    const hass = this._hass;
+    this.loadingPromise = (async () => {
+      try {
+        this.vehicles = await listVehicles(hass);
+        this.loadedConnection = hass.connection;
+        const selected = autoSelectVehicle(this._config, this.vehicles);
+        if (selected.vehicle_id !== this._config.vehicle_id) {
+          this._config = selected;
+          this.fireConfigChanged();
+        }
+      } catch {
+        this.error = messages(hass).editorLoadError;
+      } finally {
+        this.loading = false;
+        this.loadingPromise = undefined;
+        this.requestUpdate();
       }
-    } catch {
-      this.error = messages(this._hass).editorLoadError;
-    } finally {
-      this.loading = false;
-      this.requestUpdate();
-    }
+    })();
+    return this.loadingPromise;
   }
 
   private fireConfigChanged() {

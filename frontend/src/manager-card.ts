@@ -8,6 +8,8 @@ const categories = ["camping", "fuel", "toll", "parking", "food", "activities", 
 export class ManagerCard extends TravelCard {
   private snapshot?: Snapshot; private error = ""; private tripTitle = ""; private destination = ""; private amount = ""; private category = "other"; private selected = "";
   connectedCallback() { super.connectedCallback(); void this.refresh(); }
+  protected onHassConnectionChanged() { void this.refresh(); }
+  protected onConfigChanged() { void this.refresh(); }
   private async refresh() { if (!this.hass || !this.vehicleId) return; try { this.snapshot = await list(this.hass, this.vehicleId, this.selected || undefined); this.requestUpdate(); } catch { this.error = "Reisedaten konnten nicht geladen werden."; this.requestUpdate(); } }
   private fail(message: string) { this.error = message; this.requestUpdate(); }
   private async addTrip() { if (!this.hass || !this.tripTitle.trim()) return; try { await createTrip(this.hass, this.vehicleId, this.tripTitle, new Date().toISOString(), this.destination); this.tripTitle = ""; this.destination = ""; await this.refresh(); } catch { this.fail(messages(this.hass).tripCreateError); } }
