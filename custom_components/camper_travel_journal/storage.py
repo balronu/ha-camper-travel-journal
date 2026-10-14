@@ -13,7 +13,7 @@ from contextlib import contextmanager
 from datetime import datetime, timezone
 from pathlib import Path
 
-SCHEMA_VERSION = 3
+SCHEMA_VERSION = 4
 SCHEMA_SQL = """
 PRAGMA foreign_keys = ON;
 CREATE TABLE IF NOT EXISTS schema_meta (key TEXT PRIMARY KEY, value TEXT NOT NULL);
@@ -51,14 +51,14 @@ CREATE TABLE IF NOT EXISTS trip_drives (
 CREATE TABLE IF NOT EXISTS expenses (
   id TEXT PRIMARY KEY, trip_id TEXT REFERENCES trips(id) ON DELETE SET NULL, occurred_at TEXT NOT NULL,
   category TEXT NOT NULL, amount_minor INTEGER NOT NULL, currency TEXT NOT NULL,
-  note TEXT, created_at TEXT NOT NULL, odometer_km REAL, stay_id TEXT REFERENCES stops(id) ON DELETE SET NULL
+  note TEXT, created_at TEXT NOT NULL, updated_at TEXT NOT NULL, odometer_km REAL, stay_id TEXT REFERENCES stops(id) ON DELETE SET NULL
 );
 CREATE INDEX IF NOT EXISTS idx_expenses_trip_time ON expenses(trip_id, occurred_at);
 CREATE TABLE IF NOT EXISTS stops (
   id TEXT PRIMARY KEY, vehicle_id TEXT NOT NULL REFERENCES vehicles(id), trip_id TEXT REFERENCES trips(id) ON DELETE SET NULL,
   name TEXT NOT NULL, occurred_at TEXT NOT NULL, arrived_at TEXT, departed_at TEXT,
   latitude REAL, longitude REAL, description TEXT NOT NULL DEFAULT '', stop_type TEXT NOT NULL,
-  automatic INTEGER NOT NULL DEFAULT 1, created_at TEXT NOT NULL
+  automatic INTEGER NOT NULL DEFAULT 1, created_at TEXT NOT NULL, updated_at TEXT NOT NULL
 );
 CREATE INDEX IF NOT EXISTS idx_stops_vehicle_time ON stops(vehicle_id, occurred_at);
 CREATE INDEX IF NOT EXISTS idx_stops_trip_time ON stops(trip_id, occurred_at);
@@ -85,10 +85,13 @@ class SQLiteStore:
     def open(self) -> None:
         # AsyncSQLiteWorker serializes all calls with its lock; allowing the
         # executor to use different worker threads is therefore safe here.
-        self.connection = sqlite3.connect(self.path, check_same_thread=False)
+        self.connection = sqlite3.connect(self.path, check_same_thread=False, timeout=30.0)
         try:
             self.connection.row_factory = sqlite3.Row
             self.connection.execute("PRAGMA foreign_keys = ON")
+            self.connection.execute("PRAGMA journal_mode = WAL")
+            self.connection.execute("PRAGMA synchronous = NORMAL")
+            self.connection.execute("PRAGMA busy_timeout = 30000")
             self.connection.executescript(SCHEMA_SQL)
             current = self.connection.execute("SELECT value FROM schema_meta WHERE key='version'").fetchone()
             if current is not None and int(current[0]) > SCHEMA_VERSION:
@@ -96,6 +99,8 @@ class SQLiteStore:
             previous = int(current[0]) if current is not None else 0
             if previous < 3:
                 self._migrate_v3()
+            if previous < 4:
+                self._migrate_v4()
             self.connection.execute("INSERT OR REPLACE INTO schema_meta(key, value) VALUES('version', ?)", (str(SCHEMA_VERSION),))
             self.connection.commit()
         except Exception:
@@ -127,6 +132,16 @@ class SQLiteStore:
         CREATE INDEX IF NOT EXISTS idx_stops_trip_time ON stops(trip_id, occurred_at);
         """)
 
+    def _migrate_v4(self) -> None:
+        """Add update timestamps needed for safe, observable CRUD edits."""
+        if self.connection is None:
+            raise RuntimeError("store is not open")
+        for table in ("stops", "expenses"):
+            columns = {row[1] for row in self.connection.execute(f"PRAGMA table_info({table})")}
+            if "updated_at" not in columns:
+                self.connection.execute(f"ALTER TABLE {table} ADD COLUMN updated_at TEXT")
+                self.connection.execute(f"UPDATE {table} SET updated_at=created_at WHERE updated_at IS NULL")
+
     def close(self) -> None:
         if self.connection is not None:
             self.connection.close()
@@ -137,6 +152,7 @@ class SQLiteStore:
         if self.connection is None:
             raise RuntimeError("store is not open")
         try:
+            self.connection.execute("BEGIN IMMEDIATE")
             yield self.connection
             self.connection.commit()
         except Exception:
@@ -245,10 +261,15 @@ class SQLiteStore:
         if trip_id: query += " AND td.trip_id=?"; args.append(trip_id)
         return [dict(row) for row in self.connection.execute(query + " ORDER BY d.started_at DESC", args).fetchall()]
 
+    def list_available_drives(self, vehicle_id: str) -> list[dict]:
+        if self.connection is None: raise RuntimeError("store is not open")
+        return [dict(row) for row in self.connection.execute("SELECT d.*, NULL AS trip_id FROM drives d LEFT JOIN trip_drives td ON td.drive_id=d.id WHERE d.vehicle_id=? AND td.drive_id IS NULL ORDER BY d.started_at DESC", (vehicle_id,)).fetchall()]
+
     def create_stop(self, stop, now: datetime) -> str:
         stop_id = stop.id or str(uuid.uuid4())
         with self.transaction() as connection:
-            connection.execute("INSERT INTO stops(id,vehicle_id,trip_id,name,occurred_at,arrived_at,departed_at,latitude,longitude,description,stop_type,automatic,created_at) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?)", (stop_id, stop.vehicle_id, stop.trip_id, stop.name.strip(), utc_iso(stop.occurred_at), utc_iso(stop.arrived_at) if stop.arrived_at else None, utc_iso(stop.departed_at) if stop.departed_at else None, stop.latitude, stop.longitude, stop.description.strip(), stop.stop_type, int(stop.automatic), utc_iso(now)))
+            stamp = utc_iso(now)
+            connection.execute("INSERT INTO stops(id,vehicle_id,trip_id,name,occurred_at,arrived_at,departed_at,latitude,longitude,description,stop_type,automatic,created_at,updated_at) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?)", (stop_id, stop.vehicle_id, stop.trip_id, stop.name.strip(), utc_iso(stop.occurred_at), utc_iso(stop.arrived_at) if stop.arrived_at else None, utc_iso(stop.departed_at) if stop.departed_at else None, stop.latitude, stop.longitude, stop.description.strip(), stop.stop_type, int(stop.automatic), stamp, stamp))
         return stop_id
 
     def list_stops(self, vehicle_id: str, trip_id: str | None = None) -> list[dict]:
@@ -260,11 +281,26 @@ class SQLiteStore:
     def delete_stop(self, stop_id: str) -> None:
         with self.transaction() as connection: connection.execute("DELETE FROM stops WHERE id=?", (stop_id,))
 
+    def update_stop(self, stop_id: str, now: datetime, **fields) -> None:
+        allowed = {"trip_id", "name", "occurred_at", "arrived_at", "departed_at", "latitude", "longitude", "description", "stop_type", "automatic"}
+        changes = {key: value for key, value in fields.items() if key in allowed and value is not None}
+        for key in ("occurred_at", "arrived_at", "departed_at"):
+            if isinstance(changes.get(key), datetime):
+                changes[key] = utc_iso(changes[key])
+        if "name" in changes: changes["name"] = changes["name"].strip()
+        if not changes: return
+        changes["updated_at"] = utc_iso(now)
+        assignments = ",".join(f"{key}=?" for key in changes)
+        with self.transaction() as connection:
+            cursor = connection.execute(f"UPDATE stops SET {assignments} WHERE id=?", (*changes.values(), stop_id))
+            if cursor.rowcount != 1: raise ValueError("stop_not_found")
+
     def create_expense(self, expense, now: datetime) -> str:
         expense_id = expense.id or str(uuid.uuid4())
         if expense.amount_minor < 0: raise ValueError("amount_invalid")
         with self.transaction() as connection:
-            connection.execute("INSERT INTO expenses(id,trip_id,occurred_at,category,amount_minor,currency,note,created_at,odometer_km,stay_id) VALUES(?,?,?,?,?,?,?,?,?,?)", (expense_id, expense.trip_id, utc_iso(expense.occurred_at), expense.category, expense.amount_minor, expense.currency.upper(), expense.note, utc_iso(now), expense.odometer_km, expense.stay_id))
+            stamp = utc_iso(now)
+            connection.execute("INSERT INTO expenses(id,trip_id,occurred_at,category,amount_minor,currency,note,created_at,updated_at,odometer_km,stay_id) VALUES(?,?,?,?,?,?,?,?,?,?,?)", (expense_id, expense.trip_id, utc_iso(expense.occurred_at), expense.category, expense.amount_minor, expense.currency.upper(), expense.note, stamp, stamp, expense.odometer_km, expense.stay_id))
         return expense_id
 
     def list_expenses(self, trip_id: str) -> list[dict]:
@@ -273,6 +309,36 @@ class SQLiteStore:
 
     def delete_expense(self, expense_id: str) -> None:
         with self.transaction() as connection: connection.execute("DELETE FROM expenses WHERE id=?", (expense_id,))
+
+    def update_expense(self, expense_id: str, now: datetime, **fields) -> None:
+        allowed = {"trip_id", "occurred_at", "category", "amount_minor", "currency", "note", "odometer_km", "stay_id"}
+        changes = {key: value for key, value in fields.items() if key in allowed and value is not None}
+        if "amount_minor" in changes and (isinstance(changes["amount_minor"], bool) or changes["amount_minor"] < 0):
+            raise ValueError("amount_invalid")
+        if isinstance(changes.get("occurred_at"), datetime): changes["occurred_at"] = utc_iso(changes["occurred_at"])
+        if "currency" in changes: changes["currency"] = changes["currency"].upper()
+        if not changes: return
+        changes["updated_at"] = utc_iso(now)
+        assignments = ",".join(f"{key}=?" for key in changes)
+        with self.transaction() as connection:
+            cursor = connection.execute(f"UPDATE expenses SET {assignments} WHERE id=?", (*changes.values(), expense_id))
+            if cursor.rowcount != 1: raise ValueError("expense_not_found")
+
+    def auto_assign_drive(self, vehicle_id: str, drive_id: str, now: datetime) -> str | None:
+        """Assign a newly detected drive only when exactly one trip is active."""
+        with self.transaction() as connection:
+            existing = connection.execute("SELECT trip_id FROM trip_drives WHERE drive_id=?", (drive_id,)).fetchone()
+            if existing is not None:
+                return existing[0]
+            trips = connection.execute("SELECT id FROM trips WHERE vehicle_id=? AND status='active' ORDER BY started_at DESC", (vehicle_id,)).fetchall()
+            if len(trips) != 1:
+                return None
+            trip_id = trips[0][0]
+            drive = connection.execute("SELECT vehicle_id FROM drives WHERE id=?", (drive_id,)).fetchone()
+            if drive is None or drive[0] != vehicle_id:
+                return None
+            connection.execute("INSERT INTO trip_drives(trip_id,drive_id,linked_at) VALUES(?,?,?)", (trip_id, drive_id, utc_iso(now)))
+            return trip_id
 
     def expense_summary(self, trip_id: str) -> dict:
         if self.connection is None: raise RuntimeError("store is not open")

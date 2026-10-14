@@ -11,7 +11,7 @@ def test_beta_contains_the_versioned_lovelace_bundle():
     assert "Lovelace-Karte" in text
     assert "async_register_static_paths" in text
     assert "customElements.get" in text
-    assert "0.1.0-beta.2" in text
+    assert "0.1.0-beta.3" in text
 
 
 def test_frontend_contract_is_linked_from_both_primary_readmes():

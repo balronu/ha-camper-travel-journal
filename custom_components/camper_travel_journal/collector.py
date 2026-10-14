@@ -83,7 +83,9 @@ class GPSCollector:
                     self.stats.stops += 1
                     if event.drive:
                         self.stats.distance_m += event.drive.distance_m
-                        if not self.dry_run: await self.storage.async_insert_drive(event.drive)
+                        if not self.dry_run:
+                            await self.storage.async_insert_drive(event.drive)
+                            await self.storage.async_call("auto_assign_drive", vehicle_id, event.drive.id, event.drive.ended_at)
         except (KeyError, TypeError, ValueError, OverflowError, sqlite3.Error, OSError, RuntimeError):
             self.stats.errors += 1
 

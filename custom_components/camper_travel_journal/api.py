@@ -16,7 +16,7 @@ except ImportError:  # pragma: no cover - offline domain tests
     callback = lambda func: func
 
 from .models import Expense, Stop
-from .travel import validate_amount, validate_transition
+from .travel import validate_amount, validate_expense_category, validate_transition
 
 
 def _now() -> datetime:
@@ -67,6 +67,7 @@ if websocket_api is not None:
                 "stops": await _call(hass, msg, "list_stops", msg["vehicle_id"], trip_id=trip_id),
             }
             if trip_id:
+                result["available_drives"] = await _call(hass, msg, "list_available_drives", msg["vehicle_id"])
                 result["expenses"] = await _call(hass, msg, "list_expenses", trip_id)
                 result["expense_summary"] = await _call(hass, msg, "expense_summary", trip_id)
             connection.send_result(msg["id"], result)
@@ -81,6 +82,25 @@ if websocket_api is not None:
             if not msg["title"].strip(): raise ValueError("title_required")
             result = await _call(hass, msg, "create_trip", msg["vehicle_id"], msg["title"], started, _now(), description=msg["description"], destination=msg["destination"])
             connection.send_result(msg["id"], {"trip_id": result})
+        except Exception as err: _send_error(connection, msg, err)
+
+    @websocket_api.websocket_command({**_base, vol.Required("trip_id"): str, vol.Optional("title"): str, vol.Optional("description"): str, vol.Optional("destination"): str, vol.Optional("started_at"): str})
+    @websocket_api.async_response
+    async def ws_update_trip(hass, connection, msg):
+        try:
+            fields = {key: msg[key] for key in ("title", "description", "destination") if key in msg}
+            if "title" in fields and not fields["title"].strip(): raise ValueError("title_required")
+            if "started_at" in msg: fields["started_at"] = _timestamp(msg["started_at"])
+            await _call(hass, msg, "update_trip", msg["trip_id"], _now(), **fields)
+            connection.send_result(msg["id"], {"success": True})
+        except Exception as err: _send_error(connection, msg, err)
+
+    @websocket_api.websocket_command({**_base, vol.Required("trip_id"): str})
+    @websocket_api.async_response
+    async def ws_delete_trip(hass, connection, msg):
+        try:
+            await _call(hass, msg, "delete_trip", msg["trip_id"])
+            connection.send_result(msg["id"], {"success": True})
         except Exception as err: _send_error(connection, msg, err)
 
     @websocket_api.websocket_command({**_base, vol.Required("trip_id"): str, vol.Required("status"): str})
@@ -104,6 +124,14 @@ if websocket_api is not None:
             connection.send_result(msg["id"], {"success": True})
         except Exception as err: _send_error(connection, msg, err)
 
+    @websocket_api.websocket_command({**_base, vol.Required("trip_id"): str, vol.Required("drive_id"): str})
+    @websocket_api.async_response
+    async def ws_unlink_drive(hass, connection, msg):
+        try:
+            await _call(hass, msg, "unlink_drive", msg["trip_id"], msg["drive_id"])
+            connection.send_result(msg["id"], {"success": True})
+        except Exception as err: _send_error(connection, msg, err)
+
     @websocket_api.websocket_command({**_base, vol.Required("trip_id"): str, vol.Required("occurred_at"): str, vol.Optional("name", default=""): str, vol.Optional("category", default="other"): str, vol.Optional("latitude"): vol.Coerce(float), vol.Optional("longitude"): vol.Coerce(float)})
     @websocket_api.async_response
     async def ws_create_stop(hass, connection, msg):
@@ -113,16 +141,55 @@ if websocket_api is not None:
             connection.send_result(msg["id"], {"stop_id": result})
         except Exception as err: _send_error(connection, msg, err)
 
+    @websocket_api.websocket_command({**_base, vol.Required("stop_id"): str, vol.Optional("name"): str, vol.Optional("occurred_at"): str, vol.Optional("category"): str, vol.Optional("description"): str, vol.Optional("latitude"): vol.Coerce(float), vol.Optional("longitude"): vol.Coerce(float)})
+    @websocket_api.async_response
+    async def ws_update_stop(hass, connection, msg):
+        try:
+            fields = {key: msg[key] for key in ("name", "category", "description", "latitude", "longitude") if key in msg}
+            if "occurred_at" in msg: fields["occurred_at"] = _timestamp(msg["occurred_at"])
+            if "category" in fields: fields["stop_type"] = fields.pop("category")
+            await _call(hass, msg, "update_stop", msg["stop_id"], _now(), **fields)
+            connection.send_result(msg["id"], {"success": True})
+        except Exception as err: _send_error(connection, msg, err)
+
+    @websocket_api.websocket_command({**_base, vol.Required("stop_id"): str})
+    @websocket_api.async_response
+    async def ws_delete_stop(hass, connection, msg):
+        try:
+            await _call(hass, msg, "delete_stop", msg["stop_id"])
+            connection.send_result(msg["id"], {"success": True})
+        except Exception as err: _send_error(connection, msg, err)
+
     @websocket_api.websocket_command({**_base, vol.Required("trip_id"): str, vol.Required("occurred_at"): str, vol.Required("category"): str, vol.Required("amount_minor"): vol.Coerce(int), vol.Optional("currency", default="EUR"): str, vol.Optional("note"): str, vol.Optional("odometer_km"): vol.Coerce(float)})
     @websocket_api.async_response
     async def ws_create_expense(hass, connection, msg):
         try:
-            expense = Expense(id="", trip_id=msg["trip_id"], occurred_at=_timestamp(msg["occurred_at"]), category=msg["category"], amount_minor=validate_amount(msg["amount_minor"]), currency=msg["currency"], note=msg.get("note"), odometer_km=msg.get("odometer_km"))
+            expense = Expense(id="", trip_id=msg["trip_id"], occurred_at=_timestamp(msg["occurred_at"]), category=validate_expense_category(msg["category"]), amount_minor=validate_amount(msg["amount_minor"]), currency=msg["currency"], note=msg.get("note"), odometer_km=msg.get("odometer_km"))
             result = await _call(hass, msg, "create_expense", expense, _now())
             connection.send_result(msg["id"], {"expense_id": result})
         except Exception as err: _send_error(connection, msg, err)
 
-    COMMANDS = (ws_list, ws_create_trip, ws_transition_trip, ws_link_drives, ws_create_stop, ws_create_expense)
+    @websocket_api.websocket_command({**_base, vol.Required("expense_id"): str, vol.Optional("occurred_at"): str, vol.Optional("category"): str, vol.Optional("amount_minor"): vol.Coerce(int), vol.Optional("currency"): str, vol.Optional("note"): str, vol.Optional("odometer_km"): vol.Coerce(float)})
+    @websocket_api.async_response
+    async def ws_update_expense(hass, connection, msg):
+        try:
+            fields = {key: msg[key] for key in ("currency", "note", "odometer_km", "amount_minor") if key in msg}
+            if "category" in msg: fields["category"] = validate_expense_category(msg["category"])
+            if "occurred_at" in msg: fields["occurred_at"] = _timestamp(msg["occurred_at"])
+            if "amount_minor" in fields: fields["amount_minor"] = validate_amount(fields["amount_minor"])
+            await _call(hass, msg, "update_expense", msg["expense_id"], _now(), **fields)
+            connection.send_result(msg["id"], {"success": True})
+        except Exception as err: _send_error(connection, msg, err)
+
+    @websocket_api.websocket_command({**_base, vol.Required("expense_id"): str})
+    @websocket_api.async_response
+    async def ws_delete_expense(hass, connection, msg):
+        try:
+            await _call(hass, msg, "delete_expense", msg["expense_id"])
+            connection.send_result(msg["id"], {"success": True})
+        except Exception as err: _send_error(connection, msg, err)
+
+    COMMANDS = (ws_list, ws_create_trip, ws_update_trip, ws_delete_trip, ws_transition_trip, ws_link_drives, ws_unlink_drive, ws_create_stop, ws_update_stop, ws_delete_stop, ws_create_expense, ws_update_expense, ws_delete_expense)
 else:
     COMMANDS = ()
 
