@@ -115,6 +115,15 @@ See [the Phase 1C report](docs/phase-1c-report.md), [architecture](docs/architec
 [database schema](docs/database-schema.md), [test plan](docs/test-plan.md) and
 [branding documentation](docs/BRANDING.md).
 
+## Lovelace frontend and cache
+
+This beta does not contain a Lovelace card or register a frontend resource.
+The future card must use versioned `?v=` URLs, one-time HA registration,
+idempotent custom elements and cleanup. For a stale display, check the resource
+version and reload the card first; clearing the browser cache is a last resort.
+See the [frontend/cache standard](docs/frontend-cache.md) for the contract and
+the browser/HA tests that are not yet executed.
+
 ## Roadmap
 
 - `v0.1.x`: GPS foundation and controlled beta validation

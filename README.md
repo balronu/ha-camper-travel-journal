@@ -105,6 +105,15 @@ Siehe [Architektur](docs/architecture.md), [Datenbankschema](docs/database-schem
 [Testplan](docs/test-plan.md), [Branding-Dokumentation](docs/BRANDING.md) und
 [Phase-1C-Bericht](docs/phase-1c-report.md).
 
+## Lovelace-Frontend und Cache
+
+Die Beta enthält noch keine Lovelace-Karte und registriert keine Frontend-
+Resource. Für die spätere Karte sind versionsgebundene `?v=`-URLs, einmalige
+HA-Registrierung, idempotente Custom Elements und Cleanup verbindlich. Bei
+veralteter Anzeige zuerst die Resource-Version prüfen und die Karte neu laden;
+manuelles Cache-Leeren ist nur die letzte Maßnahme. Details und die noch nicht
+ausgeführten Browser-/HA-Tests stehen in [Frontend-Cache-Standard](docs/frontend-cache.md).
+
 ## Roadmap
 
 - `v0.1.x`: GPS-Grundlage und kontrollierte Beta-Validierung

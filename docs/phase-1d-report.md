@@ -65,6 +65,20 @@ Es wurde keine produktive Home-Assistant-Konfiguration geöffnet.
 - lokales HACS-Icon dokumentiert; keine offizielle HACS-Brand-Registrierung
 - Details: [BRANDING.md](BRANDING.md)
 
+## Frontend-/Cache-Nachtrag auf `main`
+
+Der unveränderliche Tag `v0.1.0-beta.1` enthält weiterhin keine Lovelace-Karte,
+kein JavaScript-Bundle und keine Resource-Registrierung. Nach der
+Veröffentlichung wurde auf `main` daher ausschließlich der zukünftige
+Frontend-/Cache-Vertrag dokumentiert: [frontend-cache.md](frontend-cache.md),
+die Verweise in beiden primären READMEs sowie ein Test, der das Fehlen einer
+nicht vorhandenen Karte und die dokumentierten Lifecycle-Regeln prüft.
+
+Damit sind keine produktiven Dashboards oder HA-Resources verändert worden.
+Reale HA-Resource-Registrierung, Bundle-Lifecycle, Browser-Reloads sowie
+iOS/WebKit- und Windows-Cache-Verhalten bleiben bis zur Implementierung der
+Karte ungetestet. Der Beta-Tag wird dafür nicht nachträglich verändert.
+
 ## Offene Einschränkungen und Risiken
 
 - Kein produktiver HA-Pilot und kein echter Restore-Lauf gegen ein Nutzerbackup
