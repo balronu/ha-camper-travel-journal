@@ -45,8 +45,9 @@ class Phase1BTests(unittest.TestCase):
 
     def test_translations_are_json_and_aligned(self):
         root = Path(__file__).parents[1]
-        de = json.loads((root / "translations/de.json").read_text())
-        en = json.loads((root / "translations/en.json").read_text())
+        translation_dir = root / "custom_components" / "camper_travel_journal" / "translations"
+        de = json.loads((translation_dir / "de.json").read_text())
+        en = json.loads((translation_dir / "en.json").read_text())
         fields = set(de["config"]["step"]["user"]["data"])
         self.assertEqual(fields, set(de["config"]["step"]["user"]["data"]))
         self.assertEqual(fields, set(en["config"]["step"]["user"]["data"]))

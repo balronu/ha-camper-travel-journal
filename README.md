@@ -1,11 +1,11 @@
 # Camper Travel Journal
 
 <p align="center">
-  <img src="assets/branding/readme-banner-de.png" alt="Camper Travel Journal — Dein digitales Wohnmobil-Reisetagebuch für Home Assistant" width="1200">
+  <img src="https://raw.githubusercontent.com/balronu/ha-camper-travel-journal/main/assets/branding/readme-banner-de.png" alt="Camper Travel Journal — Dein digitales Wohnmobil-Reisetagebuch für Home Assistant" width="1200">
 </p>
 
 <p align="center">
-  <img src="assets/branding/logo.png" alt="Camper Travel Journal Logo" width="220">
+  <img src="https://raw.githubusercontent.com/balronu/ha-camper-travel-journal/main/assets/branding/logo.png" alt="Camper Travel Journal Logo" width="220">
 </p>
 
 🇩🇪 Deutsch | 🇬🇧 [English](README.en.md)
@@ -14,7 +14,7 @@ Eine frühe Home-Assistant-Custom-Integration für ein datenschutzbewusstes
 digitales Wohnmobil-Reisetagebuch. Langfristig sind GPS-Aufzeichnung,
 Fahrtenbuch, Reisen, Ausgaben, Karten, Statistiken und Exporte vorgesehen.
 
-> **Status: `v0.1.0-beta.5` Entwickler-Beta.** Nicht produktionsreif. Die
+> **Status: `v0.1.0-beta.6` Entwickler-Beta.** Nicht produktionsreif. Die
 > aktuelle Version wurde noch nicht in einer produktiven Home-Assistant-
 > Instanz validiert.
 
@@ -46,12 +46,22 @@ verbinden.
 
 1. **HACS → Integrationen → Benutzerdefinierte Repositories** öffnen.
 2. `https://github.com/balronu/ha-camper-travel-journal` als **Integration** hinzufügen.
-3. Beta installieren und Home Assistant neu starten.
-4. **Einstellungen → Geräte & Dienste** öffnen und Camper Travel Journal hinzufügen.
+3. In der HACS-Repository-Ansicht die Pre-Release-Version `v0.1.0-beta.6` auswählen und installieren; nicht den Entwicklungsstand `main` wählen.
+4. Home Assistant neu starten.
+5. **Einstellungen → Geräte & Dienste** öffnen und Camper Travel Journal hinzufügen.
+
+HACS verwaltet Pre-Releases pro Repository. Falls Beta 6 nicht angeboten wird,
+im HACS-Menü die Repository-Informationen aktualisieren und beim Repository die
+Pre-Release-Unterstützung aktivieren (in aktuellen HACS-Versionen über den
+Pre-Release-Schalter bzw. die Update-Entität). Diese Einstellung kann nicht
+zuverlässig durch Repository-Dateien erzwungen werden. Ein angezeigter
+`main`-Commit ist kein Beta-Release und darf nicht als Update installiert
+werden.
 
 ### Manuell
 
-`custom_components/camper_travel_journal` und `translations` in das
+`custom_components/camper_travel_journal`-Verzeichnis einschließlich seines
+Unterverzeichnisses `translations` in das
 Home-Assistant-Konfigurationsverzeichnis kopieren, Home Assistant neu starten
 und die Integration über die Oberfläche hinzufügen.
 
@@ -113,7 +123,7 @@ Siehe [Architektur](docs/architecture.md), [Datenbankschema](docs/database-schem
 
 Die Beta enthält eine kompakte Summary Card und eine breite Manager Card. Das
 Bundle wird automatisch über die Integration mit der versionsgebundenen URL
-`/camper_travel_journal/camper-travel-journal.js?v=0.1.0-beta.5` registriert.
+`/camper_travel_journal/camper-travel-journal.js?v=0.1.0-beta.6` registriert.
 Eine zweite manuelle Resource darf nicht angelegt werden. Bei veralteter
 Anzeige zuerst Resource-Version prüfen und Dashboard neu laden; manuelles
 Cache-Leeren ist letzte Maßnahme. Eine installierbare, aber nicht produktiv
@@ -123,7 +133,7 @@ Details: [Frontend-Cache-Standard](docs/frontend-cache.md).
 
 ### Kontrollierte Erstinstallation
 
-Nach Auswahl von `v0.1.0-beta.5` als Pre-Release in HACS, Neustart und
+Nach Auswahl von `v0.1.0-beta.6` als Pre-Release in HACS, Neustart und
 Einrichtung des Config-Flows kann im Wohnmobil-Dashboard zunächst eine
 Testansicht mit beiden Karten angelegt werden:
 

@@ -1,11 +1,11 @@
 # Camper Travel Journal
 
 <p align="center">
-  <img src="assets/branding/readme-banner.png" alt="Camper Travel Journal — Your digital camper travel journal for Home Assistant" width="1200">
+  <img src="https://raw.githubusercontent.com/balronu/ha-camper-travel-journal/main/assets/branding/readme-banner.png" alt="Camper Travel Journal — Your digital camper travel journal for Home Assistant" width="1200">
 </p>
 
 <p align="center">
-  <img src="assets/branding/logo.png" alt="Camper Travel Journal logo" width="220">
+  <img src="https://raw.githubusercontent.com/balronu/ha-camper-travel-journal/main/assets/branding/logo.png" alt="Camper Travel Journal logo" width="220">
 </p>
 
 [![Tests](https://github.com/balronu/ha-camper-travel-journal/actions/workflows/tests.yml/badge.svg)](https://github.com/balronu/ha-camper-travel-journal/actions/workflows/tests.yml)
@@ -18,7 +18,7 @@ An early Home Assistant custom integration for a privacy-conscious digital
 camper travel journal: GPS recording, drive detection, trips, expenses, maps,
 statistics and exports are the long-term goal.
 
-> **Status: `v0.1.0-beta.5` development beta.** Not production-ready. The
+> **Status: `v0.1.0-beta.6` development beta.** Not production-ready. The
 > current release has not yet been validated in a live Home Assistant instance.
 
 ## Current feature matrix
@@ -49,12 +49,21 @@ exists.
 
 1. Open **HACS → Integrations → Custom repositories**.
 2. Add `https://github.com/balronu/ha-camper-travel-journal` as an **Integration**.
-3. Install the beta and restart Home Assistant.
-4. Add **Camper Travel Journal** under **Settings → Devices & services**.
+3. In the HACS repository view, select and install the `v0.1.0-beta.6` pre-release; do not select the development `main` ref.
+4. Restart Home Assistant.
+5. Add **Camper Travel Journal** under **Settings → Devices & services**.
+
+HACS manages pre-releases per repository. If Beta 6 is not offered, refresh the
+repository information in the HACS menu and enable pre-release tracking for
+this repository (in current HACS versions this is exposed as a pre-release
+switch or update entity). This user setting cannot reliably be forced by
+repository files. A displayed `main` commit is not a beta release and must not
+be installed as the update.
 
 ### Manual
 
-Copy `custom_components/camper_travel_journal` and `translations` into the
+Copy `custom_components/camper_travel_journal`, including its `translations`
+subdirectory, into the
 Home Assistant configuration directory, restart Home Assistant, and add the
 integration through the UI.
 
@@ -123,7 +132,7 @@ See [the Phase 1C report](docs/phase-1c-report.md), [architecture](docs/architec
 
 This beta includes a compact summary card and a full-width manager card. The
 integration registers the versioned bundle URL
-`/camper_travel_journal/camper-travel-journal.js?v=0.1.0-beta.5` automatically.
+`/camper_travel_journal/camper-travel-journal.js?v=0.1.0-beta.6` automatically.
 Do not add a second manual resource. For a stale display, check the resource
 version and reload the dashboard first; clearing the browser cache is a last
 resort. An installable but intentionally unapplied subview example is in
@@ -132,7 +141,7 @@ See the [frontend/cache standard](docs/frontend-cache.md).
 
 ### Controlled first installation
 
-After selecting the `v0.1.0-beta.5` pre-release in HACS, restarting Home
+After selecting the `v0.1.0-beta.6` pre-release in HACS, restarting Home
 Assistant and completing the config flow, add a test view to the camper
 dashboard with both cards:
 
