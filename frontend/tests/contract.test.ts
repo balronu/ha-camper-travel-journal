@@ -9,7 +9,7 @@ const bundle = resolve(root, "../custom_components/camper_travel_journal/fronten
 
 describe("frontend release contract", () => {
   it("keeps backend, npm metadata and beta bundle aligned", () => {
-    expect(manifest.version).toBe("0.1.0-beta.2");
+    expect(manifest.version).toBe("0.1.0-beta.3");
     expect(pkg.version).toBe(manifest.version);
     expect(existsSync(bundle)).toBe(true);
   });
@@ -30,5 +30,17 @@ describe("frontend release contract", () => {
     const constants = readFileSync(resolve(root, "../custom_components/camper_travel_journal/const.py"), "utf8");
     expect(constants).toContain("FRONTEND_URL");
     expect(constants).toContain("?v={FRONTEND_VERSION}");
+  });
+  it("exposes CRUD, assignment and error-state UI contracts", () => {
+    const api = readFileSync(resolve(root, "src/api.ts"), "utf8");
+    const manager = readFileSync(resolve(root, "src/manager-card.ts"), "utf8");
+    expect(api).toContain("updateTrip");
+    expect(api).toContain("deleteTrip");
+    expect(api).toContain("linkDrives");
+    expect(api).toContain("updateExpense");
+    expect(manager).toContain("window.confirm");
+    expect(manager).toContain("role=\"alert\"");
+    expect(manager).toContain("Bearbeiten");
+    expect(manager).toContain("Zuordnen");
   });
 });

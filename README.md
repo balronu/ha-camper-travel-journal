@@ -14,7 +14,7 @@ Eine frühe Home-Assistant-Custom-Integration für ein datenschutzbewusstes
 digitales Wohnmobil-Reisetagebuch. Langfristig sind GPS-Aufzeichnung,
 Fahrtenbuch, Reisen, Ausgaben, Karten, Statistiken und Exporte vorgesehen.
 
-> **Status: `v0.1.0-beta.2` Entwickler-Beta.** Nicht produktionsreif. Die
+> **Status: `v0.1.0-beta.3` Entwickler-Beta.** Nicht produktionsreif. Die
 > aktuelle Version wurde noch nicht in einer produktiven Home-Assistant-
 > Instanz validiert.
 
@@ -32,7 +32,8 @@ Fahrtenbuch, Reisen, Ausgaben, Karten, Statistiken und Exporte vorgesehen.
 | Neustart-Wiederherstellung | Implementiert mit begrenztem Replay; HA-Neustart wird in CI geprüft |
 | Aufbewahrung | Nur Dry-Run; keine destruktive Löschung in der Beta |
 | Reise-/Ausgabenoberfläche | Summary-/Manager-Card implementiert; CI getestet, produktiver Pilot offen |
-| Reisezuordnung, Zwischenstopps, Reisekosten | Backend/API implementiert; UI-Grundfunktionen vorhanden |
+| Reiseverwaltung | Reise-CRUD, Statuswechsel, manuelle Fahrtzuordnung und Aufhebung |
+| Zwischenstopps, Reisekosten | API-CRUD; Manager-Grundfunktionen, Kategorien und Summen je Kategorie |
 | Karten, Statistiken, Exporte | Kartenansicht und Exporte geplant; Kostenübersicht teilweise vorhanden |
 
 ## Installation
@@ -75,8 +76,10 @@ Zugriffe laufen über einen serialisierten Executor-Worker.
 
 Unzugeordnete GPS-Punkte werden im Retention-Dry-Run berücksichtigt; zugeordnete
 Routen bleiben geschützt. Destruktive Löschung ist in dieser Beta nicht
-implementiert. Reisen und Ausgaben werden aufbewahrt, ihre Oberfläche ist noch
-nicht verfügbar. Die zusätzliche Datenbankdatei muss in Backups enthalten sein.
+implementiert. Reisen, Zwischenstopps und Ausgaben werden in der eigenen
+Datenbank aufbewahrt; die zusätzliche Datenbankdatei muss in Backups enthalten
+sein. Automatische Fahrtzuordnung erfolgt nur bei genau einer aktiven Reise
+und überschreibt keine bestehende manuelle Zuordnung.
 
 GPS-Daten sind sensibel. In Issues und Pull Requests nur synthetische
 Koordinaten verwenden; niemals exakte Orte, Adressen, Tokens oder unredigierte
@@ -110,13 +113,32 @@ Siehe [Architektur](docs/architecture.md), [Datenbankschema](docs/database-schem
 
 Die Beta enthält eine kompakte Summary Card und eine breite Manager Card. Das
 Bundle wird automatisch über die Integration mit der versionsgebundenen URL
-`/camper_travel_journal/camper-travel-journal.js?v=0.1.0-beta.2` registriert.
+`/camper_travel_journal/camper-travel-journal.js?v=0.1.0-beta.3` registriert.
 Eine zweite manuelle Resource darf nicht angelegt werden. Bei veralteter
 Anzeige zuerst Resource-Version prüfen und Dashboard neu laden; manuelles
 Cache-Leeren ist letzte Maßnahme. Eine installierbare, aber nicht produktiv
 angewendete Unterseitenvorlage steht in
 [dashboard-wohnmobil-reisetagebuch.yaml](docs/examples/dashboard-wohnmobil-reisetagebuch.yaml).
 Details: [Frontend-Cache-Standard](docs/frontend-cache.md).
+
+### Kontrollierte Erstinstallation
+
+Nach Auswahl von `v0.1.0-beta.3` als Pre-Release in HACS, Neustart und
+Einrichtung des Config-Flows kann im Wohnmobil-Dashboard zunächst eine
+Testansicht mit beiden Karten angelegt werden:
+
+```yaml
+type: custom:camper-travel-journal-summary-card
+vehicle_id: <config-entry-id>
+```
+
+```yaml
+type: custom:camper-travel-journal-manager-card
+vehicle_id: <config-entry-id>
+```
+
+Die Beispiel-Unterseite in `docs/examples/dashboard-wohnmobil-reisetagebuch.yaml`
+ist nur eine Vorlage und wird nicht automatisch installiert.
 
 ## Roadmap
 

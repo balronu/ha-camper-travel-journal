@@ -18,7 +18,7 @@ An early Home Assistant custom integration for a privacy-conscious digital
 camper travel journal: GPS recording, drive detection, trips, expenses, maps,
 statistics and exports are the long-term goal.
 
-> **Status: `v0.1.0-beta.2` development beta.** Not production-ready. The
+> **Status: `v0.1.0-beta.3` development beta.** Not production-ready. The
 > current release has not yet been validated in a live Home Assistant instance.
 
 ## Current feature matrix
@@ -35,7 +35,8 @@ statistics and exports are the long-term goal.
 | Restart recovery | Implemented with bounded replay; HA restart requires CI verification |
 | Retention | Dry-run only; no destructive deletion in beta |
 | Trip/expense UI | Summary and manager cards implemented; production pilot remains open |
-| Trip assignment, stops, expenses | Backend/API implemented; basic UI available |
+| Trip management | Trip CRUD, lifecycle controls, manual drive assignment/unassignment |
+| Stops and travel costs | API CRUD, expense categories and per-category totals; basic manager UI |
 | Maps, statistics, exports | Map/export work planned; expense summary is partial |
 
 ## Installation
@@ -82,8 +83,10 @@ executor-backed serialized worker.
 
 Unassigned GPS points are eligible for a configurable retention dry-run;
 assigned route data is protected. Destructive deletion is not implemented in
-this beta. Trips and expenses are retained, but their UI is not available yet.
-Include this additional database file in backup/restore checks.
+this beta. Trips, stops and expenses are retained in the integration-owned
+database. Include this additional database file in backup/restore checks.
+Automatic drive assignment runs only when exactly one trip is active and never
+overwrites an existing manual assignment.
 
 GPS data is sensitive. Use synthetic coordinates in issues, tests and pull
 requests. Never publish exact locations, private addresses, tokens, credentials
@@ -120,12 +123,31 @@ See [the Phase 1C report](docs/phase-1c-report.md), [architecture](docs/architec
 
 This beta includes a compact summary card and a full-width manager card. The
 integration registers the versioned bundle URL
-`/camper_travel_journal/camper-travel-journal.js?v=0.1.0-beta.2` automatically.
+`/camper_travel_journal/camper-travel-journal.js?v=0.1.0-beta.3` automatically.
 Do not add a second manual resource. For a stale display, check the resource
 version and reload the dashboard first; clearing the browser cache is a last
 resort. An installable but intentionally unapplied subview example is in
 [dashboard-wohnmobil-reisetagebuch.yaml](docs/examples/dashboard-wohnmobil-reisetagebuch.yaml).
 See the [frontend/cache standard](docs/frontend-cache.md).
+
+### Controlled first installation
+
+After selecting the `v0.1.0-beta.3` pre-release in HACS, restarting Home
+Assistant and completing the config flow, add a test view to the camper
+dashboard with both cards:
+
+```yaml
+type: custom:camper-travel-journal-summary-card
+vehicle_id: <config-entry-id>
+```
+
+```yaml
+type: custom:camper-travel-journal-manager-card
+vehicle_id: <config-entry-id>
+```
+
+The example subview in `docs/examples/dashboard-wohnmobil-reisetagebuch.yaml`
+is a template only and is not installed automatically.
 
 ## Roadmap
 

@@ -12,6 +12,9 @@ class TripStatus(StrEnum):
     COMPLETED = "completed"
 
 
+EXPENSE_CATEGORIES = frozenset({"camping", "fuel", "toll", "parking", "food", "activities", "other"})
+
+
 VALID_TRANSITIONS: dict[TripStatus, frozenset[TripStatus]] = {
     TripStatus.PLANNED: frozenset({TripStatus.ACTIVE}),
     TripStatus.ACTIVE: frozenset({TripStatus.PAUSED, TripStatus.COMPLETED}),
@@ -35,3 +38,9 @@ def validate_amount(amount_minor: object) -> int:
     if isinstance(amount_minor, bool) or not isinstance(amount_minor, int) or amount_minor < 0:
         raise ValueError("amount_invalid")
     return amount_minor
+
+
+def validate_expense_category(category: object) -> str:
+    if not isinstance(category, str) or category not in EXPENSE_CATEGORIES:
+        raise ValueError("expense_category_invalid")
+    return category

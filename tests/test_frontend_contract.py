@@ -11,10 +11,16 @@ def test_beta_contains_the_versioned_lovelace_bundle():
     assert "Lovelace-Karte" in text
     assert "async_register_static_paths" in text
     assert "customElements.get" in text
-    assert "0.1.0-beta.2" in text
+    assert "0.1.0-beta.3" in text
 
 
 def test_frontend_contract_is_linked_from_both_primary_readmes():
     for name in ("README.md", "README.en.md"):
         text = (ROOT / name).read_text(encoding="utf-8")
         assert "docs/frontend-cache.md" in text
+
+
+def test_release_version_is_aligned_across_project_and_readmes():
+    assert 'version = "0.1.0-beta.3"' in (ROOT / "pyproject.toml").read_text(encoding="utf-8")
+    for name in ("README.md", "README.de.md", "README.en.md"):
+        assert "0.1.0-beta.3" in (ROOT / name).read_text(encoding="utf-8")

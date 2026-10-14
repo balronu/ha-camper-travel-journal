@@ -29,6 +29,14 @@ references to stops. Existing GPS rows are preserved. `trip_drives` remains
 transactional and its unique `drive_id` constraint prevents silent
 multi-assignment. Mixed expense currencies are reported rather than summed.
 
+## Phase 3 schema additions (version 4)
+
+Migration 4 adds `updated_at` to `stops` and `expenses`, backfilled from
+`created_at` for existing rows. All edits use allow-listed columns and a
+transaction. The worker opens SQLite with WAL mode, a 30-second busy timeout,
+foreign keys, and `BEGIN IMMEDIATE` for writes; this protects the file when
+more than one executor or backup reader is present.
+
 All changes run through the serialized executor worker. A database newer than
 the supported version fails closed. No Recorder tables or migrations are
 touched, and retention remains non-destructive in this beta.
@@ -47,5 +55,10 @@ GPS-gap state and never contributes an air-line segment to distance.
 
 The file resides in the HA configuration directory and is therefore included
 in a normal HA configuration backup; restore must restore this file together
-with the integration configuration. Phase 1B does not run a live backup,
-restore, migration against production, or destructive retention job.
+with the integration configuration. For a manual backup, stop/unload the
+integration or use SQLite's online backup API, copy `camper_travel_journal.db`
+together with `-wal`/`-shm` if present, and verify it with `PRAGMA
+integrity_check` on a separate copy. Restore is the inverse: stop the
+integration, preserve the old file, restore the database, run the integrity
+check, and start the integration. No live backup, restore, migration against
+production, or destructive retention job is performed by this project.

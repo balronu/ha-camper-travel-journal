@@ -3,7 +3,7 @@
 from datetime import timedelta
 
 DOMAIN = "camper_travel_journal"
-FRONTEND_VERSION = "0.1.0-beta.2"
+FRONTEND_VERSION = "0.1.0-beta.3"
 FRONTEND_URL = f"/{DOMAIN}/camper-travel-journal.js?v={FRONTEND_VERSION}"
 DEFAULT_MIN_INTERVAL = timedelta(seconds=30)
 DEFAULT_MIN_MOVEMENT_M = 25.0
