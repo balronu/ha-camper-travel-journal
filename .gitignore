@@ -5,6 +5,7 @@ __pycache__/
 coverage.xml
 htmlcov/
 .venv/
+node_modules/
 dist/
 build/
 *.db
@@ -12,4 +13,3 @@ build/
 *.sqlite3
 .mypy_cache/
 .ruff_cache/
-
