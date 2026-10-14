@@ -5,7 +5,7 @@
 ## Ergebnis
 
 Camper Travel Journal ist als öffentliche Entwickler-Beta unter
-`https://github.com/balronu/ha-camper-travel-journal` vorbereitet. Die
+`https://github.com/balronu/ha-camper-travel-journal` veröffentlicht. Die
 Veröffentlichung bleibt ausdrücklich eine frühe Beta und ist nicht als stabile
 oder produktiv validierte Integration gekennzeichnet.
 
@@ -16,6 +16,9 @@ oder produktiv validierte Integration gekennzeichnet.
   Assistant, Recorder-Datenbank, Dashboards oder PAJ GPS
 - Keine produktiven GPS-Daten, Datenbanklöschungen oder Dienstneustarts
 - GitHub Actions: `tests.yml`, `validate.yml`, `release.yml`
+- Release-Commit: `56706477244912d2f8bef909caa33bb1d0f9c711`
+- Git-Tag: `v0.1.0-beta.1`
+- Pre-Release: https://github.com/balronu/ha-camper-travel-journal/releases/tag/v0.1.0-beta.1
 - Deutsche Primärdokumentation: `README.md`; englische Fassung: `README.en.md`
 - `README.de.md` bleibt als kurze Weiterleitung erhalten
 
@@ -73,9 +76,9 @@ Es wurde keine produktive Home-Assistant-Konfiguration geöffnet.
 
 ## Releaseentscheidung
 
-Nach dem letzten grünen CI-Lauf kann `v0.1.0-beta.1` als frühe Entwickler-
-Pre-Release-Beta getaggt und veröffentlicht werden. Eine Stable-Kennzeichnung
-oder produktive Einsatzfreigabe ist nicht zulässig.
+`v0.1.0-beta.1` wurde nach grünem CI-Lauf als frühe Entwickler-Pre-Release-
+Beta getaggt und veröffentlicht. Eine Stable-Kennzeichnung oder produktive
+Einsatzfreigabe ist nicht zulässig.
 
 ## Empfehlung für Phase 1E
 

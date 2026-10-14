@@ -1,6 +1,6 @@
 # Camper Travel Journal v0.1.0-beta.1 – Versionshinweise
 
-🇩🇪 Deutsch | 🇬🇧 [English](../../README.en.md)
+🇩🇪 Deutsch | 🇬🇧 [English](https://github.com/balronu/ha-camper-travel-journal/blob/main/README.en.md)
 
 Frühe Entwickler-Beta für ein datenschutzbewusstes digitales
 Wohnmobil-Reisetagebuch für Home Assistant.
