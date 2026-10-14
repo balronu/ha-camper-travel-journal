@@ -111,6 +111,11 @@ if config_entries is not None:
                     return self.async_create_entry(title=user_input[CONF_VEHICLE_NAME], data=user_input)
             return self.async_show_form(step_id="user", data_schema=vol.Schema(_schema()), errors=errors)
 
+        @staticmethod
+        @callback
+        def async_get_options_flow(config_entry):
+            return CamperTravelJournalOptionsFlow(config_entry)
+
     class CamperTravelJournalOptionsFlow(config_entries.OptionsFlow):
         """Edit all runtime settings without reinstalling the entry."""
 
@@ -125,9 +130,6 @@ if config_entries is not None:
                     return self.async_create_entry(title="", data=defaults(user_input))
             return self.async_show_form(step_id="init", data_schema=vol.Schema(_schema({**self.config_entry.data, **self.config_entry.options})), errors=errors)
 
-    @callback
-    def async_get_options_flow(config_entry):
-        return CamperTravelJournalOptionsFlow(config_entry)
 else:
     CamperTravelJournalConfigFlow = None
     CamperTravelJournalOptionsFlow = None

@@ -50,13 +50,14 @@ else:
         assert await hass.config_entries.async_unload(entry.entry_id)
 
     async def test_setup_unload_listener_lifecycle(hass: HomeAssistant, enable_custom_integrations):
-        hass.states.async_set("device_tracker.synthetic", "home", {"latitude": 49.0, "longitude": 7.0, "gps_accuracy": 5})
-        entry = MockConfigEntry(domain=DOMAIN, data={**_data(), CONF_RECORDING_ENABLED: True})
+        tracker = "device_tracker.lifecycle"
+        hass.states.async_set(tracker, "home", {"latitude": 49.0, "longitude": 7.0, "gps_accuracy": 5})
+        entry = MockConfigEntry(domain=DOMAIN, data={**_data(tracker), CONF_RECORDING_ENABLED: True})
         entry.add_to_hass(hass)
         assert await hass.config_entries.async_setup(entry.entry_id)
         await hass.async_block_till_done()
         assert entry.entry_id in hass.data[DOMAIN]
-        hass.states.async_set("device_tracker.synthetic", "home", {"latitude": 49.001, "longitude": 7.0, "gps_accuracy": 5})
+        hass.states.async_set(tracker, "home", {"latitude": 49.001, "longitude": 7.0, "gps_accuracy": 5})
         await hass.async_block_till_done()
         assert await hass.config_entries.async_unload(entry.entry_id)
         assert entry.entry_id not in hass.data[DOMAIN]
