@@ -1,9 +1,9 @@
 {
   "domain": "camper_travel_journal",
   "name": "Camper Travel Journal",
+  "after_dependencies": ["frontend", "http"],
   "codeowners": ["@balronu"],
   "config_flow": true,
-  "after_dependencies": ["frontend", "http"],
   "documentation": "https://github.com/balronu/ha-camper-travel-journal",
   "integration_type": "hub",
   "iot_class": "local_push",
