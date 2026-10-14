@@ -3,7 +3,7 @@
   "name": "Camper Travel Journal",
   "codeowners": ["@balronu"],
   "config_flow": true,
-  "dependencies": ["frontend", "http"],
+  "after_dependencies": ["frontend", "http"],
   "documentation": "https://github.com/balronu/ha-camper-travel-journal",
   "integration_type": "hub",
   "iot_class": "local_push",
