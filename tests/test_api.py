@@ -51,7 +51,12 @@ class FakeHass:
     def __init__(self):
         worker = FakeWorker()
         self.worker = worker
-        self.data = {"camper_travel_journal": {"v1": type("Runtime", (), {"worker": worker})()}}
+        runtime = type("Runtime", (), {
+            "worker": worker,
+            "values": {"vehicle_name": "Wohnmobil"},
+            "entry": type("Entry", (), {"title": "Camper Travel Journal"})(),
+        })()
+        self.data = {"camper_travel_journal": {"v1": runtime}}
 
     def async_create_background_task(self, coroutine, *_args, **_kwargs):
         self.task = asyncio.create_task(coroutine)
@@ -90,6 +95,14 @@ async def test_list_command_returns_separate_domains():
     await api.ws_list.__wrapped__(hass, connection, {"id": 2, "vehicle_id": "v1", "trip_id": "t1"})
     assert connection.results[0][1]["trips"][0]["id"] == "t1"
     assert "expenses" in connection.results[0][1]
+
+
+@pytest.mark.asyncio
+async def test_list_vehicles_exposes_only_editor_safe_hub_metadata():
+    hass = FakeHass()
+    connection = FakeConnection()
+    await api.ws_list_vehicles.__wrapped__(hass, connection, {"id": 20, "type": "camper_travel_journal/list_vehicles"})
+    assert connection.results == [(20, {"vehicles": [{"vehicle_id": "v1", "name": "Wohnmobil", "title": "Camper Travel Journal"}]})]
 
 
 @pytest.mark.asyncio

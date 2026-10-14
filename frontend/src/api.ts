@@ -1,4 +1,5 @@
 export type Hass = { connection: { sendMessagePromise<T>(message: Record<string, unknown>): Promise<T> }; locale?: { language?: string } };
+export type Vehicle = { vehicle_id: string; name: string; title: string };
 export type Trip = { id: string; title: string; description: string; destination: string; status: "planned" | "active" | "paused" | "completed"; started_at: string; ended_at?: string };
 export type Drive = { id: string; started_at: string; ended_at: string; distance_m: number; trip_id?: string };
 export type Stop = { id: string; trip_id?: string; name: string; description: string; occurred_at: string; stop_type: string };
@@ -15,3 +16,7 @@ export const linkDrives = (hass: Hass, vehicleId: string, tripId: string, driveI
 export const createExpense = (hass: Hass, vehicleId: string, tripId: string, data: { occurred_at: string; category: string; amount_minor: number; currency: string; note?: string }) => command(hass, "camper_travel_journal/create_expense", vehicleId, { trip_id: tripId, ...data });
 export const updateExpense = (hass: Hass, vehicleId: string, expenseId: string, data: Record<string, unknown>) => command(hass, "camper_travel_journal/update_expense", vehicleId, { expense_id: expenseId, ...data });
 export const deleteExpense = (hass: Hass, vehicleId: string, expenseId: string) => command(hass, "camper_travel_journal/delete_expense", vehicleId, { expense_id: expenseId });
+export const listVehicles = async (hass: Hass): Promise<Vehicle[]> => {
+  const result = await hass.connection.sendMessagePromise<{ vehicles?: Vehicle[] }>({ type: "camper_travel_journal/list_vehicles" });
+  return result.vehicles ?? [];
+};

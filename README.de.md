@@ -1,6 +1,6 @@
 # Camper Travel Journal
 
-`v0.1.0-beta.4` ist eine kontrollierte Entwickler-Beta für Home Assistant.
+`v0.1.0-beta.5` ist eine kontrollierte Entwickler-Beta für Home Assistant.
 Sie enthält eine eigene SQLite-Datenbank, GPS-Fahrterkennung, Reiseverwaltung,
 automatische und manuelle Fahrtzuordnung, Zwischenstopps, Reisekosten sowie
 eine Summary- und Manager-Card. Die Karten werden über die automatische,

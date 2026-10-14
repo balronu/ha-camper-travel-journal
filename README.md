@@ -14,7 +14,7 @@ Eine frühe Home-Assistant-Custom-Integration für ein datenschutzbewusstes
 digitales Wohnmobil-Reisetagebuch. Langfristig sind GPS-Aufzeichnung,
 Fahrtenbuch, Reisen, Ausgaben, Karten, Statistiken und Exporte vorgesehen.
 
-> **Status: `v0.1.0-beta.4` Entwickler-Beta.** Nicht produktionsreif. Die
+> **Status: `v0.1.0-beta.5` Entwickler-Beta.** Nicht produktionsreif. Die
 > aktuelle Version wurde noch nicht in einer produktiven Home-Assistant-
 > Instanz validiert.
 
@@ -113,7 +113,7 @@ Siehe [Architektur](docs/architecture.md), [Datenbankschema](docs/database-schem
 
 Die Beta enthält eine kompakte Summary Card und eine breite Manager Card. Das
 Bundle wird automatisch über die Integration mit der versionsgebundenen URL
-`/camper_travel_journal/camper-travel-journal.js?v=0.1.0-beta.4` registriert.
+`/camper_travel_journal/camper-travel-journal.js?v=0.1.0-beta.5` registriert.
 Eine zweite manuelle Resource darf nicht angelegt werden. Bei veralteter
 Anzeige zuerst Resource-Version prüfen und Dashboard neu laden; manuelles
 Cache-Leeren ist letzte Maßnahme. Eine installierbare, aber nicht produktiv
@@ -123,7 +123,7 @@ Details: [Frontend-Cache-Standard](docs/frontend-cache.md).
 
 ### Kontrollierte Erstinstallation
 
-Nach Auswahl von `v0.1.0-beta.4` als Pre-Release in HACS, Neustart und
+Nach Auswahl von `v0.1.0-beta.5` als Pre-Release in HACS, Neustart und
 Einrichtung des Config-Flows kann im Wohnmobil-Dashboard zunächst eine
 Testansicht mit beiden Karten angelegt werden:
 
@@ -139,6 +139,10 @@ vehicle_id: <config-entry-id>
 
 Die Beispiel-Unterseite in `docs/examples/dashboard-wohnmobil-reisetagebuch.yaml`
 ist nur eine Vorlage und wird nicht automatisch installiert.
+
+Beide Karten sind zusätzlich im visuellen Kartenkatalog verfügbar. Nach Auswahl
+einer Karte wird das eingerichtete Wohnmobil im grafischen Editor ausgewählt;
+bei genau einem Hub erfolgt die Vorauswahl automatisch.
 
 ## Roadmap
 

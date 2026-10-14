@@ -34,3 +34,9 @@ def test_readmes_reference_relative_branding_assets():
         assert "assets/branding/readme-banner" in text
         assert "assets/branding/logo.png" in text
         assert "Deutsch" in text or "German" in text
+
+
+def test_local_integration_brand_icon_has_home_assistant_dimensions():
+    icon = ROOT / "custom_components" / "camper_travel_journal" / "brand" / "icon.png"
+    assert icon.is_file()
+    assert png_size(icon) == (256, 256)

@@ -2,6 +2,7 @@ import { existsSync, readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { describe, expect, it } from "vitest";
 import { categoryLabel, messages, statusLabel } from "../src/i18n";
+import { autoSelectVehicle } from "../src/card-editor";
 
 const root = resolve(import.meta.dirname, "..");
 const manifest = JSON.parse(readFileSync(resolve(root, "../custom_components/camper_travel_journal/manifest.json"), "utf8"));
@@ -10,7 +11,7 @@ const bundle = resolve(root, "../custom_components/camper_travel_journal/fronten
 
 describe("frontend release contract", () => {
   it("keeps backend, npm metadata and beta bundle aligned", () => {
-    expect(manifest.version).toBe("0.1.0-beta.4");
+    expect(manifest.version).toBe("0.1.0-beta.5");
     expect(pkg.version).toBe(manifest.version);
     expect(existsSync(bundle)).toBe(true);
   });
@@ -20,10 +21,33 @@ describe("frontend release contract", () => {
     expect(readFileSync(resolve(root, "src/base-card.ts"), "utf8")).toContain("customElements.get");
     expect(source).toContain("camper-travel-journal-summary-card");
     expect(source).toContain("camper-travel-journal-manager-card");
+    expect(source).toContain("Reiseübersicht");
+    expect(source).toContain("Reiseverwaltung");
     const init = readFileSync(resolve(root, "../custom_components/camper_travel_journal/__init__.py"), "utf8");
     expect(init).toContain("async_register_static_paths");
     expect(init).toContain("add_extra_js_url");
     expect(init).toContain("frontend_registered");
+  });
+  it("provides graphical editors and preserves the vehicle_id API contract", () => {
+    const base = readFileSync(resolve(root, "src/base-card.ts"), "utf8");
+    const editor = readFileSync(resolve(root, "src/card-editor.ts"), "utf8");
+    const api = readFileSync(resolve(root, "src/api.ts"), "utf8");
+    expect(base).toContain("getConfigElement");
+    expect(base).toContain("getStubConfig");
+    expect(editor).toContain("config-changed");
+    expect(editor).toContain("editorNoVehicle");
+    expect(api).toContain("listVehicles");
+    expect(autoSelectVehicle({}, [{ vehicle_id: "entry-1", name: "Wohnmobil", title: "Camper Travel Journal" }])).toEqual({ vehicle_id: "entry-1" });
+    expect(autoSelectVehicle({ vehicle_id: "existing" }, [{ vehicle_id: "entry-1", name: "Wohnmobil", title: "Camper Travel Journal" }])).toEqual({ vehicle_id: "existing" });
+    expect(autoSelectVehicle({}, [])).toEqual({});
+    expect(autoSelectVehicle({}, [
+      { vehicle_id: "entry-1", name: "Eins", title: "Eins" },
+      { vehicle_id: "entry-2", name: "Zwei", title: "Zwei" },
+    ])).toEqual({});
+  });
+  it("keeps the hub editor texts in German and English", () => {
+    expect(messages({ locale: { language: "de-DE" } } as any).editorChooseVehicle).toBe("Wohnmobil auswählen");
+    expect(messages({ locale: { language: "en-US" } } as any).editorChooseVehicle).toBe("Select camper");
   });
   it("contains no location data and exposes the versioned resource contract", () => {
     const source = readFileSync(bundle, "utf8");

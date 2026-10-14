@@ -14,6 +14,8 @@ export abstract class TravelCard extends LitElement {
     @media (max-width:500px) { ha-card { padding:12px; } }
   `;
   setConfig(config: { vehicle_id?: string }) { this.config = config; }
+  static getConfigElement() { return document.createElement("camper-travel-journal-card-editor"); }
+  static getStubConfig() { return { vehicle_id: "" }; }
   protected get vehicleId() { return this.config.vehicle_id ?? ""; }
 }
 export function defineOnce(name: string, element: CustomElementConstructor) { if (!customElements.get(name)) customElements.define(name, element); }
