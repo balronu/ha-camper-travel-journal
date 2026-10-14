@@ -34,6 +34,8 @@ class Phase2Tests(unittest.TestCase):
         self.store.update_trip(trip_id, self.now, status="completed", ended_at=self.now + timedelta(hours=2))
         with self.assertRaises(ValueError):
             validate_transition("planned", "completed")
+        with self.assertRaisesRegex(ValueError, "invalid_trip_status"):
+            validate_transition("unknown", "active")
 
     def test_drive_assignment_is_unique_and_vehicle_bound(self):
         trip_id = self.store.create_trip("v1", "Alpen", self.now, self.now)

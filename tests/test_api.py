@@ -63,6 +63,13 @@ def test_timestamp_and_amount_validation():
         api._timestamp("not-a-timestamp")
     with pytest.raises(ValueError, match="amount_invalid"):
         api.validate_amount(-1)
+    assert api._timestamp(None, required=False) is None
+    with pytest.raises(ValueError, match="timestamp_invalid"):
+        api._timestamp(123)
+    with pytest.raises(ValueError, match="timestamp_must_be_utc"):
+        api._timestamp("2026-10-01T12:00:00")
+    with pytest.raises(ValueError, match="vehicle_not_loaded"):
+        api._runtime(type("Hass", (), {"data": {}})(), "missing")
 
 
 @pytest.mark.asyncio
