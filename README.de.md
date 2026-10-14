@@ -1,12 +1,12 @@
 # Camper Travel Journal
 
-`v0.1.0-beta.6` ist eine kontrollierte Entwickler-Beta für Home Assistant.
+`v0.1.0-beta.7` ist eine kontrollierte Entwickler-Beta für Home Assistant.
 Sie enthält eine eigene SQLite-Datenbank, GPS-Fahrterkennung, Reiseverwaltung,
 automatische und manuelle Fahrtzuordnung, Zwischenstopps, Reisekosten sowie
 eine Summary- und Manager-Card. Die Karten werden über die automatische,
 versionsgebundene Frontend-Resource registriert.
 
-Die Installation erfolgt als Pre-Release `v0.1.0-beta.6` über HACS. Der HACS-
+Die Installation erfolgt als Pre-Release `v0.1.0-beta.7` über HACS. Der HACS-
 Pre-Release-Schalter muss für dieses Repository aktiviert sein; ein angezeigter
 `main`-Commit ist kein Beta-Release. Nach dem Config-Flow kann
 die Beispiel-Unterseite

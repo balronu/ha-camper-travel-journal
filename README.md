@@ -14,7 +14,7 @@ Eine frühe Home-Assistant-Custom-Integration für ein datenschutzbewusstes
 digitales Wohnmobil-Reisetagebuch. Langfristig sind GPS-Aufzeichnung,
 Fahrtenbuch, Reisen, Ausgaben, Karten, Statistiken und Exporte vorgesehen.
 
-> **Status: `v0.1.0-beta.6` Entwickler-Beta.** Nicht produktionsreif. Die
+> **Status: `v0.1.0-beta.7` Entwickler-Beta.** Nicht produktionsreif. Die
 > aktuelle Version wurde noch nicht in einer produktiven Home-Assistant-
 > Instanz validiert.
 
@@ -46,7 +46,7 @@ verbinden.
 
 1. **HACS → Integrationen → Benutzerdefinierte Repositories** öffnen.
 2. `https://github.com/balronu/ha-camper-travel-journal` als **Integration** hinzufügen.
-3. In der HACS-Repository-Ansicht die Pre-Release-Version `v0.1.0-beta.6` auswählen und installieren; nicht den Entwicklungsstand `main` wählen.
+3. Für den Entwicklungsstand Beta 7 die Pre-Release-Version `v0.1.0-beta.7` auswählen; nicht den Entwicklungsstand `main` wählen.
 4. Home Assistant neu starten.
 5. **Einstellungen → Geräte & Dienste** öffnen und Camper Travel Journal hinzufügen.
 
@@ -123,7 +123,7 @@ Siehe [Architektur](docs/architecture.md), [Datenbankschema](docs/database-schem
 
 Die Beta enthält eine kompakte Summary Card und eine breite Manager Card. Das
 Bundle wird automatisch über die Integration mit der versionsgebundenen URL
-`/camper_travel_journal/camper-travel-journal.js?v=0.1.0-beta.6` registriert.
+`/camper_travel_journal/camper-travel-journal.js?v=0.1.0-beta.7` registriert.
 Eine zweite manuelle Resource darf nicht angelegt werden. Bei veralteter
 Anzeige zuerst Resource-Version prüfen und Dashboard neu laden; manuelles
 Cache-Leeren ist letzte Maßnahme. Eine installierbare, aber nicht produktiv
@@ -133,7 +133,7 @@ Details: [Frontend-Cache-Standard](docs/frontend-cache.md).
 
 ### Kontrollierte Erstinstallation
 
-Nach Auswahl von `v0.1.0-beta.6` als Pre-Release in HACS, Neustart und
+Nach Auswahl von `v0.1.0-beta.7` als Pre-Release in HACS, Neustart und
 Einrichtung des Config-Flows kann im Wohnmobil-Dashboard zunächst eine
 Testansicht mit beiden Karten angelegt werden:
 

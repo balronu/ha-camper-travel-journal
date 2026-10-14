@@ -12,7 +12,7 @@ const bundle = resolve(root, "../custom_components/camper_travel_journal/fronten
 
 describe("frontend release contract", () => {
   it("keeps backend, npm metadata and beta bundle aligned", () => {
-    expect(manifest.version).toBe("0.1.0-beta.6");
+    expect(manifest.version).toBe("0.1.0-beta.7");
     expect(pkg.version).toBe(manifest.version);
     expect(existsSync(bundle)).toBe(true);
   });
@@ -71,6 +71,7 @@ describe("frontend release contract", () => {
     expect(editor).toContain("this._hass?.connection !== value?.connection");
     expect(editor).toContain("if (this.loadingPromise) return this.loadingPromise");
     expect(editor).toContain("sameCardConfig(this._config, config)");
+    expect(editor).toContain("?selected=${vehicle.vehicle_id === this._config.vehicle_id}");
     expect(base).toContain("this._hass?.connection !== value?.connection");
     expect(base).toContain("if (this.config.vehicle_id === config.vehicle_id) return");
     expect(summary).toContain("protected onHassConnectionChanged");

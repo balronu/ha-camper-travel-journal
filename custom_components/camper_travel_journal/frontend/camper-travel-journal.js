@@ -1,4 +1,4 @@
-const P = globalThis, I = P.ShadowRoot && (P.ShadyCSS === void 0 || P.ShadyCSS.nativeShadow) && "adoptedStyleSheets" in Document.prototype && "replace" in CSSStyleSheet.prototype, V = /* @__PURE__ */ Symbol(), K = /* @__PURE__ */ new WeakMap();
+const R = globalThis, I = R.ShadowRoot && (R.ShadyCSS === void 0 || R.ShadyCSS.nativeShadow) && "adoptedStyleSheets" in Document.prototype && "replace" in CSSStyleSheet.prototype, V = /* @__PURE__ */ Symbol(), K = /* @__PURE__ */ new WeakMap();
 let ne = class {
   constructor(e, t, s) {
     if (this._$cssResult$ = !0, s !== V) throw Error("CSSResult is not constructable. Use `unsafeCSS` or `css` instead.");
@@ -27,7 +27,7 @@ const me = (r) => new ne(typeof r == "string" ? r : r + "", void 0, V), z = (r, 
 }, fe = (r, e) => {
   if (I) r.adoptedStyleSheets = e.map((t) => t instanceof CSSStyleSheet ? t : t.styleSheet);
   else for (const t of e) {
-    const s = document.createElement("style"), i = P.litNonce;
+    const s = document.createElement("style"), i = R.litNonce;
     i !== void 0 && s.setAttribute("nonce", i), s.textContent = t.cssText, r.appendChild(s);
   }
 }, Z = I ? (r) => r : (r) => r instanceof CSSStyleSheet ? ((e) => {
@@ -35,7 +35,7 @@ const me = (r) => new ne(typeof r == "string" ? r : r + "", void 0, V), z = (r, 
   for (const s of e.cssRules) t += s.cssText;
   return me(t);
 })(r) : r;
-const { is: ve, defineProperty: _e, getOwnPropertyDescriptor: ye, getOwnPropertyNames: be, getOwnPropertySymbols: Ee, getPrototypeOf: Ae } = Object, M = globalThis, J = M.trustedTypes, we = J ? J.emptyScript : "", xe = M.reactiveElementPolyfillSupport, S = (r, e) => r, L = { toAttribute(r, e) {
+const { is: ve, defineProperty: _e, getOwnPropertyDescriptor: ye, getOwnPropertyNames: be, getOwnPropertySymbols: Ee, getPrototypeOf: Ae } = Object, H = globalThis, J = H.trustedTypes, we = J ? J.emptyScript : "", xe = H.reactiveElementPolyfillSupport, S = (r, e) => r, L = { toAttribute(r, e) {
   switch (e) {
     case Boolean:
       r = r ? we : null;
@@ -64,7 +64,7 @@ const { is: ve, defineProperty: _e, getOwnPropertyDescriptor: ye, getOwnProperty
   }
   return t;
 } }, ae = (r, e) => !ve(r, e), G = { attribute: !0, type: String, converter: L, reflect: !1, useDefault: !1, hasChanged: ae };
-Symbol.metadata ??= /* @__PURE__ */ Symbol("metadata"), M.litPropertyMetadata ??= /* @__PURE__ */ new WeakMap();
+Symbol.metadata ??= /* @__PURE__ */ Symbol("metadata"), H.litPropertyMetadata ??= /* @__PURE__ */ new WeakMap();
 let E = class extends HTMLElement {
   static addInitializer(e) {
     this._$Ei(), (this.l ??= []).push(e);
@@ -246,12 +246,12 @@ let E = class extends HTMLElement {
   firstUpdated(e) {
   }
 };
-E.elementStyles = [], E.shadowRootOptions = { mode: "open" }, E[S("elementProperties")] = /* @__PURE__ */ new Map(), E[S("finalized")] = /* @__PURE__ */ new Map(), xe?.({ ReactiveElement: E }), (M.reactiveElementVersions ??= []).push("2.1.2");
-const F = globalThis, Q = (r) => r, N = F.trustedTypes, X = N ? N.createPolicy("lit-html", { createHTML: (r) => r }) : void 0, oe = "$lit$", v = `lit$${Math.random().toFixed(9).slice(2)}$`, he = "?" + v, Ce = `<${he}>`, b = document, k = () => b.createComment(""), T = (r) => r === null || typeof r != "object" && typeof r != "function", B = Array.isArray, Se = (r) => B(r) || typeof r?.[Symbol.iterator] == "function", H = `[ \t
-\f\r]`, C = /<(?:(!--|\/[^a-zA-Z])|(\/?[a-zA-Z][^>\s]*)|(\/?$))/g, Y = /-->/g, ee = />/g, _ = RegExp(`>|${H}(?:([^\\s"'>=/]+)(${H}*=${H}*(?:[^ \t
+E.elementStyles = [], E.shadowRootOptions = { mode: "open" }, E[S("elementProperties")] = /* @__PURE__ */ new Map(), E[S("finalized")] = /* @__PURE__ */ new Map(), xe?.({ ReactiveElement: E }), (H.reactiveElementVersions ??= []).push("2.1.2");
+const q = globalThis, Q = (r) => r, N = q.trustedTypes, X = N ? N.createPolicy("lit-html", { createHTML: (r) => r }) : void 0, oe = "$lit$", v = `lit$${Math.random().toFixed(9).slice(2)}$`, he = "?" + v, Ce = `<${he}>`, b = document, k = () => b.createComment(""), T = (r) => r === null || typeof r != "object" && typeof r != "function", F = Array.isArray, Se = (r) => F(r) || typeof r?.[Symbol.iterator] == "function", j = `[ 	
+\f\r]`, C = /<(?:(!--|\/[^a-zA-Z])|(\/?[a-zA-Z][^>\s]*)|(\/?$))/g, Y = /-->/g, ee = />/g, _ = RegExp(`>|${j}(?:([^\\s"'>=/]+)(${j}*=${j}*(?:[^ 	
 \f\r"'\`<>=]|("|')|))|$)`, "g"), te = /'/g, se = /"/g, le = /^(?:script|style|textarea|title)$/i, ke = (r) => (e, ...t) => ({ _$litType$: r, strings: e, values: t }), h = ke(1), w = /* @__PURE__ */ Symbol.for("lit-noChange"), p = /* @__PURE__ */ Symbol.for("lit-nothing"), ie = /* @__PURE__ */ new WeakMap(), y = b.createTreeWalker(b, 129);
 function ce(r, e) {
-  if (!B(r) || !r.hasOwnProperty("raw")) throw Error("invalid template strings array");
+  if (!F(r) || !r.hasOwnProperty("raw")) throw Error("invalid template strings array");
   return X !== void 0 ? X.createHTML(e) : e;
 }
 const Te = (r, e) => {
@@ -266,21 +266,21 @@ const Te = (r, e) => {
   }
   return [ce(r, n + (r[t] || "<?>") + (e === 2 ? "</svg>" : e === 3 ? "</math>" : "")), s];
 };
-class D {
+class P {
   constructor({ strings: e, _$litType$: t }, s) {
     let i;
     this.parts = [];
     let n = 0, a = 0;
     const c = e.length - 1, o = this.parts, [d, u] = Te(e, t);
-    if (this.el = D.createElement(d, s), y.currentNode = this.el.content, t === 2 || t === 3) {
+    if (this.el = P.createElement(d, s), y.currentNode = this.el.content, t === 2 || t === 3) {
       const l = this.el.content.firstChild;
       l.replaceWith(...l.childNodes);
     }
     for (; (i = y.nextNode()) !== null && o.length < c; ) {
       if (i.nodeType === 1) {
         if (i.hasAttributes()) for (const l of i.getAttributeNames()) if (l.endsWith(oe)) {
-          const m = u[a++], f = i.getAttribute(l).split(v), U = /([.?@])?(.*)/.exec(m);
-          o.push({ type: 1, index: n, name: U[2], strings: f, ctor: U[1] === "." ? Re : U[1] === "?" ? Ue : U[1] === "@" ? Pe : j }), i.removeAttribute(l);
+          const m = u[a++], f = i.getAttribute(l).split(v), D = /([.?@])?(.*)/.exec(m);
+          o.push({ type: 1, index: n, name: D[2], strings: f, ctor: D[1] === "." ? Ue : D[1] === "?" ? De : D[1] === "@" ? Re : M }), i.removeAttribute(l);
         } else l.startsWith(v) && (o.push({ type: 6, index: n }), i.removeAttribute(l));
         if (le.test(i.tagName)) {
           const l = i.textContent.split(v), m = l.length - 1;
@@ -309,7 +309,7 @@ function x(r, e, t = r, s) {
   const n = T(e) ? void 0 : e._$litDirective$;
   return i?.constructor !== n && (i?._$AO?.(!1), n === void 0 ? i = void 0 : (i = new n(r), i._$AT(r, t, s)), s !== void 0 ? (t._$Co ??= [])[s] = i : t._$Cl = i), i !== void 0 && (e = x(r, i._$AS(r, e.values), i, s)), e;
 }
-class De {
+class Pe {
   constructor(e, t) {
     this._$AV = [], this._$AN = void 0, this._$AD = e, this._$AM = t;
   }
@@ -326,7 +326,7 @@ class De {
     for (; o !== void 0; ) {
       if (a === o.index) {
         let d;
-        o.type === 2 ? d = new R(n, n.nextSibling, this, e) : o.type === 1 ? d = new o.ctor(n, o.name, o.strings, this, e) : o.type === 6 && (d = new Ne(n, this, e)), this._$AV.push(d), o = s[++c];
+        o.type === 2 ? d = new U(n, n.nextSibling, this, e) : o.type === 1 ? d = new o.ctor(n, o.name, o.strings, this, e) : o.type === 6 && (d = new Ne(n, this, e)), this._$AV.push(d), o = s[++c];
       }
       a !== o?.index && (n = y.nextNode(), a++);
     }
@@ -337,7 +337,7 @@ class De {
     for (const s of this._$AV) s !== void 0 && (s.strings !== void 0 ? (s._$AI(e, s, t), t += s.strings.length - 2) : s._$AI(e[t])), t++;
   }
 }
-class R {
+class U {
   get _$AU() {
     return this._$AM?._$AU ?? this._$Cv;
   }
@@ -368,22 +368,22 @@ class R {
     this._$AH !== p && T(this._$AH) ? this._$AA.nextSibling.data = e : this.T(b.createTextNode(e)), this._$AH = e;
   }
   $(e) {
-    const { values: t, _$litType$: s } = e, i = typeof s == "number" ? this._$AC(e) : (s.el === void 0 && (s.el = D.createElement(ce(s.h, s.h[0]), this.options)), s);
+    const { values: t, _$litType$: s } = e, i = typeof s == "number" ? this._$AC(e) : (s.el === void 0 && (s.el = P.createElement(ce(s.h, s.h[0]), this.options)), s);
     if (this._$AH?._$AD === i) this._$AH.p(t);
     else {
-      const n = new De(i, this), a = n.u(this.options);
+      const n = new Pe(i, this), a = n.u(this.options);
       n.p(t), this.T(a), this._$AH = n;
     }
   }
   _$AC(e) {
     let t = ie.get(e.strings);
-    return t === void 0 && ie.set(e.strings, t = new D(e)), t;
+    return t === void 0 && ie.set(e.strings, t = new P(e)), t;
   }
   k(e) {
-    B(this._$AH) || (this._$AH = [], this._$AR());
+    F(this._$AH) || (this._$AH = [], this._$AR());
     const t = this._$AH;
     let s, i = 0;
-    for (const n of e) i === t.length ? t.push(s = new R(this.O(k()), this.O(k()), this, this.options)) : s = t[i], s._$AI(n), i++;
+    for (const n of e) i === t.length ? t.push(s = new U(this.O(k()), this.O(k()), this, this.options)) : s = t[i], s._$AI(n), i++;
     i < t.length && (this._$AR(s && s._$AB.nextSibling, i), t.length = i);
   }
   _$AR(e = this._$AA.nextSibling, t) {
@@ -396,7 +396,7 @@ class R {
     this._$AM === void 0 && (this._$Cv = e, this._$AP?.(e));
   }
 }
-class j {
+class M {
   get tagName() {
     return this.element.tagName;
   }
@@ -421,7 +421,7 @@ class j {
     e === p ? this.element.removeAttribute(this.name) : this.element.setAttribute(this.name, e ?? "");
   }
 }
-class Re extends j {
+class Ue extends M {
   constructor() {
     super(...arguments), this.type = 3;
   }
@@ -429,7 +429,7 @@ class Re extends j {
     this.element[this.name] = e === p ? void 0 : e;
   }
 }
-class Ue extends j {
+class De extends M {
   constructor() {
     super(...arguments), this.type = 4;
   }
@@ -437,7 +437,7 @@ class Ue extends j {
     this.element.toggleAttribute(this.name, !!e && e !== p);
   }
 }
-class Pe extends j {
+class Re extends M {
   constructor(e, t, s, i, n) {
     super(e, t, s, i, n), this.type = 5;
   }
@@ -461,18 +461,18 @@ class Ne {
     x(this, e);
   }
 }
-const Oe = F.litHtmlPolyfillSupport;
-Oe?.(D, R), (F.litHtmlVersions ??= []).push("3.3.3");
-const Me = (r, e, t) => {
+const Oe = q.litHtmlPolyfillSupport;
+Oe?.(P, U), (q.litHtmlVersions ??= []).push("3.3.3");
+const He = (r, e, t) => {
   const s = t?.renderBefore ?? e;
   let i = s._$litPart$;
   if (i === void 0) {
     const n = t?.renderBefore ?? null;
-    s._$litPart$ = i = new R(e.insertBefore(k(), n), n, void 0, t ?? {});
+    s._$litPart$ = i = new U(e.insertBefore(k(), n), n, void 0, t ?? {});
   }
   return i._$AI(r), i;
 };
-const W = globalThis;
+const B = globalThis;
 class A extends E {
   constructor() {
     super(...arguments), this.renderOptions = { host: this }, this._$Do = void 0;
@@ -483,7 +483,7 @@ class A extends E {
   }
   update(e) {
     const t = this.render();
-    this.hasUpdated || (this.renderOptions.isConnected = this.isConnected), super.update(e), this._$Do = Me(t, this.renderRoot, this.renderOptions);
+    this.hasUpdated || (this.renderOptions.isConnected = this.isConnected), super.update(e), this._$Do = He(t, this.renderRoot, this.renderOptions);
   }
   connectedCallback() {
     super.connectedCallback(), this._$Do?.setConnected(!0);
@@ -495,12 +495,12 @@ class A extends E {
     return w;
   }
 }
-A._$litElement$ = !0, A.finalized = !0, W.litElementHydrateSupport?.({ LitElement: A });
-const je = W.litElementPolyfillSupport;
-je?.({ LitElement: A });
-(W.litElementVersions ??= []).push("4.2.2");
-class q extends A {
-  hass;
+A._$litElement$ = !0, A.finalized = !0, B.litElementHydrateSupport?.({ LitElement: A });
+const Me = B.litElementPolyfillSupport;
+Me?.({ LitElement: A });
+(B.litElementVersions ??= []).push("4.2.2");
+class W extends A {
+  _hass;
   config = {};
   static styles = z`
     :host { display:block; color:var(--primary-text-color); } ha-card { padding:16px; background:var(--ha-card-background,var(--card-background-color)); }
@@ -511,8 +511,19 @@ class q extends A {
     .value { display:block; font-size:1.25rem; font-weight:600; } input { min-height:38px; box-sizing:border-box; border:1px solid var(--divider-color); border-radius:6px; padding:8px; background:var(--card-background-color); color:var(--primary-text-color); }
     @media (max-width:500px) { ha-card { padding:12px; } }
   `;
+  get hass() {
+    return this._hass;
+  }
+  set hass(e) {
+    const t = this._hass?.connection !== e?.connection;
+    this._hass = e, t && this.onHassConnectionChanged(), this.requestUpdate();
+  }
   setConfig(e) {
-    this.config = e;
+    this.config.vehicle_id !== e.vehicle_id && (this.config = { ...e }, this.onConfigChanged(), this.requestUpdate());
+  }
+  onHassConnectionChanged() {
+  }
+  onConfigChanged() {
   }
   static getConfigElement() {
     return document.createElement("camper-travel-journal-card-editor");
@@ -530,7 +541,7 @@ function de(r, e) {
 async function $(r, e, t, s = {}) {
   return r.connection.sendMessagePromise({ type: e, vehicle_id: t, ...s });
 }
-const pe = (r, e, t) => $(r, "camper_travel_journal/list", e, t ? { trip_id: t } : {}), ue = (r, e, t, s) => $(r, "camper_travel_journal/transition_trip", e, { trip_id: t, status: s }), He = (r, e, t, s, i = "") => $(r, "camper_travel_journal/create_trip", e, { title: t, started_at: s, destination: i }), Le = (r, e, t, s) => $(r, "camper_travel_journal/update_trip", e, { trip_id: t, ...s }), Ie = (r, e, t) => $(r, "camper_travel_journal/delete_trip", e, { trip_id: t }), Ve = (r, e, t, s) => $(r, "camper_travel_journal/unlink_drive", e, { trip_id: t, drive_id: s }), ze = (r, e, t, s) => $(r, "camper_travel_journal/link_drives", e, { trip_id: t, drive_ids: s }), Fe = (r, e, t, s) => $(r, "camper_travel_journal/create_expense", e, { trip_id: t, ...s }), Be = (r, e, t, s) => $(r, "camper_travel_journal/update_expense", e, { expense_id: t, ...s }), We = (r, e, t) => $(r, "camper_travel_journal/delete_expense", e, { expense_id: t }), qe = async (r) => (await r.connection.sendMessagePromise({ type: "camper_travel_journal/list_vehicles" })).vehicles ?? [], Ke = {
+const pe = (r, e, t) => $(r, "camper_travel_journal/list", e, t ? { trip_id: t } : {}), ue = (r, e, t, s) => $(r, "camper_travel_journal/transition_trip", e, { trip_id: t, status: s }), je = (r, e, t, s, i = "") => $(r, "camper_travel_journal/create_trip", e, { title: t, started_at: s, destination: i }), Le = (r, e, t, s) => $(r, "camper_travel_journal/update_trip", e, { trip_id: t, ...s }), Ie = (r, e, t) => $(r, "camper_travel_journal/delete_trip", e, { trip_id: t }), Ve = (r, e, t, s) => $(r, "camper_travel_journal/unlink_drive", e, { trip_id: t, drive_id: s }), ze = (r, e, t, s) => $(r, "camper_travel_journal/link_drives", e, { trip_id: t, drive_ids: s }), qe = (r, e, t, s) => $(r, "camper_travel_journal/create_expense", e, { trip_id: t, ...s }), Fe = (r, e, t, s) => $(r, "camper_travel_journal/update_expense", e, { expense_id: t, ...s }), Be = (r, e, t) => $(r, "camper_travel_journal/delete_expense", e, { expense_id: t }), We = async (r) => (await r.connection.sendMessagePromise({ type: "camper_travel_journal/list_vehicles" })).vehicles ?? [], Ke = {
   title: "Reisetagebuch",
   noDestination: "Kein Reiseziel",
   loading: "Reisedaten werden geladen …",
@@ -640,7 +651,7 @@ function ge(r, e) {
 function re(r, e) {
   return g(e).categories[r] ?? r;
 }
-class Je extends q {
+class Je extends W {
   snapshot;
   loading = !1;
   error = "";
@@ -649,6 +660,12 @@ class Je extends q {
   }
   disconnectedCallback() {
     super.disconnectedCallback();
+  }
+  onHassConnectionChanged() {
+    this.refresh();
+  }
+  onConfigChanged() {
+    this.refresh();
   }
   async refresh() {
     if (!(!this.hass || !this.vehicleId)) {
@@ -678,7 +695,7 @@ class Je extends q {
 }
 de("camper-travel-journal-summary-card", Je);
 const Ge = ["camping", "fuel", "toll", "parking", "food", "activities", "other"];
-class $e extends q {
+class $e extends W {
   snapshot;
   error = "";
   tripTitle = "";
@@ -688,6 +705,12 @@ class $e extends q {
   selected = "";
   connectedCallback() {
     super.connectedCallback(), this.refresh();
+  }
+  onHassConnectionChanged() {
+    this.refresh();
+  }
+  onConfigChanged() {
+    this.refresh();
   }
   async refresh() {
     if (!(!this.hass || !this.vehicleId))
@@ -703,7 +726,7 @@ class $e extends q {
   async addTrip() {
     if (!(!this.hass || !this.tripTitle.trim()))
       try {
-        await He(this.hass, this.vehicleId, this.tripTitle, (/* @__PURE__ */ new Date()).toISOString(), this.destination), this.tripTitle = "", this.destination = "", await this.refresh();
+        await je(this.hass, this.vehicleId, this.tripTitle, (/* @__PURE__ */ new Date()).toISOString(), this.destination), this.tripTitle = "", this.destination = "", await this.refresh();
       } catch {
         this.fail(g(this.hass).tripCreateError);
       }
@@ -747,7 +770,7 @@ class $e extends q {
   async addExpense(e) {
     if (!(!this.hass || !this.amount))
       try {
-        await Fe(this.hass, this.vehicleId, e, { occurred_at: (/* @__PURE__ */ new Date()).toISOString(), category: this.category, amount_minor: Math.round(Number(this.amount) * 100), currency: "EUR" }), this.amount = "", await this.refresh();
+        await qe(this.hass, this.vehicleId, e, { occurred_at: (/* @__PURE__ */ new Date()).toISOString(), category: this.category, amount_minor: Math.round(Number(this.amount) * 100), currency: "EUR" }), this.amount = "", await this.refresh();
       } catch {
         this.fail(g(this.hass).expenseCreateError);
       }
@@ -757,7 +780,7 @@ class $e extends q {
     const t = g(this.hass);
     if (window.confirm(t.expenseDeleteConfirm))
       try {
-        await We(this.hass, this.vehicleId, e), await this.refresh();
+        await Be(this.hass, this.vehicleId, e), await this.refresh();
       } catch {
         this.fail(t.expenseDeleteError);
       }
@@ -769,7 +792,7 @@ class $e extends q {
     const i = Math.round(Number(s) * 100);
     if (!(!Number.isFinite(i) || i < 0))
       try {
-        await Be(this.hass, this.vehicleId, e.id, { amount_minor: i }), await this.refresh();
+        await Fe(this.hass, this.vehicleId, e.id, { amount_minor: i }), await this.refresh();
       } catch {
         this.fail(t.expenseEditError);
       }
@@ -781,12 +804,15 @@ class $e extends q {
     }}>${e.details}</button></div>${this.selected === i.id ? h`<div class="details"><h4>${e.assignedDrives}</h4>${(this.snapshot?.drives ?? []).map((n) => h`<div class="row"><span>${O(n.started_at, this.hass)} · ${(n.distance_m / 1e3).toFixed(1)} km</span>${n.trip_id === i.id ? h`<button class="link" @click=${() => this.hass && Ve(this.hass, this.vehicleId, i.id, n.id).then(() => this.refresh())}>${e.unassign}</button>` : ""}</div>`)}${(this.snapshot?.available_drives ?? []).length ? h`<h4>${e.freeDrives}</h4>${this.snapshot?.available_drives?.map((n) => h`<div class="row"><span>${O(n.started_at, this.hass)} · ${(n.distance_m / 1e3).toFixed(1)} km</span><button class="link" @click=${() => this.assignDrive(i.id, n.id)}>${e.assign}</button></div>`)}` : ""}<h4>${e.expenses}</h4><div class="actions"><input aria-label=${e.amount} type="number" min="0" step="0.01" placeholder="EUR" .value=${this.amount} @input=${(n) => this.amount = n.target.value}><select aria-label=${e.category} .value=${this.category} @change=${(n) => this.category = n.target.value}>${Ge.map((n) => h`<option value=${n}>${re(n, this.hass)}</option>`)}</select><button @click=${() => this.addExpense(i.id)}>${e.save}</button></div>${s.map((n) => h`<div class="row"><span>${re(n.category, this.hass)}: ${(n.amount_minor / 100).toFixed(2)} ${n.currency}</span><span><button class="link" @click=${() => this.editExpense(n)}>${e.edit}</button><button class="link" @click=${() => this.removeExpense(n.id)}>${e.remove}</button></span></div>`)}</div>` : ""}</article>`) : h`<p class="muted">${e.noTrip}</p>`}</section></ha-card>`;
   }
 }
-$e.styles = [q.styles, z`section{margin-top:16px}.trip{display:grid;gap:8px;padding:12px 0;border-bottom:1px solid var(--divider-color)}.row{display:flex;justify-content:space-between;gap:8px;align-items:center;flex-wrap:wrap}.details{padding:8px;background:var(--secondary-background-color)}h4{margin:12px 0 4px}.link{min-height:30px;padding:4px 8px;font-size:.9em}`];
+$e.styles = [W.styles, z`section{margin-top:16px}.trip{display:grid;gap:8px;padding:12px 0;border-bottom:1px solid var(--divider-color)}.row{display:flex;justify-content:space-between;gap:8px;align-items:center;flex-wrap:wrap}.details{padding:8px;background:var(--secondary-background-color)}h4{margin:12px 0 4px}.link{min-height:30px;padding:4px 8px;font-size:.9em}`];
 de("camper-travel-journal-manager-card", $e);
 function Qe(r, e) {
   return r.vehicle_id || e.length !== 1 ? r : { ...r, vehicle_id: e[0].vehicle_id };
 }
-class Xe extends A {
+function Xe(r, e) {
+  return r.type === e.type && r.vehicle_id === e.vehicle_id;
+}
+class Ye extends A {
   static styles = z`
     :host { display: block; color: var(--primary-text-color); }
     .field { display: flex; flex-direction: column; gap: 6px; margin: 8px 0; }
@@ -800,29 +826,35 @@ class Xe extends A {
   vehicles = [];
   loading = !1;
   error = "";
+  loadedConnection;
+  loadingPromise;
   set hass(e) {
-    const t = this._hass !== e;
-    this._hass = e, t && e && this.loadVehicles();
+    const t = this._hass?.connection !== e?.connection;
+    this._hass = e, t && e && this.loadVehicles(), this.requestUpdate();
   }
   get hass() {
     return this._hass;
   }
   setConfig(e) {
-    this._config = { ...e }, this._hass && this.loadVehicles();
+    Xe(this._config, e) || (this._config = { ...e }, this._hass && !this.loadedConnection && this.loadVehicles(), this.requestUpdate());
   }
   async loadVehicles() {
-    if (this._hass) {
-      this.loading = !0, this.error = "", this.requestUpdate();
+    if (!this._hass) return;
+    if (this.loadingPromise) return this.loadingPromise;
+    if (this.loadedConnection === this._hass.connection) return;
+    this.loading = !0, this.error = "", this.requestUpdate();
+    const e = this._hass;
+    return this.loadingPromise = (async () => {
       try {
-        this.vehicles = await qe(this._hass);
-        const e = Qe(this._config, this.vehicles);
-        e.vehicle_id !== this._config.vehicle_id && (this._config = e, this.fireConfigChanged());
+        this.vehicles = await We(e), this.loadedConnection = e.connection;
+        const t = Qe(this._config, this.vehicles);
+        t.vehicle_id !== this._config.vehicle_id && (this._config = t, this.fireConfigChanged());
       } catch {
-        this.error = g(this._hass).editorLoadError;
+        this.error = g(e).editorLoadError;
       } finally {
-        this.loading = !1, this.requestUpdate();
+        this.loading = !1, this.loadingPromise = void 0, this.requestUpdate();
       }
-    }
+    })(), this.loadingPromise;
   }
   fireConfigChanged() {
     this.dispatchEvent(new CustomEvent("config-changed", { bubbles: !0, composed: !0, detail: { config: { ...this._config } } }));
@@ -837,9 +869,9 @@ class Xe extends A {
       <div class="field">
         <label for="vehicle">${e.editorVehicle}</label>
         ${this.loading ? h`<span class="muted">${e.editorLoading}</span>` : h`
-          <select id="vehicle" aria-label=${e.editorVehicle} .value=${this._config.vehicle_id ?? ""} @change=${this.selectVehicle}>
-            <option value="">${e.editorChooseVehicle}</option>
-            ${this.vehicles.map((t) => h`<option value=${t.vehicle_id}>${t.name || t.title}</option>`)}
+          <select id="vehicle" aria-label=${e.editorVehicle} @change=${this.selectVehicle}>
+            <option value="" ?selected=${!this._config.vehicle_id}>${e.editorChooseVehicle}</option>
+            ${this.vehicles.map((t) => h`<option value=${t.vehicle_id} ?selected=${t.vehicle_id === this._config.vehicle_id}>${t.name || t.title}</option>`)}
           </select>
         `}
         ${this.error ? h`<span class="error" role="alert">${this.error}</span>` : ""}
@@ -848,10 +880,10 @@ class Xe extends A {
     `;
   }
 }
-typeof customElements < "u" && !customElements.get("camper-travel-journal-card-editor") && customElements.define("camper-travel-journal-card-editor", Xe);
-const Ye = [
+typeof customElements < "u" && !customElements.get("camper-travel-journal-card-editor") && customElements.define("camper-travel-journal-card-editor", Ye);
+const et = [
   { type: "camper-travel-journal-summary-card", name: "Camper Travel Journal – Reiseübersicht", description: "Zeigt die aktuelle Reise, Fahrten, Strecke und Reisekosten kompakt an.", documentationURL: "https://github.com/balronu/ha-camper-travel-journal" },
   { type: "camper-travel-journal-manager-card", name: "Camper Travel Journal – Reiseverwaltung", description: "Reisen erstellen, bearbeiten und verwalten.", documentationURL: "https://github.com/balronu/ha-camper-travel-journal" }
 ];
 window.customCards ??= [];
-for (const r of Ye) window.customCards.some((e) => e.type === r.type) || window.customCards.push(r);
+for (const r of et) window.customCards.some((e) => e.type === r.type) || window.customCards.push(r);

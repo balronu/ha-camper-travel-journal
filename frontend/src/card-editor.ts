@@ -92,9 +92,9 @@ export class TravelCardEditor extends LitElement {
       <div class="field">
         <label for="vehicle">${lang.editorVehicle}</label>
         ${this.loading ? html`<span class="muted">${lang.editorLoading}</span>` : html`
-          <select id="vehicle" aria-label=${lang.editorVehicle} .value=${this._config.vehicle_id ?? ""} @change=${this.selectVehicle}>
-            <option value="">${lang.editorChooseVehicle}</option>
-            ${this.vehicles.map((vehicle) => html`<option value=${vehicle.vehicle_id}>${vehicle.name || vehicle.title}</option>`)}
+          <select id="vehicle" aria-label=${lang.editorVehicle} @change=${this.selectVehicle}>
+            <option value="" ?selected=${!this._config.vehicle_id}>${lang.editorChooseVehicle}</option>
+            ${this.vehicles.map((vehicle) => html`<option value=${vehicle.vehicle_id} ?selected=${vehicle.vehicle_id === this._config.vehicle_id}>${vehicle.name || vehicle.title}</option>`)}
           </select>
         `}
         ${this.error ? html`<span class="error" role="alert">${this.error}</span>` : ""}
