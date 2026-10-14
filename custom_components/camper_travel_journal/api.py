@@ -44,9 +44,9 @@ def _runtime(hass: HomeAssistant, vehicle_id: str):
     return runtime
 
 
-async def _call(hass: HomeAssistant, msg: dict, method: str, *args):
+async def _call(hass: HomeAssistant, msg: dict, method: str, *args, **kwargs):
     runtime = _runtime(hass, msg["vehicle_id"])
-    return await runtime.worker.async_call(method, *args)
+    return await runtime.worker.async_call(method, *args, **kwargs)
 
 
 def _send_error(connection, msg: dict, error: Exception) -> None:
