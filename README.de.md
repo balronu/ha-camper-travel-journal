@@ -1,6 +1,19 @@
 # Camper Travel Journal
 
-Die primäre deutsche Projektdokumentation befindet sich in
-[README.md](README.md).
+`v0.1.0-beta.3` ist eine kontrollierte Entwickler-Beta für Home Assistant.
+Sie enthält eine eigene SQLite-Datenbank, GPS-Fahrterkennung, Reiseverwaltung,
+automatische und manuelle Fahrtzuordnung, Zwischenstopps, Reisekosten sowie
+eine Summary- und Manager-Card. Die Karten werden über die automatische,
+versionsgebundene Frontend-Resource registriert.
+
+Die Installation erfolgt als Pre-Release über HACS. Nach dem Config-Flow kann
+die Beispiel-Unterseite
+[`docs/examples/dashboard-wohnmobil-reisetagebuch.yaml`](docs/examples/dashboard-wohnmobil-reisetagebuch.yaml)
+in das Wohnmobil-Dashboard übernommen werden; sie wird nicht automatisch
+angewendet. Für vollständige deutsche Details siehe [README.md](README.md).
+
+Die Beta ist noch nicht produktiv validiert. Keine Installation, kein Reload
+und keine Änderung an VM 104, Proxmox, Recorder oder produktiven Dashboards
+ist Bestandteil dieses Releases.
 
 🇩🇪 Deutsch | 🇬🇧 [English](README.en.md)
