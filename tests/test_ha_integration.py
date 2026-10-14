@@ -28,13 +28,13 @@ else:
             CONF_MAX_SPEED: 200.0,
         }
 
-    async def test_config_flow_rejects_missing_tracker(hass: HomeAssistant):
+    async def test_config_flow_rejects_missing_tracker(hass: HomeAssistant, enable_custom_integrations):
         result = await hass.config_entries.flow.async_init(DOMAIN, context={"source": "user"})
         result = await hass.config_entries.flow.async_configure(result["flow_id"], {**_data(), CONF_TRACKER_ENTITY: "device_tracker.missing"})
         assert result["type"] == "form"
         assert result["errors"][CONF_TRACKER_ENTITY] == "tracker_not_found"
 
-    async def test_config_flow_creates_entry_and_options_update(hass: HomeAssistant):
+    async def test_config_flow_creates_entry_and_options_update(hass: HomeAssistant, enable_custom_integrations):
         hass.states.async_set("device_tracker.synthetic", "home", {"latitude": 49.0, "longitude": 7.0, "gps_accuracy": 5})
         result = await hass.config_entries.flow.async_init(DOMAIN, context={"source": "user"})
         result = await hass.config_entries.flow.async_configure(result["flow_id"], _data())
@@ -49,7 +49,7 @@ else:
         assert result["data"][CONF_RETENTION_DAYS] == 180
         assert await hass.config_entries.async_unload(entry.entry_id)
 
-    async def test_setup_unload_listener_lifecycle(hass: HomeAssistant):
+    async def test_setup_unload_listener_lifecycle(hass: HomeAssistant, enable_custom_integrations):
         hass.states.async_set("device_tracker.synthetic", "home", {"latitude": 49.0, "longitude": 7.0, "gps_accuracy": 5})
         entry = MockConfigEntry(domain=DOMAIN, data={**_data(), CONF_RECORDING_ENABLED: True})
         entry.add_to_hass(hass)
