@@ -1,13 +1,15 @@
-# Changelog
+# Änderungsprotokoll
 
-## 0.1.0-beta.1 – Early developer beta
+🇩🇪 Deutsch | 🇬🇧 [English](README.en.md)
 
-- Add UI Config Flow and Options Flow for multiple vehicle trackers.
-- Add event-driven GPS collection with validation, duplicate filtering,
-  adaptive storage, gap protection and conservative drive detection.
-- Add integration-owned SQLite storage, schema versioning, async worker and
-  bounded restart recovery.
-- Add retention dry-run reporting without destructive deletion.
-- Add local tests, CI, Hassfest, HACS-structure and secret-scan workflows.
-- This beta has not been tested in a live Home Assistant instance and is not
-  production-ready.
+## 0.1.0-beta.1 – Frühe Entwickler-Beta
+
+- Config Flow und Options Flow für mehrere Fahrzeuge hinzugefügt.
+- Ereignisbasierte GPS-Aufzeichnung mit Validierung, Duplikatfilter,
+  adaptiver Speicherung, Lückenschutz und konservativer Fahrterkennung.
+- Eigene SQLite-Speicherung mit Schema-Versionierung, asynchronem Worker und
+  begrenzter Neustart-Wiederherstellung.
+- Retention-Dry-Run ohne destruktive Löschung.
+- Lokale Tests sowie CI-, Hassfest-, HACS-Struktur- und Secret-Scan-Workflows.
+- Diese Beta wurde noch nicht in einer produktiven Home-Assistant-Instanz
+  getestet und ist nicht produktionsreif.

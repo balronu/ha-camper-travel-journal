@@ -1,7 +1,9 @@
-# Security policy
+# Sicherheitsrichtlinie
 
-Please report vulnerabilities through GitHub Security Advisories, not public
-issues. Never include GPS coordinates, private addresses, credentials, tokens,
-private URLs, or unredacted logs in a report.
+🇩🇪 Deutsch | 🇬🇧 [English](README.en.md)
 
-`v0.1.0-beta.1` is an early development beta and is not production-ready.
+Sicherheitslücken bitte über GitHub Security Advisories melden, nicht über
+öffentliche Issues. Niemals GPS-Koordinaten, private Adressen, Zugangsdaten,
+Tokens, private URLs oder unredigierte Logs mitsenden.
+
+`v0.1.0-beta.1` ist eine frühe Entwickler-Beta und nicht produktionsreif.

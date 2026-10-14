@@ -7,11 +7,13 @@
 | `assets/branding/logo.png` | 1024 × 1024 px | Projektlogo, README |
 | `assets/branding/icon.png` | 256 × 256 px | Kleine Integration-/HACS-Darstellung im Repository |
 | `assets/branding/social-preview.png` | 1280 × 640 px | GitHub Social Preview |
-| `assets/branding/readme-banner.png` | 1280 × 640 px | README-Header in Englisch und Deutsch |
+| `assets/branding/readme-banner.png` | 1280 × 640 px | Englischer README-Header |
+| `assets/branding/readme-banner-de.png` | 1280 × 640 px | Deutscher README-Header |
 
-Alle Dateien sind PNGs. Die beiden breiten Grafiken verwenden bewusst dieselbe
-Bildsprache; der README-Banner enthält den englischen Projekttitel und den
-Untertitel `Your digital camper travel journal for Home Assistant`.
+Alle Dateien sind PNGs. Die breiten Grafiken verwenden bewusst dieselbe
+Bildsprache. Der deutsche README-Banner enthält `Dein digitales
+Wohnmobil-Reisetagebuch für Home Assistant`, der englische Banner
+`Your digital camper travel journal for Home Assistant`.
 
 ## Quelle und Rechte
 
@@ -25,7 +27,8 @@ des jeweils verwendeten Bilddienstes.
 
 ## Einbindung
 
-- Beide READMEs referenzieren `readme-banner.png` und `logo.png` über relative
+- `README.md` referenziert `readme-banner-de.png`, `README.en.md`
+  referenziert `readme-banner.png`; beide verwenden `logo.png` über relative
   Pfade.
 - `social-preview.png` ist für die Einstellung der GitHub-Repository-Vorschau
   vorgesehen.

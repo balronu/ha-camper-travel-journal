@@ -18,6 +18,7 @@ def test_branding_assets_have_required_dimensions_and_no_coordinates():
         "icon.png": (256, 256),
         "social-preview.png": (1280, 640),
         "readme-banner.png": (1280, 640),
+        "readme-banner-de.png": (1280, 640),
     }
     asset_dir = ROOT / "assets" / "branding"
     for name, size in expected.items():
@@ -28,7 +29,8 @@ def test_branding_assets_have_required_dimensions_and_no_coordinates():
 
 
 def test_readmes_reference_relative_branding_assets():
-    for name in ("README.md", "README.de.md"):
+    for name in ("README.md", "README.en.md"):
         text = (ROOT / name).read_text(encoding="utf-8")
-        assert "assets/branding/readme-banner.png" in text
+        assert "assets/branding/readme-banner" in text
         assert "assets/branding/logo.png" in text
+        assert "Deutsch" in text or "German" in text

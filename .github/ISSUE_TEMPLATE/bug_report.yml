@@ -1,46 +1,46 @@
-name: Bug report
-description: Report a reproducible problem
-title: "[Bug]: "
+name: Fehlerbericht
+description: Ein reproduzierbares Problem melden
+title: "[Fehler]: "
 labels: [bug]
 body:
   - type: markdown
     attributes:
-      value: "Do not include exact GPS coordinates, private addresses, tokens, credentials, or full movement profiles."
+      value: "Keine exakten GPS-Koordinaten, privaten Adressen, Tokens, Zugangsdaten oder vollständigen Bewegungsprofile veröffentlichen. Englische Meldungen sind willkommen."
   - type: input
     id: version
     attributes:
-      label: Integration version
+      label: Integrationsversion
       placeholder: "0.1.0-beta.1"
     validations:
       required: true
   - type: input
     id: ha_version
     attributes:
-      label: Home Assistant version
+      label: Home-Assistant-Version
       placeholder: "2026.10.1"
     validations:
       required: true
   - type: dropdown
     id: installation
     attributes:
-      label: Installation method
-      options: [HACS custom repository, Manual, Other]
+      label: Installationsmethode
+      options: [HACS-Custom-Repository, Manuell, Andere]
     validations:
       required: true
   - type: input
     id: tracker_type
     attributes:
-      label: GPS integration and tracker type
+      label: GPS-Integration und Tracker-Typ
       placeholder: "PAJ GPS device_tracker"
   - type: textarea
     id: problem
     attributes:
-      label: Problem and reproduction steps
+      label: Problem und Schritte zur Reproduktion
     validations:
       required: true
   - type: textarea
     id: logs
     attributes:
-      label: Redacted logs
-      description: Remove coordinates, addresses, URLs, tokens, and personal data.
+      label: Bereinigte Logs
+      description: Koordinaten, Adressen, URLs, Tokens und personenbezogene Daten entfernen.
       render: text

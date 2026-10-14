@@ -1,34 +1,37 @@
-# Camper Travel Journal v0.1.0-beta.1
+# Camper Travel Journal v0.1.0-beta.1 – Versionshinweise
 
-Early developer beta for an integration-owned GPS travel journal.
+🇩🇪 Deutsch | 🇬🇧 [English](../../README.en.md)
 
-## Included
+Frühe Entwickler-Beta für ein datenschutzbewusstes digitales
+Wohnmobil-Reisetagebuch für Home Assistant.
 
-- Config and Options Flow
-- Event-driven GPS collector
-- Synthetic-test-covered validation and drive detection
-- Separate SQLite database in the HA configuration directory
-- Restart recovery and retention dry-run
+## Enthalten
 
-## Important limitations
+- Config Flow und Options Flow für mehrere Fahrzeuge
+- Ereignisbasierter GPS-Collector mit synthetisch getesteter Validierung
+- Eigene SQLite-Datenbank im Home-Assistant-Konfigurationsverzeichnis
+- Schema-Versionierung, asynchroner Worker und Neustart-Wiederherstellung
+- Retention-Dry-Run ohne destruktive Löschung
+- Deutsche und englische Projektübersetzungen sowie Branding-Assets
 
-- This is not a stable release.
-- Production Home Assistant installation and GPS recording require separate
-  validation and approval.
-- The database is separate from Recorder.
-- MariaDB/PostgreSQL adapters are not included.
-- Travel and expense management have schema foundations but no user UI.
-- Do not publish exact GPS coordinates or movement profiles in issues.
+## Wichtige Einschränkungen
 
-## Validation
+- Dies ist keine stabile Version und nicht produktionsreif.
+- Produktive Home-Assistant-Installation und GPS-Aufzeichnung benötigen eine
+  separate Validierung und Freigabe.
+- Die Datenbank ist von Home Assistant Recorder getrennt; MariaDB-/PostgreSQL-
+  Adapter sind nicht enthalten.
+- Reise- und Ausgabenverwaltung besitzen nur Schema-Grundlagen, keine UI.
+- Keine exakten GPS-Koordinaten oder Bewegungsprofile in Issues veröffentlichen.
 
-The release is valid only after the GitHub Actions Python, HA integration,
-Hassfest, HACS-structure and secret-scan checks pass on the tagged commit.
+## Validierung
 
-## Deutsche Kurzfassung
+Die Beta darf nur dann als qualitätsgesichert gelten, wenn Python-/HA-Tests,
+Hassfest, HACS-Strukturprüfung, JSON-Validierung und Secret-Scan auf dem
+tatsächlich veröffentlichten Commit erfolgreich sind.
 
-Frühe Entwickler-Beta mit Config-/Options-Flow, ereignisbasierter GPS-
-Aufzeichnung, eigener SQLite-Datenbank, Neustart-Wiederherstellung und
-Retention-Dry-Run. Keine stabile Version: Reise-/Ausgabenoberflächen fehlen,
-produktive GPS-Aufzeichnung und destruktive Löschungen sind nicht Bestandteil
-dieser Beta.
+## English summary
+
+Early developer beta with Config/Options Flow, event-driven GPS collection,
+separate SQLite storage, restart recovery and retention dry-run. It is not a
+stable release; travel/expense UI and production validation are not included.

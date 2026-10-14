@@ -1,136 +1,126 @@
 # Camper Travel Journal
 
 <p align="center">
-  <img src="assets/branding/readme-banner.png" alt="Camper Travel Journal — Your digital camper travel journal for Home Assistant" width="1200">
+  <img src="assets/branding/readme-banner-de.png" alt="Camper Travel Journal — Dein digitales Wohnmobil-Reisetagebuch für Home Assistant" width="1200">
 </p>
 
 <p align="center">
-  <img src="assets/branding/logo.png" alt="Camper Travel Journal logo" width="220">
+  <img src="assets/branding/logo.png" alt="Camper Travel Journal Logo" width="220">
 </p>
 
-[![Tests](https://github.com/balronu/ha-camper-travel-journal/actions/workflows/tests.yml/badge.svg)](https://github.com/balronu/ha-camper-travel-journal/actions/workflows/tests.yml)
-[![Validate](https://github.com/balronu/ha-camper-travel-journal/actions/workflows/validate.yml/badge.svg)](https://github.com/balronu/ha-camper-travel-journal/actions/workflows/validate.yml)
-[![Latest beta](https://img.shields.io/github/v/release/balronu/ha-camper-travel-journal?include_prereleases&label=latest%20beta)](https://github.com/balronu/ha-camper-travel-journal/releases)
+🇩🇪 Deutsch | 🇬🇧 [English](README.en.md)
 
-🇩🇪 [Deutsch](README.de.md)
+Eine frühe Home-Assistant-Custom-Integration für ein datenschutzbewusstes
+digitales Wohnmobil-Reisetagebuch. Langfristig sind GPS-Aufzeichnung,
+Fahrtenbuch, Reisen, Ausgaben, Karten, Statistiken und Exporte vorgesehen.
 
-An early Home Assistant custom integration for a privacy-conscious digital
-camper travel journal: GPS recording, drive detection, trips, expenses, maps,
-statistics and exports are the long-term goal.
+> **Status: `v0.1.0-beta.1` Entwickler-Beta.** Nicht produktionsreif. Die
+> aktuelle Version wurde noch nicht in einer produktiven Home-Assistant-
+> Instanz validiert.
 
-> **Status: `v0.1.0-beta.1` development beta.** Not production-ready. The
-> current release has not yet been validated in a live Home Assistant instance.
+## Aktueller Funktionsstand
 
-## Current feature matrix
-
-| Area | Status |
+| Bereich | Status |
 | --- | --- |
-| Config Flow / Options Flow | Implemented; offline-tested, HA fixtures run in CI |
-| GPS validation | Implemented and synthetic-tested |
-| Event-driven collector | Implemented; live HA lifecycle still requires CI verification |
-| Duplicate, accuracy, jump and GPS-gap handling | Implemented and synthetic-tested |
-| Adaptive point storage | Implemented and synthetic-tested |
-| Multiple vehicles | Implemented and synthetic-tested |
-| Separate SQLite database | Implemented and synthetic-tested |
-| Restart recovery | Implemented with bounded replay; HA restart requires CI verification |
-| Retention | Dry-run only; no destructive deletion in beta |
-| Trip/expense UI | Not available; schema foundation only |
-| Maps, statistics, exports | Planned |
+| Config Flow / Options Flow | Implementiert; offline getestet, HA-Fixtures laufen in CI |
+| GPS-Validierung | Implementiert und mit synthetischen Daten getestet |
+| Ereignisbasierter Collector | Implementiert; echter HA-Lifecycle wird in CI geprüft |
+| Duplikate, Genauigkeit, Sprünge und GPS-Lücken | Implementiert und synthetisch getestet |
+| Adaptive Punktspeicherung | Implementiert und synthetisch getestet |
+| Mehrere Fahrzeuge | Implementiert und synthetisch getestet |
+| Eigene SQLite-Datenbank | Implementiert und synthetisch getestet |
+| Neustart-Wiederherstellung | Implementiert mit begrenztem Replay; HA-Neustart wird in CI geprüft |
+| Aufbewahrung | Nur Dry-Run; keine destruktive Löschung in der Beta |
+| Reise-/Ausgabenoberfläche | Nicht verfügbar; nur Schema-Grundlage |
+| Karten, Statistiken, Exporte | Geplant |
 
 ## Installation
 
-This beta is for development testing. Do not connect a production GPS source
-until CI and Home Assistant gates are green and a separate backup/pilot approval
-exists.
+Diese Beta ist für Entwicklungstests bestimmt. Produktive GPS-Quellen erst
+nach grünen CI-/Home-Assistant-Prüfungen und separater Backup-/Pilotfreigabe
+verbinden.
 
-### HACS custom repository
+### HACS-Custom-Repository
 
-1. Open **HACS → Integrations → Custom repositories**.
-2. Add `https://github.com/balronu/ha-camper-travel-journal` as an **Integration**.
-3. Install the beta and restart Home Assistant.
-4. Add **Camper Travel Journal** under **Settings → Devices & services**.
+1. **HACS → Integrationen → Benutzerdefinierte Repositories** öffnen.
+2. `https://github.com/balronu/ha-camper-travel-journal` als **Integration** hinzufügen.
+3. Beta installieren und Home Assistant neu starten.
+4. **Einstellungen → Geräte & Dienste** öffnen und Camper Travel Journal hinzufügen.
 
-### Manual
+### Manuell
 
-Copy `custom_components/camper_travel_journal` and `translations` into the
-Home Assistant configuration directory, restart Home Assistant, and add the
-integration through the UI.
+`custom_components/camper_travel_journal` und `translations` in das
+Home-Assistant-Konfigurationsverzeichnis kopieren, Home Assistant neu starten
+und die Integration über die Oberfläche hinzufügen.
 
-## Configuration
+## Konfiguration
 
-The flow requires a vehicle name and a `device_tracker` entity with numeric
-`latitude` and `longitude` attributes. It also configures recording enabled,
-minimum interval (30 seconds by default), minimum movement (25 metres),
-unassigned retention (90 days), stop detection (10 minutes), GPS-gap and
-plausible-speed thresholds.
+Der Flow benötigt einen Fahrzeugnamen und eine `device_tracker`-Entität mit
+numerischen `latitude`- und `longitude`-Attributen. Zusätzlich werden
+Aufzeichnung, Mindestintervall (Standard 30 Sekunden), Mindestbewegung (25 m),
+Aufbewahrung unzugeordneter Daten (90 Tage), Stopperkennung (10 Minuten),
+GPS-Lücken und Plausibilitätsgrenzen konfiguriert.
 
-Recording is disabled by default in this development build. Options can be
-changed without reinstalling. Multiple config entries support multiple vehicles.
+In diesem Entwicklungsstand ist die Aufzeichnung standardmäßig deaktiviert.
+Optionen können ohne Neuinstallation geändert werden. Mehrere Config Entries
+unterstützen mehrere Fahrzeuge.
 
-The collector uses state events, validates timestamps and coordinates, rejects
-implausible jumps, handles `unknown`/`unavailable`, and does not bridge a long
-GPS outage with artificial straight-line distance. Logs do not contain complete
-routes or coordinates.
+## Datenbank und Datenschutz
 
-## Database and privacy
+Die Integration verwaltet `camper_travel_journal.db` im Home-Assistant-
+Konfigurationsverzeichnis. Die Recorder-Datenbank wird weder geändert noch
+geöffnet; Recorder-/MariaDB-Zugangsdaten werden nicht verwendet. SQLite-
+Zugriffe laufen über einen serialisierten Executor-Worker.
 
-The integration owns `camper_travel_journal.db` in the Home Assistant
-configuration directory. It never changes or opens the Recorder database and
-does not use Recorder/MariaDB credentials. SQLite operations run through an
-executor-backed serialized worker.
+Unzugeordnete GPS-Punkte werden im Retention-Dry-Run berücksichtigt; zugeordnete
+Routen bleiben geschützt. Destruktive Löschung ist in dieser Beta nicht
+implementiert. Reisen und Ausgaben werden aufbewahrt, ihre Oberfläche ist noch
+nicht verfügbar. Die zusätzliche Datenbankdatei muss in Backups enthalten sein.
 
-Unassigned GPS points are eligible for a configurable retention dry-run;
-assigned route data is protected. Destructive deletion is not implemented in
-this beta. Trips and expenses are retained, but their UI is not available yet.
-Include this additional database file in backup/restore checks.
+GPS-Daten sind sensibel. In Issues und Pull Requests nur synthetische
+Koordinaten verwenden; niemals exakte Orte, Adressen, Tokens oder unredigierte
+Home-Assistant-Logs veröffentlichen.
 
-GPS data is sensitive. Use synthetic coordinates in issues, tests and pull
-requests. Never publish exact locations, private addresses, tokens, credentials
-or unredacted Home Assistant logs.
+## Fehlerbehebung
 
-## Troubleshooting
+- **Tracker nicht verfügbar:** Entitäts-ID und numerische Koordinaten prüfen.
+- **Keine Punkte:** Aufzeichnung und Schwellwerte prüfen.
+- **Keine Fahrt:** Die Erkennung ist konservativ und benötigt mehrere plausible Bewegungen.
+- **GPS-Lücke:** Die Lücke wird absichtlich nicht als Streckenkilometer berechnet.
+- **Datenbankfehler:** Logs prüfen und nur die separate Datenbank aus einem Backup wiederherstellen; Recorder nicht anfassen.
+- **HACS:** Dies ist eine frühe Custom-Repository-Beta, keine offizielle HACS-Standardlistung.
 
-- **Tracker unavailable:** verify the entity ID and numeric coordinates.
-- **No points:** check recording and configured thresholds.
-- **No drive:** detection is intentionally conservative and needs multiple
-  plausible movement samples.
-- **GPS gap:** the gap is deliberately not converted into route kilometres.
-- **Database error:** inspect logs and restore only the separate database from
-  a known-good backup; do not touch Recorder.
-- **HACS validation:** this is an early custom-repository beta, not an official
-  HACS default-listing submission.
-
-## Development and tests
+## Entwicklung und Tests
 
 ```bash
 pytest -q
 python -m compileall -q custom_components tests
 ```
 
-GitHub Actions additionally run Home Assistant 2026.10.1 fixtures, coverage,
-Hassfest, JSON/structure validation and Gitleaks. A missing or failing required
-gate blocks a release.
+GitHub Actions prüfen zusätzlich Home Assistant 2026.10.1, Coverage,
+Hassfest, JSON-/Strukturvalidierung und Gitleaks. Fehlende oder fehlgeschlagene
+Pflichtprüfungen blockieren eine Veröffentlichung.
 
-See [the Phase 1C report](docs/phase-1c-report.md), [architecture](docs/architecture.md),
-[database schema](docs/database-schema.md), [test plan](docs/test-plan.md) and
-[branding documentation](docs/BRANDING.md).
+Siehe [Architektur](docs/architecture.md), [Datenbankschema](docs/database-schema.md),
+[Testplan](docs/test-plan.md), [Branding-Dokumentation](docs/BRANDING.md) und
+[Phase-1C-Bericht](docs/phase-1c-report.md).
 
 ## Roadmap
 
-- `v0.1.x`: GPS foundation and controlled beta validation
-- `v0.2.x`: trip management UI
-- `v0.3.x`: expense management UI
-- `v0.4.x`: maps and dashboard resources
-- `v1.0.0`: stable release after production-grade validation
+- `v0.1.x`: GPS-Grundlage und kontrollierte Beta-Validierung
+- `v0.2.x`: Reiseverwaltung
+- `v0.3.x`: Reisekosten
+- `v0.4.x`: Karten und Dashboard
+- `v1.0.0`: stabile Version nach produktiver Validierung
 
 ## Support
 
-- [Bug report](https://github.com/balronu/ha-camper-travel-journal/issues/new?template=bug_report.yml)
-- [Feature request](https://github.com/balronu/ha-camper-travel-journal/issues/new?template=feature_request.yml)
+- [Fehler melden](https://github.com/balronu/ha-camper-travel-journal/issues/new?template=bug_report.yml)
+- [Feature vorschlagen](https://github.com/balronu/ha-camper-travel-journal/issues/new?template=feature_request.yml)
 - [Issues](https://github.com/balronu/ha-camper-travel-journal/issues)
 - [Releases](https://github.com/balronu/ha-camper-travel-journal/releases)
 - [Changelog](CHANGELOG.md)
 
-## License
+## Lizenz
 
-MIT; see [LICENSE](LICENSE).
+MIT; siehe [LICENSE](LICENSE).

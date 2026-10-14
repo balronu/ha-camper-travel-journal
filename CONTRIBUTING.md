@@ -1,9 +1,11 @@
-# Contributing
+# Mitwirken
 
-Run `pytest -q` and `python -m compileall -q custom_components tests` before a
-pull request. Keep English and German documentation aligned.
+🇩🇪 Deutsch | 🇬🇧 [English](README.en.md)
 
-Use only synthetic GPS data in tests. Never commit exact private coordinates,
+Vor einem Pull Request `pytest -q` und `python -m compileall -q custom_components tests`
+ausführen. Deutsche und englische Dokumentation müssen inhaltlich übereinstimmen.
+
+Nur synthetische GPS-Daten in Tests verwenden. Niemals exakte private Koordinaten,
 movement profiles, credentials, tokens, or unredacted Home Assistant logs.
-Changes affecting Config Flow, storage, listener lifecycle, migrations or
-retention require focused regression tests.
+Änderungen an Config Flow, Speicherung, Listener-Lifecycle, Migrationen oder
+Retention benötigen gezielte Regressionstests.

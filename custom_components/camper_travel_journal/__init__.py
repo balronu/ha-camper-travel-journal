@@ -4,7 +4,10 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from homeassistant.helpers import config_validation as cv
+try:
+    from homeassistant.helpers import config_validation as cv
+except ImportError:  # pragma: no cover - permits the offline domain test suite
+    cv = None
 
 from .const import DOMAIN
 from .runtime import Runtime
@@ -13,7 +16,7 @@ from .storage import AsyncSQLiteWorker
 VERSION = "0.1.0"
 
 PLATFORMS: list[str] = []
-CONFIG_SCHEMA = cv.config_entry_only_config_schema(DOMAIN)
+CONFIG_SCHEMA = cv.config_entry_only_config_schema(DOMAIN) if cv else None
 
 
 async def async_setup(hass, config):
