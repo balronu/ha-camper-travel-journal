@@ -2,6 +2,14 @@
 
 🇩🇪 Deutsch | 🇬🇧 [English](README.en.md)
 
+## 0.1.0-beta.7 – Karteneditor-Lifecycle-Hotfix
+
+- Liefert das korrigierte Frontend-Bundle tatsächlich aus.
+- Stabilisiert native Fahrzeugauswahl, automatische Vorauswahl und Vorschau
+  gegen wiederholte HA-State-Updates.
+- Ergänzt einen realitätsnahen Chromium-Lifecycle-Test mit Custom Elements,
+  simulierten WebSocket-Antworten und State-Updates.
+
 ## 0.1.0-beta.6 – Hotfix für Paketstruktur und HACS
 
 - Übersetzungen liegen jetzt im offiziellen Integrationspfad und werden durch

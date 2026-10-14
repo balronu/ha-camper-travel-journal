@@ -1,0 +1,51 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>Camper Travel Journal lifecycle test</title>
+<div id="editor-host"></div>
+<div id="summary-host"></div>
+<pre id="result">starting</pre>
+<script type="module">
+const result = document.querySelector("#result");
+let vehicleCalls = 0;
+let dataCalls = 0;
+const connection = {
+  async sendMessagePromise(message) {
+    if (message.type === "camper_travel_journal/list_vehicles") {
+      vehicleCalls += 1;
+      return { vehicles: [{ vehicle_id: "entry-wohnmobil", name: "Wohnmobil", title: "Camper Travel Journal" }] };
+    }
+    dataCalls += 1;
+    return { trips: [], drives: [], stops: [] };
+  },
+};
+const hass = { connection, locale: { language: "de-DE" } };
+await import("/custom_components/camper_travel_journal/frontend/camper-travel-journal.js");
+await customElements.whenDefined("camper-travel-journal-card-editor");
+await customElements.whenDefined("camper-travel-journal-summary-card");
+
+const editor = document.createElement("camper-travel-journal-card-editor");
+let configEvents = 0;
+editor.addEventListener("config-changed", () => { configEvents += 1; });
+document.querySelector("#editor-host").append(editor);
+editor.setConfig({ type: "custom:camper-travel-journal-summary-card" });
+editor.hass = hass;
+for (let i = 0; i < 8; i += 1) editor.hass = { ...hass };
+await new Promise((resolve) => setTimeout(resolve, 50));
+const select = editor.shadowRoot.querySelector("select");
+
+const summary = document.createElement("camper-travel-journal-summary-card");
+summary.setConfig({ vehicle_id: "entry-wohnmobil" });
+document.querySelector("#summary-host").append(summary);
+summary.hass = hass;
+for (let i = 0; i < 8; i += 1) summary.hass = { ...hass };
+await new Promise((resolve) => setTimeout(resolve, 50));
+
+result.textContent = JSON.stringify({
+  vehicleCalls,
+  dataCalls,
+  configEvents,
+  selectedVehicle: select?.value ?? null,
+  optionCount: select?.options.length ?? 0,
+  noTripMessage: summary.shadowRoot.textContent.includes("Noch keine Reise angelegt."),
+}, null, 2);
+</script>

@@ -28,3 +28,24 @@ jobs:
       - name: Build and test frontend
         working-directory: frontend
         run: npm ci && npm run build && npm test
+      - name: Run Chromium lifecycle regression
+        run: |
+          python3 -m http.server 8765 --bind 127.0.0.1 >/tmp/camper-travel-journal-http.log 2>&1 &
+          server_pid=$!
+          trap 'kill "$server_pid"' EXIT
+          chromium --headless --no-sandbox --disable-gpu --virtual-time-budget=1000 \
+            --dump-dom http://127.0.0.1:8765/frontend/tests/browser/lifecycle.html >/tmp/camper-travel-journal-dom.html
+          node - <<'NODE'
+          const fs = require('fs');
+          const html = fs.readFileSync('/tmp/camper-travel-journal-dom.html', 'utf8');
+          const match = html.match(/<pre id="result">([\s\S]*?)<\/pre>/);
+          if (!match) throw new Error('lifecycle harness returned no result');
+          const result = JSON.parse(match[1]);
+          if (result.vehicleCalls !== 1) throw new Error(`expected one vehicle query, got ${result.vehicleCalls}`);
+          if (result.dataCalls !== 1) throw new Error(`expected one preview query, got ${result.dataCalls}`);
+          if (result.configEvents !== 1) throw new Error(`expected one config-changed event, got ${result.configEvents}`);
+          if (result.selectedVehicle !== 'entry-wohnmobil') throw new Error(`unexpected selected vehicle: ${result.selectedVehicle}`);
+          if (result.optionCount !== 2) throw new Error(`unexpected option count: ${result.optionCount}`);
+          if (!result.noTripMessage) throw new Error('empty preview did not remain stable');
+          console.log(JSON.stringify(result));
+          NODE
