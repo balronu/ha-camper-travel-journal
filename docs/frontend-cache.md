@@ -2,7 +2,7 @@
 
 ## Aktueller Stand
 
-`v0.1.0-beta.3` enthält die Phase-3-Lovelace-Karten und registriert das Bundle
+`v0.1.0-beta.6` enthält die Phase-3-Lovelace-Karten und registriert das Bundle
 über den öffentlichen HA-Mechanismus. Der historische Tag `v0.1.0-beta.1`
 enthielt **keine** Lovelace-Karte.
 
@@ -13,7 +13,7 @@ Metadaten dieselbe veröffentlichte Version tragen. Die Resource-URL folgt dann
 diesem Muster:
 
 ```text
-/camper_travel_journal/camper-travel-journal.js?v=0.1.0-beta.3
+/camper_travel_journal/camper-travel-journal.js?v=0.1.0-beta.6
 ```
 
 `<VERSION>` wird bei jeder Bundle-Änderung erhöht, auch zwischen stabilen
@@ -28,6 +28,13 @@ Die Integration verwendet ausschließlich die zu Home Assistant passende,
 Registrierung über den unterstützten Helper. Die Resource-URL muss
 versionsgebunden sein und darf nicht durch direkte Änderungen an
 `.storage/lovelace.resources` gepflegt werden.
+
+Das Bundle registriert beide Kartentypen zusätzlich idempotent in
+`window.customCards`. Beide Karten liefern über `getConfigElement()` einen
+grafischen Editor. Dieser lädt die eingerichteten Camper über den
+authentifizierten Befehl `camper_travel_journal/list_vehicles`, übernimmt
+bestehende `vehicle_id`-Werte und wählt den einzigen vorhandenen Hub
+automatisch vor.
 
 Die API-Signatur wird in der HA-Fixture geprüft. Cache-Control-Header werden nur
 verwendet, wenn die öffentliche HA-HTTP-Schnittstelle sie kontrollieren lässt;
@@ -72,4 +79,5 @@ Gates erforderlich:
 
 Die Browser- und echte Dashboard-Verifikation bleibt für diese Beta offen;
 die statische Registrierung, Versionskennung und idempotente Elementdefinition
-sind durch Code- und CI-Tests abzusichern.
+sowie der Editor-Vertrag sind durch Code- und CI-Tests abgesichert. Eine echte
+iOS-/WebKit-Prüfung wurde nicht durchgeführt.

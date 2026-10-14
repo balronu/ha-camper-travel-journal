@@ -56,6 +56,21 @@ def _send_error(connection, msg: dict, error: Exception) -> None:
 if websocket_api is not None:
     _base = {vol.Required("type"): str, vol.Required("vehicle_id"): str}
 
+    @websocket_api.websocket_command({vol.Required("type"): "camper_travel_journal/list_vehicles"})
+    @websocket_api.async_response
+    async def ws_list_vehicles(hass: HomeAssistant, connection, msg: dict) -> None:
+        """Return configured journal hubs for the visual Lovelace editor."""
+        vehicles = []
+        for vehicle_id, runtime in hass.data.get("camper_travel_journal", {}).items():
+            if not isinstance(vehicle_id, str) or not hasattr(runtime, "values"):
+                continue
+            vehicles.append({
+                "vehicle_id": vehicle_id,
+                "name": runtime.values.get("vehicle_name", "Wohnmobil"),
+                "title": getattr(runtime.entry, "title", "Camper Travel Journal"),
+            })
+        connection.send_result(msg["id"], {"vehicles": sorted(vehicles, key=lambda item: item["name"].lower())})
+
     @websocket_api.websocket_command({**_base, vol.Optional("trip_id"): str})
     @websocket_api.async_response
     async def ws_list(hass: HomeAssistant, connection, msg: dict) -> None:
@@ -189,7 +204,7 @@ if websocket_api is not None:
             connection.send_result(msg["id"], {"success": True})
         except Exception as err: _send_error(connection, msg, err)
 
-    COMMANDS = (ws_list, ws_create_trip, ws_update_trip, ws_delete_trip, ws_transition_trip, ws_link_drives, ws_unlink_drive, ws_create_stop, ws_update_stop, ws_delete_stop, ws_create_expense, ws_update_expense, ws_delete_expense)
+    COMMANDS = (ws_list_vehicles, ws_list, ws_create_trip, ws_update_trip, ws_delete_trip, ws_transition_trip, ws_link_drives, ws_unlink_drive, ws_create_stop, ws_update_stop, ws_delete_stop, ws_create_expense, ws_update_expense, ws_delete_expense)
 else:
     COMMANDS = ()
 

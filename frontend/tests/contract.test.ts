@@ -1,6 +1,9 @@
 import { existsSync, readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { describe, expect, it } from "vitest";
+import { categoryLabel, messages, statusLabel } from "../src/i18n";
+import { autoSelectVehicle, sameCardConfig } from "../src/card-editor";
+import { listVehicles } from "../src/api";
 
 const root = resolve(import.meta.dirname, "..");
 const manifest = JSON.parse(readFileSync(resolve(root, "../custom_components/camper_travel_journal/manifest.json"), "utf8"));
@@ -9,7 +12,7 @@ const bundle = resolve(root, "../custom_components/camper_travel_journal/fronten
 
 describe("frontend release contract", () => {
   it("keeps backend, npm metadata and beta bundle aligned", () => {
-    expect(manifest.version).toBe("0.1.0-beta.3");
+    expect(manifest.version).toBe("0.1.0-beta.6");
     expect(pkg.version).toBe(manifest.version);
     expect(existsSync(bundle)).toBe(true);
   });
@@ -19,10 +22,58 @@ describe("frontend release contract", () => {
     expect(readFileSync(resolve(root, "src/base-card.ts"), "utf8")).toContain("customElements.get");
     expect(source).toContain("camper-travel-journal-summary-card");
     expect(source).toContain("camper-travel-journal-manager-card");
+    expect(source).toContain("Reiseübersicht");
+    expect(source).toContain("Reiseverwaltung");
     const init = readFileSync(resolve(root, "../custom_components/camper_travel_journal/__init__.py"), "utf8");
     expect(init).toContain("async_register_static_paths");
     expect(init).toContain("add_extra_js_url");
     expect(init).toContain("frontend_registered");
+  });
+  it("provides graphical editors and preserves the vehicle_id API contract", () => {
+    const base = readFileSync(resolve(root, "src/base-card.ts"), "utf8");
+    const editor = readFileSync(resolve(root, "src/card-editor.ts"), "utf8");
+    const api = readFileSync(resolve(root, "src/api.ts"), "utf8");
+    expect(base).toContain("getConfigElement");
+    expect(base).toContain("getStubConfig");
+    expect(editor).toContain("config-changed");
+    expect(editor).toContain("editorNoVehicle");
+    expect(api).toContain("listVehicles");
+    expect(autoSelectVehicle({}, [{ vehicle_id: "entry-1", name: "Wohnmobil", title: "Camper Travel Journal" }])).toEqual({ vehicle_id: "entry-1" });
+    expect(autoSelectVehicle({ vehicle_id: "existing" }, [{ vehicle_id: "entry-1", name: "Wohnmobil", title: "Camper Travel Journal" }])).toEqual({ vehicle_id: "existing" });
+    expect(autoSelectVehicle({}, [])).toEqual({});
+    expect(autoSelectVehicle({}, [
+      { vehicle_id: "entry-1", name: "Eins", title: "Eins" },
+      { vehicle_id: "entry-2", name: "Zwei", title: "Zwei" },
+    ])).toEqual({});
+  });
+  it("covers vehicle discovery, empty/error responses and stable editor configs", async () => {
+    const vehicle = { vehicle_id: "entry-1", name: "Wohnmobil", title: "Camper Travel Journal" };
+    expect(autoSelectVehicle({}, [vehicle])).toEqual({ vehicle_id: "entry-1" });
+    expect(autoSelectVehicle({}, [vehicle, { ...vehicle, vehicle_id: "entry-2", name: "Zweitfahrzeug" }])).toEqual({});
+    expect(autoSelectVehicle({}, [])).toEqual({});
+    expect(sameCardConfig({ vehicle_id: "entry-1" }, { vehicle_id: "entry-1" })).toBe(true);
+    expect(sameCardConfig({ vehicle_id: "entry-1" }, { vehicle_id: "entry-2" })).toBe(false);
+    const hass = { connection: { sendMessagePromise: async () => ({ vehicles: [vehicle] }) } } as any;
+    await expect(listVehicles(hass)).resolves.toEqual([vehicle]);
+    const empty = { connection: { sendMessagePromise: async () => ({}) } } as any;
+    await expect(listVehicles(empty)).resolves.toEqual([]);
+    const broken = { connection: { sendMessagePromise: async () => { throw new Error("websocket failed"); } } } as any;
+    await expect(listVehicles(broken)).rejects.toThrow("websocket failed");
+  });
+  it("keeps the hub editor texts in German and English", () => {
+    expect(messages({ locale: { language: "de-DE" } } as any).editorChooseVehicle).toBe("Wohnmobil auswählen");
+    expect(messages({ locale: { language: "en-US" } } as any).editorChooseVehicle).toBe("Select camper");
+  });
+  it("guards reload loops and repeated state updates in card sources", () => {
+    const editor = readFileSync(resolve(root, "src/card-editor.ts"), "utf8");
+    const base = readFileSync(resolve(root, "src/base-card.ts"), "utf8");
+    const summary = readFileSync(resolve(root, "src/summary-card.ts"), "utf8");
+    expect(editor).toContain("this._hass?.connection !== value?.connection");
+    expect(editor).toContain("if (this.loadingPromise) return this.loadingPromise");
+    expect(editor).toContain("sameCardConfig(this._config, config)");
+    expect(base).toContain("this._hass?.connection !== value?.connection");
+    expect(base).toContain("if (this.config.vehicle_id === config.vehicle_id) return");
+    expect(summary).toContain("protected onHassConnectionChanged");
   });
   it("contains no location data and exposes the versioned resource contract", () => {
     const source = readFileSync(bundle, "utf8");
@@ -34,13 +85,27 @@ describe("frontend release contract", () => {
   it("exposes CRUD, assignment and error-state UI contracts", () => {
     const api = readFileSync(resolve(root, "src/api.ts"), "utf8");
     const manager = readFileSync(resolve(root, "src/manager-card.ts"), "utf8");
+    const i18n = readFileSync(resolve(root, "src/i18n.ts"), "utf8");
     expect(api).toContain("updateTrip");
     expect(api).toContain("deleteTrip");
     expect(api).toContain("linkDrives");
     expect(api).toContain("updateExpense");
     expect(manager).toContain("window.confirm");
     expect(manager).toContain("role=\"alert\"");
-    expect(manager).toContain("Bearbeiten");
-    expect(manager).toContain("Zuordnen");
+    expect(manager).toContain("statusLabel");
+    expect(manager).toContain("categoryLabel");
+    expect(i18n).toContain("const de");
+    expect(i18n).toContain("const en");
+    expect(i18n).toContain("language");
+  });
+  it("localizes visible status and category labels for German and English", () => {
+    const german = { locale: { language: "de-DE" } } as any;
+    const english = { locale: { language: "en-US" } } as any;
+    expect(messages(german).manager).toBe("Reiseverwaltung");
+    expect(messages(english).manager).toBe("Trip management");
+    expect(statusLabel("paused", german)).toBe("pausiert");
+    expect(statusLabel("paused", english)).toBe("paused");
+    expect(categoryLabel("fuel", german)).toBe("Kraftstoff");
+    expect(categoryLabel("fuel", english)).toBe("Fuel");
   });
 });

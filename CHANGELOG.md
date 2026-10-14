@@ -2,6 +2,14 @@
 
 🇩🇪 Deutsch | 🇬🇧 [English](README.en.md)
 
+## 0.1.0-beta.6 – Hotfix für Paketstruktur und HACS
+
+- Übersetzungen liegen jetzt im offiziellen Integrationspfad und werden durch
+  einen Regressionstest gegen ein versehentliches Root-Verzeichnis geschützt.
+- README-Bilder verwenden dauerhaft erreichbare absolute GitHub-Raw-URLs.
+- HACS-Pre-Release-Auswahl, `main`-Synchronisierung und lokale/HACS/Update-
+  Branding-Grenzen sind dokumentiert.
+
 ## 0.1.0-beta.2 – Reiseverwaltung und Lovelace-Karten
 
 - Reiseverwaltung mit Statusmodell, Fahrtzuordnung, Zwischenstopps und

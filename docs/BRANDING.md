@@ -27,14 +27,32 @@ des jeweils verwendeten Bilddienstes.
 
 ## Einbindung
 
+Für Home Assistant 2026.3 und neuer wird das Integrationssymbol lokal unter
+`custom_components/camper_travel_journal/brand/icon.png` ausgeliefert. Das ist
+der unterstützte Brands-Proxy-Weg; ein zusätzlicher `icon`-Eintrag im Manifest
+ist nicht erforderlich. Nach einem HACS-Update sind ein Home-Assistant-Neustart
+und gegebenenfalls ein harter Browser-Refresh erforderlich.
+
 - `README.md` referenziert `readme-banner-de.png`, `README.en.md`
-  referenziert `readme-banner.png`; beide verwenden `logo.png` über relative
-  Pfade.
+  referenziert `readme-banner.png`; beide verwenden `logo.png` über dauerhafte
+  absolute GitHub-Raw-URLs, damit HACS-README-Renderer die Bilder laden können.
 - `social-preview.png` ist für die Einstellung der GitHub-Repository-Vorschau
   vorgesehen.
 - `icon.png` ist ein lokales Projekt-Asset. Es ist **keine** Aussage über eine
   offizielle HACS-Brand-Registrierung oder eine Aufnahme in den HACS-
   Standardkatalog. Eine solche Registrierung wurde nicht beantragt.
+
+Neue Custom-Integration-Assets werden nicht mehr als gewöhnliche PR im
+offiziellen `home-assistant/brands`-Repository aufgenommen. Die lokale
+Auslieferung und die HACS-Anzeige sind getrennte Pfade; ein CDN-Platzhalter in
+HACS beweist daher nicht, dass das lokale Home-Assistant-Symbol fehlt.
+
+Das lokale Home-Assistant-Branding wird aus `custom_components/.../brand/`
+ausgeliefert. Die HACS-Repository-Karte verwendet dagegen GitHub-/HACS-Metadaten
+und kann ein eigenes Platzhalterbild zeigen. Die Home-Assistant-Update-Anzeige
+ist wiederum der HACS-Release-/Pre-Release-Auswahl untergeordnet. Diese drei
+Anzeigen sind unabhängig und werden nicht durch eine zusätzliche Manifest-
+`icon`-Angabe gekoppelt.
 
 ## Qualitäts- und Datenschutzprüfung
 
