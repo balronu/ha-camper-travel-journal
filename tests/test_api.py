@@ -69,8 +69,7 @@ def test_timestamp_and_amount_validation():
 async def test_create_trip_command_validates_and_returns_id():
     hass = FakeHass()
     connection = FakeConnection()
-    api.ws_create_trip(hass, connection, {"id": 1, "vehicle_id": "v1", "title": "Alpen", "description": "", "destination": "Berge", "started_at": "2026-10-01T12:00:00Z"})
-    await hass.task
+    await api.ws_create_trip.__wrapped__(hass, connection, {"id": 1, "vehicle_id": "v1", "title": "Alpen", "description": "", "destination": "Berge", "started_at": "2026-10-01T12:00:00Z"})
     assert connection.results == [(1, {"trip_id": "t-new"})]
     assert connection.errors == []
 
@@ -79,8 +78,7 @@ async def test_create_trip_command_validates_and_returns_id():
 async def test_list_command_returns_separate_domains():
     hass = FakeHass()
     connection = FakeConnection()
-    api.ws_list(hass, connection, {"id": 2, "vehicle_id": "v1", "trip_id": "t1"})
-    await hass.task
+    await api.ws_list.__wrapped__(hass, connection, {"id": 2, "vehicle_id": "v1", "trip_id": "t1"})
     assert connection.results[0][1]["trips"][0]["id"] == "t1"
     assert "expenses" in connection.results[0][1]
 
@@ -89,12 +87,8 @@ async def test_list_command_returns_separate_domains():
 async def test_transition_and_write_commands_complete():
     hass = FakeHass()
     connection = FakeConnection()
-    api.ws_transition_trip(hass, connection, {"id": 3, "vehicle_id": "v1", "trip_id": "t1", "status": "active"})
-    await hass.task
-    api.ws_link_drives(hass, connection, {"id": 4, "vehicle_id": "v1", "trip_id": "t1", "drive_ids": []})
-    await hass.task
-    api.ws_create_stop(hass, connection, {"id": 5, "vehicle_id": "v1", "trip_id": "t1", "occurred_at": "2026-10-01T12:00:00Z", "name": "Stopp", "category": "parking"})
-    await hass.task
-    api.ws_create_expense(hass, connection, {"id": 6, "vehicle_id": "v1", "trip_id": "t1", "occurred_at": "2026-10-01T12:00:00Z", "category": "fuel", "amount_minor": 100, "currency": "EUR"})
-    await hass.task
-    assert len(connection.results) == 4
+    await api.ws_transition_trip.__wrapped__(hass, connection, {"id": 3, "vehicle_id": "v1", "trip_id": "t1", "status": "active"})
+    await api.ws_link_drives.__wrapped__(hass, connection, {"id": 4, "vehicle_id": "v1", "trip_id": "t1", "drive_ids": []})
+    await api.ws_create_stop.__wrapped__(hass, connection, {"id": 5, "vehicle_id": "v1", "trip_id": "t1", "occurred_at": "2026-10-01T12:00:00Z", "name": "Stopp", "category": "parking"})
+    await api.ws_create_expense.__wrapped__(hass, connection, {"id": 6, "vehicle_id": "v1", "trip_id": "t1", "occurred_at": "2026-10-01T12:00:00Z", "category": "fuel", "amount_minor": 100, "currency": "EUR"})
+    assert len(connection.results) == 4, connection.errors
