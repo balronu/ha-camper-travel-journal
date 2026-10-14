@@ -1,0 +1,62 @@
+"""Home Assistant integration tests, executed in the pinned CI environment."""
+
+from __future__ import annotations
+
+try:
+    import pytest
+    from homeassistant.core import HomeAssistant
+    from pytest_homeassistant_custom_component.common import MockConfigEntry
+except ImportError:  # pragma: no cover - expected on the local offline runner
+    pytest = None
+else:
+    from custom_components.camper_travel_journal.const import (
+        CONF_MAX_GAP, CONF_MAX_SPEED, CONF_MIN_INTERVAL, CONF_MIN_MOVEMENT,
+        CONF_RECORDING_ENABLED, CONF_RETENTION_DAYS, CONF_STOP_AFTER,
+        CONF_TRACKER_ENTITY, CONF_VEHICLE_NAME, DOMAIN,
+    )
+
+    def _data(entity: str = "device_tracker.synthetic") -> dict:
+        return {
+            CONF_VEHICLE_NAME: "Synthetic Camper",
+            CONF_TRACKER_ENTITY: entity,
+            CONF_RECORDING_ENABLED: False,
+            CONF_MIN_INTERVAL: 30,
+            CONF_MIN_MOVEMENT: 25.0,
+            CONF_RETENTION_DAYS: 90,
+            CONF_STOP_AFTER: 10,
+            CONF_MAX_GAP: 10,
+            CONF_MAX_SPEED: 200.0,
+        }
+
+    async def test_config_flow_rejects_missing_tracker(hass: HomeAssistant):
+        result = await hass.config_entries.flow.async_init(DOMAIN, context={"source": "user"})
+        result = await hass.config_entries.flow.async_configure(result["flow_id"], {**_data(), CONF_TRACKER_ENTITY: "device_tracker.missing"})
+        assert result["type"] == "form"
+        assert result["errors"][CONF_TRACKER_ENTITY] == "tracker_not_found"
+
+    async def test_config_flow_creates_entry_and_options_update(hass: HomeAssistant):
+        hass.states.async_set("device_tracker.synthetic", "home", {"latitude": 49.0, "longitude": 7.0, "gps_accuracy": 5})
+        result = await hass.config_entries.flow.async_init(DOMAIN, context={"source": "user"})
+        result = await hass.config_entries.flow.async_configure(result["flow_id"], _data())
+        assert result["type"] == "create_entry"
+        entry = result["result"]
+        assert entry.data[CONF_VEHICLE_NAME] == "Synthetic Camper"
+        options = await hass.config_entries.options.async_init(entry.entry_id)
+        updated = {**_data(), CONF_MIN_INTERVAL: 60, CONF_MIN_MOVEMENT: 50.0, CONF_RETENTION_DAYS: 180}
+        result = await hass.config_entries.options.async_configure(options["flow_id"], updated)
+        assert result["type"] == "create_entry"
+        assert result["data"][CONF_MIN_INTERVAL] == 60
+        assert result["data"][CONF_RETENTION_DAYS] == 180
+        assert await hass.config_entries.async_unload(entry.entry_id)
+
+    async def test_setup_unload_listener_lifecycle(hass: HomeAssistant):
+        hass.states.async_set("device_tracker.synthetic", "home", {"latitude": 49.0, "longitude": 7.0, "gps_accuracy": 5})
+        entry = MockConfigEntry(domain=DOMAIN, data={**_data(), CONF_RECORDING_ENABLED: True})
+        entry.add_to_hass(hass)
+        assert await hass.config_entries.async_setup(entry.entry_id)
+        await hass.async_block_till_done()
+        assert entry.entry_id in hass.data[DOMAIN]
+        hass.states.async_set("device_tracker.synthetic", "home", {"latitude": 49.001, "longitude": 7.0, "gps_accuracy": 5})
+        await hass.async_block_till_done()
+        assert await hass.config_entries.async_unload(entry.entry_id)
+        assert entry.entry_id not in hass.data[DOMAIN]

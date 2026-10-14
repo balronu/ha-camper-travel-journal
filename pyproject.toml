@@ -1,0 +1,18 @@
+[project]
+name = "ha-camper-travel-journal"
+version = "0.1.0"
+description = "Home Assistant Camper Travel Journal custom integration"
+requires-python = ">=3.12"
+license = {file = "LICENSE"}
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["custom_components"]
+asyncio_mode = "auto"
+addopts = "--cov=custom_components/camper_travel_journal --cov-report=term-missing --cov-report=xml --cov-fail-under=85"
+
+[tool.coverage.run]
+branch = true
+
+[tool.coverage.report]
+exclude_lines = ["pragma: no cover", "if TYPE_CHECKING:"]

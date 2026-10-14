@@ -1,0 +1,46 @@
+name: Bug report
+description: Report a reproducible problem
+title: "[Bug]: "
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: "Do not include exact GPS coordinates, private addresses, tokens, credentials, or full movement profiles."
+  - type: input
+    id: version
+    attributes:
+      label: Integration version
+      placeholder: "0.1.0-beta.1"
+    validations:
+      required: true
+  - type: input
+    id: ha_version
+    attributes:
+      label: Home Assistant version
+      placeholder: "2026.10.1"
+    validations:
+      required: true
+  - type: dropdown
+    id: installation
+    attributes:
+      label: Installation method
+      options: [HACS custom repository, Manual, Other]
+    validations:
+      required: true
+  - type: input
+    id: tracker_type
+    attributes:
+      label: GPS integration and tracker type
+      placeholder: "PAJ GPS device_tracker"
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem and reproduction steps
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Redacted logs
+      description: Remove coordinates, addresses, URLs, tokens, and personal data.
+      render: text
