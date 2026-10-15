@@ -42,10 +42,22 @@ und gegebenenfalls ein harter Browser-Refresh erforderlich.
   offizielle HACS-Brand-Registrierung oder eine Aufnahme in den HACS-
   Standardkatalog. Eine solche Registrierung wurde nicht beantragt.
 
-Neue Custom-Integration-Assets werden nicht mehr als gewöhnliche PR im
-offiziellen `home-assistant/brands`-Repository aufgenommen. Die lokale
-Auslieferung und die HACS-Anzeige sind getrennte Pfade; ein CDN-Platzhalter in
-HACS beweist daher nicht, dass das lokale Home-Assistant-Symbol fehlt.
+Neue Custom-Integration-Assets werden nach der aktuellen Brands-Proxy-Ankündigung
+nicht mehr als gewöhnliche PR im offiziellen `home-assistant/brands`-Repository
+aufgenommen. Die lokale Auslieferung und die HACS-Anzeige sind getrennte Pfade;
+ein CDN-Platzhalter in HACS beweist daher nicht, dass das lokale
+Home-Assistant-Symbol fehlt.
+
+Home Assistant 2026.3+ proxied lokale Bilder über den authentifizierten
+Endpunkt `/api/brands/integration/{domain}/{image}`. Die HACS-Update-Entität in
+HACS 2.0.5 verwendet dagegen weiterhin die öffentliche URL
+`https://brands.home-assistant.io/_/{domain}/icon.png`. Für dieses Repository
+liefert der `/_/`-Endpunkt den vorgesehenen Platzhalter, während der direkte
+CDN-Pfad ohne `/_/` mit 404 endet. Das ist die Ursache für ein fehlendes Logo
+in der HACS-Update-Entität; das lokale Branding bleibt davon unabhängig.
+
+Die HACS-/Release-Erläuterung und die Freigabegrenzen stehen in
+[`docs/HACS_RELEASE_STRATEGY.md`](HACS_RELEASE_STRATEGY.md).
 
 Das lokale Home-Assistant-Branding wird aus `custom_components/.../brand/`
 ausgeliefert. Die HACS-Repository-Karte verwendet dagegen GitHub-/HACS-Metadaten

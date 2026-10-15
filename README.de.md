@@ -13,6 +13,8 @@ die Beispiel-Unterseite
 [`docs/examples/dashboard-wohnmobil-reisetagebuch.yaml`](docs/examples/dashboard-wohnmobil-reisetagebuch.yaml)
 in das Wohnmobil-Dashboard übernommen werden; sie wird nicht automatisch
 angewendet. Für vollständige deutsche Details siehe [README.md](README.md).
+Die dauerhafte Release-, HACS- und Branding-Strategie steht in
+[`docs/HACS_RELEASE_STRATEGY.md`](docs/HACS_RELEASE_STRATEGY.md).
 
 Die Beta ist noch nicht produktiv validiert. Keine Installation, kein Reload
 und keine Änderung an VM 104, Proxmox, Recorder oder produktiven Dashboards
