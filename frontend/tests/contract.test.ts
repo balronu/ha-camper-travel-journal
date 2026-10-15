@@ -66,6 +66,12 @@ describe("frontend release contract", () => {
     expect(messages({ locale: { language: "de-DE" } } as any).editorChooseVehicle).toBe("Wohnmobil auswählen");
     expect(messages({ locale: { language: "en-US" } } as any).editorChooseVehicle).toBe("Select camper");
   });
+  it("translates the explicit GPX target controls", () => {
+    expect(messages({ locale: { language: "de-DE" } } as any).gpxTargetTrip).toBe("Zielreise");
+    expect(messages({ locale: { language: "de-DE" } } as any).gpxGapBoundary).toContain("GPS-Lücke");
+    expect(messages({ locale: { language: "en-US" } } as any).gpxTargetTrip).toBe("Target trip");
+    expect(messages({ locale: { language: "en-US" } } as any).gpxNoTrip).toContain("unassigned");
+  });
   it("guards reload loops and repeated state updates in card sources", () => {
     const editor = readFileSync(resolve(root, "src/card-editor.ts"), "utf8");
     const base = readFileSync(resolve(root, "src/base-card.ts"), "utf8");

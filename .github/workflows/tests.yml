@@ -97,3 +97,23 @@ jobs:
           if (result.visibleTemplateLeak) throw new Error('frontend template source leaked into visible DOM');
           console.log(JSON.stringify(result));
           NODE
+      - name: Run GPX import target-selection regression
+        run: |
+          python3 -m http.server 8765 --bind 127.0.0.1 >/tmp/camper-travel-journal-gpx-http.log 2>&1 &
+          server_pid=$!
+          trap 'kill "$server_pid"' EXIT
+          sleep 0.3
+          chromium --headless --no-sandbox --disable-gpu --virtual-time-budget=1500 \
+            --dump-dom http://127.0.0.1:8765/frontend/tests/browser/gpx-import.html >/tmp/camper-travel-journal-gpx-dom.html
+          node - <<'NODE'
+          const fs = require('fs');
+          const html = fs.readFileSync('/tmp/camper-travel-journal-gpx-dom.html', 'utf8');
+          const match = html.match(/<pre id="result">([\s\S]*?)<\/pre>/);
+          if (!match) throw new Error('GPX harness returned no result');
+          const result = JSON.parse(match[1]);
+          for (const [key, value] of Object.entries(result)) {
+            if (key !== 'visibleTemplateLeak' && key !== 'importTripIds' && value !== true) throw new Error(`${key}=${value}`);
+          }
+          if (result.visibleTemplateLeak) throw new Error('frontend template source leaked into visible DOM');
+          console.log(JSON.stringify(result));
+          NODE

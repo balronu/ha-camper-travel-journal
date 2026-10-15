@@ -12,7 +12,7 @@ export class ManagerCard extends TravelCard {
   private selected = ""; private editingExpenseId = ""; private editingAmount = ""; private editingCategory = "other"; private expenseSavingId = "";
   private manualOccurredAt = ""; private manualStartLocation = ""; private manualEndLocation = ""; private manualDistanceKm = ""; private manualDurationMinutes = ""; private manualSaving = false;
   private editingDriveId = ""; private editingDriveOccurredAt = ""; private editingDriveStartLocation = ""; private editingDriveEndLocation = ""; private editingDriveDistanceKm = ""; private editingDriveDurationMinutes = ""; private driveSavingId = ""; private confirmingDriveId = "";
-  private gpxContent = ""; private gpxName = ""; private gpxPreview?: GPXPreview; private gpxSelected = new Set<string>(); private gpxBusy = false; private gpxError = "";
+  private gpxContent = ""; private gpxName = ""; private gpxPreview?: GPXPreview; private gpxSelected = new Set<string>(); private gpxTripId = ""; private gpxBusy = false; private gpxError = "";
 
   connectedCallback() { super.connectedCallback(); void this.refresh(); }
   protected onHassConnectionChanged() { void this.refresh(); }
@@ -23,14 +23,14 @@ export class ManagerCard extends TravelCard {
     const file = (event.currentTarget as HTMLInputElement).files?.[0];
     if (!file || !this.hass) return;
     this.gpxBusy = true; this.gpxError = ""; this.gpxPreview = undefined; this.gpxName = file.name;
-    try { const bytes = new Uint8Array(await file.arrayBuffer()); let binary = ""; bytes.forEach((byte) => { binary += String.fromCharCode(byte); }); this.gpxContent = btoa(binary); this.gpxPreview = await analyzeGPX(this.hass, this.vehicleId, this.gpxContent); this.gpxSelected = new Set(this.gpxPreview.drives.map((drive) => drive.key)); }
+    try { const bytes = new Uint8Array(await file.arrayBuffer()); let binary = ""; bytes.forEach((byte) => { binary += String.fromCharCode(byte); }); this.gpxContent = btoa(binary); this.gpxPreview = await analyzeGPX(this.hass, this.vehicleId, this.gpxContent); this.gpxSelected = new Set(this.gpxPreview.drives.map((drive) => drive.key)); this.gpxTripId = this.selected; }
     catch { this.gpxError = messages(this.hass).gpxAnalyzeError; }
     finally { this.gpxBusy = false; this.requestUpdate(); }
   }
   private async confirmGPX() {
     if (!this.hass || !this.gpxPreview || this.gpxBusy || this.gpxPreview.conflicts.duplicate_file) return;
     this.gpxBusy = true; this.gpxError = "";
-    try { await importGPX(this.hass, this.vehicleId, this.gpxContent, this.gpxPreview.file_hash, [...this.gpxSelected], this.selected || undefined); this.gpxPreview = undefined; this.gpxContent = ""; this.gpxSelected.clear(); this.actionError = ""; await this.refresh(); notifyTravelChanged({ vehicleId: this.vehicleId, tripId: this.selected }); }
+    try { const importedTripId = this.gpxTripId || undefined; await importGPX(this.hass, this.vehicleId, this.gpxContent, this.gpxPreview.file_hash, [...this.gpxSelected], importedTripId); this.gpxPreview = undefined; this.gpxContent = ""; this.gpxSelected.clear(); this.gpxTripId = ""; this.actionError = ""; await this.refresh(); notifyTravelChanged({ vehicleId: this.vehicleId, tripId: importedTripId ?? "" }); }
     catch { this.gpxError = messages(this.hass).gpxImportError; }
     finally { this.gpxBusy = false; this.requestUpdate(); }
   }
@@ -38,6 +38,17 @@ export class ManagerCard extends TravelCard {
   private setEditingExpenseAmount(value: string) { this.editingAmount = value; this.requestUpdate(); }
   private setExpenseCategory(value: string) { if (!isExpenseCategory(value)) return this.fail(messages(this.hass).categoryInvalid); this.category = value; this.requestUpdate(); }
   private setEditingExpenseCategory(value: string) { if (!isExpenseCategory(value)) return this.fail(messages(this.hass).categoryInvalid); this.editingCategory = value; this.requestUpdate(); }
+  private gpxPeriod(): { start: string; end: string } | undefined {
+    const dates = (this.gpxPreview?.points ?? []).map((point) => point.recorded_at).sort();
+    return dates.length ? { start: dates[0], end: dates[dates.length - 1] } : undefined;
+  }
+  private gpxSelectedDistanceKm(): number { return (this.gpxPreview?.drives ?? []).filter((drive) => this.gpxSelected.has(drive.key)).reduce((total, drive) => total + drive.distance_m, 0) / 1000; }
+  private gpxTripPeriodWarning(trip: Snapshot["trips"][number] | undefined): boolean {
+    const period = this.gpxPeriod();
+    if (!period || !trip || (!trip.start_date && !trip.end_date)) return false;
+    const start = period.start.slice(0, 10); const end = period.end.slice(0, 10);
+    return Boolean((trip.start_date && start < trip.start_date) || (trip.end_date && end > trip.end_date));
+  }
 
   private async addTrip() {
     if (!this.hass || !this.tripTitle.trim()) return;
@@ -128,7 +139,14 @@ export class ManagerCard extends TravelCard {
     const manualActions = drive.source === "manual" ? html`<button type="button" class="link" @click=${() => this.startManualDriveEdit(drive)} ?disabled=${Boolean(this.driveSavingId)}>${lang.edit}</button><button type="button" class="link" @click=${() => this.removeManualDrive(tripId, drive.id)} ?disabled=${Boolean(this.driveSavingId)}>${this.confirmingDriveId === drive.id ? lang.confirmDelete : lang.remove}</button>` : "";
     return html`<div class="drive-row"><div><strong>${source}</strong> · ${locations}<br><span class="muted">${(drive.distance_m / 1000).toFixed(1)} km · ${formatDuration(drive.duration_seconds, this.hass)} · ${drive.assignment_status === "assigned" ? lang.assignedDrives : lang.freeDrives}</span></div><span class="actions">${manualActions}${assignment}</span></div>`;
   }
-  render() {
+  private renderGpx(lang: ReturnType<typeof messages>, trips: Snapshot["trips"], gpx: GPXPreview | undefined) {
+    const selectedTrip = trips.find((trip) => trip.id === this.gpxTripId);
+    const period = this.gpxPeriod();
+    const periodWarning = this.gpxTripPeriodWarning(selectedTrip);
+    return html`<ha-card><section class="gpx-import gpx-explicit"><h2>${lang.gpxImport}</h2><p class="muted"><strong>${lang.gpxVehicle}:</strong> ${this.vehicleId} (${lang.gpxVehicleFixed})</p><label>${lang.gpxTargetTrip}<select aria-label=${lang.gpxTargetTrip} .value=${this.gpxTripId} @change=${(event: Event) => { this.gpxTripId = (event.currentTarget as HTMLSelectElement).value; this.requestUpdate(); }}><option value="">${lang.gpxNoTrip}</option>${trips.map((trip) => html`<option value=${trip.id}>${trip.title} · ${statusLabel(trip.status, this.hass)} · ${formatTripPeriod(trip, this.hass) || lang.period}</option>`)}</select></label><input type="file" accept=".gpx,application/gpx+xml,application/xml" @change=${(event: Event) => this.readGPX(event)} ?disabled=${this.gpxBusy}><p class="muted">${this.gpxName || lang.gpxPrivacy}</p>${this.gpxError ? html`<p class="error" role="alert">${this.gpxError}</p>` : ""}${gpx ? html`<div class="gpx-preview"><strong>${gpx.drives.length} ${lang.gpxSections}, ${gpx.points.length} ${lang.gpxPoints}</strong>${period ? html`<p class="muted">${lang.gpxPeriod}: ${formatDateTime(period.start, this.hass)} – ${formatDateTime(period.end, this.hass)}</p>` : ""}${periodWarning ? html`<p class="warning" role="alert">${lang.gpxPeriodWarning}</p>` : ""}<h3>${lang.gpxSummary}</h3><p class="muted">${gpx.points.length} ${lang.gpxPoints}, ${this.gpxSelected.size} ${lang.gpxSelectedDrives}, ${this.gpxSelectedDistanceKm().toFixed(1)} ${lang.gpxDistance}, ${selectedTrip?.title || lang.gpxNoTrip}</p><div class="gpx-drive-list">${gpx.drives.map((drive) => html`<label><input type="checkbox" .checked=${this.gpxSelected.has(drive.key)} @change=${(event: Event) => { const checked = (event.currentTarget as HTMLInputElement).checked; checked ? this.gpxSelected.add(drive.key) : this.gpxSelected.delete(drive.key); this.requestUpdate(); }}> ${formatDateTime(drive.started_at, this.hass)} – ${formatDateTime(drive.ended_at, this.hass)} · ${(drive.distance_m / 1000).toFixed(1)} km · ${formatDuration(drive.duration_seconds, this.hass)}</label>`)}</div>${gpx.warnings.length ? html`<p class="muted">${lang.gpxWarnings}: ${gpx.warnings.map((warning) => warning === "gpx_gap_possible_drive_boundary" ? lang.gpxGapBoundary : warning).join(", ")}</p>` : ""}${gpx.conflicts.duplicate_file ? html`<p class="error" role="alert">${lang.gpxDuplicate}</p>` : html`<button type="button" @click=${() => this.confirmGPX()} ?disabled=${this.gpxBusy || this.gpxSelected.size === 0}>${this.gpxBusy ? lang.saving : lang.gpxConfirm}</button>`}</div>` : ""}</section></ha-card>`;
+  }
+  render() { const lang = messages(this.hass); const trips = this.snapshot?.trips ?? []; return html`${this.renderGpx(lang, trips, this.gpxPreview)}${this.renderLegacy()}`; }
+  private renderLegacy() {
     const lang = messages(this.hass); const trips = this.snapshot?.trips ?? []; const expenses = this.snapshot?.expenses ?? []; const summary = this.snapshot?.expense_summary;
     const total = summary?.mixed_currency ? lang.mixedCurrency : summary?.total_minor !== undefined && summary.currency ? formatMoneyMinor(summary.total_minor, summary.currency, this.hass) : formatMoneyMinor(0, "EUR", this.hass); const error = this.loadError || this.actionError;
     const gpx = this.gpxPreview;
@@ -137,4 +155,5 @@ export class ManagerCard extends TravelCard {
 }
 
 ManagerCard.styles = [TravelCard.styles, css`section{margin-top:16px}.gpx-preview{padding:8px;background:var(--secondary-background-color)}.trip{display:grid;gap:8px;padding:12px 0;border-bottom:1px solid var(--divider-color)}.row,.expense-row,.drive-row{display:flex;justify-content:space-between;gap:8px;align-items:center;flex-wrap:wrap}.details{padding:8px;background:var(--secondary-background-color)}h4{margin:12px 0 4px}.link{min-height:30px;padding:4px 8px;font-size:.9em}.form-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(9rem,1fr));gap:8px;align-items:end}.form-grid input,.form-grid select{min-width:0;width:100%;box-sizing:border-box}.form-grid label{display:grid;gap:4px;font-size:.9em}.expense-form{display:grid;grid-template-columns:minmax(0,1fr) minmax(7rem,10rem) auto;gap:8px;align-items:center;width:100%}.expense-form input,.expense-form select{min-width:0;width:100%;box-sizing:border-box}.create-form{grid-template-columns:minmax(7rem,10rem) minmax(0,1fr) auto}.total{margin:12px 0 0;text-align:right}@media(max-width:500px){.expense-form,.create-form,.drive-edit-form{grid-template-columns:1fr}.expense-form .actions{margin-top:0}.total{text-align:left}}`] as any;
+ManagerCard.styles = [...(ManagerCard.styles as any), css`.gpx-import:not(.gpx-explicit){display:none}.gpx-import.gpx-explicit label{display:grid;gap:4px}.gpx-import.gpx-explicit select{min-width:0;max-width:100%;padding:6px}.gpx-drive-list{display:grid;gap:6px;margin:8px 0}.warning{padding:8px;background:var(--warning-color,#ff9800);color:var(--primary-text-color)}`] as any;
 defineOnce("camper-travel-journal-manager-card", ManagerCard);
