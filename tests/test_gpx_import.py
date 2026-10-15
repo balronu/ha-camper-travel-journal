@@ -21,6 +21,10 @@ class GPXImportTests(unittest.TestCase):
         self.assertIn("gpx_duplicate_point", preview.warnings)
         self.assertTrue(preview.drives)
 
+    def test_valid_cdata_description_is_accepted(self):
+        data = b'''<gpx version="1.1" xmlns="http://www.topografix.com/GPX/1/1"><trk><trkseg><trkpt lat="49" lon="7"><time>2026-10-13T08:00:00Z</time><desc><![CDATA[PAJ description with <b>markup</b>]]></desc></trkpt></trkseg></trk></gpx>'''
+        self.assertEqual(len(analyze_gpx(data, "v").points), 1)
+
     def test_rejects_dtd_and_bad_coordinates(self):
         with self.assertRaisesRegex(ValueError, "gpx_dtd_forbidden"):
             analyze_gpx(b'<!DOCTYPE gpx [<!ENTITY x "x">]><gpx version="1.1"/>', "v")

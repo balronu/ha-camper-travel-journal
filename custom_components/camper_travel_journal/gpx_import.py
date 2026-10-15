@@ -82,7 +82,9 @@ def _safe_root(data: bytes) -> ET.Element:
     # ElementTree does not resolve external entities, but rejecting declarations
     # also prevents ambiguous/hostile input from entering future parser changes.
     upper = data[:4096].upper()
-    if b"<!DOCTYPE" in upper or b"<!ENTITY" in upper or b"<![" in upper:
+    # CDATA is valid in GPX descriptions and is harmless to ElementTree. Only
+    # reject declarations that can alter entity resolution or document type.
+    if b"<!DOCTYPE" in upper or b"<!ENTITY" in upper:
         raise ValueError("gpx_dtd_forbidden")
     try:
         root = ET.fromstring(data)
