@@ -39,6 +39,16 @@ dates; no GPS timestamps are copied into a trip date automatically. Desktop
 Chromium/CI coverage is required; iOS, Safari/WebKit and production-dashboard
 practice remain open.
 
+## Beta 13 – frontend bundle registration hotfix (prepared)
+
+`v0.1.0-beta.13` is not published. The candidate removes stale historical
+Extra-JS bundle URLs during integration setup before registering the current
+versioned bundle. This addresses update/reload situations in which Manager,
+Summary and diagnostic cards could be affected by parallel bundle lifecycles.
+The candidate adds DOM checks that fail if Lit markers or JavaScript handler
+source becomes visible text. No database, trip, drive or expense behavior is
+changed.
+
 ## Beta 11 – expense-category correction (completed)
 
 1. Use stable internal IDs independently from German labels. **Done.**

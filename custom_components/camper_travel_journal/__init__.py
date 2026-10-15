@@ -9,7 +9,7 @@ try:
 except ImportError:  # pragma: no cover - permits the offline domain test suite
     cv = None
 
-from .const import DOMAIN, FRONTEND_URL
+from .const import DOMAIN, FRONTEND_URL, LEGACY_FRONTEND_VERSIONS
 from .runtime import Runtime
 from .storage import AsyncSQLiteWorker
 from .api import async_register as async_register_api
@@ -26,10 +26,12 @@ async def async_setup(hass, config):
     async_register_api(hass)
     if not hass.data[DOMAIN].get("frontend_registered"):
         try:
-            from homeassistant.components.frontend import add_extra_js_url
+            from homeassistant.components.frontend import add_extra_js_url, remove_extra_js_url
             from homeassistant.components.http import StaticPathConfig
             frontend_dir = Path(__file__).parent / "frontend"
             await hass.http.async_register_static_paths([StaticPathConfig(f"/{DOMAIN}", str(frontend_dir), False)])
+            for version in LEGACY_FRONTEND_VERSIONS:
+                remove_extra_js_url(hass, f"/{DOMAIN}/camper-travel-journal.js?v={version}")
             add_extra_js_url(hass, FRONTEND_URL)
             hass.data[DOMAIN]["frontend_registered"] = True
         except (ImportError, AttributeError):  # pragma: no cover - offline tests

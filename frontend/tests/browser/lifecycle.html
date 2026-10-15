@@ -70,5 +70,6 @@ result.textContent = JSON.stringify({
   diagnosticCallsAfter: vehicleCalls + dataCalls + authCalls,
   authCalls,
   diagnosticReport: diagnostic.shadowRoot.textContent.includes("Authentifizierung"),
+  visibleTemplateLeak: [editor, diagnostic, summary].some((card) => /lit\$\d|=>\s*this\.|currentTarget\.value/.test(card.shadowRoot?.textContent ?? "")),
 }, null, 2);
 </script>

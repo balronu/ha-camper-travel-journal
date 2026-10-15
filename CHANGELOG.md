@@ -2,6 +2,16 @@
 
 🇩🇪 Deutsch | 🇬🇧 [English](README.en.md)
 
+## 0.1.0-beta.13 – vorbereitet, noch nicht veröffentlicht
+
+- Behebt die Frontend-Registrierung nach einem HACS-Update: historische
+  Camper-Travel-Journal-Extra-JS-URLs werden vor der aktuellen Bundle-URL
+  entfernt.
+- Die versionsgebundene URL für Cache-Busting bleibt erhalten, ohne alte und
+  neue Bundles parallel zu registrieren.
+- Ergänzt Browser-Regressionstests, die sichtbare Lit-Marker und JavaScript-
+  Handler-Ausdrücke im DOM erkennen.
+
 ## 0.1.0-beta.11 – veröffentlicht
 
 - Korrigiert die initiale Kostenkategorie `camping`, die zuvor beim ersten

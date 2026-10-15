@@ -82,5 +82,6 @@ result.textContent = JSON.stringify({
   reopened,
   switchedTrip,
   closedSecond,
+  visibleTemplateLeak: [manager, summary].some((card) => /lit\$\d|=>\s*this\.|currentTarget\.value/.test(card.shadowRoot?.textContent ?? "")),
 }, null, 2);
 </script>

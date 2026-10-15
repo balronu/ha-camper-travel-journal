@@ -8,6 +8,7 @@ stored in an integration-owned SQLite database.
 ![Camper Travel Journal Logo](https://raw.githubusercontent.com/balronu/ha-camper-travel-journal/main/assets/branding/logo.png)
 
 > **Status:** `v0.1.0-beta.12` – currently published pre-release. Practical
+> Beta 13 is prepared as a frontend hotfix but has not been published.
 > validation on iOS/Safari and a productive HA installation remains open.
 
 ## Actual feature status
@@ -82,7 +83,7 @@ The Summary Card shows the current trip, status, distance, drives, stops and
 costs. The Manager Card manages trips, status changes, drive assignment and
 expenses. The visual editor auto-selects the vehicle when exactly one exists.
 
-Prepared Beta 12 bundle URL: `/camper_travel_journal/camper-travel-journal.js?v=0.1.0-beta.12`.
+Prepared Beta 13 bundle URL: `/camper_travel_journal/camper-travel-journal.js?v=0.1.0-beta.13`.
 See [docs/frontend-cache.md](docs/frontend-cache.md).
 
 ## Trips, drives and stops
