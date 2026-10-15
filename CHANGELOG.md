@@ -2,7 +2,7 @@
 
 🇩🇪 Deutsch | 🇬🇧 [English](README.en.md)
 
-## 0.1.0-beta.13 – vorbereitet, noch nicht veröffentlicht
+## 0.1.0-beta.13 – veröffentlicht
 
 - Behebt die Frontend-Registrierung nach einem HACS-Update: historische
   Camper-Travel-Journal-Extra-JS-URLs werden vor der aktuellen Bundle-URL

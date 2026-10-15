@@ -1,6 +1,6 @@
-# Camper Travel Journal `v0.1.0-beta.13` (prepared)
+# Camper Travel Journal `v0.1.0-beta.13`
 
-This release is prepared for review and is **not published**.
+This pre-release is published for manual practice validation.
 
 ## Frontend hotfix
 

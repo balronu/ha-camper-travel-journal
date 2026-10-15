@@ -1,7 +1,7 @@
 # Camper Travel Journal – Roadmap
 
 This roadmap separates implemented work, current limitations and planned
-features. It is based on the published `v0.1.0-beta.12` source tree and tests.
+features. It is based on the published `v0.1.0-beta.13` source tree and tests.
 A database
 table or WebSocket method is not treated as a finished user feature
 without a corresponding UI and test path.
@@ -21,7 +21,7 @@ without a corresponding UI and test path.
 - Expense CRUD, integer-cent totals, mixed-currency protection, inline editing
   and canonical category IDs, including the `camping` round-trip.
 
-## Current published development baseline: `v0.1.0-beta.12`
+## Current published development baseline: `v0.1.0-beta.13`
 
 This is a published development beta, not a stable release. CI covers the
 pinned Home Assistant environment and synthetic/isolated data. Beta 12 adds
@@ -39,9 +39,9 @@ dates; no GPS timestamps are copied into a trip date automatically. Desktop
 Chromium/CI coverage is required; iOS, Safari/WebKit and production-dashboard
 practice remain open.
 
-## Beta 13 – frontend bundle registration hotfix (prepared)
+## Beta 13 – frontend bundle registration hotfix (published)
 
-`v0.1.0-beta.13` is not published. The candidate removes stale historical
+`v0.1.0-beta.13` removes stale historical
 Extra-JS bundle URLs during integration setup before registering the current
 versioned bundle. This addresses update/reload situations in which Manager,
 Summary and diagnostic cards could be affected by parallel bundle lifecycles.
