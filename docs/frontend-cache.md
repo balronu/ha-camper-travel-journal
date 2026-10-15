@@ -2,7 +2,7 @@
 
 ## Aktueller Stand
 
-Der vorbereitete Stand `v0.1.0-beta.12` enthält die Phase-3-Lovelace-Karten,
+Der veröffentlichte Stand `v0.1.0-beta.12` enthält die Phase-3-Lovelace-Karten,
 die optionale read-only-Diagnosekarte und registriert das Bundle
 über den öffentlichen HA-Mechanismus. Der historische Tag `v0.1.0-beta.1`
 enthielt **keine** Lovelace-Karte.

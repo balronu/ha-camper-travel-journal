@@ -7,8 +7,8 @@ stored in an integration-owned SQLite database.
 
 ![Camper Travel Journal Logo](https://raw.githubusercontent.com/balronu/ha-camper-travel-journal/main/assets/branding/logo.png)
 
-> **Status:** `v0.1.0-beta.12` – prepared, not published. Beta 11 remains the
-> currently supported pre-release.
+> **Status:** `v0.1.0-beta.12` – currently published pre-release. Practical
+> validation on iOS/Safari and a productive HA installation remains open.
 
 ## Actual feature status
 
@@ -31,15 +31,15 @@ user feature.
 
 ## HACS installation
 
-The currently published and supported version is `v0.1.0-beta.11`. Beta 12 is
-prepared on this development branch but has not been published. It has not
-been generally production-validated.
+The currently published and supported version is `v0.1.0-beta.12`. It has not
+been generally production-validated; Beta 11 remains available as a
+historical release.
 
-For the currently published Beta 11:
+For the currently published Beta 12:
 
 1. Open **HACS → Integrations → Custom repositories**.
 2. Add `https://github.com/balronu/ha-camper-travel-journal` as an integration.
-3. Select the `v0.1.0-beta.11` pre-release, not `main`.
+3. Select the `v0.1.0-beta.12` pre-release, not `main`.
 4. Restart Home Assistant manually after installation.
 5. Add the integration under **Settings → Devices & services**.
 

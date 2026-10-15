@@ -1,6 +1,6 @@
 # Camper Travel Journal v0.1.0-beta.12
 
-> Prepared development release notes. This version is not published yet.
+> Published development release notes for the GitHub pre-release.
 
 ## Trips and drives
 
