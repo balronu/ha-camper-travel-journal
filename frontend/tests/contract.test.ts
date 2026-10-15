@@ -65,6 +65,8 @@ describe("frontend release contract", () => {
   it("keeps the hub editor texts in German and English", () => {
     expect(messages({ locale: { language: "de-DE" } } as any).editorChooseVehicle).toBe("Wohnmobil auswählen");
     expect(messages({ locale: { language: "en-US" } } as any).editorChooseVehicle).toBe("Select camper");
+    expect(messages({ locale: { language: "de-DE" } } as any).summaryChooseTrip).toBe("Reise auswählen");
+    expect(messages({ locale: { language: "en-US" } } as any).summaryChooseTrip).toBe("Select trip");
   });
   it("translates the explicit GPX target controls", () => {
     expect(messages({ locale: { language: "de-DE" } } as any).gpxTargetTrip).toBe("Zielreise");

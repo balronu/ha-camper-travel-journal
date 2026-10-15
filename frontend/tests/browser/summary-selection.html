@@ -1,0 +1,71 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>Camper Travel Journal summary trip selection test</title>
+<div id="summary-host"></div>
+<pre id="result">starting</pre>
+<script type="module">
+const result = document.querySelector("#result");
+let trips = [
+  { id: "planned", title: "Ligaspiel Hoffenheim – Mainz", description: "", destination: "Mainz", status: "planned", started_at: "2026-10-23T12:00:00Z", start_date: "2026-10-23", end_date: "2026-10-25" },
+  { id: "active-earlier", title: "Frühere aktive Reise", description: "", destination: "Kiel", status: "active", started_at: "2026-10-10T12:00:00Z", start_date: "2026-10-10", end_date: "2026-10-11" },
+  { id: "active-latest", title: "Länderspiel Deutschland – Japan", description: "", destination: "Bremen", status: "active", started_at: "2026-10-13T12:00:00Z", start_date: "2026-10-13", end_date: "2026-10-14" },
+  { id: "paused", title: "Pausierte Reise", description: "", destination: "Ulm", status: "paused", started_at: "2026-09-01T12:00:00Z", start_date: "2026-09-01", end_date: "2026-09-02" },
+  { id: "completed", title: "Abgeschlossene Reise", description: "", destination: "Köln", status: "completed", started_at: "2026-08-01T12:00:00Z", start_date: "2026-08-01", end_date: "2026-08-02" },
+];
+let listCalls = 0;
+const snapshots = {
+  planned: { drives: [], stops: [], expenses: [], expense_summary: { total_minor: 0, currency: "EUR", mixed_currency: false } },
+  "active-latest": { drives: [{ id: "drive-1", started_at: "2026-10-13T08:00:00Z", ended_at: "2026-10-13T10:00:00Z", distance_m: 1118700, trip_id: "active-latest", assignment_status: "assigned" }], stops: [{ id: "stop-1", name: "Pause", description: "", occurred_at: "2026-10-13T09:00:00Z", stop_type: "break" }], expenses: [{ id: "expense-1", category: "fuel", amount_minor: 12345, currency: "EUR", occurred_at: "2026-10-13T10:00:00Z" }], expense_summary: { total_minor: 12345, currency: "EUR", mixed_currency: false } },
+};
+const connection = {
+  async sendMessagePromise(message) {
+    if (message.type !== "camper_travel_journal/list") throw new Error(`unexpected command ${message.type}`);
+    listCalls += 1;
+    if (!message.trip_id) return { trips, drives: [], stops: [], expenses: [], expense_summary: { total_minor: 0, currency: "EUR", mixed_currency: false } };
+    const trip = trips.find((item) => item.id === message.trip_id);
+    return { trips: trip ? [trip] : [], ...(snapshots[message.trip_id] ?? snapshots.planned) };
+  },
+};
+const hass = { connection, locale: { language: "de-DE" } };
+await import("/custom_components/camper_travel_journal/frontend/camper-travel-journal.js");
+await customElements.whenDefined("camper-travel-journal-summary-card");
+const summary = document.createElement("camper-travel-journal-summary-card");
+summary.setConfig({ vehicle_id: "entry-wohnmobil" });
+document.querySelector("#summary-host").append(summary);
+summary.hass = hass;
+const waitFor = async (predicate) => {
+  for (let attempt = 0; attempt < 120; attempt += 1) {
+    if (predicate()) return;
+    await new Promise((resolve) => setTimeout(resolve, 25));
+  }
+  throw new Error(`summary harness timed out calls=${listCalls} shadow=${summary.shadowRoot?.innerHTML ?? "none"}`);
+};
+await waitFor(() => summary.shadowRoot.querySelector("select")?.value === "active-latest");
+const selector = () => summary.shadowRoot.querySelector("select");
+const text = () => summary.shadowRoot.textContent ?? "";
+const initial = { selected: selector()?.value, title: text().includes("Länderspiel Deutschland – Japan"), distance: text().includes("1118.7 km"), costs: text().includes("123,45"), actions: text().includes("Pausieren") && text().includes("Abschließen") };
+const allTripsSelectable = selector()?.options.length === 5;
+selector().value = "planned";
+selector().dispatchEvent(new Event("change", { bubbles: true }));
+await waitFor(() => selector()?.value === "planned" && summary.shadowRoot.querySelector("h2")?.textContent === "Ligaspiel Hoffenheim – Mainz");
+const planned = { selected: selector()?.value, zeroDistance: text().includes("0.0 km"), resumeOnly: text().includes("Reise fortsetzen") && !text().includes("Pausieren") && !text().includes("Abschließen") };
+window.dispatchEvent(new CustomEvent("camper-travel-journal-data-changed", { detail: { vehicleId: "entry-wohnmobil", tripId: "planned" } }));
+await waitFor(() => listCalls >= 6 && selector()?.value === "planned" && summary.shadowRoot.querySelector("h2")?.textContent === "Ligaspiel Hoffenheim – Mainz");
+trips = trips.filter((trip) => trip.id !== "planned").map((trip) => ({ ...trip, status: trip.status === "active" ? "completed" : trip.status }));
+window.dispatchEvent(new CustomEvent("camper-travel-journal-data-changed", { detail: { vehicleId: "entry-wohnmobil" } }));
+await waitFor(() => selector()?.value === "active-latest");
+const noActiveFallback = { selected: selector()?.value, fallbackIsLatestRelevant: text().includes("Länderspiel Deutschland – Japan") };
+selector().value = "completed";
+selector().dispatchEvent(new Event("change", { bubbles: true }));
+await waitFor(() => selector()?.value === "completed" && text().includes("Abgeschlossene Reise"));
+const completed = { selected: selector()?.value, noActiveAction: !text().includes("Pausieren") && !text().includes("Abschließen") };
+result.textContent = JSON.stringify({
+  allTripsSelectable,
+  initialActive: initial.selected === "active-latest" && initial.title && initial.distance && initial.costs && initial.actions,
+  plannedSelection: planned.selected === "planned" && planned.zeroDistance && planned.resumeOnly,
+  noActiveFallback: noActiveFallback.selected === "active-latest" && noActiveFallback.fallbackIsLatestRelevant,
+  completedSelection: completed.selected === "completed" && completed.noActiveAction,
+  refreshedSelectionPersists: listCalls >= 4,
+  visibleTemplateLeak: /lit\$\d|=>\s*this\.|currentTarget\.value/.test(text()),
+}, null, 2);
+</script>
