@@ -2,6 +2,17 @@
 
 🇩🇪 Deutsch | 🇬🇧 [English](README.en.md)
 
+## 0.1.0-beta.14 – vorbereitet, noch nicht veröffentlicht
+
+- Lokalisiert reine Kalenderdaten in Manager- und Summary Card ohne
+  Zeitzonenverschiebung; interne Eingabewerte bleiben ISO-formatiert.
+- Ergänzt read-only GPS-Collector-Diagnose mit Lebenszyklus-, Ereignis- und
+  Verwerfungszählern sowie datenschutzsicherem Bericht ohne Koordinaten.
+- Verarbeitet Tracker-Events auch bei unverändertem Zustand (`home`) mit
+  aktualisierten GPS-Attributen und akzeptiert `gps_accuracy: 0`.
+- Härtet die HA-2026.10-Callback-Registrierung und behandelt GPS-Lücken über
+  zehn Minuten ohne künstliche Luftlinien-Entfernung.
+
 ## 0.1.0-beta.13 – veröffentlicht
 
 - Behebt die Frontend-Registrierung nach einem HACS-Update: historische

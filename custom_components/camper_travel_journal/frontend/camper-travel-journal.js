@@ -1095,10 +1095,10 @@ function Ae(s) {
 }
 async function Se(s, t, e = ye) {
   const i = { state: "not_run", durationMs: null };
-  if (!s?.connection) return { version: "0.1.0-beta.13", connectionBefore: "unavailable", connectionAfter: "unavailable", authentication: i, vehicles: i, trips: i, vehicleId: W(t) };
+  if (!s?.connection) return { version: "0.1.0-beta.14", connectionBefore: "unavailable", connectionAfter: "unavailable", authentication: i, vehicles: i, trips: i, vehicleId: W(t) };
   const r = yt(s), n = await G(s, { type: "auth/current_user" }, xe, e), o = await G(s, { type: "camper_travel_journal/list_vehicles" }, we, e), c = o.value?.vehicles?.filter((Nt) => typeof Nt.vehicle_id == "string") ?? [], a = c.length === 1 ? c[0].vehicle_id : void 0, p = await G(s, { type: "camper_travel_journal/list", vehicle_id: a ?? t }, Ae, e), { value: h, ...v } = n, { value: f, ...x } = o, { value: Ue, ...Rt } = p;
   return {
-    version: "0.1.0-beta.13",
+    version: "0.1.0-beta.14",
     connectionBefore: r,
     connectionAfter: yt(s),
     authentication: v,

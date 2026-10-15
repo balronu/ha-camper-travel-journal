@@ -1,13 +1,13 @@
 # Lovelace-Frontend- und Cache-Standard
 
-Beta 13 bereinigt beim Setup registrierte historische Camper-
+Beta 14 enthält die seit Beta 13 eingeführte Bereinigung historischer Camper-
 Bundle-URLs, bevor die aktuelle URL registriert wird. Dadurch bleiben nach
 einem HACS-Update nicht gleichzeitig Beta-12- und Beta-13-Module als Extra-
 Module aktiv. Die versionierte URL bleibt für Browser-Cache-Busting erhalten.
 
 ## Aktueller Stand
 
-Der veröffentlichte Stand `v0.1.0-beta.13` enthält die Phase-3-Lovelace-Karten,
+Der vorbereitete Stand `v0.1.0-beta.14` enthält die Phase-3-Lovelace-Karten,
 die optionale read-only-Diagnosekarte und registriert das Bundle
 über den öffentlichen HA-Mechanismus. Der historische Tag `v0.1.0-beta.1`
 enthielt **keine** Lovelace-Karte.
@@ -20,7 +20,7 @@ Resource-URL folgt dann
 diesem Muster:
 
 ```text
-/camper_travel_journal/camper-travel-journal.js?v=0.1.0-beta.13
+/camper_travel_journal/camper-travel-journal.js?v=0.1.0-beta.14
 ```
 
 `<VERSION>` wird bei jeder Bundle-Änderung erhöht, auch zwischen stabilen
