@@ -20,6 +20,19 @@
 - Ergänzt API-, Storage-, Frontend- und Browser-Regressionstests ohne Migration
   oder automatische Änderung bestehender Einträge.
 
+## 0.1.0-beta.12 – vorbereitet, nicht veröffentlicht
+
+- Ergänzt optionale Start- und Enddaten für Reisen inklusive Bearbeitung und
+  Anzeige in Manager- und Summary Card.
+- Macht erkannte Fahrten mit Start/Ende, Entfernung, Dauer und Zuordnungsstatus
+  sichtbar und hält Fahrzeuggrenzen sowie eindeutige Zuordnungen ein.
+- Ergänzt getrennte manuelle Fahrten mit Startort, Zielort, Kilometern und
+  optionaler Dauer; es werden keine künstlichen GPS-Punkte erzeugt.
+- Führt Schema 5 mit rückwärtskompatibler Migration für Reisedaten und
+  manuelle Fahrtmetadaten ein.
+- Aktualisiert die Summary Card nach bestätigten Reise-/Fahrtänderungen und
+  dokumentiert Beta 12 als vorbereitet, nicht veröffentlicht.
+
 ## 0.1.0-beta.10 – Vollständige Kostenverwaltung
 
 - Korrigiert Kostenkategorien, Beträge und Reisezuordnung über die gesamte

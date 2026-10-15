@@ -1,8 +1,9 @@
 # Camper Travel Journal – Roadmap
 
 This roadmap separates implemented work, current limitations and planned
-features. It is based on the published `v0.1.0-beta.11` source tree and tests; a
-database table or WebSocket method is not treated as a finished user feature
+features. It is based on the published `v0.1.0-beta.11` source tree and tests;
+a Beta-12 candidate may contain additional work before publication. A database
+table or WebSocket method is not treated as a finished user feature
 without a corresponding UI and test path.
 
 ## Completed foundation
@@ -28,6 +29,16 @@ category ID, explicit select-state handling, and a browser/API/storage/reload
 regression path. Existing rows remain untouched until a user explicitly edits
 them.
 
+## Beta 12 candidate: travel periods and drives
+
+The current development branch prepares, but does not publish, `v0.1.0-beta.12`.
+It adds optional trip start/end dates, inline editing, visible detected drives,
+vehicle-bound assignment/unassignment, and separate manual drives with source,
+locations, distance and optional duration. The schema-5 migration preserves
+existing GPS rows and trips without dates; no GPS timestamps are copied into a
+trip date automatically. Desktop Chromium/CI coverage is required; iOS,
+Safari/WebKit and production-dashboard practice remain open.
+
 ## Beta 11 – expense-category correction (completed)
 
 1. Use stable internal IDs independently from German labels. **Done.**
@@ -41,10 +52,9 @@ them.
 
 ## Next development phase
 
-- Make detected drives user-accessible with date, duration, distance and
-  assignment context.
-- Decide whether manual drive creation is needed and define its contract.
-- Provide a route/drive detail view and clear assignment controls.
+- Provide a map/route detail view with coordinates or neutral labels where no
+  place name exists.
+- Add richer drive filtering and date-range selection without mixing vehicles.
 - Add complete stop creation, editing and deletion to Lovelace.
 - Add acceptance tests for reload, empty data, failures and mobile layout.
 
@@ -53,7 +63,7 @@ them.
 - Map view and trip route history.
 - Drive, distance and stop statistics.
 - Privacy-aware data exports.
-- Usability improvements after Beta 11 practice validation.
+- Usability improvements after Beta 12 practice validation.
 
 ## Later architecture investigation
 

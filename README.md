@@ -7,8 +7,8 @@ und Kosten werden in einer eigenen SQLite-Datei gespeichert.
 
 ![Camper Travel Journal Logo](https://raw.githubusercontent.com/balronu/ha-camper-travel-journal/main/assets/branding/logo.png)
 
-> **Stand:** `v0.1.0-beta.11` – veröffentlichte Entwickler-Beta. Nicht als
-> stabile oder allgemein produktiv validierte Version freigegeben.
+> **Stand:** `v0.1.0-beta.12` – vorbereitet, noch nicht veröffentlicht. Beta 11
+> bleibt die aktuell unterstützte Pre-Release-Version.
 
 ## Tatsächlicher Funktionsstand
 
@@ -18,8 +18,8 @@ und Kosten werden in einer eigenen SQLite-Datei gespeichert.
 | GPS-Aufzeichnung | Ereignis-Collector, Filter, Sprung-/Gap-Schutz | Indirekt über Optionen | Domain-/SQLite-Tests, CI |
 | Fahrterkennung | Konservativer Statusautomat und Distanz | Nein, Ergebnisdaten | Synthetische Tests |
 | Mehrere Fahrzeuge | Getrennte Config Entries | Karteneditor | HA-/Frontend-Tests |
-| Reisen | Anlegen, Titel ändern, löschen, Statuswechsel | Ja, Manager Card | API-/HA-/Frontend-Tests |
-| Fahrten | GPS-Ergebnis, Zuordnung/Lösen | Zuordnung | Storage-/API-Verträge |
+| Reisen | Anlegen, Zeitraum bearbeiten, löschen, Statuswechsel | Ja, Manager Card | API-/HA-/Frontend-Tests |
+| Fahrten | GPS-/manuelle Fahrten, Anzeige, Zuordnung/Lösen | Ja, Manager Card | Beta-12-API-/Frontend-Tests |
 | Zwischenstopps | Schema und WebSocket-CRUD | Nein | Storage-/API-Tests |
 | Kosten | Kategorien, Cent-Beträge, Summen, Editieren, Löschen | Ja | Beta-11-Roundtrip getestet |
 | Karten/Diagnose | Summary, Manager, Editor, manuelle Diagnose | Ja | Bundle/Vitest/Chromium |
@@ -31,8 +31,9 @@ eine fertige Benutzerfunktion.
 
 ## Installation über HACS
 
-Aktuell veröffentlicht und unterstützt ist `v0.1.0-beta.11`. Sie bleibt eine
-Entwickler-Beta und ist noch nicht allgemein produktiv validiert.
+Aktuell veröffentlicht und unterstützt ist `v0.1.0-beta.11`. Beta 12 ist auf
+diesem Entwicklungs-Branch vorbereitet, aber noch nicht veröffentlicht. Sie
+ist nicht allgemein produktiv validiert.
 
 Für die aktuell veröffentlichte Beta 11:
 
@@ -81,15 +82,18 @@ Die Summary Card zeigt aktuelle Reise, Status, Strecke, Fahrten, Stopps und
 Kosten. Die Manager Card verwaltet Reisen, Statuswechsel, Fahrtzuordnung und
 Kosten. Der visuelle Editor wählt bei genau einem Fahrzeug automatisch aus.
 
-Bundle-URL: `/camper_travel_journal/camper-travel-journal.js?v=0.1.0-beta.11`.
+Bundle-URL des vorbereiteten Beta-12-Stands: `/camper_travel_journal/camper-travel-journal.js?v=0.1.0-beta.12`.
 Details: [Frontend-Cache-Standard](docs/frontend-cache.md).
 
 ## Reisen, Fahrten und Zwischenstopps
 
 Reisen können angelegt, umbenannt, gelöscht, gestartet, pausiert und
-abgeschlossen werden. GPS-Fahrten werden konservativ erkannt und können einer
-Reise zugeordnet bzw. wieder gelöst werden. Eine vollständige Routenkarte,
-manuelle Fahrtneuanlage und detaillierte Streckenansicht fehlen noch.
+abgeschlossen werden; Start- und Enddatum sind optional und bearbeitbar. GPS-
+Fahrten werden konservativ erkannt und mit Start/Ende, Dauer und Entfernung
+angezeigt. Sie können einer Reise zugeordnet bzw. wieder gelöst werden.
+Manuelle Fahrten mit Startort, Zielort, Kilometern und optionaler Dauer sind
+getrennt von GPS-Fahrten speicherbar. Eine vollständige Routenkarte und
+detaillierte Kartenansicht fehlen noch.
 
 Zwischenstopps existieren im Schema und in der authentifizierten WebSocket-API,
 sind aber noch nicht über Lovelace bedienbar.
@@ -111,7 +115,9 @@ werden nicht automatisch umkategorisiert.
 
 `camper_travel_journal.db` liegt im Home-Assistant-Konfigurationsverzeichnis
 und ist von Recorder/MariaDB getrennt. SQLite läuft über einen serialisierten
-Worker; aktuell ist Schema 4 aktiv. Destruktive Retention-Löschung ist in der
+Worker; Beta 12 verwendet Schema 5. Die Migration ergänzt optionale Reisedaten
+und Metadaten für manuelle Fahrten, verändert keine GPS-Punkte und ist
+rückwärtskompatibel. Destruktive Retention-Löschung ist in der
 Beta deaktiviert. Die zusätzliche Datenbankdatei muss in Backups enthalten
 sein. Siehe [Datenbankschema](docs/database-schema.md).
 
@@ -134,8 +140,8 @@ keine privaten Routen, Tokens oder unredigierten Logs verwenden.
 Die verbindliche, statusgetrennte Roadmap steht in [docs/ROADMAP.md](docs/ROADMAP.md):
 
 - **Beta 11:** Kostenkategorie-Roundtrip mit stabilen IDs abgeschlossen.
-- **Nächste Phase:** Fahrten, Strecken und Zwischenstopps vollständig zugänglich
-  machen.
+- **Beta 12 vorbereitet:** Reisezeiträume, sichtbare/zuordenbare Fahrten und
+  manuelle Fahrten; iOS/WebKit-Praxistest bleibt offen.
 - **v0.2.x:** Kartenansicht, Reiseverlauf, Statistiken und Exporte.
 - **Später:** alternatives HA-Datenbank-Backend separat untersuchen.
 - **v1.0.0:** Stable erst nach ausreichender Praxisvalidierung.

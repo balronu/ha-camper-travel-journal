@@ -2,7 +2,7 @@
 
 ## Aktueller Stand
 
-Der veröffentlichte Stand `v0.1.0-beta.11` enthält die Phase-3-Lovelace-Karten,
+Der vorbereitete Stand `v0.1.0-beta.12` enthält die Phase-3-Lovelace-Karten,
 die optionale read-only-Diagnosekarte und registriert das Bundle
 über den öffentlichen HA-Mechanismus. Der historische Tag `v0.1.0-beta.1`
 enthielt **keine** Lovelace-Karte.
@@ -15,7 +15,7 @@ Resource-URL folgt dann
 diesem Muster:
 
 ```text
-/camper_travel_journal/camper-travel-journal.js?v=0.1.0-beta.11
+/camper_travel_journal/camper-travel-journal.js?v=0.1.0-beta.12
 ```
 
 `<VERSION>` wird bei jeder Bundle-Änderung erhöht, auch zwischen stabilen

@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from datetime import datetime, timezone
+from datetime import date, datetime, timezone
 from typing import Any
 
 try:
@@ -35,6 +35,22 @@ def _timestamp(value: str | None, *, required: bool = True) -> datetime | None:
     if parsed.tzinfo is None:
         raise ValueError("timestamp_must_be_utc")
     return parsed.astimezone(timezone.utc)
+
+
+def _date(value: str | None, *, required: bool = False) -> str | None:
+    if value in (None, "") and not required:
+        return None
+    if not isinstance(value, str):
+        raise ValueError("date_invalid")
+    try:
+        return date.fromisoformat(value).isoformat()
+    except ValueError as err:
+        raise ValueError("date_invalid") from err
+
+
+def _date_range(start: str | None, end: str | None) -> None:
+    if start and end and end < start:
+        raise ValueError("trip_date_range_invalid")
 
 
 def _runtime(hass: HomeAssistant, vehicle_id: str):
@@ -91,23 +107,33 @@ if websocket_api is not None:
         except Exception as err:  # API boundary must not expose tracebacks
             _send_error(connection, msg, err)
 
-    @websocket_api.websocket_command({**_base("camper_travel_journal/create_trip"), vol.Required("title"): str, vol.Optional("description", default=""): str, vol.Optional("destination", default=""): str, vol.Required("started_at"): str})
+    @websocket_api.websocket_command({**_base("camper_travel_journal/create_trip"), vol.Required("title"): str, vol.Optional("description", default=""): str, vol.Optional("destination", default=""): str, vol.Optional("started_at"): str, vol.Optional("start_date"): str, vol.Optional("end_date"): str})
     @websocket_api.async_response
     async def ws_create_trip(hass, connection, msg):
         try:
-            started = _timestamp(msg["started_at"])
+            started = _timestamp(msg.get("started_at"), required=False) or _now()
+            start_date = _date(msg.get("start_date"))
+            end_date = _date(msg.get("end_date"))
+            _date_range(start_date, end_date)
             if not msg["title"].strip(): raise ValueError("title_required")
-            result = await _call(hass, msg, "create_trip", msg["vehicle_id"], msg["title"], started, _now(), description=msg["description"], destination=msg["destination"])
+            result = await _call(hass, msg, "create_trip", msg["vehicle_id"], msg["title"], started, _now(), description=msg["description"], destination=msg["destination"], start_date=start_date, end_date=end_date)
             connection.send_result(msg["id"], {"trip_id": result})
         except Exception as err: _send_error(connection, msg, err)
 
-    @websocket_api.websocket_command({**_base("camper_travel_journal/update_trip"), vol.Required("trip_id"): str, vol.Optional("title"): str, vol.Optional("description"): str, vol.Optional("destination"): str, vol.Optional("started_at"): str})
+    @websocket_api.websocket_command({**_base("camper_travel_journal/update_trip"), vol.Required("trip_id"): str, vol.Optional("title"): str, vol.Optional("description"): str, vol.Optional("destination"): str, vol.Optional("started_at"): str, vol.Optional("start_date"): str, vol.Optional("end_date"): str})
     @websocket_api.async_response
     async def ws_update_trip(hass, connection, msg):
         try:
             fields = {key: msg[key] for key in ("title", "description", "destination") if key in msg}
             if "title" in fields and not fields["title"].strip(): raise ValueError("title_required")
             if "started_at" in msg: fields["started_at"] = _timestamp(msg["started_at"])
+            if "start_date" in msg: fields["start_date"] = _date(msg["start_date"])
+            if "end_date" in msg: fields["end_date"] = _date(msg["end_date"])
+            if "start_date" in fields or "end_date" in fields:
+                trips = await _call(hass, msg, "list_trips", msg["vehicle_id"])
+                current = next((trip for trip in trips if trip["id"] == msg["trip_id"]), None)
+                if current is None: raise ValueError("trip_not_found")
+                _date_range(fields.get("start_date", current.get("start_date")), fields.get("end_date", current.get("end_date")))
             await _call(hass, msg, "update_trip", msg["trip_id"], _now(), **fields)
             connection.send_result(msg["id"], {"success": True})
         except Exception as err: _send_error(connection, msg, err)
@@ -147,6 +173,15 @@ if websocket_api is not None:
         try:
             await _call(hass, msg, "unlink_drive", msg["trip_id"], msg["drive_id"])
             connection.send_result(msg["id"], {"success": True})
+        except Exception as err: _send_error(connection, msg, err)
+
+    @websocket_api.websocket_command({**_base("camper_travel_journal/create_manual_drive"), vol.Required("occurred_at"): str, vol.Required("start_location"): str, vol.Required("end_location"): str, vol.Required("distance_km"): vol.Coerce(float), vol.Optional("duration_minutes"): vol.Coerce(int), vol.Optional("trip_id"): str})
+    @websocket_api.async_response
+    async def ws_create_manual_drive(hass, connection, msg):
+        try:
+            started = _timestamp(msg["occurred_at"])
+            result = await _call(hass, msg, "create_manual_drive", msg["vehicle_id"], started, msg["start_location"], msg["end_location"], msg["distance_km"], msg.get("duration_minutes"), _now(), msg.get("trip_id"))
+            connection.send_result(msg["id"], {"drive_id": result})
         except Exception as err: _send_error(connection, msg, err)
 
     @websocket_api.websocket_command({**_base("camper_travel_journal/create_stop"), vol.Required("trip_id"): str, vol.Required("occurred_at"): str, vol.Optional("name", default=""): str, vol.Optional("category", default="other"): str, vol.Optional("latitude"): vol.Coerce(float), vol.Optional("longitude"): vol.Coerce(float)})
@@ -207,7 +242,7 @@ if websocket_api is not None:
             connection.send_result(msg["id"], {"success": True})
         except Exception as err: _send_error(connection, msg, err)
 
-    COMMANDS = (ws_list_vehicles, ws_list, ws_create_trip, ws_update_trip, ws_delete_trip, ws_transition_trip, ws_link_drives, ws_unlink_drive, ws_create_stop, ws_update_stop, ws_delete_stop, ws_create_expense, ws_update_expense, ws_delete_expense)
+    COMMANDS = (ws_list_vehicles, ws_list, ws_create_trip, ws_update_trip, ws_delete_trip, ws_transition_trip, ws_link_drives, ws_unlink_drive, ws_create_manual_drive, ws_create_stop, ws_update_stop, ws_delete_stop, ws_create_expense, ws_update_expense, ws_delete_expense)
 else:
     COMMANDS = ()
 

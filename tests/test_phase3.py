@@ -34,7 +34,7 @@ class Phase3Tests(unittest.TestCase):
         self.assertEqual(row["name"], "Camping")
         self.assertEqual(row["description"], "Nacht")
         self.assertEqual(self.store.list_expenses(trip)[0]["amount_minor"], 2345)
-        self.assertEqual(self.store.connection.execute("SELECT value FROM schema_meta WHERE key='version'").fetchone()[0], "4")
+        self.assertEqual(self.store.connection.execute("SELECT value FROM schema_meta WHERE key='version'").fetchone()[0], "5")
 
     def test_deleting_trip_preserves_drive_and_unassigns_it(self):
         trip = self.store.create_trip("v1", "Alpen", self.now, self.now)
@@ -58,6 +58,42 @@ class Phase3Tests(unittest.TestCase):
         d2 = next(row for row in self.store.list_drives("v1") if row["id"] == "d2")
         self.assertIsNone(d2["trip_id"])
         self.assertNotEqual(trip, second)
+
+    def test_optional_trip_dates_and_manual_drive_round_trip(self):
+        trip = self.store.create_trip("v1", "Mit Datum", self.now, self.now, start_date="2026-10-01", end_date="2026-10-08")
+        row = self.store.list_trips("v1")[0]
+        self.assertEqual((row["start_date"], row["end_date"]), ("2026-10-01", "2026-10-08"))
+        self.store.update_trip(trip, self.now, start_date=None, end_date=None)
+        self.assertIsNone(self.store.list_trips("v1")[0]["start_date"])
+        manual = self.store.create_manual_drive("v1", self.now, "Bremen", "Hamburg", 123.4, 90, self.now, trip)
+        drive = self.store.list_drives("v1", trip_id=trip)[0]
+        self.assertEqual(drive["id"], manual)
+        self.assertEqual((drive["source"], drive["start_label"], drive["end_label"]), ("manual", "Bremen", "Hamburg"))
+        self.assertEqual(drive["duration_seconds"], 5400)
+        self.assertEqual(drive["assignment_status"], "assigned")
+
+    def test_manual_drive_rejects_other_vehicle_trip(self):
+        self.store.insert_vehicle("v2", "Other", "device_tracker.other", self.now)
+        trip = self.store.create_trip("v2", "Andere Reise", self.now, self.now)
+        with self.assertRaisesRegex(ValueError, "vehicle_mismatch"):
+            self.store.create_manual_drive("v1", self.now, "A", "B", 1, None, self.now, trip)
+
+    def test_schema_four_database_migrates_without_losing_existing_rows(self):
+        trip = self.store.create_trip("v1", "Altbestand", self.now, self.now)
+        with self.store.transaction() as connection:
+            connection.execute("INSERT INTO drives(id,vehicle_id,started_at,ended_at,distance_m,end_reason,created_at) VALUES(?,?,?,?,?,?,?)", ("legacy", "v1", self.now.isoformat(), self.now.isoformat(), 1000, "stop", self.now.isoformat()))
+            connection.execute("UPDATE schema_meta SET value='4' WHERE key='version'")
+            connection.execute("ALTER TABLE trips DROP COLUMN start_date")
+            connection.execute("ALTER TABLE trips DROP COLUMN end_date")
+            connection.execute("ALTER TABLE drives DROP COLUMN source")
+            connection.execute("ALTER TABLE drives DROP COLUMN start_label")
+            connection.execute("ALTER TABLE drives DROP COLUMN end_label")
+        self.store.close()
+        self.store.open()
+        self.assertEqual(self.store.connection.execute("SELECT value FROM schema_meta WHERE key='version'").fetchone()[0], "5")
+        self.assertEqual(self.store.list_trips("v1")[0]["id"], trip)
+        legacy = self.store.list_drives("v1")[0]
+        self.assertEqual((legacy["id"], legacy["source"]), ("legacy", "gps"))
 
 
 if __name__ == "__main__":
