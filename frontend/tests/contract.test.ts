@@ -1,7 +1,7 @@
 import { existsSync, readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { describe, expect, it } from "vitest";
-import { categoryLabel, EXPENSE_CATEGORIES, EXPENSE_CATEGORY_IDS, formatMoneyMinor, isExpenseCategory, messages, parseAmountMinor, statusLabel } from "../src/i18n";
+import { categoryLabel, EXPENSE_CATEGORIES, EXPENSE_CATEGORY_IDS, formatDate, formatMoneyMinor, formatTripPeriod, isExpenseCategory, messages, parseAmountMinor, statusLabel } from "../src/i18n";
 import { autoSelectVehicle, sameCardConfig } from "../src/card-editor";
 import { listVehicles } from "../src/api";
 
@@ -122,6 +122,14 @@ describe("frontend release contract", () => {
     expect(EXPENSE_CATEGORIES).toEqual(EXPENSE_CATEGORY_IDS);
     expect(isExpenseCategory("camping")).toBe(true);
     expect(isExpenseCategory("Stellplatz/Campingplatz")).toBe(false);
+  });
+  it("formats ISO calendar dates without timezone shifts in both languages", () => {
+    const german = { locale: { language: "de-DE" } } as any;
+    const english = { locale: { language: "en-US" } } as any;
+    expect(formatDate("2026-10-23", german)).toBe("23.10.2026");
+    expect(formatDate("2026-10-23", english)).toBe("10/23/2026");
+    expect(formatTripPeriod({ start_date: "2026-10-23", end_date: "2026-10-25" }, german)).toBe("23.10.2026 – 25.10.2026");
+    expect(formatTripPeriod({ start_date: "2026-10-23", end_date: "2026-10-25" }, english)).toBe("10/23/2026 – 10/25/2026");
   });
   it("uses the trip-specific cost response and an inline edit form", () => {
     const summary = readFileSync(resolve(root, "src/summary-card.ts"), "utf8");

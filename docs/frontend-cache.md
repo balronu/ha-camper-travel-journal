@@ -88,3 +88,20 @@ Die Browser- und echte Dashboard-Verifikation bleibt für diese Beta offen;
 die statische Registrierung, Versionskennung und idempotente Elementdefinition
 sowie der Editor-Vertrag sind durch Code- und CI-Tests abgesichert. Eine echte
 iOS-/WebKit-Prüfung wurde nicht durchgeführt.
+
+## Datumsdarstellung
+
+ISO-Kalenderdaten (`YYYY-MM-DD`) werden in der deutschen Oberfläche als
+`TT.MM.JJJJ` und in der englischen Oberfläche als `MM/DD/YYYY` angezeigt.
+Die Werte bleiben für API und SQLite unverändert im ISO-Format. Die
+Formatierung zerlegt reine Kalenderdaten direkt und verwendet dafür kein
+`new Date("YYYY-MM-DD")`; dadurch entsteht keine Verschiebung auf den
+Vortag durch UTC-/Zeitzoneninterpretation. Zeitstempel von Fahrten werden
+weiterhin als echte Zeitstempel in der lokalen HA-Zeitzone formatiert.
+
+`<input type="date">` muss seinen Wert ebenfalls als `YYYY-MM-DD` erhalten.
+Die sichtbare Eingabemaske wird vom Browser/OS lokalisiert und kann von einer
+Web-Komponente nicht zuverlässig auf `TT.MM.JJJJ` festgelegt werden. Die
+deutsche Darstellung ist daher für Beschriftungen, Listen, Zusammenfassungen
+und Zeitstempel garantiert; bei nativen Datumseingaben entscheidet der
+Browser über das sichtbare Muster. Die gespeicherte Eingabe bleibt ISO.

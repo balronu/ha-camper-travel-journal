@@ -42,13 +42,21 @@ export function messages(hass?: Hass): Messages {
   return language.startsWith("de") ? de : en;
 }
 
+function localeFor(hass?: Hass): string {
+  return (hass?.locale?.language ?? "").toLowerCase().startsWith("de") ? "de-DE" : "en-US";
+}
+
+/** Format an ISO calendar date without parsing it as a UTC/local Date. */
 export function formatDate(value: string, hass?: Hass): string {
-  const language = (hass?.locale?.language ?? "").toLowerCase().startsWith("de") ? "de-DE" : "en-US";
-  return new Date(value).toLocaleDateString(language);
+  const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(value);
+  if (match) {
+    const [, year, month, day] = match;
+    return localeFor(hass).startsWith("de") ? `${day}.${month}.${year}` : `${month}/${day}/${year}`;
+  }
+  return new Date(value).toLocaleDateString(localeFor(hass));
 }
 export function formatDateTime(value: string, hass?: Hass): string {
-  const language = (hass?.locale?.language ?? "").toLowerCase().startsWith("de") ? "de-DE" : "en-US";
-  return new Date(value).toLocaleString(language, { dateStyle: "short", timeStyle: "short" });
+  return new Date(value).toLocaleString(localeFor(hass), { dateStyle: "short", timeStyle: "short" });
 }
 export function formatDuration(seconds: number | undefined, hass?: Hass): string {
   const minutes = Math.max(0, Math.round((seconds ?? 0) / 60));
@@ -57,7 +65,7 @@ export function formatDuration(seconds: number | undefined, hass?: Hass): string
   return `${hours} h ${minutes % 60} min`;
 }
 export function formatTripPeriod(trip: { start_date?: string | null; end_date?: string | null; started_at?: string; ended_at?: string | null }, hass?: Hass): string {
-  if (trip.start_date || trip.end_date) return [trip.start_date, trip.end_date].filter(Boolean).join(" – ") || "";
+  if (trip.start_date || trip.end_date) return [trip.start_date, trip.end_date].filter(Boolean).map((value) => formatDate(value!, hass)).join(" – ") || "";
   if (trip.started_at) return `${formatDate(trip.started_at, hass)}${trip.ended_at ? ` – ${formatDate(trip.ended_at, hass)}` : ""}`;
   return "";
 }

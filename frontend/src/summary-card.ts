@@ -1,7 +1,7 @@
 import { html } from "lit";
 import { TravelCard, defineOnce } from "./base-card";
 import { list, transition, type Snapshot } from "./api";
-import { formatDate, formatMoneyMinor, messages, statusLabel } from "./i18n";
+import { formatMoneyMinor, formatTripPeriod, messages, statusLabel } from "./i18n";
 import { EXPENSES_CHANGED_EVENT, TRAVEL_DATA_CHANGED_EVENT, type ExpenseChangedDetail } from "./expense-events";
 
 export class SummaryCard extends TravelCard {
@@ -57,7 +57,7 @@ export class SummaryCard extends TravelCard {
     const summary = this.snapshot?.expense_summary;
     const total = summary?.mixed_currency ? lang.mixedCurrency : summary?.total_minor !== undefined && summary.currency ? formatMoneyMinor(summary.total_minor, summary.currency, this.hass) : formatMoneyMinor(0, "EUR", this.hass);
     const error = this.loadError || this.actionError;
-    const period = trip ? [trip.start_date, trip.end_date].filter(Boolean).join(" – ") || (trip.started_at ? `${formatDate(trip.started_at, this.hass)}${trip.ended_at ? ` – ${formatDate(trip.ended_at, this.hass)}` : ""}` : "") : "";
+    const period = trip ? formatTripPeriod(trip, this.hass) : "";
     return html`<ha-card><h2>${trip?.title ?? lang.title}</h2>${error ? html`<p class="error" role="alert">${error}</p>` : trip ? html`<p class="muted">${trip.destination || lang.noDestination} · ${statusLabel(trip.status, this.hass)} · ${period}</p><div class="grid"><div class="metric"><span class="muted">${lang.distance}</span><span class="value">${km.toFixed(1)} km</span></div><div class="metric"><span class="muted">${lang.drives}</span><span class="value">${this.snapshot?.drives.length ?? 0}</span></div><div class="metric"><span class="muted">${lang.stops}</span><span class="value">${this.snapshot?.stops.length ?? 0}</span></div><div class="metric"><span class="muted">${lang.costs}</span><span class="value">${total}</span></div></div><div class="actions">${trip.status === "planned" || trip.status === "paused" ? html`<button @click=${() => this.setStatus("active")}>${lang.resume}</button>` : ""}${trip.status === "active" ? html`<button class="secondary" @click=${() => this.setStatus("paused")}>${lang.pause}</button><button @click=${() => this.setStatus("completed")}>${lang.complete}</button>` : ""}</div>` : html`<p class="muted">${lang.noTrip}</p>`}${this.loading ? html`<p class="muted">${lang.loading}</p>` : ""}</ha-card>`;
   }
 }
