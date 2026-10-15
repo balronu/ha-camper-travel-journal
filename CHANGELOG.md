@@ -2,6 +2,17 @@
 
 🇩🇪 Deutsch | 🇬🇧 [English](README.en.md)
 
+## 0.1.0-beta.10 – Vollständige Kostenverwaltung
+
+- Korrigiert Kostenkategorien, Beträge und Reisezuordnung über die gesamte
+  Frontend-/WebSocket-/Speicher-Kette.
+- Berechnet Summen centgenau pro Reise und erhält bestehende Datensätze ohne
+  automatische Umkategorisierung oder Datenbankmigration.
+- Ersetzt die Kosten-Browser-Prompts durch ein responsives Bearbeitungsformular
+  mit Kategorieauswahl, Betrag, Speichern/Abbrechen und robuster Fehleranzeige.
+- Ergänzt Regressionstests für Kategorien, Bearbeitung, Löschen, Summen,
+  Persistenz und die Beta-9-WebSocket-Registrierung.
+
 ## 0.1.0-beta.9 – WebSocket-Registrierung und iOS-Kopierfallback
 
 - Registriert die WebSocket-Befehle beim Laden eines Config Entries und ergänzt

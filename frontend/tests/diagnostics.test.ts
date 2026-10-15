@@ -72,7 +72,9 @@ describe("read-only WebSocket diagnostics", () => {
     expect(summary).toContain('this.loadError = ""');
     expect(manager).toContain('this.loadError = ""');
     expect(manager).toContain("private actionError");
-    expect(manager).toContain("catch { this.fail(messages(this.hass).tripCreateError); return; }");
+    expect(manager).toContain("catch { this.fail(lang.expenseCreateError); }");
+    expect(manager).toContain("editingCategory");
+    expect(manager).toContain("parseAmountMinor");
     expect(manager).toContain("await this.refresh();");
   });
 });

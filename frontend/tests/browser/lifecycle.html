@@ -21,7 +21,7 @@ const connection = {
       return { vehicles: [{ vehicle_id: "entry-wohnmobil", name: "Wohnmobil", title: "Camper Travel Journal" }] };
     }
     dataCalls += 1;
-    return { trips: [], drives: [], stops: [] };
+    return { trips: [{ id: "trip-1", title: "Länderspiel Deutschland – Japan", description: "", destination: "Bremen", status: "active", started_at: "2026-10-01T12:00:00Z" }], drives: [], stops: [], expenses: [{ id: "expense-1", category: "camping", amount_minor: 2300, currency: "EUR", occurred_at: "2026-10-01T12:00:00Z" }], expense_summary: { total_minor: 2300, currency: "EUR", mixed_currency: false } };
   },
 };
 const hass = { connection, locale: { language: "de-DE" } };
@@ -64,6 +64,7 @@ result.textContent = JSON.stringify({
   selectedVehicle: select?.value ?? null,
   optionCount: select?.options.length ?? 0,
   noTripMessage: summary.shadowRoot.textContent.includes("Noch keine Reise angelegt."),
+  summaryCost: summary.shadowRoot.textContent.includes("23,00"),
   diagnosticStarted,
   diagnosticCallsBefore,
   diagnosticCallsAfter: vehicleCalls + dataCalls + authCalls,

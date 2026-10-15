@@ -7,7 +7,7 @@ from pathlib import Path
 
 from custom_components.camper_travel_journal.models import Drive, Expense, Stop
 from custom_components.camper_travel_journal.storage import SQLiteStore
-from custom_components.camper_travel_journal.travel import validate_transition
+from custom_components.camper_travel_journal.travel import EXPENSE_CATEGORIES, validate_transition
 
 UTC = timezone.utc
 
@@ -83,6 +83,36 @@ class Phase2Tests(unittest.TestCase):
         self.assertEqual(self.store.list_expenses(trip_id), [])
         self.store.delete_trip(trip_id)
         self.assertEqual(self.store.list_trips("v1"), [])
+
+    def test_expense_categories_amounts_and_edits_round_trip_without_migration(self):
+        trip_id = self.store.create_trip("v1", "Kostenprüfung", self.now, self.now)
+        created = []
+        for index, category in enumerate(sorted(EXPENSE_CATEGORIES)):
+            created.append(self.store.create_expense(Expense("", trip_id, self.now, category, index + 1, "eur"), self.now))
+        rows = self.store.list_expenses(trip_id)
+        self.assertEqual({row["category"] for row in rows}, set(EXPENSE_CATEGORIES))
+        self.assertEqual({row["currency"] for row in rows}, {"EUR"})
+        self.assertEqual(self.store.expense_summary(trip_id)["total_minor"], sum(range(1, len(EXPENSE_CATEGORIES) + 1)))
+
+        self.store.update_expense(created[0], self.now, category="camping", amount_minor=2300)
+        updated = next(row for row in self.store.list_expenses(trip_id) if row["id"] == created[0])
+        self.assertEqual(updated["category"], "camping")
+        self.assertEqual(updated["amount_minor"], 2300)
+        self.store.close()
+        self.store.open()
+        persisted = next(row for row in self.store.list_expenses(trip_id) if row["id"] == created[0])
+        self.assertEqual((persisted["category"], persisted["amount_minor"]), ("camping", 2300))
+
+    def test_expense_validation_does_not_fallback_or_silently_delete(self):
+        trip_id = self.store.create_trip("v1", "Validierung", self.now, self.now)
+        with self.assertRaisesRegex(ValueError, "expense_category_invalid"):
+            self.store.create_expense(Expense("", trip_id, self.now, "unknown", 100, "EUR"), self.now)
+        with self.assertRaisesRegex(ValueError, "amount_invalid"):
+            self.store.create_expense(Expense("", trip_id, self.now, "camping", -1, "EUR"), self.now)
+        with self.assertRaisesRegex(ValueError, "currency_invalid"):
+            self.store.create_expense(Expense("", trip_id, self.now, "camping", 100, "EURO"), self.now)
+        with self.assertRaisesRegex(ValueError, "expense_not_found"):
+            self.store.delete_expense("missing")
 
 
 if __name__ == "__main__":

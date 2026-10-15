@@ -13,6 +13,8 @@ from contextlib import contextmanager
 from datetime import datetime, timezone
 from pathlib import Path
 
+from .travel import validate_amount, validate_expense_category, validate_expense_currency
+
 SCHEMA_VERSION = 4
 SCHEMA_SQL = """
 PRAGMA foreign_keys = ON;
@@ -297,10 +299,14 @@ class SQLiteStore:
 
     def create_expense(self, expense, now: datetime) -> str:
         expense_id = expense.id or str(uuid.uuid4())
-        if expense.amount_minor < 0: raise ValueError("amount_invalid")
+        amount_minor = validate_amount(expense.amount_minor)
+        category = validate_expense_category(expense.category)
+        currency = validate_expense_currency(expense.currency)
         with self.transaction() as connection:
             stamp = utc_iso(now)
-            connection.execute("INSERT INTO expenses(id,trip_id,occurred_at,category,amount_minor,currency,note,created_at,updated_at,odometer_km,stay_id) VALUES(?,?,?,?,?,?,?,?,?,?,?)", (expense_id, expense.trip_id, utc_iso(expense.occurred_at), expense.category, expense.amount_minor, expense.currency.upper(), expense.note, stamp, stamp, expense.odometer_km, expense.stay_id))
+            if connection.execute("SELECT 1 FROM trips WHERE id=?", (expense.trip_id,)).fetchone() is None:
+                raise ValueError("trip_not_found")
+            connection.execute("INSERT INTO expenses(id,trip_id,occurred_at,category,amount_minor,currency,note,created_at,updated_at,odometer_km,stay_id) VALUES(?,?,?,?,?,?,?,?,?,?,?)", (expense_id, expense.trip_id, utc_iso(expense.occurred_at), category, amount_minor, currency, expense.note, stamp, stamp, expense.odometer_km, expense.stay_id))
         return expense_id
 
     def list_expenses(self, trip_id: str) -> list[dict]:
@@ -308,15 +314,18 @@ class SQLiteStore:
         return [dict(row) for row in self.connection.execute("SELECT * FROM expenses WHERE trip_id=? ORDER BY occurred_at DESC", (trip_id,)).fetchall()]
 
     def delete_expense(self, expense_id: str) -> None:
-        with self.transaction() as connection: connection.execute("DELETE FROM expenses WHERE id=?", (expense_id,))
+        with self.transaction() as connection:
+            cursor = connection.execute("DELETE FROM expenses WHERE id=?", (expense_id,))
+            if cursor.rowcount != 1:
+                raise ValueError("expense_not_found")
 
     def update_expense(self, expense_id: str, now: datetime, **fields) -> None:
         allowed = {"trip_id", "occurred_at", "category", "amount_minor", "currency", "note", "odometer_km", "stay_id"}
         changes = {key: value for key, value in fields.items() if key in allowed and value is not None}
-        if "amount_minor" in changes and (isinstance(changes["amount_minor"], bool) or changes["amount_minor"] < 0):
-            raise ValueError("amount_invalid")
+        if "amount_minor" in changes: changes["amount_minor"] = validate_amount(changes["amount_minor"])
+        if "category" in changes: changes["category"] = validate_expense_category(changes["category"])
         if isinstance(changes.get("occurred_at"), datetime): changes["occurred_at"] = utc_iso(changes["occurred_at"])
-        if "currency" in changes: changes["currency"] = changes["currency"].upper()
+        if "currency" in changes: changes["currency"] = validate_expense_currency(changes["currency"])
         if not changes: return
         changes["updated_at"] = utc_iso(now)
         assignments = ",".join(f"{key}=?" for key in changes)
