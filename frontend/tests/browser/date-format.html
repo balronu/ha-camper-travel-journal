@@ -1,0 +1,36 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>Camper Travel Journal date format test</title>
+<div id="summary-host"></div>
+<div id="manager-host"></div>
+<pre id="result">starting</pre>
+<script type="module">
+const result = document.querySelector("#result");
+const trip = { id: "trip-1", title: "Datumsprüfung", description: "", destination: "Bremen", status: "planned", start_date: "2026-10-23", end_date: "2026-10-25", started_at: null, ended_at: null };
+const connection = {
+  async sendMessagePromise(message) {
+    if (message.type !== "camper_travel_journal/list") throw new Error(`unexpected command ${message.type}`);
+    return { trips: [trip], drives: [], stops: [], expenses: [], expense_summary: { total_minor: 0, currency: "EUR", mixed_currency: false } };
+  },
+};
+const hass = { connection, locale: { language: "de-DE" } };
+await import("/custom_components/camper_travel_journal/frontend/camper-travel-journal.js");
+await customElements.whenDefined("camper-travel-journal-summary-card");
+await customElements.whenDefined("camper-travel-journal-manager-card");
+const summary = document.createElement("camper-travel-journal-summary-card");
+summary.setConfig({ vehicle_id: "entry-wohnmobil" });
+document.querySelector("#summary-host").append(summary);
+summary.hass = hass;
+const manager = document.createElement("camper-travel-journal-manager-card");
+manager.setConfig({ vehicle_id: "entry-wohnmobil" });
+document.querySelector("#manager-host").append(manager);
+manager.hass = hass;
+await new Promise((resolve) => setTimeout(resolve, 100));
+const summaryText = summary.shadowRoot.textContent;
+const managerText = manager.shadowRoot.textContent;
+result.textContent = JSON.stringify({
+  summaryPeriod: summaryText.includes("23.10.2026 – 25.10.2026"),
+  managerPeriod: managerText.includes("23.10.2026 – 25.10.2026"),
+  visibleTemplateLeak: [summary, manager].some((card) => /lit\$\d|=>\s*this\.|currentTarget\.value/.test(card.shadowRoot?.textContent ?? "")),
+}, null, 2);
+</script>

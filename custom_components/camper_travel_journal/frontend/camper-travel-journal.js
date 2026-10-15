@@ -1,15 +1,15 @@
-const R = globalThis, et = R.ShadowRoot && (R.ShadyCSS === void 0 || R.ShadyCSS.nativeShadow) && "adoptedStyleSheets" in Document.prototype && "replace" in CSSStyleSheet.prototype, it = /* @__PURE__ */ Symbol(), ot = /* @__PURE__ */ new WeakMap();
-let Et = class {
+const R = globalThis, it = R.ShadowRoot && (R.ShadyCSS === void 0 || R.ShadyCSS.nativeShadow) && "adoptedStyleSheets" in Document.prototype && "replace" in CSSStyleSheet.prototype, st = /* @__PURE__ */ Symbol(), ct = /* @__PURE__ */ new WeakMap();
+let Dt = class {
   constructor(t, e, i) {
-    if (this._$cssResult$ = !0, i !== it) throw Error("CSSResult is not constructable. Use `unsafeCSS` or `css` instead.");
+    if (this._$cssResult$ = !0, i !== st) throw Error("CSSResult is not constructable. Use `unsafeCSS` or `css` instead.");
     this.cssText = t, this.t = e;
   }
   get styleSheet() {
     let t = this.o;
     const e = this.t;
-    if (et && t === void 0) {
+    if (it && t === void 0) {
       const i = e !== void 0 && e.length === 1;
-      i && (t = ot.get(e)), t === void 0 && ((this.o = t = new CSSStyleSheet()).replaceSync(this.cssText), i && ot.set(e, t));
+      i && (t = ct.get(e)), t === void 0 && ((this.o = t = new CSSStyleSheet()).replaceSync(this.cssText), i && ct.set(e, t));
     }
     return t;
   }
@@ -17,28 +17,28 @@ let Et = class {
     return this.cssText;
   }
 };
-const Rt = (s) => new Et(typeof s == "string" ? s : s + "", void 0, it), O = (s, ...t) => {
+const Pt = (s) => new Dt(typeof s == "string" ? s : s + "", void 0, st), P = (s, ...t) => {
   const e = s.length === 1 ? s[0] : t.reduce((i, r, n) => i + ((o) => {
     if (o._$cssResult$ === !0) return o.cssText;
     if (typeof o == "number") return o;
     throw Error("Value passed to 'css' function must be a 'css' function result: " + o + ". Use 'unsafeCSS' to pass non-literal values, but take care to ensure page security.");
   })(r) + s[n + 1], s[0]);
-  return new Et(e, s, it);
-}, Nt = (s, t) => {
-  if (et) s.adoptedStyleSheets = t.map((e) => e instanceof CSSStyleSheet ? e : e.styleSheet);
+  return new Dt(e, s, st);
+}, Ot = (s, t) => {
+  if (it) s.adoptedStyleSheets = t.map((e) => e instanceof CSSStyleSheet ? e : e.styleSheet);
   else for (const e of t) {
     const i = document.createElement("style"), r = R.litNonce;
     r !== void 0 && i.setAttribute("nonce", r), i.textContent = e.cssText, s.appendChild(i);
   }
-}, ct = et ? (s) => s : (s) => s instanceof CSSStyleSheet ? ((t) => {
+}, dt = it ? (s) => s : (s) => s instanceof CSSStyleSheet ? ((t) => {
   let e = "";
   for (const i of t.cssRules) e += i.cssText;
-  return Rt(e);
+  return Pt(e);
 })(s) : s;
-const { is: Pt, defineProperty: Ot, getOwnPropertyDescriptor: jt, getOwnPropertyNames: Ht, getOwnPropertySymbols: qt, getPrototypeOf: zt } = Object, j = globalThis, dt = j.trustedTypes, Bt = dt ? dt.emptyScript : "", Vt = j.reactiveElementPolyfillSupport, k = (s, t) => s, X = { toAttribute(s, t) {
+const { is: jt, defineProperty: Ht, getOwnPropertyDescriptor: qt, getOwnPropertyNames: zt, getOwnPropertySymbols: Bt, getPrototypeOf: Vt } = Object, O = globalThis, lt = O.trustedTypes, Kt = lt ? lt.emptyScript : "", Ft = O.reactiveElementPolyfillSupport, k = (s, t) => s, X = { toAttribute(s, t) {
   switch (t) {
     case Boolean:
-      s = s ? Bt : null;
+      s = s ? Kt : null;
       break;
     case Object:
     case Array:
@@ -63,8 +63,8 @@ const { is: Pt, defineProperty: Ot, getOwnPropertyDescriptor: jt, getOwnProperty
       }
   }
   return e;
-} }, Dt = (s, t) => !Pt(s, t), lt = { attribute: !0, type: String, converter: X, reflect: !1, useDefault: !1, hasChanged: Dt };
-Symbol.metadata ??= /* @__PURE__ */ Symbol("metadata"), j.litPropertyMetadata ??= /* @__PURE__ */ new WeakMap();
+} }, xt = (s, t) => !jt(s, t), ht = { attribute: !0, type: String, converter: X, reflect: !1, useDefault: !1, hasChanged: xt };
+Symbol.metadata ??= /* @__PURE__ */ Symbol("metadata"), O.litPropertyMetadata ??= /* @__PURE__ */ new WeakMap();
 let w = class extends HTMLElement {
   static addInitializer(t) {
     this._$Ei(), (this.l ??= []).push(t);
@@ -72,14 +72,14 @@ let w = class extends HTMLElement {
   static get observedAttributes() {
     return this.finalize(), this._$Eh && [...this._$Eh.keys()];
   }
-  static createProperty(t, e = lt) {
+  static createProperty(t, e = ht) {
     if (e.state && (e.attribute = !1), this._$Ei(), this.prototype.hasOwnProperty(t) && ((e = Object.create(e)).wrapped = !0), this.elementProperties.set(t, e), !e.noAccessor) {
       const i = /* @__PURE__ */ Symbol(), r = this.getPropertyDescriptor(t, i, e);
-      r !== void 0 && Ot(this.prototype, t, r);
+      r !== void 0 && Ht(this.prototype, t, r);
     }
   }
   static getPropertyDescriptor(t, e, i) {
-    const { get: r, set: n } = jt(this.prototype, t) ?? { get() {
+    const { get: r, set: n } = qt(this.prototype, t) ?? { get() {
       return this[e];
     }, set(o) {
       this[e] = o;
@@ -90,17 +90,17 @@ let w = class extends HTMLElement {
     }, configurable: !0, enumerable: !0 };
   }
   static getPropertyOptions(t) {
-    return this.elementProperties.get(t) ?? lt;
+    return this.elementProperties.get(t) ?? ht;
   }
   static _$Ei() {
     if (this.hasOwnProperty(k("elementProperties"))) return;
-    const t = zt(this);
+    const t = Vt(this);
     t.finalize(), t.l !== void 0 && (this.l = [...t.l]), this.elementProperties = new Map(t.elementProperties);
   }
   static finalize() {
     if (this.hasOwnProperty(k("finalized"))) return;
     if (this.finalized = !0, this._$Ei(), this.hasOwnProperty(k("properties"))) {
-      const e = this.properties, i = [...Ht(e), ...qt(e)];
+      const e = this.properties, i = [...zt(e), ...Bt(e)];
       for (const r of i) this.createProperty(r, e[r]);
     }
     const t = this[Symbol.metadata];
@@ -119,8 +119,8 @@ let w = class extends HTMLElement {
     const e = [];
     if (Array.isArray(t)) {
       const i = new Set(t.flat(1 / 0).reverse());
-      for (const r of i) e.unshift(ct(r));
-    } else t !== void 0 && e.push(ct(t));
+      for (const r of i) e.unshift(dt(r));
+    } else t !== void 0 && e.push(dt(t));
     return e;
   }
   static _$Eu(t, e) {
@@ -146,7 +146,7 @@ let w = class extends HTMLElement {
   }
   createRenderRoot() {
     const t = this.shadowRoot ?? this.attachShadow(this.constructor.shadowRootOptions);
-    return Nt(t, this.constructor.elementStyles), t;
+    return Ot(t, this.constructor.elementStyles), t;
   }
   connectedCallback() {
     this.renderRoot ??= this.createRenderRoot(), this.enableUpdating(!0), this._$EO?.forEach((t) => t.hostConnected?.());
@@ -178,7 +178,7 @@ let w = class extends HTMLElement {
   requestUpdate(t, e, i, r = !1, n) {
     if (t !== void 0) {
       const o = this.constructor;
-      if (r === !1 && (n = this[t]), i ??= o.getPropertyOptions(t), !((i.hasChanged ?? Dt)(n, e) || i.useDefault && i.reflect && n === this._$Ej?.get(t) && !this.hasAttribute(o._$Eu(t, i)))) return;
+      if (r === !1 && (n = this[t]), i ??= o.getPropertyOptions(t), !((i.hasChanged ?? xt)(n, e) || i.useDefault && i.reflect && n === this._$Ej?.get(t) && !this.hasAttribute(o._$Eu(t, i)))) return;
       this.C(t, e, i);
     }
     this.isUpdatePending === !1 && (this._$ES = this._$EP());
@@ -246,41 +246,41 @@ let w = class extends HTMLElement {
   firstUpdated(t) {
   }
 };
-w.elementStyles = [], w.shadowRootOptions = { mode: "open" }, w[k("elementProperties")] = /* @__PURE__ */ new Map(), w[k("finalized")] = /* @__PURE__ */ new Map(), Vt?.({ ReactiveElement: w }), (j.reactiveElementVersions ??= []).push("2.1.2");
-const st = globalThis, ht = (s) => s, N = st.trustedTypes, ut = N ? N.createPolicy("lit-html", { createHTML: (s) => s }) : void 0, xt = "$lit$", _ = `lit$${Math.random().toFixed(9).slice(2)}$`, wt = "?" + _, Kt = `<${wt}>`, D = document, I = () => D.createComment(""), M = (s) => s === null || typeof s != "object" && typeof s != "function", rt = Array.isArray, Ft = (s) => rt(s) || typeof s?.[Symbol.iterator] == "function", q = `[ 	
-\f\r]`, C = /<(?:(!--|\/[^a-zA-Z])|(\/?[a-zA-Z][^>\s]*)|(\/?$))/g, pt = /-->/g, gt = />/g, b = RegExp(`>|${q}(?:([^\\s"'>=/]+)(${q}*=${q}*(?:[^ 	
-\f\r"'\`<>=]|("|')|))|$)`, "g"), mt = /'/g, vt = /"/g, St = /^(?:script|style|textarea|title)$/i, Wt = (s) => (t, ...e) => ({ _$litType$: s, strings: t, values: e }), d = Wt(1), S = /* @__PURE__ */ Symbol.for("lit-noChange"), g = /* @__PURE__ */ Symbol.for("lit-nothing"), ft = /* @__PURE__ */ new WeakMap(), y = D.createTreeWalker(D, 129);
-function At(s, t) {
-  if (!rt(s) || !s.hasOwnProperty("raw")) throw Error("invalid template strings array");
-  return ut !== void 0 ? ut.createHTML(t) : t;
+w.elementStyles = [], w.shadowRootOptions = { mode: "open" }, w[k("elementProperties")] = /* @__PURE__ */ new Map(), w[k("finalized")] = /* @__PURE__ */ new Map(), Ft?.({ ReactiveElement: w }), (O.reactiveElementVersions ??= []).push("2.1.2");
+const rt = globalThis, ut = (s) => s, N = rt.trustedTypes, pt = N ? N.createPolicy("lit-html", { createHTML: (s) => s }) : void 0, wt = "$lit$", _ = `lit$${Math.random().toFixed(9).slice(2)}$`, At = "?" + _, Wt = `<${At}>`, D = document, I = () => D.createComment(""), M = (s) => s === null || typeof s != "object" && typeof s != "function", nt = Array.isArray, Gt = (s) => nt(s) || typeof s?.[Symbol.iterator] == "function", H = `[ 	
+\f\r]`, C = /<(?:(!--|\/[^a-zA-Z])|(\/?[a-zA-Z][^>\s]*)|(\/?$))/g, gt = /-->/g, mt = />/g, b = RegExp(`>|${H}(?:([^\\s"'>=/]+)(${H}*=${H}*(?:[^ 	
+\f\r"'\`<>=]|("|')|))|$)`, "g"), vt = /'/g, ft = /"/g, St = /^(?:script|style|textarea|title)$/i, Zt = (s) => (t, ...e) => ({ _$litType$: s, strings: t, values: e }), d = Zt(1), A = /* @__PURE__ */ Symbol.for("lit-noChange"), g = /* @__PURE__ */ Symbol.for("lit-nothing"), $t = /* @__PURE__ */ new WeakMap(), y = D.createTreeWalker(D, 129);
+function Ct(s, t) {
+  if (!nt(s) || !s.hasOwnProperty("raw")) throw Error("invalid template strings array");
+  return pt !== void 0 ? pt.createHTML(t) : t;
 }
-const Gt = (s, t) => {
+const Jt = (s, t) => {
   const e = s.length - 1, i = [];
   let r, n = t === 2 ? "<svg>" : t === 3 ? "<math>" : "", o = C;
   for (let c = 0; c < e; c++) {
     const a = s[c];
     let u, p, h = -1, v = 0;
-    for (; v < a.length && (o.lastIndex = v, p = o.exec(a), p !== null); ) v = o.lastIndex, o === C ? p[1] === "!--" ? o = pt : p[1] !== void 0 ? o = gt : p[2] !== void 0 ? (St.test(p[2]) && (r = RegExp("</" + p[2], "g")), o = b) : p[3] !== void 0 && (o = b) : o === b ? p[0] === ">" ? (o = r ?? C, h = -1) : p[1] === void 0 ? h = -2 : (h = o.lastIndex - p[2].length, u = p[1], o = p[3] === void 0 ? b : p[3] === '"' ? vt : mt) : o === vt || o === mt ? o = b : o === pt || o === gt ? o = C : (o = b, r = void 0);
+    for (; v < a.length && (o.lastIndex = v, p = o.exec(a), p !== null); ) v = o.lastIndex, o === C ? p[1] === "!--" ? o = gt : p[1] !== void 0 ? o = mt : p[2] !== void 0 ? (St.test(p[2]) && (r = RegExp("</" + p[2], "g")), o = b) : p[3] !== void 0 && (o = b) : o === b ? p[0] === ">" ? (o = r ?? C, h = -1) : p[1] === void 0 ? h = -2 : (h = o.lastIndex - p[2].length, u = p[1], o = p[3] === void 0 ? b : p[3] === '"' ? ft : vt) : o === ft || o === vt ? o = b : o === gt || o === mt ? o = C : (o = b, r = void 0);
     const f = o === b && s[c + 1].startsWith("/>") ? " " : "";
-    n += o === C ? a + Kt : h >= 0 ? (i.push(u), a.slice(0, h) + xt + a.slice(h) + _ + f) : a + _ + (h === -2 ? c : f);
+    n += o === C ? a + Wt : h >= 0 ? (i.push(u), a.slice(0, h) + wt + a.slice(h) + _ + f) : a + _ + (h === -2 ? c : f);
   }
-  return [At(s, n + (s[e] || "<?>") + (t === 2 ? "</svg>" : t === 3 ? "</math>" : "")), i];
+  return [Ct(s, n + (s[e] || "<?>") + (t === 2 ? "</svg>" : t === 3 ? "</math>" : "")), i];
 };
 class U {
   constructor({ strings: t, _$litType$: e }, i) {
     let r;
     this.parts = [];
     let n = 0, o = 0;
-    const c = t.length - 1, a = this.parts, [u, p] = Gt(t, e);
+    const c = t.length - 1, a = this.parts, [u, p] = Jt(t, e);
     if (this.el = U.createElement(u, i), y.currentNode = this.el.content, e === 2 || e === 3) {
       const h = this.el.content.firstChild;
       h.replaceWith(...h.childNodes);
     }
     for (; (r = y.nextNode()) !== null && a.length < c; ) {
       if (r.nodeType === 1) {
-        if (r.hasAttributes()) for (const h of r.getAttributeNames()) if (h.endsWith(xt)) {
+        if (r.hasAttributes()) for (const h of r.getAttributeNames()) if (h.endsWith(wt)) {
           const v = p[o++], f = r.getAttribute(h).split(_), x = /([.?@])?(.*)/.exec(v);
-          a.push({ type: 1, index: n, name: x[2], strings: f, ctor: x[1] === "." ? Jt : x[1] === "?" ? Xt : x[1] === "@" ? Yt : H }), r.removeAttribute(h);
+          a.push({ type: 1, index: n, name: x[2], strings: f, ctor: x[1] === "." ? Yt : x[1] === "?" ? Qt : x[1] === "@" ? te : j }), r.removeAttribute(h);
         } else h.startsWith(_) && (a.push({ type: 6, index: n }), r.removeAttribute(h));
         if (St.test(r.tagName)) {
           const h = r.textContent.split(_), v = h.length - 1;
@@ -290,7 +290,7 @@ class U {
             r.append(h[v], I());
           }
         }
-      } else if (r.nodeType === 8) if (r.data === wt) a.push({ type: 2, index: n });
+      } else if (r.nodeType === 8) if (r.data === At) a.push({ type: 2, index: n });
       else {
         let h = -1;
         for (; (h = r.data.indexOf(_, h + 1)) !== -1; ) a.push({ type: 7, index: n }), h += _.length - 1;
@@ -303,13 +303,13 @@ class U {
     return i.innerHTML = t, i;
   }
 }
-function A(s, t, e = s, i) {
-  if (t === S) return t;
+function S(s, t, e = s, i) {
+  if (t === A) return t;
   let r = i !== void 0 ? e._$Co?.[i] : e._$Cl;
   const n = M(t) ? void 0 : t._$litDirective$;
-  return r?.constructor !== n && (r?._$AO?.(!1), n === void 0 ? r = void 0 : (r = new n(s), r._$AT(s, e, i)), i !== void 0 ? (e._$Co ??= [])[i] = r : e._$Cl = r), r !== void 0 && (t = A(s, r._$AS(s, t.values), r, i)), t;
+  return r?.constructor !== n && (r?._$AO?.(!1), n === void 0 ? r = void 0 : (r = new n(s), r._$AT(s, e, i)), i !== void 0 ? (e._$Co ??= [])[i] = r : e._$Cl = r), r !== void 0 && (t = S(s, r._$AS(s, t.values), r, i)), t;
 }
-class Zt {
+class Xt {
   constructor(t, e) {
     this._$AV = [], this._$AN = void 0, this._$AD = t, this._$AM = e;
   }
@@ -326,7 +326,7 @@ class Zt {
     for (; a !== void 0; ) {
       if (o === a.index) {
         let u;
-        a.type === 2 ? u = new L(n, n.nextSibling, this, t) : a.type === 1 ? u = new a.ctor(n, a.name, a.strings, this, t) : a.type === 6 && (u = new Qt(n, this, t)), this._$AV.push(u), a = i[++c];
+        a.type === 2 ? u = new L(n, n.nextSibling, this, t) : a.type === 1 ? u = new a.ctor(n, a.name, a.strings, this, t) : a.type === 6 && (u = new ee(n, this, t)), this._$AV.push(u), a = i[++c];
       }
       o !== a?.index && (n = y.nextNode(), o++);
     }
@@ -356,7 +356,7 @@ class L {
     return this._$AB;
   }
   _$AI(t, e = this) {
-    t = A(this, t, e), M(t) ? t === g || t == null || t === "" ? (this._$AH !== g && this._$AR(), this._$AH = g) : t !== this._$AH && t !== S && this._(t) : t._$litType$ !== void 0 ? this.$(t) : t.nodeType !== void 0 ? this.T(t) : Ft(t) ? this.k(t) : this._(t);
+    t = S(this, t, e), M(t) ? t === g || t == null || t === "" ? (this._$AH !== g && this._$AR(), this._$AH = g) : t !== this._$AH && t !== A && this._(t) : t._$litType$ !== void 0 ? this.$(t) : t.nodeType !== void 0 ? this.T(t) : Gt(t) ? this.k(t) : this._(t);
   }
   O(t) {
     return this._$AA.parentNode.insertBefore(t, this._$AB);
@@ -368,19 +368,19 @@ class L {
     this._$AH !== g && M(this._$AH) ? this._$AA.nextSibling.data = t : this.T(D.createTextNode(t)), this._$AH = t;
   }
   $(t) {
-    const { values: e, _$litType$: i } = t, r = typeof i == "number" ? this._$AC(t) : (i.el === void 0 && (i.el = U.createElement(At(i.h, i.h[0]), this.options)), i);
+    const { values: e, _$litType$: i } = t, r = typeof i == "number" ? this._$AC(t) : (i.el === void 0 && (i.el = U.createElement(Ct(i.h, i.h[0]), this.options)), i);
     if (this._$AH?._$AD === r) this._$AH.p(e);
     else {
-      const n = new Zt(r, this), o = n.u(this.options);
+      const n = new Xt(r, this), o = n.u(this.options);
       n.p(e), this.T(o), this._$AH = n;
     }
   }
   _$AC(t) {
-    let e = ft.get(t.strings);
-    return e === void 0 && ft.set(t.strings, e = new U(t)), e;
+    let e = $t.get(t.strings);
+    return e === void 0 && $t.set(t.strings, e = new U(t)), e;
   }
   k(t) {
-    rt(this._$AH) || (this._$AH = [], this._$AR());
+    nt(this._$AH) || (this._$AH = [], this._$AR());
     const e = this._$AH;
     let i, r = 0;
     for (const n of t) r === e.length ? e.push(i = new L(this.O(I()), this.O(I()), this, this.options)) : i = e[r], i._$AI(n), r++;
@@ -388,15 +388,15 @@ class L {
   }
   _$AR(t = this._$AA.nextSibling, e) {
     for (this._$AP?.(!1, !0, e); t !== this._$AB; ) {
-      const i = ht(t).nextSibling;
-      ht(t).remove(), t = i;
+      const i = ut(t).nextSibling;
+      ut(t).remove(), t = i;
     }
   }
   setConnected(t) {
     this._$AM === void 0 && (this._$Cv = t, this._$AP?.(t));
   }
 }
-class H {
+class j {
   get tagName() {
     return this.element.tagName;
   }
@@ -409,11 +409,11 @@ class H {
   _$AI(t, e = this, i, r) {
     const n = this.strings;
     let o = !1;
-    if (n === void 0) t = A(this, t, e, 0), o = !M(t) || t !== this._$AH && t !== S, o && (this._$AH = t);
+    if (n === void 0) t = S(this, t, e, 0), o = !M(t) || t !== this._$AH && t !== A, o && (this._$AH = t);
     else {
       const c = t;
       let a, u;
-      for (t = n[0], a = 0; a < n.length - 1; a++) u = A(this, c[i + a], e, a), u === S && (u = this._$AH[a]), o ||= !M(u) || u !== this._$AH[a], u === g ? t = g : t !== g && (t += (u ?? "") + n[a + 1]), this._$AH[a] = u;
+      for (t = n[0], a = 0; a < n.length - 1; a++) u = S(this, c[i + a], e, a), u === A && (u = this._$AH[a]), o ||= !M(u) || u !== this._$AH[a], u === g ? t = g : t !== g && (t += (u ?? "") + n[a + 1]), this._$AH[a] = u;
     }
     o && !r && this.j(t);
   }
@@ -421,7 +421,7 @@ class H {
     t === g ? this.element.removeAttribute(this.name) : this.element.setAttribute(this.name, t ?? "");
   }
 }
-class Jt extends H {
+class Yt extends j {
   constructor() {
     super(...arguments), this.type = 3;
   }
@@ -429,7 +429,7 @@ class Jt extends H {
     this.element[this.name] = t === g ? void 0 : t;
   }
 }
-class Xt extends H {
+class Qt extends j {
   constructor() {
     super(...arguments), this.type = 4;
   }
@@ -437,12 +437,12 @@ class Xt extends H {
     this.element.toggleAttribute(this.name, !!t && t !== g);
   }
 }
-class Yt extends H {
+class te extends j {
   constructor(t, e, i, r, n) {
     super(t, e, i, r, n), this.type = 5;
   }
   _$AI(t, e = this) {
-    if ((t = A(this, t, e, 0) ?? g) === S) return;
+    if ((t = S(this, t, e, 0) ?? g) === A) return;
     const i = this._$AH, r = t === g && i !== g || t.capture !== i.capture || t.once !== i.once || t.passive !== i.passive, n = t !== g && (i === g || r);
     r && this.element.removeEventListener(this.name, this, i), n && this.element.addEventListener(this.name, this, t), this._$AH = t;
   }
@@ -450,7 +450,7 @@ class Yt extends H {
     typeof this._$AH == "function" ? this._$AH.call(this.options?.host ?? this.element, t) : this._$AH.handleEvent(t);
   }
 }
-class Qt {
+class ee {
   constructor(t, e, i) {
     this.element = t, this.type = 6, this._$AN = void 0, this._$AM = e, this.options = i;
   }
@@ -458,12 +458,12 @@ class Qt {
     return this._$AM._$AU;
   }
   _$AI(t) {
-    A(this, t);
+    S(this, t);
   }
 }
-const te = st.litHtmlPolyfillSupport;
-te?.(U, L), (st.litHtmlVersions ??= []).push("3.3.3");
-const ee = (s, t, e) => {
+const ie = rt.litHtmlPolyfillSupport;
+ie?.(U, L), (rt.litHtmlVersions ??= []).push("3.3.3");
+const se = (s, t, e) => {
   const i = e?.renderBefore ?? t;
   let r = i._$litPart$;
   if (r === void 0) {
@@ -472,7 +472,7 @@ const ee = (s, t, e) => {
   }
   return r._$AI(s), r;
 };
-const nt = globalThis;
+const at = globalThis;
 class E extends w {
   constructor() {
     super(...arguments), this.renderOptions = { host: this }, this._$Do = void 0;
@@ -483,7 +483,7 @@ class E extends w {
   }
   update(t) {
     const e = this.render();
-    this.hasUpdated || (this.renderOptions.isConnected = this.isConnected), super.update(t), this._$Do = ee(e, this.renderRoot, this.renderOptions);
+    this.hasUpdated || (this.renderOptions.isConnected = this.isConnected), super.update(t), this._$Do = se(e, this.renderRoot, this.renderOptions);
   }
   connectedCallback() {
     super.connectedCallback(), this._$Do?.setConnected(!0);
@@ -492,17 +492,17 @@ class E extends w {
     super.disconnectedCallback(), this._$Do?.setConnected(!1);
   }
   render() {
-    return S;
+    return A;
   }
 }
-E._$litElement$ = !0, E.finalized = !0, nt.litElementHydrateSupport?.({ LitElement: E });
-const ie = nt.litElementPolyfillSupport;
-ie?.({ LitElement: E });
-(nt.litElementVersions ??= []).push("4.2.2");
-class at extends E {
+E._$litElement$ = !0, E.finalized = !0, at.litElementHydrateSupport?.({ LitElement: E });
+const re = at.litElementPolyfillSupport;
+re?.({ LitElement: E });
+(at.litElementVersions ??= []).push("4.2.2");
+class ot extends E {
   _hass;
   config = {};
-  static styles = O`
+  static styles = P`
     :host { display:block; color:var(--primary-text-color); } ha-card { padding:16px; background:var(--ha-card-background,var(--card-background-color)); }
     h2,h3 { margin:0 0 12px; } .muted { color:var(--secondary-text-color); } .error { color:var(--error-color); }
     button { min-height:40px; border:0; border-radius:8px; padding:8px 12px; cursor:pointer; color:var(--text-primary-color,#fff); background:var(--primary-color); }
@@ -535,13 +535,13 @@ class at extends E {
     return this.config.vehicle_id ?? "";
   }
 }
-function Ct(s, t) {
+function kt(s, t) {
   customElements.get(s) || customElements.define(s, t);
 }
 async function m(s, t, e, i = {}) {
   return s.connection.sendMessagePromise({ type: t, vehicle_id: e, ...i });
 }
-const Y = (s, t, e) => m(s, "camper_travel_journal/list", t, e ? { trip_id: e } : {}), kt = (s, t, e, i) => m(s, "camper_travel_journal/transition_trip", t, { trip_id: e, status: i }), se = (s, t, e, i = "", r = "", n = "") => m(s, "camper_travel_journal/create_trip", t, { title: e, start_date: i || void 0, end_date: r || void 0, destination: n }), re = (s, t, e, i) => m(s, "camper_travel_journal/update_trip", t, { trip_id: e, ...i }), ne = (s, t, e) => m(s, "camper_travel_journal/delete_trip", t, { trip_id: e }), ae = (s, t, e, i) => m(s, "camper_travel_journal/unlink_drive", t, { trip_id: e, drive_id: i }), oe = (s, t, e, i) => m(s, "camper_travel_journal/link_drives", t, { trip_id: e, drive_ids: i }), ce = (s, t, e) => m(s, "camper_travel_journal/create_manual_drive", t, e), de = (s, t, e, i) => m(s, "camper_travel_journal/update_manual_drive", t, { drive_id: e, ...i }), le = (s, t, e) => m(s, "camper_travel_journal/delete_manual_drive", t, { drive_id: e }), he = (s, t, e, i) => m(s, "camper_travel_journal/create_expense", t, { trip_id: e, ...i }), ue = (s, t, e, i) => m(s, "camper_travel_journal/update_expense", t, { expense_id: e, ...i }), pe = (s, t, e) => m(s, "camper_travel_journal/delete_expense", t, { expense_id: e }), ge = async (s) => (await s.connection.sendMessagePromise({ type: "camper_travel_journal/list_vehicles" })).vehicles ?? [], Tt = ["camping", "fuel", "toll", "parking", "food", "activities", "other"], z = Tt, me = {
+const Y = (s, t, e) => m(s, "camper_travel_journal/list", t, e ? { trip_id: e } : {}), Tt = (s, t, e, i) => m(s, "camper_travel_journal/transition_trip", t, { trip_id: e, status: i }), ne = (s, t, e, i = "", r = "", n = "") => m(s, "camper_travel_journal/create_trip", t, { title: e, start_date: i || void 0, end_date: r || void 0, destination: n }), ae = (s, t, e, i) => m(s, "camper_travel_journal/update_trip", t, { trip_id: e, ...i }), oe = (s, t, e) => m(s, "camper_travel_journal/delete_trip", t, { trip_id: e }), ce = (s, t, e, i) => m(s, "camper_travel_journal/unlink_drive", t, { trip_id: e, drive_id: i }), de = (s, t, e, i) => m(s, "camper_travel_journal/link_drives", t, { trip_id: e, drive_ids: i }), le = (s, t, e) => m(s, "camper_travel_journal/create_manual_drive", t, e), he = (s, t, e, i) => m(s, "camper_travel_journal/update_manual_drive", t, { drive_id: e, ...i }), ue = (s, t, e) => m(s, "camper_travel_journal/delete_manual_drive", t, { drive_id: e }), pe = (s, t, e, i) => m(s, "camper_travel_journal/create_expense", t, { trip_id: e, ...i }), ge = (s, t, e, i) => m(s, "camper_travel_journal/update_expense", t, { expense_id: e, ...i }), me = (s, t, e) => m(s, "camper_travel_journal/delete_expense", t, { expense_id: e }), ve = async (s) => (await s.connection.sendMessagePromise({ type: "camper_travel_journal/list_vehicles" })).vehicles ?? [], It = ["camping", "fuel", "toll", "parking", "food", "activities", "other"], q = It, fe = {
   title: "Reisetagebuch",
   noDestination: "Kein Reiseziel",
   loading: "Reisedaten werden geladen …",
@@ -616,7 +616,7 @@ const Y = (s, t, e) => m(s, "camper_travel_journal/list", t, e ? { trip_id: e } 
   driveEditError: "Manuelle Fahrt konnte nicht bearbeitet werden.",
   driveDeleteError: "Manuelle Fahrt konnte nicht gelöscht werden.",
   dateInvalid: "Bitte gültige Daten eingeben."
-}, ve = {
+}, $e = {
   title: "Travel journal",
   noDestination: "No destination",
   loading: "Loading travel data …",
@@ -693,50 +693,56 @@ const Y = (s, t, e) => m(s, "camper_travel_journal/list", t, e ? { trip_id: e } 
   dateInvalid: "Enter valid dates."
 };
 function l(s) {
-  return (s?.locale?.language?.toLowerCase() ?? "de").startsWith("de") ? me : ve;
+  return (s?.locale?.language?.toLowerCase() ?? "de").startsWith("de") ? fe : $e;
 }
-function P(s, t) {
-  const e = (t?.locale?.language ?? "").toLowerCase().startsWith("de") ? "de-DE" : "en-US";
-  return new Date(s).toLocaleDateString(e);
+function Q(s) {
+  return (s?.locale?.language ?? "").toLowerCase().startsWith("de") ? "de-DE" : "en-US";
 }
-function $t(s, t) {
-  const e = (t?.locale?.language ?? "").toLowerCase().startsWith("de") ? "de-DE" : "en-US";
-  return new Date(s).toLocaleString(e, { dateStyle: "short", timeStyle: "short" });
+function z(s, t) {
+  const e = /^(\d{4})-(\d{2})-(\d{2})$/.exec(s);
+  if (e) {
+    const [, i, r, n] = e;
+    return Q(t).startsWith("de") ? `${n}.${r}.${i}` : `${r}/${n}/${i}`;
+  }
+  return new Date(s).toLocaleDateString(Q(t));
 }
-function fe(s, t) {
+function _t(s, t) {
+  return new Date(s).toLocaleString(Q(t), { dateStyle: "short", timeStyle: "short" });
+}
+function _e(s, t) {
   const e = Math.max(0, Math.round((s ?? 0) / 60));
   return e < 60 ? `${e} min` : `${Math.floor(e / 60)} h ${e % 60} min`;
 }
-function $e(s, t) {
-  return s.start_date || s.end_date ? [s.start_date, s.end_date].filter(Boolean).join(" – ") || "" : s.started_at ? `${P(s.started_at, t)}${s.ended_at ? ` – ${P(s.ended_at, t)}` : ""}` : "";
+function Mt(s, t) {
+  return s.start_date || s.end_date ? [s.start_date, s.end_date].filter(Boolean).map((e) => z(e, t)).join(" – ") || "" : s.started_at ? `${z(s.started_at, t)}${s.ended_at ? ` – ${z(s.ended_at, t)}` : ""}` : "";
 }
-function It(s, t) {
+function Ut(s, t) {
   return l(t).statuses[s] ?? s;
 }
 function B(s, t) {
   return l(t).categories[s] ?? s;
 }
 function V(s) {
-  return Tt.includes(s);
+  return It.includes(s);
 }
 function T(s, t, e) {
   const i = (e?.locale?.language ?? "").toLowerCase().startsWith("de") ? "de-DE" : "en-US";
   return new Intl.NumberFormat(i, { style: "currency", currency: t, minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(s / 100);
 }
-function _t(s) {
+function bt(s) {
   const t = s.trim().replace(",", ".");
   if (!/^\d+(?:\.\d{1,2})?$/.test(t)) return null;
   const [e, i = ""] = t.split("."), r = Number(e) * 100 + Number((i + "00").slice(0, 2));
   return Number.isSafeInteger(r) ? r : null;
 }
-const Q = "camper-travel-journal-expenses-changed", tt = "camper-travel-journal-data-changed";
+const tt = "camper-travel-journal-expenses-changed", et = "camper-travel-journal-data-changed";
 function K(s) {
-  window.dispatchEvent(new CustomEvent(Q, { detail: s }));
-}
-function $(s) {
   window.dispatchEvent(new CustomEvent(tt, { detail: s }));
 }
-class _e extends at {
+function $(s) {
+  window.dispatchEvent(new CustomEvent(et, { detail: s }));
+}
+class be extends ot {
   snapshot;
   loading = !1;
   loadError = "";
@@ -745,10 +751,10 @@ class _e extends at {
     t.detail?.vehicleId === this.vehicleId && this.refresh();
   };
   connectedCallback() {
-    super.connectedCallback(), window.addEventListener(Q, this.onDataChanged), window.addEventListener(tt, this.onDataChanged), this.refresh();
+    super.connectedCallback(), window.addEventListener(tt, this.onDataChanged), window.addEventListener(et, this.onDataChanged), this.refresh();
   }
   disconnectedCallback() {
-    window.removeEventListener(Q, this.onDataChanged), window.removeEventListener(tt, this.onDataChanged), super.disconnectedCallback();
+    window.removeEventListener(tt, this.onDataChanged), window.removeEventListener(et, this.onDataChanged), super.disconnectedCallback();
   }
   onHassConnectionChanged() {
     this.refresh();
@@ -772,18 +778,18 @@ class _e extends at {
     const e = this.snapshot?.trips[0];
     if (!(!this.hass || !e))
       try {
-        await kt(this.hass, this.vehicleId, e.id, t), this.actionError = "", await this.refresh();
+        await Tt(this.hass, this.vehicleId, e.id, t), this.actionError = "", await this.refresh();
       } catch {
         this.actionError = l(this.hass).statusError, this.requestUpdate();
       }
   }
   render() {
-    const t = l(this.hass), e = this.snapshot?.trips[0], i = (this.snapshot?.drives ?? []).reduce((a, u) => a + u.distance_m, 0) / 1e3, r = this.snapshot?.expense_summary, n = r?.mixed_currency ? t.mixedCurrency : r?.total_minor !== void 0 && r.currency ? T(r.total_minor, r.currency, this.hass) : T(0, "EUR", this.hass), o = this.loadError || this.actionError, c = e ? [e.start_date, e.end_date].filter(Boolean).join(" – ") || (e.started_at ? `${P(e.started_at, this.hass)}${e.ended_at ? ` – ${P(e.ended_at, this.hass)}` : ""}` : "") : "";
-    return d`<ha-card><h2>${e?.title ?? t.title}</h2>${o ? d`<p class="error" role="alert">${o}</p>` : e ? d`<p class="muted">${e.destination || t.noDestination} · ${It(e.status, this.hass)} · ${c}</p><div class="grid"><div class="metric"><span class="muted">${t.distance}</span><span class="value">${i.toFixed(1)} km</span></div><div class="metric"><span class="muted">${t.drives}</span><span class="value">${this.snapshot?.drives.length ?? 0}</span></div><div class="metric"><span class="muted">${t.stops}</span><span class="value">${this.snapshot?.stops.length ?? 0}</span></div><div class="metric"><span class="muted">${t.costs}</span><span class="value">${n}</span></div></div><div class="actions">${e.status === "planned" || e.status === "paused" ? d`<button @click=${() => this.setStatus("active")}>${t.resume}</button>` : ""}${e.status === "active" ? d`<button class="secondary" @click=${() => this.setStatus("paused")}>${t.pause}</button><button @click=${() => this.setStatus("completed")}>${t.complete}</button>` : ""}</div>` : d`<p class="muted">${t.noTrip}</p>`}${this.loading ? d`<p class="muted">${t.loading}</p>` : ""}</ha-card>`;
+    const t = l(this.hass), e = this.snapshot?.trips[0], i = (this.snapshot?.drives ?? []).reduce((a, u) => a + u.distance_m, 0) / 1e3, r = this.snapshot?.expense_summary, n = r?.mixed_currency ? t.mixedCurrency : r?.total_minor !== void 0 && r.currency ? T(r.total_minor, r.currency, this.hass) : T(0, "EUR", this.hass), o = this.loadError || this.actionError, c = e ? Mt(e, this.hass) : "";
+    return d`<ha-card><h2>${e?.title ?? t.title}</h2>${o ? d`<p class="error" role="alert">${o}</p>` : e ? d`<p class="muted">${e.destination || t.noDestination} · ${Ut(e.status, this.hass)} · ${c}</p><div class="grid"><div class="metric"><span class="muted">${t.distance}</span><span class="value">${i.toFixed(1)} km</span></div><div class="metric"><span class="muted">${t.drives}</span><span class="value">${this.snapshot?.drives.length ?? 0}</span></div><div class="metric"><span class="muted">${t.stops}</span><span class="value">${this.snapshot?.stops.length ?? 0}</span></div><div class="metric"><span class="muted">${t.costs}</span><span class="value">${n}</span></div></div><div class="actions">${e.status === "planned" || e.status === "paused" ? d`<button @click=${() => this.setStatus("active")}>${t.resume}</button>` : ""}${e.status === "active" ? d`<button class="secondary" @click=${() => this.setStatus("paused")}>${t.pause}</button><button @click=${() => this.setStatus("completed")}>${t.complete}</button>` : ""}</div>` : d`<p class="muted">${t.noTrip}</p>`}${this.loading ? d`<p class="muted">${t.loading}</p>` : ""}</ha-card>`;
   }
 }
-Ct("camper-travel-journal-summary-card", _e);
-class Mt extends at {
+kt("camper-travel-journal-summary-card", be);
+class Lt extends ot {
   snapshot;
   loadError = "";
   actionError = "";
@@ -799,7 +805,7 @@ class Mt extends at {
   confirmingTripId = "";
   confirmingExpenseId = "";
   amount = "";
-  category = z[0];
+  category = q[0];
   selected = "";
   editingExpenseId = "";
   editingAmount = "";
@@ -857,7 +863,7 @@ class Mt extends at {
     if (!(!this.hass || !this.tripTitle.trim())) {
       if (this.tripStartDate && this.tripEndDate && this.tripEndDate < this.tripStartDate) return this.fail(l(this.hass).dateInvalid);
       try {
-        await se(this.hass, this.vehicleId, this.tripTitle, this.tripStartDate, this.tripEndDate, this.destination), this.actionError = "", this.tripTitle = "", this.destination = "", this.tripStartDate = "", this.tripEndDate = "", await this.refresh(), $({ vehicleId: this.vehicleId, tripId: this.selected });
+        await ne(this.hass, this.vehicleId, this.tripTitle, this.tripStartDate, this.tripEndDate, this.destination), this.actionError = "", this.tripTitle = "", this.destination = "", this.tripStartDate = "", this.tripEndDate = "", await this.refresh(), $({ vehicleId: this.vehicleId, tripId: this.selected });
       } catch {
         this.fail(l(this.hass).tripCreateError);
       }
@@ -873,7 +879,7 @@ class Mt extends at {
     if (!this.hass || !this.editingTripTitle.trim()) return this.fail(l(this.hass).tripEditError);
     if (this.editingStartDate && this.editingEndDate && this.editingEndDate < this.editingStartDate) return this.fail(l(this.hass).dateInvalid);
     try {
-      await re(this.hass, this.vehicleId, t.id, { title: this.editingTripTitle, destination: this.editingDestination, start_date: this.editingStartDate, end_date: this.editingEndDate }), this.actionError = "", this.editingTripId = "", await this.refresh(), $({ vehicleId: this.vehicleId, tripId: t.id });
+      await ae(this.hass, this.vehicleId, t.id, { title: this.editingTripTitle, destination: this.editingDestination, start_date: this.editingStartDate, end_date: this.editingEndDate }), this.actionError = "", this.editingTripId = "", await this.refresh(), $({ vehicleId: this.vehicleId, tripId: t.id });
     } catch {
       this.fail(l(this.hass).tripEditError);
     }
@@ -885,7 +891,7 @@ class Mt extends at {
         return;
       }
       try {
-        await ne(this.hass, this.vehicleId, t), this.confirmingTripId = "", this.selected === t && (this.selected = ""), await this.refresh(), $({ vehicleId: this.vehicleId, tripId: t });
+        await oe(this.hass, this.vehicleId, t), this.confirmingTripId = "", this.selected === t && (this.selected = ""), await this.refresh(), $({ vehicleId: this.vehicleId, tripId: t });
       } catch {
         this.fail(l(this.hass).tripDeleteError);
       }
@@ -894,7 +900,7 @@ class Mt extends at {
   async changeStatus(t, e) {
     if (this.hass)
       try {
-        await kt(this.hass, this.vehicleId, t, e), this.actionError = "", await this.refresh(), $({ vehicleId: this.vehicleId, tripId: t });
+        await Tt(this.hass, this.vehicleId, t, e), this.actionError = "", await this.refresh(), $({ vehicleId: this.vehicleId, tripId: t });
       } catch {
         this.fail(l(this.hass).statusError);
       }
@@ -902,7 +908,7 @@ class Mt extends at {
   async assignDrive(t, e) {
     if (this.hass)
       try {
-        await oe(this.hass, this.vehicleId, t, [e]), this.actionError = "", await this.refresh(), $({ vehicleId: this.vehicleId, tripId: t });
+        await de(this.hass, this.vehicleId, t, [e]), this.actionError = "", await this.refresh(), $({ vehicleId: this.vehicleId, tripId: t });
       } catch {
         this.fail(l(this.hass).driveAssignError);
       }
@@ -910,7 +916,7 @@ class Mt extends at {
   async unassignDrive(t, e) {
     if (this.hass)
       try {
-        await ae(this.hass, this.vehicleId, t, e), this.actionError = "", await this.refresh(), $({ vehicleId: this.vehicleId, tripId: t });
+        await ce(this.hass, this.vehicleId, t, e), this.actionError = "", await this.refresh(), $({ vehicleId: this.vehicleId, tripId: t });
       } catch {
         this.fail(l(this.hass).driveAssignError);
       }
@@ -924,7 +930,7 @@ class Mt extends at {
     if (!this.manualOccurredAt || !this.manualStartLocation.trim() || !this.manualEndLocation.trim() || !Number.isFinite(e) || e < 0 || i !== void 0 && (!Number.isInteger(i) || i < 0)) return this.fail(l(this.hass).dateInvalid);
     this.manualSaving = !0;
     try {
-      await ce(this.hass, this.vehicleId, { trip_id: t, occurred_at: new Date(this.manualOccurredAt).toISOString(), start_location: this.manualStartLocation, end_location: this.manualEndLocation, distance_km: e, ...i === void 0 ? {} : { duration_minutes: i } }), this.actionError = "", this.manualStartLocation = "", this.manualEndLocation = "", this.manualDistanceKm = "", this.manualDurationMinutes = "", await this.refresh(), $({ vehicleId: this.vehicleId, tripId: t });
+      await le(this.hass, this.vehicleId, { trip_id: t, occurred_at: new Date(this.manualOccurredAt).toISOString(), start_location: this.manualStartLocation, end_location: this.manualEndLocation, distance_km: e, ...i === void 0 ? {} : { duration_minutes: i } }), this.actionError = "", this.manualStartLocation = "", this.manualEndLocation = "", this.manualDistanceKm = "", this.manualDurationMinutes = "", await this.refresh(), $({ vehicleId: this.vehicleId, tripId: t });
     } catch {
       this.fail(l(this.hass).driveCreateError);
     } finally {
@@ -947,7 +953,7 @@ class Mt extends at {
     if (!this.editingDriveOccurredAt || !this.editingDriveStartLocation.trim() || !this.editingDriveEndLocation.trim() || !Number.isFinite(i) || i < 0 || r !== void 0 && (!Number.isInteger(r) || r < 0)) return this.fail(l(this.hass).dateInvalid);
     this.driveSavingId = t.id;
     try {
-      await de(this.hass, this.vehicleId, t.id, { occurred_at: new Date(this.editingDriveOccurredAt).toISOString(), start_location: this.editingDriveStartLocation, end_location: this.editingDriveEndLocation, distance_km: i, ...r === void 0 ? {} : { duration_minutes: r } }), this.actionError = "", this.cancelManualDriveEdit(), await this.refresh(), $({ vehicleId: this.vehicleId, tripId: e });
+      await he(this.hass, this.vehicleId, t.id, { occurred_at: new Date(this.editingDriveOccurredAt).toISOString(), start_location: this.editingDriveStartLocation, end_location: this.editingDriveEndLocation, distance_km: i, ...r === void 0 ? {} : { duration_minutes: r } }), this.actionError = "", this.cancelManualDriveEdit(), await this.refresh(), $({ vehicleId: this.vehicleId, tripId: e });
     } catch {
       this.fail(l(this.hass).driveEditError);
     } finally {
@@ -962,7 +968,7 @@ class Mt extends at {
       }
       this.driveSavingId = e;
       try {
-        await le(this.hass, this.vehicleId, e), this.confirmingDriveId = "", this.actionError = "", await this.refresh(), $({ vehicleId: this.vehicleId, tripId: t });
+        await ue(this.hass, this.vehicleId, e), this.confirmingDriveId = "", this.actionError = "", await this.refresh(), $({ vehicleId: this.vehicleId, tripId: t });
       } catch {
         this.fail(l(this.hass).driveDeleteError);
       } finally {
@@ -972,10 +978,10 @@ class Mt extends at {
   }
   async addExpense(t) {
     if (!this.hass) return;
-    const e = l(this.hass), i = _t(this.amount);
+    const e = l(this.hass), i = bt(this.amount);
     if (i === null) return this.fail(e.amountInvalid);
     try {
-      await he(this.hass, this.vehicleId, t, { occurred_at: (/* @__PURE__ */ new Date()).toISOString(), category: this.category, amount_minor: i, currency: "EUR" }), this.actionError = "", await this.refresh() && (this.amount = "", K({ vehicleId: this.vehicleId, tripId: t }));
+      await pe(this.hass, this.vehicleId, t, { occurred_at: (/* @__PURE__ */ new Date()).toISOString(), category: this.category, amount_minor: i, currency: "EUR" }), this.actionError = "", await this.refresh() && (this.amount = "", K({ vehicleId: this.vehicleId, tripId: t }));
     } catch {
       this.fail(e.expenseCreateError);
     }
@@ -988,12 +994,12 @@ class Mt extends at {
   }
   async saveExpense(t) {
     if (!this.hass || this.expenseSavingId) return;
-    const e = l(this.hass), i = _t(this.editingAmount);
+    const e = l(this.hass), i = bt(this.editingAmount);
     if (i === null) return this.fail(e.amountInvalid);
     if (!V(this.editingCategory)) return this.fail(e.categoryInvalid);
     this.expenseSavingId = t.id;
     try {
-      await ue(this.hass, this.vehicleId, t.id, { amount_minor: i, category: this.editingCategory }), this.actionError = "", await this.refresh() && (this.cancelExpenseEdit(), K({ vehicleId: this.vehicleId, tripId: t.trip_id ?? this.selected }));
+      await ge(this.hass, this.vehicleId, t.id, { amount_minor: i, category: this.editingCategory }), this.actionError = "", await this.refresh() && (this.cancelExpenseEdit(), K({ vehicleId: this.vehicleId, tripId: t.trip_id ?? this.selected }));
     } catch {
       this.fail(e.expenseEditError);
     } finally {
@@ -1008,7 +1014,7 @@ class Mt extends at {
       }
       this.expenseSavingId = t;
       try {
-        await pe(this.hass, this.vehicleId, t), this.confirmingExpenseId = "", this.actionError = "", await this.refresh() && K({ vehicleId: this.vehicleId, tripId: this.selected });
+        await me(this.hass, this.vehicleId, t), this.confirmingExpenseId = "", this.actionError = "", await this.refresh() && K({ vehicleId: this.vehicleId, tripId: this.selected });
       } catch {
         this.fail(l(this.hass).expenseDeleteError);
       } finally {
@@ -1017,7 +1023,7 @@ class Mt extends at {
     }
   }
   categoryOptions(t) {
-    const e = [...z];
+    const e = [...q];
     return t && !e.includes(t) && e.unshift(t), e;
   }
   renderExpense(t, e) {
@@ -1027,37 +1033,37 @@ class Mt extends at {
     }}><select aria-label=${e.category} .value=${this.editingCategory} @change=${(n) => this.setEditingExpenseCategory(n.currentTarget.value)}>${this.categoryOptions(this.editingCategory).map((n) => d`<option value=${n}>${B(n, this.hass)}</option>`)}</select><input aria-label=${e.amount} type="number" min="0" step="0.01" inputmode="decimal" .value=${this.editingAmount} @input=${(n) => this.setEditingExpenseAmount(n.currentTarget.value)}><div class="actions"><button type="submit" ?disabled=${r}>${r ? e.saving : e.save}</button><button type="button" class="secondary" @click=${() => this.cancelExpenseEdit()} ?disabled=${r}>${e.cancel}</button></div></form>` : d`<span>${B(t.category, this.hass)}: ${T(t.amount_minor, t.currency, this.hass)}</span><span class="actions"><button type="button" class="link" @click=${() => this.startExpenseEdit(t)} ?disabled=${!!this.expenseSavingId}>${e.edit}</button><button type="button" class="link" @click=${() => this.removeExpense(t.id)}>${this.confirmingExpenseId === t.id ? e.confirmDelete : e.remove}</button></span>`}</div>`;
   }
   renderDrive(t, e, i) {
-    const r = t.source === "manual" ? i.sourceManual : i.sourceGps, n = t.source === "manual" ? `${t.start_label || "—"} → ${t.end_label || "—"}` : `${i.driveStart}: ${$t(t.started_at, this.hass)} · ${i.driveEnd}: ${$t(t.ended_at, this.hass)}`;
+    const r = t.source === "manual" ? i.sourceManual : i.sourceGps, n = t.source === "manual" ? `${t.start_label || "—"} → ${t.end_label || "—"}` : `${i.driveStart}: ${_t(t.started_at, this.hass)} · ${i.driveEnd}: ${_t(t.ended_at, this.hass)}`;
     if (this.editingDriveId === t.id) return d`<form class="form-grid drive-edit-form" @submit=${(a) => {
       a.preventDefault(), this.saveManualDrive(t, e);
     }}><label>${i.driveStart}<input type="datetime-local" .value=${this.editingDriveOccurredAt} @input=${(a) => this.editingDriveOccurredAt = a.currentTarget.value}></label><input aria-label=${i.startLocation} .value=${this.editingDriveStartLocation} @input=${(a) => this.editingDriveStartLocation = a.currentTarget.value}><input aria-label=${i.endLocation} .value=${this.editingDriveEndLocation} @input=${(a) => this.editingDriveEndLocation = a.currentTarget.value}><input aria-label=${i.distanceKm} type="number" min="0" step="0.1" inputmode="decimal" .value=${this.editingDriveDistanceKm} @input=${(a) => this.editingDriveDistanceKm = a.currentTarget.value}><input aria-label=${i.durationMinutes} type="number" min="0" step="1" .value=${this.editingDriveDurationMinutes} @input=${(a) => this.editingDriveDurationMinutes = a.currentTarget.value}><button type="submit" ?disabled=${this.driveSavingId === t.id}>${this.driveSavingId === t.id ? i.saving : i.save}</button><button type="button" class="secondary" @click=${() => this.cancelManualDriveEdit()} ?disabled=${!!this.driveSavingId}>${i.cancel}</button></form>`;
     const o = t.trip_id === e ? d`<button type="button" class="link" @click=${() => this.unassignDrive(e, t.id)}>${i.unassign}</button>` : d`<button type="button" class="link" @click=${() => this.assignDrive(e, t.id)}>${i.assign}</button>`, c = t.source === "manual" ? d`<button type="button" class="link" @click=${() => this.startManualDriveEdit(t)} ?disabled=${!!this.driveSavingId}>${i.edit}</button><button type="button" class="link" @click=${() => this.removeManualDrive(e, t.id)} ?disabled=${!!this.driveSavingId}>${this.confirmingDriveId === t.id ? i.confirmDelete : i.remove}</button>` : "";
-    return d`<div class="drive-row"><div><strong>${r}</strong> · ${n}<br><span class="muted">${(t.distance_m / 1e3).toFixed(1)} km · ${fe(t.duration_seconds, this.hass)} · ${t.assignment_status === "assigned" ? i.assignedDrives : i.freeDrives}</span></div><span class="actions">${c}${o}</span></div>`;
+    return d`<div class="drive-row"><div><strong>${r}</strong> · ${n}<br><span class="muted">${(t.distance_m / 1e3).toFixed(1)} km · ${_e(t.duration_seconds, this.hass)} · ${t.assignment_status === "assigned" ? i.assignedDrives : i.freeDrives}</span></div><span class="actions">${c}${o}</span></div>`;
   }
   render() {
     const t = l(this.hass), e = this.snapshot?.trips ?? [], i = this.snapshot?.expenses ?? [], r = this.snapshot?.expense_summary, n = r?.mixed_currency ? t.mixedCurrency : r?.total_minor !== void 0 && r.currency ? T(r.total_minor, r.currency, this.hass) : T(0, "EUR", this.hass), o = this.loadError || this.actionError;
-    return d`<ha-card><h2>${t.manager}</h2>${o ? d`<p class="error" role="alert">${o}</p>` : ""}<section><h3>${t.newTrip}</h3><div class="form-grid"><input aria-label=${t.tripName} placeholder=${t.tripName} .value=${this.tripTitle} @input=${(c) => this.tripTitle = c.target.value}><input aria-label=${t.destination} placeholder=${t.destination} .value=${this.destination} @input=${(c) => this.destination = c.target.value}><label>${t.startDate}<input type="date" .value=${this.tripStartDate} @input=${(c) => this.tripStartDate = c.currentTarget.value}></label><label>${t.endDate}<input type="date" .value=${this.tripEndDate} @input=${(c) => this.tripEndDate = c.currentTarget.value}></label><button type="button" @click=${() => this.addTrip()}>${t.create}</button></div></section><section><h3>${t.trips}</h3>${e.length ? e.map((c) => d`<article class="trip"><div class="row"><strong>${c.title}</strong><span class="muted">${c.destination || ""} · ${It(c.status, this.hass)} · ${$e(c, this.hass) || t.period}</span></div>${this.editingTripId === c.id ? d`<form class="form-grid" @submit=${(a) => {
+    return d`<ha-card><h2>${t.manager}</h2>${o ? d`<p class="error" role="alert">${o}</p>` : ""}<section><h3>${t.newTrip}</h3><div class="form-grid"><input aria-label=${t.tripName} placeholder=${t.tripName} .value=${this.tripTitle} @input=${(c) => this.tripTitle = c.target.value}><input aria-label=${t.destination} placeholder=${t.destination} .value=${this.destination} @input=${(c) => this.destination = c.target.value}><label>${t.startDate}<input type="date" .value=${this.tripStartDate} @input=${(c) => this.tripStartDate = c.currentTarget.value}></label><label>${t.endDate}<input type="date" .value=${this.tripEndDate} @input=${(c) => this.tripEndDate = c.currentTarget.value}></label><button type="button" @click=${() => this.addTrip()}>${t.create}</button></div></section><section><h3>${t.trips}</h3>${e.length ? e.map((c) => d`<article class="trip"><div class="row"><strong>${c.title}</strong><span class="muted">${c.destination || ""} · ${Ut(c.status, this.hass)} · ${Mt(c, this.hass) || t.period}</span></div>${this.editingTripId === c.id ? d`<form class="form-grid" @submit=${(a) => {
       a.preventDefault(), this.saveTrip(c);
-    }}><input aria-label=${t.tripName} .value=${this.editingTripTitle} @input=${(a) => this.editingTripTitle = a.currentTarget.value}><input aria-label=${t.destination} .value=${this.editingDestination} @input=${(a) => this.editingDestination = a.currentTarget.value}><label>${t.startDate}<input type="date" .value=${this.editingStartDate} @input=${(a) => this.editingStartDate = a.currentTarget.value}></label><label>${t.endDate}<input type="date" .value=${this.editingEndDate} @input=${(a) => this.editingEndDate = a.currentTarget.value}></label><button type="submit">${t.save}</button><button type="button" class="secondary" @click=${() => this.cancelTripEdit()}>${t.cancel}</button></form>` : d`<div class="actions"><button type="button" class="secondary" @click=${() => this.startTripEdit(c)}>${t.edit}</button><button type="button" class="secondary" @click=${() => this.removeTrip(c.id)}>${this.confirmingTripId === c.id ? t.confirmDelete : t.remove}</button>${c.status === "planned" || c.status === "paused" ? d`<button type="button" @click=${() => this.changeStatus(c.id, "active")}>${t.resume}</button>` : ""}${c.status === "active" ? d`<button type="button" class="secondary" @click=${() => this.changeStatus(c.id, "paused")}>${t.pause}</button><button type="button" @click=${() => this.changeStatus(c.id, "completed")}>${t.complete}</button>` : ""}<button type="button" class="secondary" @click=${() => this.toggleTripDetails(c.id)}>${this.selected === c.id ? t.close : t.details}</button></div>`}${this.selected === c.id ? d`<div class="details"><h4>${t.assignedDrives}</h4>${(this.snapshot?.drives ?? []).length ? (this.snapshot?.drives ?? []).map((a) => this.renderDrive(a, c.id, t)) : d`<p class="muted">${t.noDrives}</p>`}<h4>${t.freeDrives}</h4>${(this.snapshot?.available_drives ?? []).length ? (this.snapshot?.available_drives ?? []).map((a) => this.renderDrive(a, c.id, t)) : d`<p class="muted">${t.noDrives}</p>`}<h4>${t.manualDrive}</h4><div class="form-grid"><label>${t.driveStart}<input type="datetime-local" .value=${this.manualOccurredAt} @input=${(a) => this.manualOccurredAt = a.currentTarget.value}></label><input aria-label=${t.startLocation} placeholder=${t.startLocation} .value=${this.manualStartLocation} @input=${(a) => this.manualStartLocation = a.currentTarget.value}><input aria-label=${t.endLocation} placeholder=${t.endLocation} .value=${this.manualEndLocation} @input=${(a) => this.manualEndLocation = a.currentTarget.value}><input aria-label=${t.distanceKm} type="number" min="0" step="0.1" inputmode="decimal" placeholder=${t.distanceKm} .value=${this.manualDistanceKm} @input=${(a) => this.manualDistanceKm = a.currentTarget.value}><input aria-label=${t.durationMinutes} type="number" min="0" step="1" placeholder=${t.durationMinutes} .value=${this.manualDurationMinutes} @input=${(a) => this.manualDurationMinutes = a.currentTarget.value}><button type="button" @click=${() => this.addManualDrive(c.id)} ?disabled=${this.manualSaving}>${this.manualSaving ? t.saving : t.createDrive}</button></div><h4>${t.expenses}</h4><div class="expense-form create-form"><input aria-label=${t.amount} type="number" min="0" step="0.01" inputmode="decimal" placeholder="EUR" .value=${this.amount} @input=${(a) => this.setExpenseAmount(a.currentTarget.value)}><select aria-label=${t.category} .value=${this.category} @change=${(a) => this.setExpenseCategory(a.currentTarget.value)}>${z.map((a) => d`<option value=${a}>${B(a, this.hass)}</option>`)}</select><button type="button" @click=${() => this.addExpense(c.id)}>${t.save}</button></div>${i.map((a) => this.renderExpense(a, t))}<p class="total"><strong>${t.total}: ${n}</strong></p></div>` : ""}</article>`) : d`<p class="muted">${t.noTrip}</p>`}</section></ha-card>`;
+    }}><input aria-label=${t.tripName} .value=${this.editingTripTitle} @input=${(a) => this.editingTripTitle = a.currentTarget.value}><input aria-label=${t.destination} .value=${this.editingDestination} @input=${(a) => this.editingDestination = a.currentTarget.value}><label>${t.startDate}<input type="date" .value=${this.editingStartDate} @input=${(a) => this.editingStartDate = a.currentTarget.value}></label><label>${t.endDate}<input type="date" .value=${this.editingEndDate} @input=${(a) => this.editingEndDate = a.currentTarget.value}></label><button type="submit">${t.save}</button><button type="button" class="secondary" @click=${() => this.cancelTripEdit()}>${t.cancel}</button></form>` : d`<div class="actions"><button type="button" class="secondary" @click=${() => this.startTripEdit(c)}>${t.edit}</button><button type="button" class="secondary" @click=${() => this.removeTrip(c.id)}>${this.confirmingTripId === c.id ? t.confirmDelete : t.remove}</button>${c.status === "planned" || c.status === "paused" ? d`<button type="button" @click=${() => this.changeStatus(c.id, "active")}>${t.resume}</button>` : ""}${c.status === "active" ? d`<button type="button" class="secondary" @click=${() => this.changeStatus(c.id, "paused")}>${t.pause}</button><button type="button" @click=${() => this.changeStatus(c.id, "completed")}>${t.complete}</button>` : ""}<button type="button" class="secondary" @click=${() => this.toggleTripDetails(c.id)}>${this.selected === c.id ? t.close : t.details}</button></div>`}${this.selected === c.id ? d`<div class="details"><h4>${t.assignedDrives}</h4>${(this.snapshot?.drives ?? []).length ? (this.snapshot?.drives ?? []).map((a) => this.renderDrive(a, c.id, t)) : d`<p class="muted">${t.noDrives}</p>`}<h4>${t.freeDrives}</h4>${(this.snapshot?.available_drives ?? []).length ? (this.snapshot?.available_drives ?? []).map((a) => this.renderDrive(a, c.id, t)) : d`<p class="muted">${t.noDrives}</p>`}<h4>${t.manualDrive}</h4><div class="form-grid"><label>${t.driveStart}<input type="datetime-local" .value=${this.manualOccurredAt} @input=${(a) => this.manualOccurredAt = a.currentTarget.value}></label><input aria-label=${t.startLocation} placeholder=${t.startLocation} .value=${this.manualStartLocation} @input=${(a) => this.manualStartLocation = a.currentTarget.value}><input aria-label=${t.endLocation} placeholder=${t.endLocation} .value=${this.manualEndLocation} @input=${(a) => this.manualEndLocation = a.currentTarget.value}><input aria-label=${t.distanceKm} type="number" min="0" step="0.1" inputmode="decimal" placeholder=${t.distanceKm} .value=${this.manualDistanceKm} @input=${(a) => this.manualDistanceKm = a.currentTarget.value}><input aria-label=${t.durationMinutes} type="number" min="0" step="1" placeholder=${t.durationMinutes} .value=${this.manualDurationMinutes} @input=${(a) => this.manualDurationMinutes = a.currentTarget.value}><button type="button" @click=${() => this.addManualDrive(c.id)} ?disabled=${this.manualSaving}>${this.manualSaving ? t.saving : t.createDrive}</button></div><h4>${t.expenses}</h4><div class="expense-form create-form"><input aria-label=${t.amount} type="number" min="0" step="0.01" inputmode="decimal" placeholder="EUR" .value=${this.amount} @input=${(a) => this.setExpenseAmount(a.currentTarget.value)}><select aria-label=${t.category} .value=${this.category} @change=${(a) => this.setExpenseCategory(a.currentTarget.value)}>${q.map((a) => d`<option value=${a}>${B(a, this.hass)}</option>`)}</select><button type="button" @click=${() => this.addExpense(c.id)}>${t.save}</button></div>${i.map((a) => this.renderExpense(a, t))}<p class="total"><strong>${t.total}: ${n}</strong></p></div>` : ""}</article>`) : d`<p class="muted">${t.noTrip}</p>`}</section></ha-card>`;
   }
 }
-Mt.styles = [at.styles, O`section{margin-top:16px}.trip{display:grid;gap:8px;padding:12px 0;border-bottom:1px solid var(--divider-color)}.row,.expense-row,.drive-row{display:flex;justify-content:space-between;gap:8px;align-items:center;flex-wrap:wrap}.details{padding:8px;background:var(--secondary-background-color)}h4{margin:12px 0 4px}.link{min-height:30px;padding:4px 8px;font-size:.9em}.form-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(9rem,1fr));gap:8px;align-items:end}.form-grid input,.form-grid select{min-width:0;width:100%;box-sizing:border-box}.form-grid label{display:grid;gap:4px;font-size:.9em}.expense-form{display:grid;grid-template-columns:minmax(0,1fr) minmax(7rem,10rem) auto;gap:8px;align-items:center;width:100%}.expense-form input,.expense-form select{min-width:0;width:100%;box-sizing:border-box}.create-form{grid-template-columns:minmax(7rem,10rem) minmax(0,1fr) auto}.total{margin:12px 0 0;text-align:right}@media(max-width:500px){.expense-form,.create-form,.drive-edit-form{grid-template-columns:1fr}.expense-form .actions{margin-top:0}.total{text-align:left}}`];
-Ct("camper-travel-journal-manager-card", Mt);
-const be = 1e4;
+Lt.styles = [ot.styles, P`section{margin-top:16px}.trip{display:grid;gap:8px;padding:12px 0;border-bottom:1px solid var(--divider-color)}.row,.expense-row,.drive-row{display:flex;justify-content:space-between;gap:8px;align-items:center;flex-wrap:wrap}.details{padding:8px;background:var(--secondary-background-color)}h4{margin:12px 0 4px}.link{min-height:30px;padding:4px 8px;font-size:.9em}.form-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(9rem,1fr));gap:8px;align-items:end}.form-grid input,.form-grid select{min-width:0;width:100%;box-sizing:border-box}.form-grid label{display:grid;gap:4px;font-size:.9em}.expense-form{display:grid;grid-template-columns:minmax(0,1fr) minmax(7rem,10rem) auto;gap:8px;align-items:center;width:100%}.expense-form input,.expense-form select{min-width:0;width:100%;box-sizing:border-box}.create-form{grid-template-columns:minmax(7rem,10rem) minmax(0,1fr) auto}.total{margin:12px 0 0;text-align:right}@media(max-width:500px){.expense-form,.create-form,.drive-edit-form{grid-template-columns:1fr}.expense-form .actions{margin-top:0}.total{text-align:left}}`];
+kt("camper-travel-journal-manager-card", Lt);
+const ye = 1e4;
 function F() {
   return typeof performance < "u" ? performance.now() : Date.now();
 }
 function W(s) {
   return s.length <= 8 ? "••••" : `${s.slice(0, 4)}…${s.slice(-4)}`;
 }
-function bt(s) {
+function yt(s) {
   return s?.connection ? s.connection.connected === !0 ? "available" : s.connection.connected === !1 ? "unavailable" : "unknown" : "unavailable";
 }
-function ye(s) {
+function Ee(s) {
   const t = s, e = typeof t?.code == "string" ? t.code.replace(/[^a-zA-Z0-9_.-]/g, "_").slice(0, 80) : "promise_rejected", i = typeof t?.message == "string" ? t.message.replace(/bearer\s+[^\s]+/gi, "Bearer [maskiert]").replace(/(token|cookie|authorization|password)\s*[:=]\s*[^\s,;]+/gi, "$1=[maskiert]").slice(0, 240) : "Die Anfrage wurde abgelehnt.";
   return { errorCode: e, errorMessage: i };
 }
-function Ee(s, t) {
+function De(s, t) {
   return new Promise((e, i) => {
     const r = setTimeout(() => i(Object.assign(new Error("Zeitüberschreitung"), { code: "timeout" })), t);
     s.then((n) => {
@@ -1070,34 +1076,34 @@ function Ee(s, t) {
 async function G(s, t, e, i) {
   const r = F();
   try {
-    const n = await Ee(s.connection.sendMessagePromise(t), i);
+    const n = await De(s.connection.sendMessagePromise(t), i);
     return { ...e(n), durationMs: Math.round(F() - r), value: n };
   } catch (n) {
-    return { state: "failed", durationMs: Math.round(F() - r), ...ye(n) };
+    return { state: "failed", durationMs: Math.round(F() - r), ...Ee(n) };
   }
 }
-function De(s) {
+function xe(s) {
   return s && typeof s == "object" ? { state: "success", structure: "ok" } : { state: "failed", structure: "invalid" };
 }
-function xe(s) {
+function we(s) {
   const t = s?.vehicles;
   return Array.isArray(t) && t.every((e) => e && typeof e == "object" && typeof e.vehicle_id == "string") ? { state: "success", structure: "ok", count: t.length } : { state: "failed", structure: "invalid", errorCode: "invalid_response", errorMessage: "Fahrzeugantwort hat eine ungültige Struktur." };
 }
-function we(s) {
+function Ae(s) {
   const t = s;
   return Array.isArray(t?.trips) && Array.isArray(t?.drives) && Array.isArray(t?.stops) ? { state: "success", structure: "ok", count: t.trips.length, drivesCount: t.drives.length, stopsCount: t.stops.length } : { state: "failed", structure: "invalid", errorCode: "invalid_response", errorMessage: "Reisedatenantwort hat eine ungültige Struktur." };
 }
-async function Se(s, t, e = be) {
+async function Se(s, t, e = ye) {
   const i = { state: "not_run", durationMs: null };
   if (!s?.connection) return { version: "0.1.0-beta.13", connectionBefore: "unavailable", connectionAfter: "unavailable", authentication: i, vehicles: i, trips: i, vehicleId: W(t) };
-  const r = bt(s), n = await G(s, { type: "auth/current_user" }, De, e), o = await G(s, { type: "camper_travel_journal/list_vehicles" }, xe, e), c = o.value?.vehicles?.filter((Lt) => typeof Lt.vehicle_id == "string") ?? [], a = c.length === 1 ? c[0].vehicle_id : void 0, p = await G(s, { type: "camper_travel_journal/list", vehicle_id: a ?? t }, we, e), { value: h, ...v } = n, { value: f, ...x } = o, { value: Me, ...Ut } = p;
+  const r = yt(s), n = await G(s, { type: "auth/current_user" }, xe, e), o = await G(s, { type: "camper_travel_journal/list_vehicles" }, we, e), c = o.value?.vehicles?.filter((Nt) => typeof Nt.vehicle_id == "string") ?? [], a = c.length === 1 ? c[0].vehicle_id : void 0, p = await G(s, { type: "camper_travel_journal/list", vehicle_id: a ?? t }, Ae, e), { value: h, ...v } = n, { value: f, ...x } = o, { value: Ue, ...Rt } = p;
   return {
     version: "0.1.0-beta.13",
     connectionBefore: r,
-    connectionAfter: bt(s),
+    connectionAfter: yt(s),
     authentication: v,
     vehicles: x,
-    trips: Ut,
+    trips: Rt,
     vehicleId: W(t),
     ...a ? { resolvedVehicleId: W(a) } : {}
   };
@@ -1108,9 +1114,9 @@ function Z(s) {
 function J(s) {
   return s.state === "success" ? "erfolgreich" : s.state === "failed" ? "fehlgeschlagen" : "nicht geprüft";
 }
-const yt = "01M4XW0KD3GQ0KASAYHQ29840P";
-class Ae extends E {
-  static styles = O`
+const Et = "01M4XW0KD3GQ0KASAYHQ29840P";
+class Ce extends E {
+  static styles = P`
     :host { display: block; color: var(--primary-text-color); }
     ha-card { padding: 16px; }
     h2 { margin: 0 0 12px; }
@@ -1127,7 +1133,7 @@ class Ae extends E {
   running = !1;
   error = "";
   manualCopy = !1;
-  config = { vehicle_id: yt };
+  config = { vehicle_id: Et };
   set hass(t) {
     this._hass = t, this.requestUpdate();
   }
@@ -1135,7 +1141,7 @@ class Ae extends E {
     return this._hass;
   }
   setConfig(t) {
-    this.config = { vehicle_id: t.vehicle_id || yt };
+    this.config = { vehicle_id: t.vehicle_id || Et };
   }
   async start() {
     if (!this._hass || this.running) {
@@ -1186,15 +1192,15 @@ class Ae extends E {
     </ha-card>`;
   }
 }
-typeof customElements < "u" && !customElements.get("camper-travel-journal-diagnostics-card") && customElements.define("camper-travel-journal-diagnostics-card", Ae);
-function Ce(s, t) {
+typeof customElements < "u" && !customElements.get("camper-travel-journal-diagnostics-card") && customElements.define("camper-travel-journal-diagnostics-card", Ce);
+function ke(s, t) {
   return s.vehicle_id || t.length !== 1 ? s : { ...s, vehicle_id: t[0].vehicle_id };
 }
-function ke(s, t) {
+function Te(s, t) {
   return s.type === t.type && s.vehicle_id === t.vehicle_id;
 }
-class Te extends E {
-  static styles = O`
+class Ie extends E {
+  static styles = P`
     :host { display: block; color: var(--primary-text-color); }
     .field { display: flex; flex-direction: column; gap: 6px; margin: 8px 0; }
     label { font-weight: 500; }
@@ -1217,7 +1223,7 @@ class Te extends E {
     return this._hass;
   }
   setConfig(t) {
-    ke(this._config, t) || (this._config = { ...t }, this._hass && !this.loadedConnection && this.loadVehicles(), this.requestUpdate());
+    Te(this._config, t) || (this._config = { ...t }, this._hass && !this.loadedConnection && this.loadVehicles(), this.requestUpdate());
   }
   async loadVehicles() {
     if (!this._hass) return;
@@ -1227,8 +1233,8 @@ class Te extends E {
     const t = this._hass;
     return this.loadingPromise = (async () => {
       try {
-        this.vehicles = await ge(t), this.loadedConnection = t.connection;
-        const e = Ce(this._config, this.vehicles);
+        this.vehicles = await ve(t), this.loadedConnection = t.connection;
+        const e = ke(this._config, this.vehicles);
         e.vehicle_id !== this._config.vehicle_id && (this._config = e, this.fireConfigChanged());
       } catch {
         this.error = l(t).editorLoadError;
@@ -1261,11 +1267,11 @@ class Te extends E {
     `;
   }
 }
-typeof customElements < "u" && !customElements.get("camper-travel-journal-card-editor") && customElements.define("camper-travel-journal-card-editor", Te);
-const Ie = [
+typeof customElements < "u" && !customElements.get("camper-travel-journal-card-editor") && customElements.define("camper-travel-journal-card-editor", Ie);
+const Me = [
   { type: "camper-travel-journal-summary-card", name: "Camper Travel Journal – Reiseübersicht", description: "Zeigt die aktuelle Reise, Fahrten, Strecke und Reisekosten kompakt an.", documentationURL: "https://github.com/balronu/ha-camper-travel-journal" },
   { type: "camper-travel-journal-manager-card", name: "Camper Travel Journal – Reiseverwaltung", description: "Reisen erstellen, bearbeiten und verwalten.", documentationURL: "https://github.com/balronu/ha-camper-travel-journal" },
   { type: "camper-travel-journal-diagnostics-card", name: "Camper Travel Journal – Diagnose", description: "Startet manuell eine bereinigte, ausschließlich lesende WebSocket-Diagnose.", documentationURL: "https://github.com/balronu/ha-camper-travel-journal" }
 ];
 window.customCards ??= [];
-for (const s of Ie) window.customCards.some((t) => t.type === s.type) || window.customCards.push(s);
+for (const s of Me) window.customCards.some((t) => t.type === s.type) || window.customCards.push(s);
