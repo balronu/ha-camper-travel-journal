@@ -116,7 +116,7 @@ if websocket_api is not None:
             end_date = _date(msg.get("end_date"))
             _date_range(start_date, end_date)
             if not msg["title"].strip(): raise ValueError("title_required")
-            result = await _call(hass, msg, "create_trip", msg["vehicle_id"], msg["title"], started, _now(), description=msg["description"], destination=msg["destination"], start_date=start_date, end_date=end_date)
+            result = await _call(hass, msg, "create_trip", msg["vehicle_id"], msg["title"], started, _now(), description=msg.get("description", ""), destination=msg.get("destination", ""), start_date=start_date, end_date=end_date)
             connection.send_result(msg["id"], {"trip_id": result})
         except Exception as err: _send_error(connection, msg, err)
 
