@@ -53,12 +53,15 @@ exists.
 4. Restart Home Assistant.
 5. Add **Camper Travel Journal** under **Settings → Devices & services**.
 
-HACS manages pre-releases per repository. If Beta 6 is not offered, refresh the
+HACS manages pre-releases per repository. If Beta 9 is not offered, refresh the
 repository information in the HACS menu and enable pre-release tracking for
 this repository (in current HACS versions this is exposed as a pre-release
 switch or update entity). This user setting cannot reliably be forced by
 repository files. A displayed `main` commit is not a beta release and must not
 be installed as the update.
+
+The durable beta/stable strategy, HACS update logic, and branding paths are
+documented in [`docs/HACS_RELEASE_STRATEGY.md`](docs/HACS_RELEASE_STRATEGY.md).
 
 ### Manual
 
