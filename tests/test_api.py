@@ -2,6 +2,7 @@
 
 from datetime import datetime, timezone
 import asyncio
+import base64
 import unittest
 
 try:
@@ -34,6 +35,10 @@ class FakeWorker:
             return "t-new"
         if method == "create_manual_drive":
             return "d-manual"
+        if method == "gpx_conflicts":
+            return {"duplicate_file": False, "duplicate_points": 0, "overlapping_drives": 0}
+        if method == "import_gpx":
+            return {"points_imported": 1, "drives_imported": 0}
         return None
 
 
@@ -91,6 +96,19 @@ async def test_create_trip_command_validates_and_returns_id():
     await api.ws_create_trip.__wrapped__(hass, connection, {"id": 1, "vehicle_id": "v1", "title": "Alpen", "description": "", "destination": "Berge", "started_at": "2026-10-01T12:00:00Z"})
     assert connection.results == [(1, {"trip_id": "t-new"})]
     assert connection.errors == []
+
+
+@pytest.mark.asyncio
+async def test_gpx_preview_is_read_only_and_import_requires_matching_hash():
+    data = b'<gpx version="1.1" xmlns="http://www.topografix.com/GPX/1/1"><trk><trkseg><trkpt lat="49" lon="7"><time>2026-10-13T08:00:00Z</time></trkpt></trkseg></trk></gpx>'
+    encoded = base64.b64encode(data).decode()
+    hass = FakeHass()
+    connection = FakeConnection()
+    await api.ws_analyze_gpx.__wrapped__(hass, connection, {"id": 30, "vehicle_id": "v1", "content_base64": encoded})
+    assert connection.results[-1][1]["points"][0]["recorded_at"].endswith("+00:00")
+    preview = connection.results[-1][1]
+    await api.ws_import_gpx.__wrapped__(hass, connection, {"id": 31, "vehicle_id": "v1", "content_base64": encoded, "file_hash": preview["file_hash"], "drive_keys": []})
+    assert connection.results[-1] == (31, {"points_imported": 1, "drives_imported": 0})
 
 
 @pytest.mark.asyncio
