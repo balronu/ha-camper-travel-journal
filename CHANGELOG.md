@@ -27,9 +27,12 @@
 - Macht erkannte Fahrten mit Start/Ende, Entfernung, Dauer und Zuordnungsstatus
   sichtbar und hält Fahrzeuggrenzen sowie eindeutige Zuordnungen ein.
 - Ergänzt getrennte manuelle Fahrten mit Startort, Zielort, Kilometern und
-  optionaler Dauer; es werden keine künstlichen GPS-Punkte erzeugt.
+  optionaler Dauer; es werden keine künstlichen GPS-Punkte erzeugt. Manuelle
+  Fahrten können bearbeitet und mit Sicherheitsbestätigung gelöscht werden;
+  automatisch erkannte GPS-Fahrten bleiben geschützt.
 - Führt Schema 5 mit rückwärtskompatibler Migration für Reisedaten und
-  manuelle Fahrtmetadaten ein.
+  manuelle Fahrtmetadaten ein; die Migration ist transaktional und bei Fehlern
+  wiederholbar.
 - Aktualisiert die Summary Card nach bestätigten Reise-/Fahrtänderungen und
   dokumentiert Beta 12 als vorbereitet, nicht veröffentlicht.
 

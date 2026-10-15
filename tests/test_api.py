@@ -101,6 +101,9 @@ async def test_create_trip_accepts_optional_dates_and_manual_drive_command():
     assert kwargs["start_date"] == "2026-07-01"
     await api.ws_create_manual_drive.__wrapped__(hass, connection, {"id": 16, "vehicle_id": "v1", "occurred_at": "2026-07-01T08:00:00Z", "start_location": "Bremen", "end_location": "Hamburg", "distance_km": 123.4, "duration_minutes": 90, "trip_id": "t1"})
     assert connection.results[-1] == (16, {"drive_id": "d-manual"})
+    await api.ws_update_manual_drive.__wrapped__(hass, connection, {"id": 17, "vehicle_id": "v1", "drive_id": "d-manual", "occurred_at": "2026-07-01T09:00:00Z", "start_location": "Bremen Hbf", "end_location": "Hamburg Hbf", "distance_km": 125.0, "duration_minutes": 95})
+    await api.ws_delete_manual_drive.__wrapped__(hass, connection, {"id": 18, "vehicle_id": "v1", "drive_id": "d-manual"})
+    assert connection.results[-1] == (18, {"success": True})
 
 
 @pytest.mark.asyncio

@@ -19,7 +19,7 @@ und Kosten werden in einer eigenen SQLite-Datei gespeichert.
 | Fahrterkennung | Konservativer Statusautomat und Distanz | Nein, Ergebnisdaten | Synthetische Tests |
 | Mehrere Fahrzeuge | Getrennte Config Entries | Karteneditor | HA-/Frontend-Tests |
 | Reisen | Anlegen, Zeitraum bearbeiten, löschen, Statuswechsel | Ja, Manager Card | API-/HA-/Frontend-Tests |
-| Fahrten | GPS-/manuelle Fahrten, Anzeige, Zuordnung/Lösen | Ja, Manager Card | Beta-12-API-/Frontend-Tests |
+| Fahrten | GPS-Fahrten anzeigen/zuordnen; manuelle Fahrten anlegen, bearbeiten, löschen | Ja, Manager Card | Beta-12-API-/Frontend-Tests |
 | Zwischenstopps | Schema und WebSocket-CRUD | Nein | Storage-/API-Tests |
 | Kosten | Kategorien, Cent-Beträge, Summen, Editieren, Löschen | Ja | Beta-11-Roundtrip getestet |
 | Karten/Diagnose | Summary, Manager, Editor, manuelle Diagnose | Ja | Bundle/Vitest/Chromium |
@@ -117,7 +117,7 @@ werden nicht automatisch umkategorisiert.
 und ist von Recorder/MariaDB getrennt. SQLite läuft über einen serialisierten
 Worker; Beta 12 verwendet Schema 5. Die Migration ergänzt optionale Reisedaten
 und Metadaten für manuelle Fahrten, verändert keine GPS-Punkte und ist
-rückwärtskompatibel. Destruktive Retention-Löschung ist in der
+rückwärtskompatibel und transaktional wiederholbar. Destruktive Retention-Löschung ist in der
 Beta deaktiviert. Die zusätzliche Datenbankdatei muss in Backups enthalten
 sein. Siehe [Datenbankschema](docs/database-schema.md).
 

@@ -10,12 +10,15 @@
 - Keeps drive assignment bound to the vehicle and unique across trips.
 - Adds manual drives with start location, destination, distance and optional
   duration; manual drives never create synthetic GPS points.
+- Allows manual drives to be edited or deleted with source and vehicle
+  validation; GPS-detected drives are protected from these operations.
 - Refreshes the Summary Card after confirmed trip or drive changes.
 
 ## Storage and compatibility
 
 - Adds schema version 5 with additive, backward-compatible columns for trip
-  dates and manual-drive metadata.
+  dates and manual-drive metadata. The migration and schema-version update
+  are atomic; a failed step rolls back and can be retried.
 - Existing trips, GPS points, detected drives and expenses are preserved.
 - No Recorder/MariaDB migration and no automatic GPS-to-trip date assignment.
 

@@ -1,6 +1,6 @@
 import { css, html } from "lit";
 import { TravelCard, defineOnce } from "./base-card";
-import { createExpense, createManualDrive, createTrip, deleteExpense, deleteTrip, linkDrives, list, transition, unlinkDrive, updateExpense, updateTrip, type Drive, type Expense, type Snapshot } from "./api";
+import { createExpense, createManualDrive, createTrip, deleteExpense, deleteManualDrive, deleteTrip, linkDrives, list, transition, unlinkDrive, updateExpense, updateManualDrive, updateTrip, type Drive, type Expense, type Snapshot } from "./api";
 import { notifyExpensesChanged, notifyTravelChanged } from "./expense-events";
 import { categoryLabel, EXPENSE_CATEGORIES, formatDateTime, formatDuration, formatMoneyMinor, formatTripPeriod, isExpenseCategory, messages, parseAmountMinor, statusLabel, type ExpenseCategory } from "./i18n";
 
@@ -11,6 +11,7 @@ export class ManagerCard extends TravelCard {
   private confirmingTripId = ""; private confirmingExpenseId = ""; private amount = ""; private category: ExpenseCategory = EXPENSE_CATEGORIES[0];
   private selected = ""; private editingExpenseId = ""; private editingAmount = ""; private editingCategory = "other"; private expenseSavingId = "";
   private manualOccurredAt = ""; private manualStartLocation = ""; private manualEndLocation = ""; private manualDistanceKm = ""; private manualDurationMinutes = ""; private manualSaving = false;
+  private editingDriveId = ""; private editingDriveOccurredAt = ""; private editingDriveStartLocation = ""; private editingDriveEndLocation = ""; private editingDriveDistanceKm = ""; private editingDriveDurationMinutes = ""; private driveSavingId = ""; private confirmingDriveId = "";
 
   connectedCallback() { super.connectedCallback(); void this.refresh(); }
   protected onHassConnectionChanged() { void this.refresh(); }
@@ -56,6 +57,26 @@ export class ManagerCard extends TravelCard {
     catch { this.fail(messages(this.hass).driveCreateError); }
     finally { this.manualSaving = false; this.requestUpdate(); }
   }
+  private localDateTime(value: string) { const date = new Date(value); const pad = (part: number) => String(part).padStart(2, "0"); return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`; }
+  private startManualDriveEdit(drive: Drive) { this.actionError = ""; this.editingDriveId = drive.id; this.editingDriveOccurredAt = this.localDateTime(drive.started_at); this.editingDriveStartLocation = drive.start_label || ""; this.editingDriveEndLocation = drive.end_label || ""; this.editingDriveDistanceKm = (drive.distance_m / 1000).toFixed(1); this.editingDriveDurationMinutes = drive.duration_seconds ? String(Math.round(drive.duration_seconds / 60)) : ""; this.requestUpdate(); }
+  private cancelManualDriveEdit() { this.editingDriveId = ""; this.actionError = ""; this.requestUpdate(); }
+  private async saveManualDrive(drive: Drive, tripId: string) {
+    if (!this.hass || this.driveSavingId) return;
+    const distance = Number(this.editingDriveDistanceKm.replace(",", ".")); const duration = this.editingDriveDurationMinutes ? Number(this.editingDriveDurationMinutes) : undefined;
+    if (!this.editingDriveOccurredAt || !this.editingDriveStartLocation.trim() || !this.editingDriveEndLocation.trim() || !Number.isFinite(distance) || distance < 0 || (duration !== undefined && (!Number.isInteger(duration) || duration < 0))) return this.fail(messages(this.hass).dateInvalid);
+    this.driveSavingId = drive.id;
+    try { await updateManualDrive(this.hass, this.vehicleId, drive.id, { occurred_at: new Date(this.editingDriveOccurredAt).toISOString(), start_location: this.editingDriveStartLocation, end_location: this.editingDriveEndLocation, distance_km: distance, ...(duration === undefined ? {} : { duration_minutes: duration }) }); this.actionError = ""; this.cancelManualDriveEdit(); await this.refresh(); notifyTravelChanged({ vehicleId: this.vehicleId, tripId }); }
+    catch { this.fail(messages(this.hass).driveEditError); }
+    finally { this.driveSavingId = ""; this.requestUpdate(); }
+  }
+  private async removeManualDrive(tripId: string, driveId: string) {
+    if (!this.hass || this.driveSavingId) return;
+    if (this.confirmingDriveId !== driveId) { this.confirmingDriveId = driveId; this.requestUpdate(); return; }
+    this.driveSavingId = driveId;
+    try { await deleteManualDrive(this.hass, this.vehicleId, driveId); this.confirmingDriveId = ""; this.actionError = ""; await this.refresh(); notifyTravelChanged({ vehicleId: this.vehicleId, tripId }); }
+    catch { this.fail(messages(this.hass).driveDeleteError); }
+    finally { this.driveSavingId = ""; this.requestUpdate(); }
+  }
   private async addExpense(tripId: string) {
     if (!this.hass) return; const lang = messages(this.hass); const amountMinor = parseAmountMinor(this.amount); if (amountMinor === null) return this.fail(lang.amountInvalid);
     try { await createExpense(this.hass, this.vehicleId, tripId, { occurred_at: new Date().toISOString(), category: this.category, amount_minor: amountMinor, currency: "EUR" }); this.actionError = ""; if (await this.refresh()) { this.amount = ""; notifyExpensesChanged({ vehicleId: this.vehicleId, tripId }); } }
@@ -86,7 +107,10 @@ export class ManagerCard extends TravelCard {
   private renderDrive(drive: Drive, tripId: string, lang: ReturnType<typeof messages>) {
     const source = drive.source === "manual" ? lang.sourceManual : lang.sourceGps;
     const locations = drive.source === "manual" ? `${drive.start_label || "—"} → ${drive.end_label || "—"}` : `${lang.driveStart}: ${formatDateTime(drive.started_at, this.hass)} · ${lang.driveEnd}: ${formatDateTime(drive.ended_at, this.hass)}`;
-    return html`<div class="drive-row"><div><strong>${source}</strong> · ${locations}<br><span class="muted">${(drive.distance_m / 1000).toFixed(1)} km · ${formatDuration(drive.duration_seconds, this.hass)} · ${drive.assignment_status === "assigned" ? lang.assignedDrives : lang.freeDrives}</span></div>${drive.trip_id === tripId ? html`<button type="button" class="link" @click=${() => this.unassignDrive(tripId, drive.id)}>${lang.unassign}</button>` : html`<button type="button" class="link" @click=${() => this.assignDrive(tripId, drive.id)}>${lang.assign}</button>`}</div>`;
+    if (this.editingDriveId === drive.id) return html`<form class="form-grid drive-edit-form" @submit=${(event: SubmitEvent) => { event.preventDefault(); void this.saveManualDrive(drive, tripId); }}><label>${lang.driveStart}<input type="datetime-local" .value=${this.editingDriveOccurredAt} @input=${(event: InputEvent) => this.editingDriveOccurredAt = (event.currentTarget as HTMLInputElement).value}></label><input aria-label=${lang.startLocation} .value=${this.editingDriveStartLocation} @input=${(event: InputEvent) => this.editingDriveStartLocation = (event.currentTarget as HTMLInputElement).value}><input aria-label=${lang.endLocation} .value=${this.editingDriveEndLocation} @input=${(event: InputEvent) => this.editingDriveEndLocation = (event.currentTarget as HTMLInputElement).value}><input aria-label=${lang.distanceKm} type="number" min="0" step="0.1" inputmode="decimal" .value=${this.editingDriveDistanceKm} @input=${(event: InputEvent) => this.editingDriveDistanceKm = (event.currentTarget as HTMLInputElement).value}><input aria-label=${lang.durationMinutes} type="number" min="0" step="1" .value=${this.editingDriveDurationMinutes} @input=${(event: InputEvent) => this.editingDriveDurationMinutes = (event.currentTarget as HTMLInputElement).value}><button type="submit" ?disabled=${this.driveSavingId === drive.id}>${this.driveSavingId === drive.id ? lang.saving : lang.save}</button><button type="button" class="secondary" @click=${() => this.cancelManualDriveEdit()} ?disabled=${Boolean(this.driveSavingId)}>${lang.cancel}</button></form>`;
+    const assignment = drive.trip_id === tripId ? html`<button type="button" class="link" @click=${() => this.unassignDrive(tripId, drive.id)}>${lang.unassign}</button>` : html`<button type="button" class="link" @click=${() => this.assignDrive(tripId, drive.id)}>${lang.assign}</button>`;
+    const manualActions = drive.source === "manual" ? html`<button type="button" class="link" @click=${() => this.startManualDriveEdit(drive)} ?disabled=${Boolean(this.driveSavingId)}>${lang.edit}</button><button type="button" class="link" @click=${() => this.removeManualDrive(tripId, drive.id)} ?disabled=${Boolean(this.driveSavingId)}>${this.confirmingDriveId === drive.id ? lang.confirmDelete : lang.remove}</button>` : "";
+    return html`<div class="drive-row"><div><strong>${source}</strong> · ${locations}<br><span class="muted">${(drive.distance_m / 1000).toFixed(1)} km · ${formatDuration(drive.duration_seconds, this.hass)} · ${drive.assignment_status === "assigned" ? lang.assignedDrives : lang.freeDrives}</span></div><span class="actions">${manualActions}${assignment}</span></div>`;
   }
   render() {
     const lang = messages(this.hass); const trips = this.snapshot?.trips ?? []; const expenses = this.snapshot?.expenses ?? []; const summary = this.snapshot?.expense_summary;
@@ -95,5 +119,5 @@ export class ManagerCard extends TravelCard {
   }
 }
 
-ManagerCard.styles = [TravelCard.styles, css`section{margin-top:16px}.trip{display:grid;gap:8px;padding:12px 0;border-bottom:1px solid var(--divider-color)}.row,.expense-row,.drive-row{display:flex;justify-content:space-between;gap:8px;align-items:center;flex-wrap:wrap}.details{padding:8px;background:var(--secondary-background-color)}h4{margin:12px 0 4px}.link{min-height:30px;padding:4px 8px;font-size:.9em}.form-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(9rem,1fr));gap:8px;align-items:end}.form-grid input,.form-grid select{min-width:0;width:100%;box-sizing:border-box}.form-grid label{display:grid;gap:4px;font-size:.9em}.expense-form{display:grid;grid-template-columns:minmax(0,1fr) minmax(7rem,10rem) auto;gap:8px;align-items:center;width:100%}.expense-form input,.expense-form select{min-width:0;width:100%;box-sizing:border-box}.create-form{grid-template-columns:minmax(7rem,10rem) minmax(0,1fr) auto}.total{margin:12px 0 0;text-align:right}@media(max-width:500px){.expense-form,.create-form{grid-template-columns:1fr}.expense-form .actions{margin-top:0}.total{text-align:left}}`] as any;
+ManagerCard.styles = [TravelCard.styles, css`section{margin-top:16px}.trip{display:grid;gap:8px;padding:12px 0;border-bottom:1px solid var(--divider-color)}.row,.expense-row,.drive-row{display:flex;justify-content:space-between;gap:8px;align-items:center;flex-wrap:wrap}.details{padding:8px;background:var(--secondary-background-color)}h4{margin:12px 0 4px}.link{min-height:30px;padding:4px 8px;font-size:.9em}.form-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(9rem,1fr));gap:8px;align-items:end}.form-grid input,.form-grid select{min-width:0;width:100%;box-sizing:border-box}.form-grid label{display:grid;gap:4px;font-size:.9em}.expense-form{display:grid;grid-template-columns:minmax(0,1fr) minmax(7rem,10rem) auto;gap:8px;align-items:center;width:100%}.expense-form input,.expense-form select{min-width:0;width:100%;box-sizing:border-box}.create-form{grid-template-columns:minmax(7rem,10rem) minmax(0,1fr) auto}.total{margin:12px 0 0;text-align:right}@media(max-width:500px){.expense-form,.create-form,.drive-edit-form{grid-template-columns:1fr}.expense-form .actions{margin-top:0}.total{text-align:left}}`] as any;
 defineOnce("camper-travel-journal-manager-card", ManagerCard);

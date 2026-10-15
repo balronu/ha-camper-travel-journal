@@ -99,6 +99,8 @@ else:
             "camper_travel_journal/link_drives",
             "camper_travel_journal/unlink_drive",
             "camper_travel_journal/create_manual_drive",
+            "camper_travel_journal/update_manual_drive",
+            "camper_travel_journal/delete_manual_drive",
             "camper_travel_journal/create_stop",
             "camper_travel_journal/update_stop",
             "camper_travel_journal/delete_stop",

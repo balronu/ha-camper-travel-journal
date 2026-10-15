@@ -19,7 +19,7 @@ stored in an integration-owned SQLite database.
 | Drive detection | Conservative state machine and distance | No, result data | Synthetic tests |
 | Multiple vehicles | Separate config entries | Card editor | HA/frontend tests |
 | Trips | Create, edit title/period, delete, status changes | Yes, Manager Card | API/HA/frontend tests |
-| Drives | GPS/manual drives, display, link/unlink | Yes, Manager Card | Beta 12 API/frontend tests |
+| Drives | Display/link GPS drives; create, edit and delete manual drives | Yes, Manager Card | Beta 12 API/frontend tests |
 | Stops | Schema and WebSocket CRUD | No | Storage/API tests |
 | Expenses | Categories, cents, totals, edit, delete | Yes | Beta 11 round-trip tested |
 | Cards/diagnostics | Summary, Manager, editor, manual diagnostics | Yes | Bundle/Vitest/Chromium |
@@ -115,7 +115,7 @@ The integration owns `camper_travel_journal.db` in the Home Assistant
 configuration directory and never opens or changes Recorder/MariaDB. SQLite
 access is serialized; Beta 12 uses schema version 5. The migration adds
 optional trip dates and manual-drive metadata, preserves GPS rows and is
-backward-compatible. Destructive retention
+backward-compatible and retryable as one transaction. Destructive retention
 deletion is disabled in this beta. Include the additional database file in
 backups; see [docs/database-schema.md](docs/database-schema.md).
 

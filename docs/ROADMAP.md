@@ -34,10 +34,11 @@ them.
 The current development branch prepares, but does not publish, `v0.1.0-beta.12`.
 It adds optional trip start/end dates, inline editing, visible detected drives,
 vehicle-bound assignment/unassignment, and separate manual drives with source,
-locations, distance and optional duration. The schema-5 migration preserves
-existing GPS rows and trips without dates; no GPS timestamps are copied into a
-trip date automatically. Desktop Chromium/CI coverage is required; iOS,
-Safari/WebKit and production-dashboard practice remain open.
+locations, distance, optional duration, editing and deletion. The schema-5
+migration is transactional and preserves existing GPS rows and trips without
+dates; no GPS timestamps are copied into a trip date automatically. Desktop
+Chromium/CI coverage is required; iOS, Safari/WebKit and production-dashboard
+practice remain open.
 
 ## Beta 11 – expense-category correction (completed)
 

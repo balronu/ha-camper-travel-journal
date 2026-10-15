@@ -9,10 +9,12 @@ Assistant pilot.
 - coordinate ranges, aware timestamps, accuracy and duplicate filtering;
 - haversine distance, movement/time thresholds and implausible jumps;
 - drive start/finish, stationary stops and GPS gaps without artificial distance;
-- SQLite schema, migrations, foreign keys and serialized worker;
+- SQLite schema, atomic migrations, interruption/retry recovery, foreign keys
+  and serialized worker;
 - restart tail recovery and multi-vehicle isolation;
 - retention candidate safety and assigned-data protection;
 - trip lifecycle, drive assignment and reversible links;
+- manual drive create/edit/delete, GPS-drive protection and restart persistence;
 - stop CRUD and expense CRUD, categories, integer cents and mixed currencies;
 - expense edit, delete, reload persistence and invalid-input rejection.
 

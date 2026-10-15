@@ -184,6 +184,22 @@ if websocket_api is not None:
             connection.send_result(msg["id"], {"drive_id": result})
         except Exception as err: _send_error(connection, msg, err)
 
+    @websocket_api.websocket_command({**_base("camper_travel_journal/update_manual_drive"), vol.Required("drive_id"): str, vol.Required("occurred_at"): str, vol.Required("start_location"): str, vol.Required("end_location"): str, vol.Required("distance_km"): vol.Coerce(float), vol.Optional("duration_minutes"): vol.Coerce(int)})
+    @websocket_api.async_response
+    async def ws_update_manual_drive(hass, connection, msg):
+        try:
+            await _call(hass, msg, "update_manual_drive", msg["drive_id"], msg["vehicle_id"], _timestamp(msg["occurred_at"]), msg["start_location"], msg["end_location"], msg["distance_km"], msg.get("duration_minutes"), _now())
+            connection.send_result(msg["id"], {"success": True})
+        except Exception as err: _send_error(connection, msg, err)
+
+    @websocket_api.websocket_command({**_base("camper_travel_journal/delete_manual_drive"), vol.Required("drive_id"): str})
+    @websocket_api.async_response
+    async def ws_delete_manual_drive(hass, connection, msg):
+        try:
+            await _call(hass, msg, "delete_manual_drive", msg["drive_id"], msg["vehicle_id"])
+            connection.send_result(msg["id"], {"success": True})
+        except Exception as err: _send_error(connection, msg, err)
+
     @websocket_api.websocket_command({**_base("camper_travel_journal/create_stop"), vol.Required("trip_id"): str, vol.Required("occurred_at"): str, vol.Optional("name", default=""): str, vol.Optional("category", default="other"): str, vol.Optional("latitude"): vol.Coerce(float), vol.Optional("longitude"): vol.Coerce(float)})
     @websocket_api.async_response
     async def ws_create_stop(hass, connection, msg):
@@ -242,7 +258,7 @@ if websocket_api is not None:
             connection.send_result(msg["id"], {"success": True})
         except Exception as err: _send_error(connection, msg, err)
 
-    COMMANDS = (ws_list_vehicles, ws_list, ws_create_trip, ws_update_trip, ws_delete_trip, ws_transition_trip, ws_link_drives, ws_unlink_drive, ws_create_manual_drive, ws_create_stop, ws_update_stop, ws_delete_stop, ws_create_expense, ws_update_expense, ws_delete_expense)
+    COMMANDS = (ws_list_vehicles, ws_list, ws_create_trip, ws_update_trip, ws_delete_trip, ws_transition_trip, ws_link_drives, ws_unlink_drive, ws_create_manual_drive, ws_update_manual_drive, ws_delete_manual_drive, ws_create_stop, ws_update_stop, ws_delete_stop, ws_create_expense, ws_update_expense, ws_delete_expense)
 else:
     COMMANDS = ()
 

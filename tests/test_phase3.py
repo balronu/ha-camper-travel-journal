@@ -2,7 +2,7 @@
 
 import tempfile
 import unittest
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 from custom_components.camper_travel_journal.models import Expense, Stop
@@ -71,6 +71,31 @@ class Phase3Tests(unittest.TestCase):
         self.assertEqual((drive["source"], drive["start_label"], drive["end_label"]), ("manual", "Bremen", "Hamburg"))
         self.assertEqual(drive["duration_seconds"], 5400)
         self.assertEqual(drive["assignment_status"], "assigned")
+        self.store.update_manual_drive(manual, "v1", self.now + timedelta(hours=1), "Bremen Hbf", "Hamburg Hbf", 125.6, 95, self.now)
+        updated = self.store.list_drives("v1", trip_id=trip)[0]
+        self.assertEqual((updated["start_label"], updated["end_label"], updated["manual_distance_km"]), ("Bremen Hbf", "Hamburg Hbf", 125.6))
+        self.store.delete_manual_drive(manual, "v1")
+        self.assertEqual(self.store.list_drives("v1", trip_id=trip), [])
+
+    def test_gps_drive_cannot_be_manually_edited_or_deleted(self):
+        with self.store.transaction() as connection:
+            connection.execute("INSERT INTO drives(id,vehicle_id,started_at,ended_at,distance_m,end_reason,created_at) VALUES(?,?,?,?,?,?,?)", ("gps1", "v1", self.now.isoformat(), self.now.isoformat(), 1000, "stop", self.now.isoformat()))
+        with self.assertRaisesRegex(ValueError, "drive_not_manual"):
+            self.store.update_manual_drive("gps1", "v1", self.now, "A", "B", 1, None, self.now)
+        with self.assertRaisesRegex(ValueError, "drive_not_manual"):
+            self.store.delete_manual_drive("gps1", "v1")
+        self.assertEqual(self.store.list_drives("v1")[0]["id"], "gps1")
+
+    def test_manual_drive_validation_and_restart_persistence(self):
+        trip = self.store.create_trip("v1", "Persistenz", self.now, self.now)
+        with self.assertRaisesRegex(ValueError, "drive_distance_invalid"):
+            self.store.create_manual_drive("v1", self.now, "A", "B", -1, None, self.now)
+        with self.assertRaisesRegex(ValueError, "drive_duration_invalid"):
+            self.store.create_manual_drive("v1", self.now, "A", "B", 1, -1, self.now)
+        manual = self.store.create_manual_drive("v1", self.now, "A", "B", 1, 10, self.now, trip)
+        self.store.close()
+        self.store.open()
+        self.assertEqual(self.store.list_drives("v1", trip_id=trip)[0]["id"], manual)
 
     def test_manual_drive_rejects_other_vehicle_trip(self):
         self.store.insert_vehicle("v2", "Other", "device_tracker.other", self.now)
@@ -94,6 +119,30 @@ class Phase3Tests(unittest.TestCase):
         self.assertEqual(self.store.list_trips("v1")[0]["id"], trip)
         legacy = self.store.list_drives("v1")[0]
         self.assertEqual((legacy["id"], legacy["source"]), ("legacy", "gps"))
+
+    def test_schema_five_migration_rolls_back_interruption_and_resumes(self):
+        with self.store.transaction() as connection:
+            connection.execute("UPDATE schema_meta SET value='4' WHERE key='version'")
+            connection.execute("ALTER TABLE trips DROP COLUMN start_date")
+            connection.execute("ALTER TABLE trips DROP COLUMN end_date")
+            connection.execute("ALTER TABLE drives DROP COLUMN source")
+            connection.execute("ALTER TABLE drives DROP COLUMN start_label")
+            connection.execute("ALTER TABLE drives DROP COLUMN end_label")
+        original = SQLiteStore._migrate_v5
+
+        def interrupted(store):
+            store.connection.execute("ALTER TABLE trips ADD COLUMN interrupted TEXT")
+            raise RuntimeError("synthetic_migration_interrupt")
+
+        SQLiteStore._migrate_v5 = interrupted
+        self.store.close()
+        with self.assertRaisesRegex(RuntimeError, "synthetic_migration_interrupt"):
+            self.store.open()
+        SQLiteStore._migrate_v5 = original
+        self.store.open()
+        columns = {row[1] for row in self.store.connection.execute("PRAGMA table_info(trips)")}
+        self.assertNotIn("interrupted", columns)
+        self.assertEqual(self.store.connection.execute("SELECT value FROM schema_meta WHERE key='version'").fetchone()[0], "5")
 
 
 if __name__ == "__main__":

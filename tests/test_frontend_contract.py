@@ -17,7 +17,7 @@ def test_beta_contains_the_versioned_lovelace_bundle():
     assert "ws_list_vehicles" in api
     for command in (
         "list", "create_trip", "update_trip", "delete_trip", "transition_trip",
-        "link_drives", "unlink_drive", "create_manual_drive", "create_stop", "update_stop", "delete_stop",
+        "link_drives", "unlink_drive", "create_manual_drive", "update_manual_drive", "delete_manual_drive", "create_stop", "update_stop", "delete_stop",
         "create_expense", "update_expense", "delete_expense",
     ):
         assert f'camper_travel_journal/{command}' in api

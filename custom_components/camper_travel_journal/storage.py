@@ -101,14 +101,14 @@ class SQLiteStore:
             if current is not None and int(current[0]) > SCHEMA_VERSION:
                 raise RuntimeError(f"database schema {current[0]} is newer than supported {SCHEMA_VERSION}")
             previous = int(current[0]) if current is not None else 0
-            if previous < 3:
-                self._migrate_v3()
-            if previous < 4:
-                self._migrate_v4()
-            if previous < 5:
-                self._migrate_v5()
-            self.connection.execute("INSERT OR REPLACE INTO schema_meta(key, value) VALUES('version', ?)", (str(SCHEMA_VERSION),))
-            self.connection.commit()
+            with self.transaction() as connection:
+                if previous < 3:
+                    self._migrate_v3()
+                if previous < 4:
+                    self._migrate_v4()
+                if previous < 5:
+                    self._migrate_v5()
+                connection.execute("INSERT OR REPLACE INTO schema_meta(key, value) VALUES('version', ?)", (str(SCHEMA_VERSION),))
         except Exception:
             self.close()
             raise
@@ -331,6 +331,36 @@ class SQLiteStore:
             if trip_id is not None:
                 connection.execute("INSERT INTO trip_drives(trip_id,drive_id,linked_at) VALUES(?,?,?)", (trip_id, drive_id, stamp))
         return drive_id
+
+    def update_manual_drive(self, drive_id: str, vehicle_id: str, started_at: datetime, start_label: str, end_label: str, distance_km: float, duration_minutes: int | None, now: datetime) -> None:
+        if not start_label.strip() or not end_label.strip():
+            raise ValueError("drive_location_required")
+        if distance_km < 0:
+            raise ValueError("drive_distance_invalid")
+        if duration_minutes is not None and duration_minutes < 0:
+            raise ValueError("drive_duration_invalid")
+        ended_at = started_at + timedelta(minutes=duration_minutes or 0)
+        with self.transaction() as connection:
+            drive = connection.execute("SELECT vehicle_id, source FROM drives WHERE id=?", (drive_id,)).fetchone()
+            if drive is None:
+                raise ValueError("drive_not_found")
+            if drive[0] != vehicle_id:
+                raise ValueError("vehicle_mismatch")
+            if drive[1] != "manual":
+                raise ValueError("drive_not_manual")
+            connection.execute("UPDATE drives SET started_at=?, ended_at=?, distance_m=?, manual_distance_km=?, start_label=?, end_label=? WHERE id=?", (utc_iso(started_at), utc_iso(ended_at), distance_km * 1000, distance_km, start_label.strip(), end_label.strip(), drive_id))
+
+    def delete_manual_drive(self, drive_id: str, vehicle_id: str) -> None:
+        with self.transaction() as connection:
+            drive = connection.execute("SELECT vehicle_id, source FROM drives WHERE id=?", (drive_id,)).fetchone()
+            if drive is None:
+                raise ValueError("drive_not_found")
+            if drive[0] != vehicle_id:
+                raise ValueError("vehicle_mismatch")
+            if drive[1] != "manual":
+                raise ValueError("drive_not_manual")
+            connection.execute("DELETE FROM trip_drives WHERE drive_id=?", (drive_id,))
+            connection.execute("DELETE FROM drives WHERE id=?", (drive_id,))
 
     def create_stop(self, stop, now: datetime) -> str:
         stop_id = stop.id or str(uuid.uuid4())

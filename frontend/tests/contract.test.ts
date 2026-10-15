@@ -146,6 +146,8 @@ describe("frontend release contract", () => {
     const manager = readFileSync(resolve(root, "src/manager-card.ts"), "utf8");
     const summary = readFileSync(resolve(root, "src/summary-card.ts"), "utf8");
     expect(api).toContain("createManualDrive");
+    expect(api).toContain("updateManualDrive");
+    expect(api).toContain("deleteManualDrive");
     expect(api).toContain("start_date");
     expect(api).toContain("end_date");
     expect(manager).toContain("type=\"date\"");
@@ -153,6 +155,8 @@ describe("frontend release contract", () => {
     expect(manager).toContain("notifyTravelChanged");
     expect(manager).toContain("formatDuration");
     expect(manager).toContain("sourceManual");
+    expect(manager).toContain("saveManualDrive");
+    expect(manager).toContain("removeManualDrive");
     expect(summary).toContain("TRAVEL_DATA_CHANGED_EVENT");
   });
 });
