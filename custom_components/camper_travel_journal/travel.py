@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from enum import StrEnum
+import re
 
 
 class TripStatus(StrEnum):
@@ -13,6 +14,7 @@ class TripStatus(StrEnum):
 
 
 EXPENSE_CATEGORIES = frozenset({"camping", "fuel", "toll", "parking", "food", "activities", "other"})
+EXPENSE_CURRENCY_PATTERN = re.compile(r"^[A-Z]{3}$")
 
 
 VALID_TRANSITIONS: dict[TripStatus, frozenset[TripStatus]] = {
@@ -44,3 +46,13 @@ def validate_expense_category(category: object) -> str:
     if not isinstance(category, str) or category not in EXPENSE_CATEGORIES:
         raise ValueError("expense_category_invalid")
     return category
+
+
+def validate_expense_currency(currency: object) -> str:
+    """Return a normalized ISO-like currency code for expense storage."""
+    if not isinstance(currency, str):
+        raise ValueError("currency_invalid")
+    normalized = currency.strip().upper()
+    if not EXPENSE_CURRENCY_PATTERN.fullmatch(normalized):
+        raise ValueError("currency_invalid")
+    return normalized

@@ -16,7 +16,7 @@ except ImportError:  # pragma: no cover - offline domain tests
     callback = lambda func: func
 
 from .models import Expense, Stop
-from .travel import validate_amount, validate_expense_category, validate_transition
+from .travel import validate_amount, validate_expense_category, validate_expense_currency, validate_transition
 
 
 def _now() -> datetime:
@@ -181,7 +181,7 @@ if websocket_api is not None:
     @websocket_api.async_response
     async def ws_create_expense(hass, connection, msg):
         try:
-            expense = Expense(id="", trip_id=msg["trip_id"], occurred_at=_timestamp(msg["occurred_at"]), category=validate_expense_category(msg["category"]), amount_minor=validate_amount(msg["amount_minor"]), currency=msg["currency"], note=msg.get("note"), odometer_km=msg.get("odometer_km"))
+            expense = Expense(id="", trip_id=msg["trip_id"], occurred_at=_timestamp(msg["occurred_at"]), category=validate_expense_category(msg["category"]), amount_minor=validate_amount(msg["amount_minor"]), currency=validate_expense_currency(msg["currency"]), note=msg.get("note"), odometer_km=msg.get("odometer_km"))
             result = await _call(hass, msg, "create_expense", expense, _now())
             connection.send_result(msg["id"], {"expense_id": result})
         except Exception as err: _send_error(connection, msg, err)
@@ -194,6 +194,7 @@ if websocket_api is not None:
             if "category" in msg: fields["category"] = validate_expense_category(msg["category"])
             if "occurred_at" in msg: fields["occurred_at"] = _timestamp(msg["occurred_at"])
             if "amount_minor" in fields: fields["amount_minor"] = validate_amount(fields["amount_minor"])
+            if "currency" in fields: fields["currency"] = validate_expense_currency(fields["currency"])
             await _call(hass, msg, "update_expense", msg["expense_id"], _now(), **fields)
             connection.send_result(msg["id"], {"success": True})
         except Exception as err: _send_error(connection, msg, err)
