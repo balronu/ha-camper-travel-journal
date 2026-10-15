@@ -1,7 +1,8 @@
 # Camper Travel Journal – Roadmap
 
 This roadmap separates implemented work, current limitations and planned
-features. It is based on the source tree and tests at `v0.1.0-beta.11`; a
+features. It is based on the prepared, not yet published `v0.1.0-beta.11`
+source tree and tests; a
 database table or WebSocket method is not treated as a finished user feature
 without a corresponding UI and test path.
 
@@ -20,12 +21,14 @@ without a corresponding UI and test path.
 - Expense CRUD, integer-cent totals, mixed-currency protection, inline editing
   and canonical category IDs, including the `camping` round-trip.
 
-## Current Beta: `v0.1.0-beta.11`
+## Prepared development baseline: `v0.1.0-beta.11`
 
-This is a development beta. CI covers the pinned Home Assistant environment and
-synthetic/isolated data. Beta 11 adds the canonical `camping` category ID,
-explicit select-state handling, and a browser/API/storage/reload regression
-path. Existing rows remain untouched until a user explicitly edits them.
+This is a development baseline, not a published release. The currently
+published version remains Beta 10. CI covers the pinned Home Assistant
+environment and synthetic/isolated data. Beta 11 adds the canonical `camping`
+category ID, explicit select-state handling, and a browser/API/storage/reload
+regression path. Existing rows remain untouched until a user explicitly edits
+them.
 
 ## Beta 11 – expense-category correction (completed)
 
@@ -33,7 +36,8 @@ path. Existing rows remain untouched until a user explicitly edits them.
 2. Test every category through select input, WebSocket payload, storage,
    response, display and reload; give `camping` a dedicated regression path.
 3. Reject unknown category IDs; never fall back silently to `other`. **Done.**
-4. Add browser interaction checks at desktop and narrow/mobile widths. **Done.**
+4. Add desktop Chromium browser interaction checks. **Done.** iOS/Safari/WebKit
+   and narrow/mobile practice validation remain open.
 5. Preserve existing expenses and avoid schema migration or automatic
    recategorization. **Done.**
 

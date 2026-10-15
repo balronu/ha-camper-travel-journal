@@ -47,8 +47,9 @@ manual diagnostics and repeated Home Assistant state updates.
 ## Practice and production gates
 
 The Beta-10 practice report found a `camping` expense-category round-trip bug.
-Beta 11 adds the real selection → WebSocket → storage → response → reload
-regression path and narrow-layout interaction coverage.
+The prepared Beta 11 adds the real selection → WebSocket → storage → response
+→ reload regression path and desktop Chromium interaction coverage. Narrow
+mobile layouts and iOS/Safari/WebKit remain open practice gates.
 
 Still separate from automated tests:
 

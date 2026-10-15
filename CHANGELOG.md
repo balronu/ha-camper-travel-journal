@@ -2,12 +2,21 @@
 
 🇩🇪 Deutsch | 🇬🇧 [English](README.en.md)
 
-## 0.1.0-beta.11 – Kostenkategorie-Roundtrip
+## 0.1.0-beta.11 – vorbereitet, nicht veröffentlicht
 
+- Korrigiert die initiale Kostenkategorie `camping`, die zuvor beim ersten
+  Speichern als `other` übertragen werden konnte.
 - Verwendet kanonische interne Kostenkategorie-IDs unabhängig von den
   deutschen Anzeigenamen.
 - Bewahrt `camping` über Auswahl, WebSocket, SQLite, Antwort und Reload; lehnt
   unbekannte Kategorien ohne Fallback auf `other` ab.
+- Aktualisiert die Summary Card nach erfolgreichen Kostenänderungen erneut aus
+  dem Backend.
+- Macht den Details-Button zu einem Auf-/Zu-Umschalter und erhält den
+  Detailzustand bei Kostenänderungen.
+- Überarbeitet README, README.de, README.en und Roadmap grundlegend und hält
+  den tatsächlichen Entwicklungsstand sowie offene Mobile-/Praxisprüfungen
+  fest.
 - Ergänzt API-, Storage-, Frontend- und Browser-Regressionstests ohne Migration
   oder automatische Änderung bestehender Einträge.
 

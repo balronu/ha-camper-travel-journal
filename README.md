@@ -12,7 +12,7 @@ und Kosten werden in einer eigenen SQLite-Datei gespeichert.
 
 ## Tatsächlicher Funktionsstand
 
-| Bereich | Beta-10-Stand | Lovelace? | Nachweis |
+| Bereich | Aktueller Stand | Lovelace? | Nachweis |
 | --- | --- | --- | --- |
 | Config-/Options-Flow | Fahrzeug, Tracker, Aufzeichnungsoptionen | Nein, HA-Einstellungen | HA-Fixtures/offline |
 | GPS-Aufzeichnung | Ereignis-Collector, Filter, Sprung-/Gap-Schutz | Indirekt über Optionen | Domain-/SQLite-Tests, CI |
@@ -31,17 +31,22 @@ eine fertige Benutzerfunktion.
 
 ## Installation über HACS
 
-Beta 11 ist für kontrollierte Entwicklungstests vorgesehen:
+Aktuell veröffentlicht und unterstützt ist `v0.1.0-beta.10`. Beta 11 ist auf
+PR #8 vorbereitet, aber noch nicht veröffentlicht. Für eine bestehende
+Installation ist weiterhin Beta 10 auszuwählen; Beta 11 wird erst nach einem
+separaten Merge-, Tag- und Release-Schritt verfügbar.
+
+Für die aktuell veröffentlichte Beta 10:
 
 1. **HACS → Integrationen → Benutzerdefinierte Repositories** öffnen.
 2. `https://github.com/balronu/ha-camper-travel-journal` als Integration
    hinzufügen.
-3. Pre-Release `v0.1.0-beta.11` auswählen, nicht `main`.
+3. Pre-Release `v0.1.0-beta.10` auswählen, nicht `main`.
 4. Home Assistant nach der Installation manuell neu starten.
 5. Die Integration unter **Einstellungen → Geräte & Dienste** hinzufügen.
 
-Wenn HACS Beta 11 nicht anbietet, Repository-Informationen aktualisieren und
-die Pre-Release-Auswahl aktivieren. Ein `main`-Commit ist kein Beta-Release.
+Die vorbereitete Beta 11 wird in HACS erst nach ihrer ausdrücklichen
+Veröffentlichung angeboten. Ein `main`-Commit ist kein Beta-Release.
 Details: [HACS-/Release-Strategie](docs/HACS_RELEASE_STRATEGY.md).
 
 Manuell das Verzeichnis `custom_components/camper_travel_journal/` samt

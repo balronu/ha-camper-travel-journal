@@ -12,7 +12,7 @@ stored in an integration-owned SQLite database.
 
 ## Actual feature status
 
-| Area | Beta 10 status | Lovelace? | Evidence |
+| Area | Current status | Lovelace? | Evidence |
 | --- | --- | --- | --- |
 | Config-/Options Flow | Vehicle, tracker and recording options | No, HA settings | HA fixtures/offline |
 | GPS recording | Event collector, filters, jump/gap protection | Indirectly through options | Domain/SQLite tests, CI |
@@ -31,16 +31,21 @@ user feature.
 
 ## HACS installation
 
-Beta 11 is intended for controlled development testing:
+The currently published and supported version is `v0.1.0-beta.10`. Beta 11 is
+prepared on PR #8 but has not been published. Existing installations should
+continue to use Beta 10; Beta 11 becomes available only after a separate
+merge, tag and release step.
+
+For the currently published Beta 10:
 
 1. Open **HACS → Integrations → Custom repositories**.
 2. Add `https://github.com/balronu/ha-camper-travel-journal` as an integration.
-3. Select the `v0.1.0-beta.11` pre-release, not `main`.
+3. Select the `v0.1.0-beta.10` pre-release, not `main`.
 4. Restart Home Assistant manually after installation.
 5. Add the integration under **Settings → Devices & services**.
 
-If HACS does not offer Beta 11, refresh repository information and enable
-pre-release selection. A `main` commit is not the beta release. See
+The prepared Beta 11 will be offered by HACS only after explicit publication.
+A `main` commit is not a beta release. See
 [docs/HACS_RELEASE_STRATEGY.md](docs/HACS_RELEASE_STRATEGY.md).
 
 Manual installation copies `custom_components/camper_travel_journal/`,

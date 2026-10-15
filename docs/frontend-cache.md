@@ -2,15 +2,16 @@
 
 ## Aktueller Stand
 
-`v0.1.0-beta.11` enthält die Phase-3-Lovelace-Karten, die optionale read-only-
-Diagnosekarte und registriert das Bundle
+Der vorbereitete Stand `v0.1.0-beta.11` enthält die Phase-3-Lovelace-Karten,
+die optionale read-only-Diagnosekarte und registriert das Bundle
 über den öffentlichen HA-Mechanismus. Der historische Tag `v0.1.0-beta.1`
 enthielt **keine** Lovelace-Karte.
 
 ## Bundle- und Cache-Vertrag
 
 Wenn die Karte entwickelt wird, müssen Bundle, Backend-Manifest und npm-
-Metadaten dieselbe veröffentlichte Version tragen. Die Resource-URL folgt dann
+Metadaten dieselbe vorbereitete bzw. veröffentlichte Version tragen. Die
+Resource-URL folgt dann
 diesem Muster:
 
 ```text
