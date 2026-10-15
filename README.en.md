@@ -3,7 +3,7 @@
 A privacy-conscious Home Assistant custom integration for **Your digital camper travel journal**. GPS points, detected drives, trips, stops and expenses are
 stored in an integration-owned SQLite database.
 
-[🇩🇪 Deutsch](README.md) | 🇬🇧 **English**
+[🇩🇪 Deutsch](README.md) | 🇬🇧 English
 
 ![Camper Travel Journal Logo](https://raw.githubusercontent.com/balronu/ha-camper-travel-journal/main/assets/branding/logo.png)
 
