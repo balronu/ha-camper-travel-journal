@@ -13,3 +13,13 @@ Die automatische Fahrtenerkennung ist eine überprüfbare Vorschlagslogik.
 Koordinaten werden nicht in Git, CI-Artefakte oder öffentliche Testdaten
 übernommen. Die reale PAJ-Testdatei ist in diesem Entwicklungsstand nicht im
 Repository enthalten.
+
+## Abnahme und Grenzen
+
+Der Real-GPX-Abnahmetest verarbeitete 903 GPS-Punkte aus einem Track und einem
+Tracksegment und erkannte drei konservative Fahrtabschnitte. Der isolierte
+SQLite-Import blieb nach dem erneuten Öffnen erhalten; identische und
+überlappende Folgeimporte wurden abgewiesen. Die PAJ-Gesamtstrecke kann wegen
+unterschiedlicher Punktfilterung und Berechnungsmethoden geringfügig von der
+GPS-Punktstrecke abweichen. Keine produktive Home-Assistant-Installation,
+VM 104 oder produktive Datenbank wurde verändert.

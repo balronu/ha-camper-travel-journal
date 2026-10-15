@@ -1,7 +1,7 @@
 # Camper Travel Journal – Roadmap
 
 This roadmap separates implemented work, current limitations and planned
-features. It is based on the prepared `v0.1.0-beta.15` source tree and tests.
+features. It is based on the released `v0.1.0-beta.15` source tree and tests.
 A database
 table or WebSocket method is not treated as a finished user feature
 without a corresponding UI and test path.
@@ -21,10 +21,9 @@ without a corresponding UI and test path.
 - Expense CRUD, integer-cent totals, mixed-currency protection, inline editing
   and canonical category IDs, including the `camping` round-trip.
 
-## Current prepared development baseline: `v0.1.0-beta.15`
+## Current pre-release baseline: `v0.1.0-beta.15`
 
-This is a prepared development beta, not yet a published release and not a
-stable release. CI covers the
+This is a published development beta, not a stable release. CI covers the
 pinned Home Assistant environment and synthetic/isolated data. Beta 12 adds
 trip periods, visible and assignable drives, manual-drive CRUD and atomic
 schema migration. Existing rows remain untouched until a user explicitly
@@ -40,7 +39,7 @@ dates; no GPS timestamps are copied into a trip date automatically. Desktop
 Chromium/CI coverage is required; iOS, Safari/WebKit and production-dashboard
 practice remain open.
 
-## Beta 14 – date formatting and GPS collector diagnostics (prepared)
+## Beta 14 – date formatting and GPS collector diagnostics (published)
 
 `v0.1.0-beta.14` localizes calendar dates without timezone shifts and adds a
 read-only GPS collector diagnostic report with privacy-safe counters and
@@ -58,6 +57,13 @@ Summary and diagnostic cards could be affected by parallel bundle lifecycles.
 The candidate adds DOM checks that fail if Lit markers or JavaScript handler
 source becomes visible text. No database, trip, drive or expense behavior is
 changed.
+
+## Beta 15 – GPX import of historical drives (published)
+
+`v0.1.0-beta.15` adds bounded PAJ GPX 1.1 analysis and an explicit atomic
+import flow. The real acceptance test used an isolated temporary database and
+confirmed 903 points and three detected drives; the source GPX and coordinates
+remain outside the repository and CI artifacts.
 
 ## Beta 11 – expense-category correction (completed)
 

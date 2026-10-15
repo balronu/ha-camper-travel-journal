@@ -2,7 +2,19 @@
 
 🇩🇪 Deutsch | 🇬🇧 [English](README.en.md)
 
-## 0.1.0-beta.14 – vorbereitet, noch nicht veröffentlicht
+## 0.1.0-beta.15 – veröffentlicht
+
+- Ergänzt sicheren, begrenzten GPX-1.1-Import für historische PAJ-Fahrten.
+- Zeigt eine read-only Vorschau mit UTC-Zeitstempeln, Fahrtabschnitten,
+  Entfernungen, Pausen-/Lückenhinweisen und Konflikten.
+- Importiert nach ausdrücklicher Bestätigung atomar und idempotent in bestehende
+  Fahrzeuge und Reisen; doppelte und überlappende Importe werden abgewiesen.
+- Akzeptiert gültige XML-CDATA und weist weiterhin DOCTYPE-/ENTITY-Deklarationen,
+  übergroße Dateien und zu viele Punkte ab.
+- Real-GPX-Abnahmetest: 903 Punkte, drei Fahrtabschnitte, isolierter SQLite-
+  Import und Wiedereröffnung erfolgreich; Originalkoordinaten bleiben erhalten.
+
+## 0.1.0-beta.14 – veröffentlicht
 
 - Lokalisiert reine Kalenderdaten in Manager- und Summary Card ohne
   Zeitzonenverschiebung; interne Eingabewerte bleiben ISO-formatiert.

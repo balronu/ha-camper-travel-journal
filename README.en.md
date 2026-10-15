@@ -7,8 +7,7 @@ stored in an integration-owned SQLite database.
 
 ![Camper Travel Journal Logo](https://raw.githubusercontent.com/balronu/ha-camper-travel-journal/main/assets/branding/logo.png)
 
-> **Status:** `v0.1.0-beta.15` – prepared for the next pre-release, not yet
-> published. It contains the secure GPX import, localized calendar dates and
+> **Status:** `v0.1.0-beta.15` – published pre-release. It contains the secure GPX import, localized calendar dates and
 > read-only GPS collector
 > diagnostics and Home Assistant 2026.10 compatibility hardening.
 > validation on iOS/Safari and a productive HA installation remains open.
@@ -34,16 +33,15 @@ user feature.
 
 ## HACS installation
 
-The currently published and supported version is `v0.1.0-beta.14`; Beta 15
-is prepared but not yet published. It has not been generally production-
+The currently published and supported version is `v0.1.0-beta.15`. It has not been generally production-
 validated; Beta 11 remains available as a
 historical release (`v0.1.0-beta.12`).
 
-For the currently published Beta 13:
+For the currently published Beta 15:
 
 1. Open **HACS → Integrations → Custom repositories**.
 2. Add `https://github.com/balronu/ha-camper-travel-journal` as an integration.
-3. Select the `v0.1.0-beta.13` pre-release, not `main`.
+3. Select the `v0.1.0-beta.15` pre-release, not `main`.
 4. Restart Home Assistant manually after installation.
 5. Add the integration under **Settings → Devices & services**.
 
@@ -86,9 +84,9 @@ The Summary Card shows the current trip, status, distance, drives, stops and
 costs. The Manager Card manages trips, status changes, drive assignment and
 expenses. The visual editor auto-selects the vehicle when exactly one exists.
 
-Prepared Beta 15 bundle URL: `/camper_travel_journal/camper-travel-journal.js?v=0.1.0-beta.15`.
+Beta 15 bundle URL: `/camper_travel_journal/camper-travel-journal.js?v=0.1.0-beta.15`.
 
-### GPX import (Beta 15 prepared)
+### GPX import (Beta 15)
 
 PAJ GPX 1.1 files can be analyzed with **Import GPX** in the manager card. The
 preview shows sections, time, distance, duration, gaps, jumps and duplicate

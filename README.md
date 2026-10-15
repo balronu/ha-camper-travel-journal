@@ -7,8 +7,7 @@ und Kosten werden in einer eigenen SQLite-Datei gespeichert.
 
 ![Camper Travel Journal Logo](https://raw.githubusercontent.com/balronu/ha-camper-travel-journal/main/assets/branding/logo.png)
 
-> **Stand:** `v0.1.0-beta.15` – für die nächste Pre-Release-Version vorbereitet,
-> noch nicht veröffentlicht. Beta 15 enthält den sicheren GPX-Import sowie
+> **Stand:** `v0.1.0-beta.15` – veröffentlichte Pre-Release. Beta 15 enthält den sicheren GPX-Import sowie
 > read-only GPS-Collector-Diagnose und HA-2026.10-Kompatibilität.
 > Die Praxisvalidierung auf iOS/Safari und in einer produktiven HA-Installation
 > bleibt offen.
@@ -34,17 +33,16 @@ eine fertige Benutzerfunktion.
 
 ## Installation über HACS
 
-Aktuell veröffentlicht und unterstützt ist `v0.1.0-beta.14`; Beta 15 ist
-vorbereitet, aber noch nicht veröffentlicht. Beta 14 ist nicht
+Aktuell veröffentlicht und unterstützt ist `v0.1.0-beta.15`. Beta 15 ist nicht
 allgemein produktiv validiert; Beta 11 bleibt als historischer Release
 verfügbar (`v0.1.0-beta.12`).
 
-Für die aktuell veröffentlichte Beta 13 (bis Beta 14 freigegeben wird):
+Für die aktuell veröffentlichte Beta 15:
 
 1. **HACS → Integrationen → Benutzerdefinierte Repositories** öffnen.
 2. `https://github.com/balronu/ha-camper-travel-journal` als Integration
    hinzufügen.
-3. Pre-Release `v0.1.0-beta.13` auswählen, nicht `main`.
+3. Pre-Release `v0.1.0-beta.15` auswählen, nicht `main`.
 4. Home Assistant nach der Installation manuell neu starten.
 5. Die Integration unter **Einstellungen → Geräte & Dienste** hinzufügen.
 
@@ -86,9 +84,9 @@ Die Summary Card zeigt aktuelle Reise, Status, Strecke, Fahrten, Stopps und
 Kosten. Die Manager Card verwaltet Reisen, Statuswechsel, Fahrtzuordnung und
 Kosten. Der visuelle Editor wählt bei genau einem Fahrzeug automatisch aus.
 
-Die vorbereitete Beta-15-Bundle-URL lautet: `/camper_travel_journal/camper-travel-journal.js?v=0.1.0-beta.15`.
+Die Beta-15-Bundle-URL lautet: `/camper_travel_journal/camper-travel-journal.js?v=0.1.0-beta.15`.
 
-### GPX-Import (Beta 15 vorbereitet)
+### GPX-Import (Beta 15)
 
 PAJ-GPX-1.1-Dateien können über **GPX importieren** in der Manager-Karte
 analysiert werden. Die Vorschau zeigt Abschnitte, Zeit, Kilometer, Dauer,
