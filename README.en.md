@@ -7,8 +7,9 @@ stored in an integration-owned SQLite database.
 
 ![Camper Travel Journal Logo](https://raw.githubusercontent.com/balronu/ha-camper-travel-journal/main/assets/branding/logo.png)
 
-> **Status:** `v0.1.0-beta.13` – currently published pre-release. It contains
-> the frontend hotfix for stale bundle registrations.
+> **Status:** `v0.1.0-beta.14` – prepared for the next pre-release, not yet
+> published. It contains localized calendar dates, read-only GPS collector
+> diagnostics and Home Assistant 2026.10 compatibility hardening.
 > validation on iOS/Safari and a productive HA installation remains open.
 
 ## Actual feature status
@@ -32,8 +33,9 @@ user feature.
 
 ## HACS installation
 
-The currently published and supported version is `v0.1.0-beta.13`. It has not
-been generally production-validated; Beta 11 remains available as a
+The currently published and supported version remains `v0.1.0-beta.13`; Beta 14
+is prepared but not yet published. It has not been generally production-
+validated; Beta 11 remains available as a
 historical release (`v0.1.0-beta.12`).
 
 For the currently published Beta 13:
@@ -83,7 +85,7 @@ The Summary Card shows the current trip, status, distance, drives, stops and
 costs. The Manager Card manages trips, status changes, drive assignment and
 expenses. The visual editor auto-selects the vehicle when exactly one exists.
 
-Published Beta 13 bundle URL: `/camper_travel_journal/camper-travel-journal.js?v=0.1.0-beta.13`.
+Prepared Beta 14 bundle URL: `/camper_travel_journal/camper-travel-journal.js?v=0.1.0-beta.14`.
 See [docs/frontend-cache.md](docs/frontend-cache.md).
 
 ## Trips, drives and stops

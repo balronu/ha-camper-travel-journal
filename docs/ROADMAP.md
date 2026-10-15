@@ -1,7 +1,7 @@
 # Camper Travel Journal – Roadmap
 
 This roadmap separates implemented work, current limitations and planned
-features. It is based on the published `v0.1.0-beta.13` source tree and tests.
+features. It is based on the prepared `v0.1.0-beta.14` source tree and tests.
 A database
 table or WebSocket method is not treated as a finished user feature
 without a corresponding UI and test path.
@@ -21,9 +21,10 @@ without a corresponding UI and test path.
 - Expense CRUD, integer-cent totals, mixed-currency protection, inline editing
   and canonical category IDs, including the `camping` round-trip.
 
-## Current published development baseline: `v0.1.0-beta.13`
+## Current prepared development baseline: `v0.1.0-beta.14`
 
-This is a published development beta, not a stable release. CI covers the
+This is a prepared development beta, not yet a published release and not a
+stable release. CI covers the
 pinned Home Assistant environment and synthetic/isolated data. Beta 12 adds
 trip periods, visible and assignable drives, manual-drive CRUD and atomic
 schema migration. Existing rows remain untouched until a user explicitly
@@ -38,6 +39,15 @@ migration is transactional and preserves existing GPS rows and trips without
 dates; no GPS timestamps are copied into a trip date automatically. Desktop
 Chromium/CI coverage is required; iOS, Safari/WebKit and production-dashboard
 practice remain open.
+
+## Beta 14 – date formatting and GPS collector diagnostics (prepared)
+
+`v0.1.0-beta.14` localizes calendar dates without timezone shifts and adds a
+read-only GPS collector diagnostic report with privacy-safe counters and
+rejection reasons. The collector handles unchanged `home` states with updated
+GPS attributes, accepts `gps_accuracy: 0`, survives HA restart registration and
+closes open drives safely across GPS gaps. HA-2026.10 callback registration is
+compatible. No production HA or stored travel data is changed.
 
 ## Beta 13 – frontend bundle registration hotfix (published)
 
