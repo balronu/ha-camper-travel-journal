@@ -67,6 +67,8 @@ describe("frontend release contract", () => {
     expect(messages({ locale: { language: "en-US" } } as any).editorChooseVehicle).toBe("Select camper");
     expect(messages({ locale: { language: "de-DE" } } as any).summaryChooseTrip).toBe("Reise auswählen");
     expect(messages({ locale: { language: "en-US" } } as any).summaryChooseTrip).toBe("Select trip");
+    expect(messages({ locale: { language: "de-DE" } } as any).start).toBe("Reise starten");
+    expect(messages({ locale: { language: "en-US" } } as any).start).toBe("Start trip");
   });
   it("translates the explicit GPX target controls", () => {
     expect(messages({ locale: { language: "de-DE" } } as any).gpxTargetTrip).toBe("Zielreise");

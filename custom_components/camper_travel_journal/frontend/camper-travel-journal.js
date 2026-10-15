@@ -554,6 +554,7 @@ const re = (s, e, t) => m(s, "camper_travel_journal/list", e, t ? { trip_id: t }
   drives: "Fahrten",
   stops: "Zwischenstopps",
   costs: "Kosten",
+  start: "Reise starten",
   resume: "Reise fortsetzen",
   pause: "Pausieren",
   complete: "Abschließen",
@@ -651,6 +652,7 @@ const re = (s, e, t) => m(s, "camper_travel_journal/list", e, t ? { trip_id: t }
   drives: "Drives",
   stops: "Stops",
   costs: "Costs",
+  start: "Start trip",
   resume: "Resume trip",
   pause: "Pause",
   complete: "Complete",
@@ -818,8 +820,10 @@ class Le extends F {
     try {
       const e = await re(this.hass, this.vehicleId);
       this.trips = e.trips;
-      const i = e.trips.find((r) => r.id === this.selectedTripId) ?? this.chooseDefaultTrip(e.trips);
-      return this.selectedTripId = i?.id ?? "", this.snapshot = i ? await re(this.hass, this.vehicleId, i.id) : e, this.loadError = "", !0;
+      const i = e.trips.find((n) => n.id === this.selectedTripId) ?? this.chooseDefaultTrip(e.trips);
+      this.selectedTripId = i?.id ?? "";
+      const r = i ? await re(this.hass, this.vehicleId, i.id) : e;
+      return this.snapshot = i ? { ...r, trips: [i] } : r, this.loadError = "", !0;
     } catch {
       return this.loadError = h(this.hass).loadError, !1;
     } finally {
@@ -842,7 +846,7 @@ class Le extends F {
     const e = h(this.hass), t = this.snapshot?.trips[0], i = this.trips, r = (this.snapshot?.drives ?? []).reduce((c, p) => c + p.distance_m, 0) / 1e3, n = this.snapshot?.expense_summary, o = n?.mixed_currency ? e.mixedCurrency : n?.total_minor !== void 0 && n.currency ? P(n.total_minor, n.currency, this.hass) : P(0, "EUR", this.hass), l = this.loadError || this.actionError, a = t ? B(t, this.hass) : "";
     return d`<ha-card><h2>${t?.title ?? e.title}</h2>${i.length ? d`<label class="trip-selector">${e.summaryChooseTrip}<select aria-label=${e.summaryTrip} @change=${(c) => {
       this.selectTrip(c.currentTarget.value);
-    }} ?disabled=${this.loading}>${i.map((c) => d`<option value=${c.id} ?selected=${c.id === this.selectedTripId}>${c.title} · ${j(c.status, this.hass)} · ${B(c, this.hass)}</option>`)}</select></label>` : ""}${l ? d`<p class="error" role="alert">${l}</p>` : t ? d`<p class="muted">${t.destination || e.noDestination} · ${j(t.status, this.hass)} · ${a}</p><div class="grid"><div class="metric"><span class="muted">${e.distance}</span><span class="value">${r.toFixed(1)} km</span></div><div class="metric"><span class="muted">${e.drives}</span><span class="value">${this.snapshot?.drives.length ?? 0}</span></div><div class="metric"><span class="muted">${e.stops}</span><span class="value">${this.snapshot?.stops.length ?? 0}</span></div><div class="metric"><span class="muted">${e.costs}</span><span class="value">${o}</span></div></div><div class="actions">${t.status === "planned" || t.status === "paused" ? d`<button @click=${() => this.setStatus("active")}>${e.resume}</button>` : ""}${t.status === "active" ? d`<button class="secondary" @click=${() => this.setStatus("paused")}>${e.pause}</button><button @click=${() => this.setStatus("completed")}>${e.complete}</button>` : ""}</div>` : d`<p class="muted">${e.noTrip}</p>`}${this.loading ? d`<p class="muted">${e.loading}</p>` : ""}</ha-card>`;
+    }} ?disabled=${this.loading}>${i.map((c) => d`<option value=${c.id} ?selected=${c.id === this.selectedTripId}>${c.title} · ${j(c.status, this.hass)} · ${B(c, this.hass)}</option>`)}</select></label>` : ""}${l ? d`<p class="error" role="alert">${l}</p>` : t ? d`<p class="muted">${t.destination || e.noDestination} · ${j(t.status, this.hass)} · ${a}</p><div class="grid"><div class="metric"><span class="muted">${e.distance}</span><span class="value">${r.toFixed(1)} km</span></div><div class="metric"><span class="muted">${e.drives}</span><span class="value">${this.snapshot?.drives.length ?? 0}</span></div><div class="metric"><span class="muted">${e.stops}</span><span class="value">${this.snapshot?.stops.length ?? 0}</span></div><div class="metric"><span class="muted">${e.costs}</span><span class="value">${o}</span></div></div><div class="actions">${t.status === "planned" ? d`<button @click=${() => this.setStatus("active")}>${e.start}</button>` : t.status === "paused" ? d`<button @click=${() => this.setStatus("active")}>${e.resume}</button>` : ""}${t.status === "active" ? d`<button class="secondary" @click=${() => this.setStatus("paused")}>${e.pause}</button><button @click=${() => this.setStatus("completed")}>${e.complete}</button>` : ""}</div>` : d`<p class="muted">${e.noTrip}</p>`}${this.loading ? d`<p class="muted">${e.loading}</p>` : ""}</ha-card>`;
   }
 }
 Le.styles = [F.styles, T`.trip-selector{display:grid;gap:4px;margin:12px 0;font-size:.9em}.trip-selector select{min-width:0;width:100%;box-sizing:border-box;padding:6px}`];
