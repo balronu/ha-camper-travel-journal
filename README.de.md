@@ -5,7 +5,7 @@
 
 **Dein digitales Wohnmobil-Reisetagebuch** für Home Assistant.
 
-`v0.1.0-beta.15` ist als Pre-Release veröffentlicht. Der Beta-15-Stand enthält GPS-Aufzeichnung,
+`v0.1.0-beta.17` ist als Pre-Release veröffentlicht. Der Beta-17-Stand enthält die explizite GPX-Zielreiseauswahl und GPS-Aufzeichnung,
 Reiseverwaltung, Kostenverwaltung, Summary Card und Manager Card. Die
 vollständige deutsche Dokumentation steht in [README.md](README.md); die
 englische Fassung ist [README.en.md](README.en.md).
@@ -16,7 +16,7 @@ Die Kostenkategorien verwenden kanonische interne IDs, und die Summary Card
 lädt nach erfolgreichen Kostenänderungen den aktuellen Backend-Stand neu.
 Der Details-Button der Manager Card ist ein echter Auf-/Zu-Umschalter.
 
-Aktuell veröffentlicht und unterstützt ist `v0.1.0-beta.15`. Die Version ist nicht allgemein produktiv validiert;
+Aktuell veröffentlicht und unterstützt ist `v0.1.0-beta.17`. Die Version ist nicht allgemein produktiv validiert;
 `v0.1.0-beta.12` bleibt als historischer
 Release verfügbar. Keine Installation, kein Reload
 und keine Änderung an VM 104, Proxmox, Recorder oder produktiven Dashboards

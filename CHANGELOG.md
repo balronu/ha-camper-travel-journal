@@ -2,6 +2,14 @@
 
 🇩🇪 Deutsch | 🇬🇧 [English](README.en.md)
 
+## 0.1.0-beta.17 – veröffentlicht
+
+- Ergänzt sichtbare Fahrzeugbindung und explizite Zielreiseauswahl im GPX-Import.
+- Ermöglicht freie Fahrten ohne Reise sowie den Wechsel der Auswahl nach der Vorschau.
+- Ergänzt Punkt-/Fahrt-/Kilometer-Zusammenfassung und eine Warnung bei abweichenden Reisezeiträumen.
+- Ersetzt technische GPX-Lückenmarker durch verständlichen Text und entfernt sichtbare Aufzählungspunkte.
+- Aktualisiert Manager- und Summary-Card nach erfolgreichem Import; Backend-Validierung, Duplikatschutz und atomarer Import bleiben unverändert.
+
 ## 0.1.0-beta.15 – veröffentlicht
 
 - Ergänzt sicheren, begrenzten GPX-1.1-Import für historische PAJ-Fahrten.

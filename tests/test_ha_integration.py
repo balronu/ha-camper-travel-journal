@@ -79,7 +79,7 @@ else:
         hass.http = Mock(async_register_static_paths=AsyncMock())
         stale_urls = {
             f"/camper_travel_journal/camper-travel-journal.js?v=0.1.0-beta.{version}"
-            for version in range(2, 15)
+            for version in range(2, 17)
         }
         for stale in stale_urls:
             add_extra_js_url(hass, stale)

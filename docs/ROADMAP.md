@@ -1,7 +1,7 @@
 # Camper Travel Journal – Roadmap
 
 This roadmap separates implemented work, current limitations and planned
-features. It is based on the released `v0.1.0-beta.15` source tree and tests.
+features. It is based on the released `v0.1.0-beta.17` source tree and tests.
 A database
 table or WebSocket method is not treated as a finished user feature
 without a corresponding UI and test path.
@@ -21,13 +21,23 @@ without a corresponding UI and test path.
 - Expense CRUD, integer-cent totals, mixed-currency protection, inline editing
   and canonical category IDs, including the `camping` round-trip.
 
-## Current pre-release baseline: `v0.1.0-beta.15`
+## Current pre-release baseline: `v0.1.0-beta.17`
 
 This is a published development beta, not a stable release. CI covers the
 pinned Home Assistant environment and synthetic/isolated data. Beta 12 adds
 trip periods, visible and assignable drives, manual-drive CRUD and atomic
 schema migration. Existing rows remain untouched until a user explicitly
 edits them.
+
+## Beta 17 – explicit GPX target selection (published)
+
+`v0.1.0-beta.17` makes the vehicle binding and target trip explicit in the
+GPX import dialog. An opened trip is only a visible preselection; the user can
+switch to another vehicle-bound trip or save the import as free drives. The
+dialog shows a point/drive/distance summary, warns about trip-period
+deviations, and refreshes the Manager and Summary cards after a successful
+import. Backend validation, duplicate protection and atomic import semantics
+remain unchanged.
 
 ## Beta 12 – travel periods and drives (published)
 
