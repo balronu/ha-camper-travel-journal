@@ -84,6 +84,14 @@ The Summary Card shows the current trip, status, distance, drives, stops and
 costs. The Manager Card manages trips, status changes, drive assignment and
 expenses. The visual editor auto-selects the vehicle when exactly one exists.
 
+The Summary Card defaults to an active trip. If several trips are active, it
+deterministically chooses the one with the latest `started_at` timestamp and,
+for ties, the lexicographically greatest ID. If no trip is active, the same
+rule is applied to all trips. The compact selector exposes planned, paused and
+completed trips for the configured vehicle; manual selection survives data
+refreshes and falls back to the default rule only when the selected trip no
+longer exists.
+
 Beta 15 bundle URL: `/camper_travel_journal/camper-travel-journal.js?v=0.1.0-beta.15`.
 
 ### GPX import (Beta 15)

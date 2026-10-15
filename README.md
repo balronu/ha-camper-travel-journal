@@ -84,6 +84,14 @@ Die Summary Card zeigt aktuelle Reise, Status, Strecke, Fahrten, Stopps und
 Kosten. Die Manager Card verwaltet Reisen, Statuswechsel, Fahrtzuordnung und
 Kosten. Der visuelle Editor wählt bei genau einem Fahrzeug automatisch aus.
 
+Die Summary Card wählt standardmäßig eine aktive Reise. Gibt es mehrere aktive
+Reisen, wird deterministisch die mit dem neuesten `started_at`-Zeitpunkt und
+bei Gleichstand die lexikografisch größte ID verwendet. Ohne aktive Reise gilt
+dieselbe Regel für alle Reisen. Über die kompakte Auswahl sind geplante,
+pausierte und abgeschlossene Reisen des konfigurierten Fahrzeugs auswählbar;
+die Auswahl bleibt bei Datenaktualisierungen erhalten und fällt nur bei einer
+nicht mehr vorhandenen Reise auf die Standardregel zurück.
+
 Die Beta-15-Bundle-URL lautet: `/camper_travel_journal/camper-travel-journal.js?v=0.1.0-beta.15`.
 
 ### GPX-Import (Beta 15)
