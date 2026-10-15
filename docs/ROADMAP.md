@@ -125,7 +125,7 @@ validation.
   immutable annotated tag and explicit release authorization.
 - Database-backend changes, destructive retention, migrations and Stable
   publication require separate explicit approval.
-## Beta 15 – GPX-Import historischer Fahrten (vorbereitet)
+## Historischer Beta-15-Stand – GPX-Import historischer Fahrten
 
 Die Beta-15-Entwicklung ergänzt einen begrenzten GPX-1.1-Parser für PAJ-Exporte,
 eine read-only Importvorschau und einen atomaren, idempotenten Import. GPS-

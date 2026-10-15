@@ -52,7 +52,7 @@ backed-up integration database; no destructive down-migration is attempted.
 
 All changes run through the serialized executor worker. A database newer than
 the supported version fails closed. No Recorder tables or migrations are
-touched, and retention remains non-destructive in this beta.
+touched, and retention remains non-destructive in this release.
 
 ## Schema versioning and recovery
 

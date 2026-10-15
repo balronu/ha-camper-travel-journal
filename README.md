@@ -6,9 +6,10 @@
 
 <h1 align="center">Camper Travel Journal</h1>
 <p align="center">Dein digitales Wohnmobil-Reisetagebuch für Home Assistant</p>
+<p align="center"><strong>Aktuelle stabile Version: v0.1.0</strong></p>
 
 <p align="center">
-  <a href="https://github.com/balronu/ha-camper-travel-journal/releases/latest"><img src="https://img.shields.io/github/v/release/balronu/ha-camper-travel-journal?include_prereleases&label=Release" alt="Release"></a>
+  <a href="https://github.com/balronu/ha-camper-travel-journal/releases/latest"><img src="https://img.shields.io/github/v/release/balronu/ha-camper-travel-journal?label=Release" alt="Release"></a>
   <a href="https://hacs.xyz/"><img src="https://img.shields.io/badge/HACS-Custom-orange" alt="HACS Custom Integration"></a>
   <a href="https://github.com/balronu/ha-camper-travel-journal/actions/workflows/tests.yml"><img src="https://img.shields.io/github/actions/workflow/status/balronu/ha-camper-travel-journal/tests.yml?label=CI" alt="CI"></a>
   <a href="https://github.com/balronu/ha-camper-travel-journal/actions/workflows/validate.yml"><img src="https://img.shields.io/github/actions/workflow/status/balronu/ha-camper-travel-journal/validate.yml?label=Hassfest%20%2F%20HACS" alt="Hassfest and HACS validation"></a>
@@ -25,9 +26,9 @@ Zwischenstopps und Kosten bleiben in einer eigenen lokalen SQLite-Datenbank.
 Die Integration ist für private Home-Assistant-Installationen ausgelegt und
 benötigt keinen externen Cloud-Dienst.
 
-Die aktuelle stabile Version ist `v0.1.0`. Die Integration ist weiterhin ein
-aktives Projekt; Praxisvalidierung auf verschiedenen mobilen Browsern und in
-unterschiedlichen Home-Assistant-Installationen bleibt wichtig.
+Die Integration ist weiterhin ein aktives Projekt; Praxisvalidierung auf
+verschiedenen mobilen Browsern und in unterschiedlichen Home-Assistant-
+Installationen bleibt wichtig.
 
 ## Funktionen
 
@@ -101,6 +102,16 @@ um freie Fahrten zu speichern. Reisezeitraumabweichungen warnen, blockieren den
 Import aber nicht. Erst die ausdrückliche Bestätigung schreibt atomar in die
 lokale Datenbank.
 
+## Praxiserprobte Abläufe
+
+Der Stable-Stand wurde mit einer realen PAJ-GPX-Datei praktisch geprüft: 903
+GPS-Punkte wurden in drei Fahrtabschnitte mit insgesamt rund 1.118,7 km
+aufbereitet. Die Fahrtenzuordnung zu einer Reise, Streckensummen und die
+Kostenverwaltung wurden dabei erfolgreich kontrolliert. Diese Ergebnisse
+belegen den geprüften Ablauf mit den verwendeten Daten; sie sind keine
+allgemeine Kompatibilitätszusage für jede Home-Assistant- oder
+Browser-Umgebung.
+
 ## Reise- und Kostenverwaltung
 
 Reisen können angelegt, bearbeitet, gestartet, pausiert und abgeschlossen
@@ -130,9 +141,8 @@ privaten Koordinaten, Tokens oder unredigierten Logs.
   Praxisvalidierung.
 
 Technische Hinweise zur versionierten Frontend-Auslieferung stehen in der
-[Frontend-Cache-Dokumentation](docs/frontend-cache.md). Historische
-Kompatibilitätsstände wie `0.1.0-beta.12` bleiben dort nachvollziehbar; die
-aktuelle Projektversion steht oben bei den Release-Badges.
+[Frontend-Cache-Dokumentation](docs/frontend-cache.md); die aktuelle
+Projektversion steht oben bei den Release-Badges.
 
 ## Roadmap
 

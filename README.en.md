@@ -6,9 +6,10 @@
 
 <h1 align="center">Camper Travel Journal</h1>
 <p align="center">Your digital camper travel journal for Home Assistant</p>
+<p align="center"><strong>Current stable version: v0.1.0</strong></p>
 
 <p align="center">
-  <a href="https://github.com/balronu/ha-camper-travel-journal/releases/latest"><img src="https://img.shields.io/github/v/release/balronu/ha-camper-travel-journal?include_prereleases&label=Release" alt="Release"></a>
+  <a href="https://github.com/balronu/ha-camper-travel-journal/releases/latest"><img src="https://img.shields.io/github/v/release/balronu/ha-camper-travel-journal?label=Release" alt="Release"></a>
   <a href="https://hacs.xyz/"><img src="https://img.shields.io/badge/HACS-Custom-orange" alt="HACS Custom Integration"></a>
   <a href="https://github.com/balronu/ha-camper-travel-journal/actions/workflows/tests.yml"><img src="https://img.shields.io/github/actions/workflow/status/balronu/ha-camper-travel-journal/tests.yml?label=CI" alt="CI"></a>
   <a href="https://github.com/balronu/ha-camper-travel-journal/actions/workflows/validate.yml"><img src="https://img.shields.io/github/actions/workflow/status/balronu/ha-camper-travel-journal/validate.yml?label=Hassfest%20%2F%20HACS" alt="Hassfest and HACS validation"></a>
@@ -24,9 +25,8 @@ in Home Assistant. GPS points, detected drives, trips, stops and expenses are
 stored in an integration-owned local SQLite database. No external cloud service
 is required.
 
-The current stable version is `v0.1.0`. The project is still actively evolving;
-practical validation on different mobile browsers and Home Assistant setups is
-important.
+The project is still actively evolving; practical validation on different
+mobile browsers and Home Assistant setups is important.
 
 ## Features
 
@@ -97,6 +97,15 @@ the target trip can be selected or left empty to save free drives. Trip-period
 differences produce warnings but do not block the import. Only explicit
 confirmation writes atomically to the local database.
 
+## Practically validated workflows
+
+The stable release was practically checked with a real PAJ GPX file: 903 GPS
+points were processed into three drive sections covering about 1,118.7 km.
+Drive assignment to a trip, distance totals and expense management were
+successfully verified. These results document the tested workflow with the
+data used; they are not a general compatibility promise for every Home
+Assistant or browser environment.
+
 ## Trip and expense management
 
 Trips can be created, edited, started, paused and completed. Detected drives can
@@ -123,9 +132,8 @@ issues or tests.
   validation.
 
 Technical details about versioned frontend delivery are documented in the
-[frontend cache documentation](docs/frontend-cache.md). Historical
-compatibility states such as `0.1.0-beta.12` remain documented there; the
-current project version is shown by the release badges above.
+[frontend cache documentation](docs/frontend-cache.md); the current project
+version is shown by the release badges above.
 
 ## Roadmap
 

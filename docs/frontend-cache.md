@@ -88,7 +88,8 @@ Gates erforderlich:
 4. isolierte HA-Fixture für Registrierung ohne Duplikate,
 5. Browser-Tests für Update/Reload, iOS/WebKit und Windows Chromium.
 
-Die Browser- und echte Dashboard-Verifikation bleibt für diese Beta offen;
+Die Browser- und echte Dashboard-Verifikation außerhalb der geprüften
+Chromium-Harnesses bleibt für den Stable-Stand umgebungsabhängig;
 die statische Registrierung, Versionskennung und idempotente Elementdefinition
 sowie der Editor-Vertrag sind durch Code- und CI-Tests abgesichert. Der
 Release-Build muss zusätzlich bytegenau dem eingecheckten Bundle entsprechen;
