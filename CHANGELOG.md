@@ -2,6 +2,18 @@
 
 🇩🇪 Deutsch | 🇬🇧 [English](README.en.md)
 
+## 0.1.0 – veröffentlicht
+
+- Stabilisiert die Summary Card: Titel, Ziel, Zeitraum, Status, Kennzahlen und
+  Aktionen stammen immer aus derselben ausgewählten Reise.
+- Bevorzugt aktive Reisen und bewahrt eine manuelle Reiseauswahl bei Refresh.
+- Enthält die explizite GPX-Zielreiseauswahl, freie Fahrten und die sichere
+  historische GPX-Importkette aus den Betas.
+- Modernisiert die deutschsprachige Projektdokumentation und ergänzt die
+  vollständige englische README.
+- Keine automatische Änderung bestehender Reisen, Fahrten, Kosten oder
+  produktiver Home-Assistant-Daten.
+
 ## 0.1.0-beta.18 – veröffentlicht
 
 - Bevorzugt in der Summary Card deterministisch eine aktive Reise vor

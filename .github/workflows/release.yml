@@ -1,10 +1,10 @@
-name: Beta Release
+name: Stable Release
 
 on:
   workflow_dispatch:
     inputs:
       tag:
-        description: "Existing tested tag, for example v0.1.0-beta.18"
+        description: "Existing tested stable tag, for example v0.1.0"
         required: true
         type: string
 
@@ -18,9 +18,9 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - name: Require beta tag
-        run: test "${{ inputs.tag }}" = "v0.1.0-beta.18"
-      - name: Create GitHub prerelease
+      - name: Require stable tag
+        run: test "${{ inputs.tag }}" = "v0.1.0"
+      - name: Create GitHub stable release
         env:
           GH_TOKEN: ${{ github.token }}
-        run: gh release create "${{ inputs.tag }}" --repo "${{ github.repository }}" --prerelease --title "Camper Travel Journal ${{ inputs.tag }}" --notes-file docs/releases/RELEASE_NOTES_v0.1.0-beta.18.md
+        run: gh release create "${{ inputs.tag }}" --repo "${{ github.repository }}" --title "Camper Travel Journal ${{ inputs.tag }}" --notes-file docs/releases/RELEASE_NOTES_v0.1.0.md
