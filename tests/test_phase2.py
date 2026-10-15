@@ -7,7 +7,7 @@ from pathlib import Path
 
 from custom_components.camper_travel_journal.models import Drive, Expense, Stop
 from custom_components.camper_travel_journal.storage import SQLiteStore
-from custom_components.camper_travel_journal.travel import EXPENSE_CATEGORIES, validate_transition
+from custom_components.camper_travel_journal.travel import EXPENSE_CATEGORIES, EXPENSE_CATEGORY_IDS, validate_transition
 
 UTC = timezone.utc
 
@@ -87,7 +87,8 @@ class Phase2Tests(unittest.TestCase):
     def test_expense_categories_amounts_and_edits_round_trip_without_migration(self):
         trip_id = self.store.create_trip("v1", "Kostenprüfung", self.now, self.now)
         created = []
-        for index, category in enumerate(sorted(EXPENSE_CATEGORIES)):
+        self.assertEqual(set(EXPENSE_CATEGORY_IDS), EXPENSE_CATEGORIES)
+        for index, category in enumerate(EXPENSE_CATEGORY_IDS):
             created.append(self.store.create_expense(Expense("", trip_id, self.now, category, index + 1, "eur"), self.now))
         rows = self.store.list_expenses(trip_id)
         self.assertEqual({row["category"] for row in rows}, set(EXPENSE_CATEGORIES))

@@ -1,9 +1,8 @@
 import { css, html } from "lit";
 import { TravelCard, defineOnce } from "./base-card";
 import { createExpense, createTrip, deleteExpense, deleteTrip, linkDrives, list, transition, unlinkDrive, updateExpense, updateTrip, type Expense, type Snapshot } from "./api";
-import { categoryLabel, EXPENSE_CATEGORIES, formatDate, formatMoneyMinor, messages, parseAmountMinor, statusLabel } from "./i18n";
-
-type ExpenseCategory = typeof EXPENSE_CATEGORIES[number];
+import { notifyExpensesChanged } from "./expense-events";
+import { categoryLabel, EXPENSE_CATEGORIES, formatDate, formatMoneyMinor, isExpenseCategory, messages, parseAmountMinor, statusLabel, type ExpenseCategory } from "./i18n";
 
 export class ManagerCard extends TravelCard {
   private snapshot?: Snapshot;
@@ -12,7 +11,7 @@ export class ManagerCard extends TravelCard {
   private tripTitle = "";
   private destination = "";
   private amount = "";
-  private category: ExpenseCategory = "other";
+  private category: ExpenseCategory = EXPENSE_CATEGORIES[0];
   private selected = "";
   private editingExpenseId = "";
   private editingAmount = "";
@@ -23,19 +22,49 @@ export class ManagerCard extends TravelCard {
   protected onHassConnectionChanged() { void this.refresh(); }
   protected onConfigChanged() { void this.refresh(); }
 
-  private async refresh() {
-    if (!this.hass || !this.vehicleId) return;
+  private async refresh(): Promise<boolean> {
+    if (!this.hass || !this.vehicleId) return false;
     try {
       this.snapshot = await list(this.hass, this.vehicleId, this.selected || undefined);
       this.loadError = "";
       this.requestUpdate();
+      return true;
     } catch {
       this.loadError = messages(this.hass).loadError;
       this.requestUpdate();
+      return false;
     }
   }
 
   private fail(message: string) { this.actionError = message; this.requestUpdate(); }
+
+  private setExpenseAmount(value: string) {
+    this.amount = value;
+    this.requestUpdate();
+  }
+
+  private setEditingExpenseAmount(value: string) {
+    this.editingAmount = value;
+    this.requestUpdate();
+  }
+
+  private setExpenseCategory(value: string) {
+    if (!isExpenseCategory(value)) {
+      this.fail(messages(this.hass).categoryInvalid);
+      return;
+    }
+    this.category = value;
+    this.requestUpdate();
+  }
+
+  private setEditingExpenseCategory(value: string) {
+    if (!isExpenseCategory(value)) {
+      this.fail(messages(this.hass).categoryInvalid);
+      return;
+    }
+    this.editingCategory = value;
+    this.requestUpdate();
+  }
 
   private async addTrip() {
     if (!this.hass || !this.tripTitle.trim()) return;
@@ -80,6 +109,16 @@ export class ManagerCard extends TravelCard {
     catch { this.fail(messages(this.hass).driveAssignError); }
   }
 
+  private toggleTripDetails(tripId: string) {
+    if (this.selected === tripId) {
+      this.selected = "";
+      this.requestUpdate();
+      return;
+    }
+    this.selected = tripId;
+    void this.refresh();
+  }
+
   private async addExpense(tripId: string) {
     if (!this.hass) return;
     const lang = messages(this.hass);
@@ -88,8 +127,10 @@ export class ManagerCard extends TravelCard {
     try {
       await createExpense(this.hass, this.vehicleId, tripId, { occurred_at: new Date().toISOString(), category: this.category, amount_minor: amountMinor, currency: "EUR" });
       this.actionError = "";
-      this.amount = "";
-      await this.refresh();
+      if (await this.refresh()) {
+        this.amount = "";
+        notifyExpensesChanged({ vehicleId: this.vehicleId, tripId });
+      }
     } catch { this.fail(lang.expenseCreateError); }
   }
 
@@ -119,8 +160,10 @@ export class ManagerCard extends TravelCard {
     try {
       await updateExpense(this.hass, this.vehicleId, expense.id, { amount_minor: amountMinor, category: this.editingCategory });
       this.actionError = "";
-      this.cancelExpenseEdit();
-      await this.refresh();
+      if (await this.refresh()) {
+        this.cancelExpenseEdit();
+        notifyExpensesChanged({ vehicleId: this.vehicleId, tripId: expense.trip_id ?? this.selected });
+      }
     } catch { this.fail(lang.expenseEditError); }
     finally { this.expenseSavingId = ""; this.requestUpdate(); }
   }
@@ -130,7 +173,7 @@ export class ManagerCard extends TravelCard {
     const lang = messages(this.hass);
     if (!window.confirm(lang.expenseDeleteConfirm)) return;
     this.expenseSavingId = id;
-    try { await deleteExpense(this.hass, this.vehicleId, id); this.actionError = ""; await this.refresh(); }
+    try { await deleteExpense(this.hass, this.vehicleId, id); this.actionError = ""; if (await this.refresh()) notifyExpensesChanged({ vehicleId: this.vehicleId, tripId: this.selected }); }
     catch { this.fail(lang.expenseDeleteError); }
     finally { this.expenseSavingId = ""; this.requestUpdate(); }
   }
@@ -146,10 +189,10 @@ export class ManagerCard extends TravelCard {
     const saving = this.expenseSavingId === expense.id;
     return html`<div class="expense-row">
       ${editing ? html`<form class="expense-form" @submit=${(event: SubmitEvent) => { event.preventDefault(); void this.saveExpense(expense); }}>
-        <select aria-label=${lang.category} .value=${this.editingCategory} @change=${(event: Event) => this.editingCategory = (event.target as HTMLSelectElement).value}>
+        <select aria-label=${lang.category} .value=${this.editingCategory} @change=${(event: Event) => this.setEditingExpenseCategory((event.currentTarget as HTMLSelectElement).value)}>
           ${this.categoryOptions(this.editingCategory).map((item) => html`<option value=${item}>${categoryLabel(item, this.hass)}</option>`)}
         </select>
-        <input aria-label=${lang.amount} type="number" min="0" step="0.01" inputmode="decimal" .value=${this.editingAmount} @input=${(event: InputEvent) => this.editingAmount = (event.target as HTMLInputElement).value}>
+        <input aria-label=${lang.amount} type="number" min="0" step="0.01" inputmode="decimal" .value=${this.editingAmount} @input=${(event: InputEvent) => this.setEditingExpenseAmount((event.currentTarget as HTMLInputElement).value)}>
         <div class="actions"><button type="submit" ?disabled=${saving}>${saving ? lang.saving : lang.save}</button><button type="button" class="secondary" @click=${() => this.cancelExpenseEdit()} ?disabled=${saving}>${lang.cancel}</button></div>
       </form>` : html`<span>${categoryLabel(expense.category, this.hass)}: ${formatMoneyMinor(expense.amount_minor, expense.currency, this.hass)}</span>
         <span class="actions"><button type="button" class="link" @click=${() => this.startExpenseEdit(expense)} ?disabled=${Boolean(this.expenseSavingId)}>${lang.edit}</button><button type="button" class="link" @click=${() => this.removeExpense(expense.id)} ?disabled=${Boolean(this.expenseSavingId)}>${lang.remove}</button></span>`}
@@ -163,7 +206,7 @@ export class ManagerCard extends TravelCard {
     const summary = this.snapshot?.expense_summary;
     const total = summary?.mixed_currency ? lang.mixedCurrency : summary?.total_minor !== undefined && summary.currency ? formatMoneyMinor(summary.total_minor, summary.currency, this.hass) : formatMoneyMinor(0, "EUR", this.hass);
     const error = this.loadError || this.actionError;
-    return html`<ha-card><h2>${lang.manager}</h2>${error ? html`<p class="error" role="alert">${error}</p>` : ""}<section><h3>${lang.newTrip}</h3><div class="actions"><input aria-label=${lang.tripName} placeholder=${lang.tripName} .value=${this.tripTitle} @input=${(event: InputEvent) => this.tripTitle = (event.target as HTMLInputElement).value}><input aria-label=${lang.destination} placeholder=${lang.destination} .value=${this.destination} @input=${(event: InputEvent) => this.destination = (event.target as HTMLInputElement).value}><button type="button" @click=${() => this.addTrip()}>${lang.create}</button></div></section><section><h3>${lang.trips}</h3>${trips.length ? trips.map((trip) => html`<article class="trip"><div class="row"><strong>${trip.title}</strong><span class="muted">${trip.destination || ""} · ${statusLabel(trip.status, this.hass)}</span></div><div class="actions"><button type="button" class="secondary" @click=${() => this.editTrip(trip)}>${lang.edit}</button><button type="button" class="secondary" @click=${() => this.removeTrip(trip.id)}>${lang.remove}</button>${trip.status === "planned" || trip.status === "paused" ? html`<button type="button" @click=${() => this.changeStatus(trip.id, "active")}>${lang.resume}</button>` : ""}${trip.status === "active" ? html`<button type="button" class="secondary" @click=${() => this.changeStatus(trip.id, "paused")}>${lang.pause}</button><button type="button" @click=${() => this.changeStatus(trip.id, "completed")}>${lang.complete}</button>` : ""}<button type="button" class="secondary" @click=${() => { this.selected = trip.id; void this.refresh(); }}>${lang.details}</button></div>${this.selected === trip.id ? html`<div class="details"><h4>${lang.assignedDrives}</h4>${(this.snapshot?.drives ?? []).map((drive) => html`<div class="row"><span>${formatDate(drive.started_at, this.hass)} · ${(drive.distance_m / 1000).toFixed(1)} km</span>${drive.trip_id === trip.id ? html`<button type="button" class="link" @click=${() => this.hass && unlinkDrive(this.hass, this.vehicleId, trip.id, drive.id).then(() => this.refresh())}>${lang.unassign}</button>` : ""}</div>`)}${(this.snapshot?.available_drives ?? []).length ? html`<h4>${lang.freeDrives}</h4>${this.snapshot?.available_drives?.map((drive) => html`<div class="row"><span>${formatDate(drive.started_at, this.hass)} · ${(drive.distance_m / 1000).toFixed(1)} km</span><button type="button" class="link" @click=${() => this.assignDrive(trip.id, drive.id)}>${lang.assign}</button></div>`)}` : ""}<h4>${lang.expenses}</h4><div class="expense-form create-form"><input aria-label=${lang.amount} type="number" min="0" step="0.01" inputmode="decimal" placeholder="EUR" .value=${this.amount} @input=${(event: InputEvent) => this.amount = (event.target as HTMLInputElement).value}><select aria-label=${lang.category} .value=${this.category} @change=${(event: Event) => this.category = (event.target as HTMLSelectElement).value as ExpenseCategory}>${EXPENSE_CATEGORIES.map((item) => html`<option value=${item}>${categoryLabel(item, this.hass)}</option>`)}</select><button type="button" @click=${() => this.addExpense(trip.id)}>${lang.save}</button></div>${expenses.map((expense) => this.renderExpense(expense, lang))}<p class="total"><strong>${lang.total}: ${total}</strong></p></div>` : ""}</article>`) : html`<p class="muted">${lang.noTrip}</p>`}</section></ha-card>`;
+    return html`<ha-card><h2>${lang.manager}</h2>${error ? html`<p class="error" role="alert">${error}</p>` : ""}<section><h3>${lang.newTrip}</h3><div class="actions"><input aria-label=${lang.tripName} placeholder=${lang.tripName} .value=${this.tripTitle} @input=${(event: InputEvent) => this.tripTitle = (event.target as HTMLInputElement).value}><input aria-label=${lang.destination} placeholder=${lang.destination} .value=${this.destination} @input=${(event: InputEvent) => this.destination = (event.target as HTMLInputElement).value}><button type="button" @click=${() => this.addTrip()}>${lang.create}</button></div></section><section><h3>${lang.trips}</h3>${trips.length ? trips.map((trip) => html`<article class="trip"><div class="row"><strong>${trip.title}</strong><span class="muted">${trip.destination || ""} · ${statusLabel(trip.status, this.hass)}</span></div><div class="actions"><button type="button" class="secondary" @click=${() => this.editTrip(trip)}>${lang.edit}</button><button type="button" class="secondary" @click=${() => this.removeTrip(trip.id)}>${lang.remove}</button>${trip.status === "planned" || trip.status === "paused" ? html`<button type="button" @click=${() => this.changeStatus(trip.id, "active")}>${lang.resume}</button>` : ""}${trip.status === "active" ? html`<button type="button" class="secondary" @click=${() => this.changeStatus(trip.id, "paused")}>${lang.pause}</button><button type="button" @click=${() => this.changeStatus(trip.id, "completed")}>${lang.complete}</button>` : ""}<button type="button" class="secondary" @click=${() => this.toggleTripDetails(trip.id)}>${this.selected === trip.id ? lang.close : lang.details}</button></div>${this.selected === trip.id ? html`<div class="details"><h4>${lang.assignedDrives}</h4>${(this.snapshot?.drives ?? []).map((drive) => html`<div class="row"><span>${formatDate(drive.started_at, this.hass)} · ${(drive.distance_m / 1000).toFixed(1)} km</span>${drive.trip_id === trip.id ? html`<button type="button" class="link" @click=${() => this.hass && unlinkDrive(this.hass, this.vehicleId, trip.id, drive.id).then(() => this.refresh())}>${lang.unassign}</button>` : ""}</div>`)}${(this.snapshot?.available_drives ?? []).length ? html`<h4>${lang.freeDrives}</h4>${this.snapshot?.available_drives?.map((drive) => html`<div class="row"><span>${formatDate(drive.started_at, this.hass)} · ${(drive.distance_m / 1000).toFixed(1)} km}</span><button type="button" class="link" @click=${() => this.assignDrive(trip.id, drive.id)}>${lang.assign}</button></div>`)}` : ""}<h4>${lang.expenses}</h4><div class="expense-form create-form"><input aria-label=${lang.amount} type="number" min="0" step="0.01" inputmode="decimal" placeholder="EUR" .value=${this.amount} @input=${(event: InputEvent) => this.setExpenseAmount((event.currentTarget as HTMLInputElement).value)}><select aria-label=${lang.category} .value=${this.category} @change=${(event: Event) => this.setExpenseCategory((event.currentTarget as HTMLSelectElement).value)}>${EXPENSE_CATEGORIES.map((item) => html`<option value=${item}>${categoryLabel(item, this.hass)}</option>`)}</select><button type="button" @click=${() => this.addExpense(trip.id)}>${lang.save}</button></div>${expenses.map((expense) => this.renderExpense(expense, lang))}<p class="total"><strong>${lang.total}: ${total}</strong></p></div>` : ""}</article>`) : html`<p class="muted">${lang.noTrip}</p>`}</section></ha-card>`;
   }
 }
 

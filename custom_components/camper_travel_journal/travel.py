@@ -13,7 +13,8 @@ class TripStatus(StrEnum):
     COMPLETED = "completed"
 
 
-EXPENSE_CATEGORIES = frozenset({"camping", "fuel", "toll", "parking", "food", "activities", "other"})
+EXPENSE_CATEGORY_IDS = ("camping", "fuel", "toll", "parking", "food", "activities", "other")
+EXPENSE_CATEGORIES = frozenset(EXPENSE_CATEGORY_IDS)
 EXPENSE_CURRENCY_PATTERN = re.compile(r"^[A-Z]{3}$")
 
 

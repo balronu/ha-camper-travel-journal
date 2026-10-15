@@ -1,0 +1,86 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>Camper Travel Journal expense category test</title>
+<div id="summary-host"></div>
+<div id="host"></div>
+<pre id="result">starting</pre>
+<script type="module">
+const result = document.querySelector("#result");
+let createdCategory = null;
+let listCalls = 0;
+let summaryListCalls = 0;
+const trip = { id: "trip-1", title: "Kostenprüfung", description: "", destination: "Bremen", status: "active", started_at: "2026-10-01T12:00:00Z" };
+const secondTrip = { id: "trip-2", title: "Zweite Reise", description: "", destination: "Kiel", status: "planned", started_at: "2026-10-02T12:00:00Z" };
+const connection = {
+  async sendMessagePromise(message) {
+    if (message.type === "camper_travel_journal/list") {
+      listCalls += 1;
+      if (message.trip_id) summaryListCalls += 1;
+      return { trips: [trip, secondTrip], drives: [], stops: [], expenses: message.trip_id === trip.id ? [{ id: "expense-1", trip_id: trip.id, category: "camping", amount_minor: 2300, currency: "EUR", occurred_at: trip.started_at }] : [], expense_summary: { total_minor: message.trip_id === trip.id ? 2300 : 0, currency: "EUR", mixed_currency: false } };
+    }
+    if (message.type === "camper_travel_journal/create_expense") {
+      createdCategory = message.category;
+      return { expense_id: "expense-new" };
+    }
+    throw new Error(`unexpected command ${message.type}`);
+  },
+};
+const hass = { connection, locale: { language: "de-DE" } };
+await import("/custom_components/camper_travel_journal/frontend/camper-travel-journal.js");
+await customElements.whenDefined("camper-travel-journal-summary-card");
+await customElements.whenDefined("camper-travel-journal-manager-card");
+const summary = document.createElement("camper-travel-journal-summary-card");
+summary.setConfig({ vehicle_id: "entry-wohnmobil" });
+document.querySelector("#summary-host").append(summary);
+summary.hass = hass;
+await new Promise((resolve) => setTimeout(resolve, 80));
+const manager = document.createElement("camper-travel-journal-manager-card");
+manager.setConfig({ vehicle_id: "entry-wohnmobil" });
+document.querySelector("#host").append(manager);
+manager.hass = hass;
+await new Promise((resolve) => setTimeout(resolve, 60));
+const details = [...manager.shadowRoot.querySelectorAll("button")].find((button) => button.textContent.trim() === "Details");
+details?.click();
+await new Promise((resolve) => setTimeout(resolve, 60));
+const select = manager.shadowRoot.querySelector(".create-form select");
+const initialSelectValue = select?.value ?? null;
+await manager.updateComplete;
+const amount = manager.shadowRoot.querySelector(".create-form input");
+amount.value = "23.00";
+amount.dispatchEvent(new InputEvent("input", { bubbles: true }));
+await manager.updateComplete;
+manager.shadowRoot.querySelector(".create-form button")?.click();
+await new Promise((resolve) => setTimeout(resolve, 120));
+await new Promise((resolve) => setTimeout(resolve, 120));
+const managerCategoryLabel = manager.shadowRoot.textContent.includes("Stellplatz/Campingplatz");
+const managerTotal = manager.shadowRoot.textContent.includes("23,00");
+const closeAfterSave = [...manager.shadowRoot.querySelectorAll("button")].find((button) => button.textContent.trim() === "Schließen");
+closeAfterSave?.click();
+await manager.updateComplete;
+const closedAfterSave = !manager.shadowRoot.querySelector(".details");
+const reopen = [...manager.shadowRoot.querySelectorAll("button")].find((button) => button.textContent.trim() === "Details");
+reopen?.click();
+await new Promise((resolve) => setTimeout(resolve, 60));
+const reopened = Boolean(manager.shadowRoot.querySelector(".details"));
+const secondDetails = [...manager.shadowRoot.querySelectorAll("button")].find((button) => button.textContent.trim() === "Details");
+secondDetails?.click();
+await new Promise((resolve) => setTimeout(resolve, 60));
+const switchedTrip = manager.shadowRoot.querySelectorAll(".details").length === 1;
+const closeSecond = [...manager.shadowRoot.querySelectorAll("button")].find((button) => button.textContent.trim() === "Schließen");
+closeSecond?.click();
+await manager.updateComplete;
+const closedSecond = !manager.shadowRoot.querySelector(".details");
+result.textContent = JSON.stringify({
+  createdCategory,
+  initialSelectValue,
+  listCalls,
+  categoryLabel: managerCategoryLabel,
+  total: managerTotal,
+  summaryTotal: summary.shadowRoot.textContent.includes("23,00"),
+  summaryListCalls,
+  closedAfterSave,
+  reopened,
+  switchedTrip,
+  closedSecond,
+}, null, 2);
+</script>
