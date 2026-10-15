@@ -54,7 +54,9 @@ def _send_error(connection, msg: dict, error: Exception) -> None:
 
 
 if websocket_api is not None:
-    _base = {vol.Required("type"): str, vol.Required("vehicle_id"): str}
+    def _base(command: str) -> dict:
+        """Build a command schema with an exact websocket command name."""
+        return {vol.Required("type"): command, vol.Required("vehicle_id"): str}
 
     @websocket_api.websocket_command({vol.Required("type"): "camper_travel_journal/list_vehicles"})
     @websocket_api.async_response
@@ -71,7 +73,7 @@ if websocket_api is not None:
             })
         connection.send_result(msg["id"], {"vehicles": sorted(vehicles, key=lambda item: item["name"].lower())})
 
-    @websocket_api.websocket_command({**_base, vol.Optional("trip_id"): str})
+    @websocket_api.websocket_command({**_base("camper_travel_journal/list"), vol.Optional("trip_id"): str})
     @websocket_api.async_response
     async def ws_list(hass: HomeAssistant, connection, msg: dict) -> None:
         try:
@@ -89,7 +91,7 @@ if websocket_api is not None:
         except Exception as err:  # API boundary must not expose tracebacks
             _send_error(connection, msg, err)
 
-    @websocket_api.websocket_command({**_base, vol.Required("title"): str, vol.Optional("description", default=""): str, vol.Optional("destination", default=""): str, vol.Required("started_at"): str})
+    @websocket_api.websocket_command({**_base("camper_travel_journal/create_trip"), vol.Required("title"): str, vol.Optional("description", default=""): str, vol.Optional("destination", default=""): str, vol.Required("started_at"): str})
     @websocket_api.async_response
     async def ws_create_trip(hass, connection, msg):
         try:
@@ -99,7 +101,7 @@ if websocket_api is not None:
             connection.send_result(msg["id"], {"trip_id": result})
         except Exception as err: _send_error(connection, msg, err)
 
-    @websocket_api.websocket_command({**_base, vol.Required("trip_id"): str, vol.Optional("title"): str, vol.Optional("description"): str, vol.Optional("destination"): str, vol.Optional("started_at"): str})
+    @websocket_api.websocket_command({**_base("camper_travel_journal/update_trip"), vol.Required("trip_id"): str, vol.Optional("title"): str, vol.Optional("description"): str, vol.Optional("destination"): str, vol.Optional("started_at"): str})
     @websocket_api.async_response
     async def ws_update_trip(hass, connection, msg):
         try:
@@ -110,7 +112,7 @@ if websocket_api is not None:
             connection.send_result(msg["id"], {"success": True})
         except Exception as err: _send_error(connection, msg, err)
 
-    @websocket_api.websocket_command({**_base, vol.Required("trip_id"): str})
+    @websocket_api.websocket_command({**_base("camper_travel_journal/delete_trip"), vol.Required("trip_id"): str})
     @websocket_api.async_response
     async def ws_delete_trip(hass, connection, msg):
         try:
@@ -118,7 +120,7 @@ if websocket_api is not None:
             connection.send_result(msg["id"], {"success": True})
         except Exception as err: _send_error(connection, msg, err)
 
-    @websocket_api.websocket_command({**_base, vol.Required("trip_id"): str, vol.Required("status"): str})
+    @websocket_api.websocket_command({**_base("camper_travel_journal/transition_trip"), vol.Required("trip_id"): str, vol.Required("status"): str})
     @websocket_api.async_response
     async def ws_transition_trip(hass, connection, msg):
         try:
@@ -131,7 +133,7 @@ if websocket_api is not None:
             connection.send_result(msg["id"], {"success": True})
         except Exception as err: _send_error(connection, msg, err)
 
-    @websocket_api.websocket_command({**_base, vol.Required("trip_id"): str, vol.Required("drive_ids"): [str]})
+    @websocket_api.websocket_command({**_base("camper_travel_journal/link_drives"), vol.Required("trip_id"): str, vol.Required("drive_ids"): [str]})
     @websocket_api.async_response
     async def ws_link_drives(hass, connection, msg):
         try:
@@ -139,7 +141,7 @@ if websocket_api is not None:
             connection.send_result(msg["id"], {"success": True})
         except Exception as err: _send_error(connection, msg, err)
 
-    @websocket_api.websocket_command({**_base, vol.Required("trip_id"): str, vol.Required("drive_id"): str})
+    @websocket_api.websocket_command({**_base("camper_travel_journal/unlink_drive"), vol.Required("trip_id"): str, vol.Required("drive_id"): str})
     @websocket_api.async_response
     async def ws_unlink_drive(hass, connection, msg):
         try:
@@ -147,7 +149,7 @@ if websocket_api is not None:
             connection.send_result(msg["id"], {"success": True})
         except Exception as err: _send_error(connection, msg, err)
 
-    @websocket_api.websocket_command({**_base, vol.Required("trip_id"): str, vol.Required("occurred_at"): str, vol.Optional("name", default=""): str, vol.Optional("category", default="other"): str, vol.Optional("latitude"): vol.Coerce(float), vol.Optional("longitude"): vol.Coerce(float)})
+    @websocket_api.websocket_command({**_base("camper_travel_journal/create_stop"), vol.Required("trip_id"): str, vol.Required("occurred_at"): str, vol.Optional("name", default=""): str, vol.Optional("category", default="other"): str, vol.Optional("latitude"): vol.Coerce(float), vol.Optional("longitude"): vol.Coerce(float)})
     @websocket_api.async_response
     async def ws_create_stop(hass, connection, msg):
         try:
@@ -156,7 +158,7 @@ if websocket_api is not None:
             connection.send_result(msg["id"], {"stop_id": result})
         except Exception as err: _send_error(connection, msg, err)
 
-    @websocket_api.websocket_command({**_base, vol.Required("stop_id"): str, vol.Optional("name"): str, vol.Optional("occurred_at"): str, vol.Optional("category"): str, vol.Optional("description"): str, vol.Optional("latitude"): vol.Coerce(float), vol.Optional("longitude"): vol.Coerce(float)})
+    @websocket_api.websocket_command({**_base("camper_travel_journal/update_stop"), vol.Required("stop_id"): str, vol.Optional("name"): str, vol.Optional("occurred_at"): str, vol.Optional("category"): str, vol.Optional("description"): str, vol.Optional("latitude"): vol.Coerce(float), vol.Optional("longitude"): vol.Coerce(float)})
     @websocket_api.async_response
     async def ws_update_stop(hass, connection, msg):
         try:
@@ -167,7 +169,7 @@ if websocket_api is not None:
             connection.send_result(msg["id"], {"success": True})
         except Exception as err: _send_error(connection, msg, err)
 
-    @websocket_api.websocket_command({**_base, vol.Required("stop_id"): str})
+    @websocket_api.websocket_command({**_base("camper_travel_journal/delete_stop"), vol.Required("stop_id"): str})
     @websocket_api.async_response
     async def ws_delete_stop(hass, connection, msg):
         try:
@@ -175,7 +177,7 @@ if websocket_api is not None:
             connection.send_result(msg["id"], {"success": True})
         except Exception as err: _send_error(connection, msg, err)
 
-    @websocket_api.websocket_command({**_base, vol.Required("trip_id"): str, vol.Required("occurred_at"): str, vol.Required("category"): str, vol.Required("amount_minor"): vol.Coerce(int), vol.Optional("currency", default="EUR"): str, vol.Optional("note"): str, vol.Optional("odometer_km"): vol.Coerce(float)})
+    @websocket_api.websocket_command({**_base("camper_travel_journal/create_expense"), vol.Required("trip_id"): str, vol.Required("occurred_at"): str, vol.Required("category"): str, vol.Required("amount_minor"): vol.Coerce(int), vol.Optional("currency", default="EUR"): str, vol.Optional("note"): str, vol.Optional("odometer_km"): vol.Coerce(float)})
     @websocket_api.async_response
     async def ws_create_expense(hass, connection, msg):
         try:
@@ -184,7 +186,7 @@ if websocket_api is not None:
             connection.send_result(msg["id"], {"expense_id": result})
         except Exception as err: _send_error(connection, msg, err)
 
-    @websocket_api.websocket_command({**_base, vol.Required("expense_id"): str, vol.Optional("occurred_at"): str, vol.Optional("category"): str, vol.Optional("amount_minor"): vol.Coerce(int), vol.Optional("currency"): str, vol.Optional("note"): str, vol.Optional("odometer_km"): vol.Coerce(float)})
+    @websocket_api.websocket_command({**_base("camper_travel_journal/update_expense"), vol.Required("expense_id"): str, vol.Optional("occurred_at"): str, vol.Optional("category"): str, vol.Optional("amount_minor"): vol.Coerce(int), vol.Optional("currency"): str, vol.Optional("note"): str, vol.Optional("odometer_km"): vol.Coerce(float)})
     @websocket_api.async_response
     async def ws_update_expense(hass, connection, msg):
         try:
@@ -196,7 +198,7 @@ if websocket_api is not None:
             connection.send_result(msg["id"], {"success": True})
         except Exception as err: _send_error(connection, msg, err)
 
-    @websocket_api.websocket_command({**_base, vol.Required("expense_id"): str})
+    @websocket_api.websocket_command({**_base("camper_travel_journal/delete_expense"), vol.Required("expense_id"): str})
     @websocket_api.async_response
     async def ws_delete_expense(hass, connection, msg):
         try:

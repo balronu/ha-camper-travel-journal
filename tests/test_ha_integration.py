@@ -61,3 +61,48 @@ else:
         await hass.async_block_till_done()
         assert await hass.config_entries.async_unload(entry.entry_id)
         assert entry.entry_id not in hass.data[DOMAIN]
+
+    async def test_websocket_commands_are_registered_after_entry_setup(
+        hass: HomeAssistant, hass_ws_client, enable_custom_integrations
+    ):
+        """A loaded config entry must expose the read/write command registry."""
+        tracker = "device_tracker.websocket_registry"
+        hass.states.async_set(tracker, "home", {"latitude": 49.0, "longitude": 7.0, "gps_accuracy": 5})
+        entry = MockConfigEntry(domain=DOMAIN, data=_data(tracker))
+        entry.add_to_hass(hass)
+
+        assert await hass.config_entries.async_setup(entry.entry_id)
+        await hass.async_block_till_done()
+
+        client = await hass_ws_client(hass)
+        await client.send_json({"id": 1, "type": "camper_travel_journal/list_vehicles"})
+        vehicles = await client.receive_json()
+        assert vehicles["success"] is True
+        assert vehicles["result"]["vehicles"][0]["vehicle_id"] == entry.entry_id
+
+        await client.send_json({"id": 2, "type": "camper_travel_journal/list", "vehicle_id": entry.entry_id})
+        listed = await client.receive_json()
+        assert listed["success"] is True
+        assert set(listed["result"]) == {"trips", "drives", "stops"}
+
+        # All write handlers are checked through the same registration list;
+        # this test deliberately does not invoke a mutating command.
+        from custom_components.camper_travel_journal import api
+
+        assert [command._ws_command for command in api.COMMANDS] == [
+            "camper_travel_journal/list_vehicles",
+            "camper_travel_journal/list",
+            "camper_travel_journal/create_trip",
+            "camper_travel_journal/update_trip",
+            "camper_travel_journal/delete_trip",
+            "camper_travel_journal/transition_trip",
+            "camper_travel_journal/link_drives",
+            "camper_travel_journal/unlink_drive",
+            "camper_travel_journal/create_stop",
+            "camper_travel_journal/update_stop",
+            "camper_travel_journal/delete_stop",
+            "camper_travel_journal/create_expense",
+            "camper_travel_journal/update_expense",
+            "camper_travel_journal/delete_expense",
+        ]
+        assert await hass.config_entries.async_unload(entry.entry_id)
