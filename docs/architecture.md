@@ -1,4 +1,4 @@
-# Architecture – implemented Beta-10 boundary
+# Architecture – implemented Stable v0.1.0 boundary
 
 This document describes the current implementation, not a proposal for
 features that are only planned.
@@ -47,7 +47,8 @@ state on startup, and closes both listeners and the worker on unload.
 
 - No map renderer, statistics view, export path or Lovelace stop editor exists.
 - There is no manual drive creation form; drives originate in GPS detection.
-- Retention only computes candidates. It does not delete data in this beta.
+- Retention only computes candidates. It does not delete data automatically in
+  this release.
 - The integration-owned SQLite file is separate from HA Recorder/MariaDB.
   Replacing it is a future technical investigation, not an implemented option.
 - Existing expense categories are not migrated or automatically recategorized.

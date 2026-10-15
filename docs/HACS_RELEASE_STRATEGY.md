@@ -76,9 +76,10 @@ verschoben werden.
 
 ### Stable
 
-Erst nach produktiver Validierung wird `v0.1.0` veröffentlicht. Dafür müssen
-Release-Notes, HACS-Versionsanzeige, Bundle-Version und der Tag konsistent sein.
-Der Beta-Tag bleibt als historische Rollback-Referenz bestehen.
+`v0.1.0` ist als Stable veröffentlicht. Release-Notes, HACS-Versionsanzeige,
+Bundle-Version und der annotierte Tag sind konsistent. Die Beta-Tags bleiben
+als historische Rollback-Referenzen bestehen; ihre GitHub-Release-Objekte sind
+nicht mehr Teil der sichtbaren Release-Liste.
 
 ### Rollback
 
@@ -115,12 +116,11 @@ Brands-Proxy-Ankündigung keine neuen Custom-Integration-PRs mehr. Eine solche
 Einreichung wird daher nicht vorbereitet oder abgesendet. Die lokale Datei ist
 die unterstützte Lösung; ein HACS-Platzhalter ist davon unabhängig.
 
-## Freigaben, die ausdrücklich erforderlich bleiben
+## Freigaben und unveränderliche Historie
 
-- Löschen der GitHub-Releases `v0.1.0-beta.1` bis `v0.1.0-beta.8`.
 - Löschen, Verschieben oder Überschreiben irgendeines Git-Tags.
 - Einreichen eines PR im offiziellen Brands-Repository.
-- Veröffentlichung einer neuen Beta oder von `v0.1.0`.
+- Veröffentlichung einer neuen Beta oder eines neuen Stable-Releases.
 - Änderungen an HACS-internen Speicherdateien, Home Assistant, VM 104,
   Datenbank, Reisen, Dashboard, Proxy oder Netzwerk.
 
@@ -129,4 +129,4 @@ die unterstützte Lösung; ein HACS-Platzhalter ist davon unabhängig.
 - [HACS 2.0.5 Repository- und Update-Logik](https://github.com/hacs/integration/tree/2.0.5/custom_components/hacs)
 - [Home Assistant: lokale Brand-Bilder und Brands Proxy API](https://developers.home-assistant.io/blog/2026/02/24/brands-proxy-api/)
 - [Home Assistant Brands README und Bildanforderungen](https://github.com/home-assistant/brands#readme)
-- [Aktuelle Beta-Releases](https://github.com/balronu/ha-camper-travel-journal/releases)
+- [Aktuelle Releases](https://github.com/balronu/ha-camper-travel-journal/releases)

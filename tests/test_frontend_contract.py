@@ -32,7 +32,9 @@ def test_frontend_contract_is_linked_from_both_primary_readmes():
 def test_release_version_is_aligned_across_project_and_readmes():
     assert 'version = "0.1.0"' in (ROOT / "pyproject.toml").read_text(encoding="utf-8")
     for name in ("README.md", "README.de.md", "README.en.md"):
-        assert "0.1.0-beta.12" in (ROOT / name).read_text(encoding="utf-8")
+        text = (ROOT / name).read_text(encoding="utf-8")
+        assert "v0.1.0" in text
+        assert "beta." not in text
 
 
 def test_local_home_assistant_brand_asset_is_present():
