@@ -16,9 +16,8 @@ Die Kostenkategorien verwenden kanonische interne IDs, und die Summary Card
 lädt nach erfolgreichen Kostenänderungen den aktuellen Backend-Stand neu.
 Der Details-Button der Manager Card ist ein echter Auf-/Zu-Umschalter.
 
-Aktuell veröffentlicht und unterstützt ist `v0.1.0-beta.10`; `v0.1.0-beta.11`
-ist vorbereitet, aber noch nicht veröffentlicht. Die Beta ist noch nicht
-produktiv validiert. Keine Installation, kein Reload
+Aktuell veröffentlicht und unterstützt ist `v0.1.0-beta.11`. Die Beta ist noch
+nicht allgemein produktiv validiert. Keine Installation, kein Reload
 und keine Änderung an VM 104, Proxmox, Recorder oder produktiven Dashboards
 ist Bestandteil dieses Releases.
 
