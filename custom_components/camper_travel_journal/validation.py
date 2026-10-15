@@ -64,10 +64,17 @@ def validate_point(point: GPSPoint, previous: GPSPoint | None = None, max_speed_
 
 def should_store_point(previous: GPSPoint | None, current: GPSPoint, min_interval_s: int = 30, min_movement_m: float = 25.0) -> bool:
     """Apply filtering with an adaptive significant-movement path."""
+    return point_filter_reason(previous, current, min_interval_s, min_movement_m) is None
+
+
+def point_filter_reason(previous: GPSPoint | None, current: GPSPoint, min_interval_s: int = 30, min_movement_m: float = 25.0) -> str | None:
+    """Return a privacy-safe reason when a valid point is not stored."""
     if previous is None:
-        return True
+        return None
     elapsed = (ensure_aware_utc(current.recorded_at) - ensure_aware_utc(previous.recorded_at)).total_seconds()
     if elapsed < min_interval_s:
-        return False
+        return "time_filter"
     distance = haversine_m(previous.latitude, previous.longitude, current.latitude, current.longitude)
-    return (elapsed >= min_interval_s and distance >= min_movement_m) or distance >= max(4 * min_movement_m, 100.0)
+    if distance >= max(4 * min_movement_m, 100.0):
+        return None
+    return None if distance >= min_movement_m else "movement_filter"

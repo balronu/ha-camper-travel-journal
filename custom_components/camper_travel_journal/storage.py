@@ -199,6 +199,16 @@ class SQLiteStore:
         ).fetchall()
         return list(reversed(rows))
 
+    def diagnostic_counts(self, vehicle_id: str) -> dict[str, int]:
+        """Return aggregate counts only; never expose stored coordinates."""
+        if self.connection is None:
+            raise RuntimeError("store is not open")
+        return {
+            "gps_points": self.connection.execute("SELECT count(*) FROM gps_points WHERE vehicle_id=?", (vehicle_id,)).fetchone()[0],
+            "drives": self.connection.execute("SELECT count(*) FROM drives WHERE vehicle_id=?", (vehicle_id,)).fetchone()[0],
+            "trips": self.connection.execute("SELECT count(*) FROM trips WHERE vehicle_id=?", (vehicle_id,)).fetchone()[0],
+        }
+
     def insert_vehicle(self, vehicle_id: str, name: str, tracker_entity_id: str, now: datetime) -> None:
         with self.transaction() as connection:
             stamp = utc_iso(now)

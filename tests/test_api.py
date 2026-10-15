@@ -58,6 +58,9 @@ class FakeHass:
             "values": {"vehicle_name": "Wohnmobil"},
             "entry": type("Entry", (), {"title": "Camper Travel Journal"})(),
         })()
+        async def async_diagnostics():
+            return {"active": True, "tracker_entity": "device_tracker.synthetic", "stored_counts": {"gps_points": 1, "drives": 0}}
+        runtime.async_diagnostics = async_diagnostics
         self.data = {"camper_travel_journal": {"v1": runtime}}
 
     def async_create_background_task(self, coroutine, *_args, **_kwargs):
@@ -113,6 +116,15 @@ async def test_list_command_returns_separate_domains():
     await api.ws_list.__wrapped__(hass, connection, {"id": 2, "vehicle_id": "v1", "trip_id": "t1"})
     assert connection.results[0][1]["trips"][0]["id"] == "t1"
     assert "expenses" in connection.results[0][1]
+
+
+@pytest.mark.asyncio
+async def test_diagnostics_command_is_read_only_and_returns_health_payload():
+    hass = FakeHass()
+    connection = FakeConnection()
+    await api.ws_diagnostics.__wrapped__(hass, connection, {"id": 21, "vehicle_id": "v1"})
+    assert connection.errors == []
+    assert connection.results == [(21, {"active": True, "tracker_entity": "device_tracker.synthetic", "stored_counts": {"gps_points": 1, "drives": 0}})]
 
 
 @pytest.mark.asyncio

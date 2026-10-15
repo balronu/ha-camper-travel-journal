@@ -103,6 +103,32 @@ class Phase1BTests(unittest.TestCase):
             self.assertGreaterEqual(collector.stats.rejected_jump, 1)
         asyncio.run(run())
 
+    def test_accuracy_zero_is_valid_and_diagnostics_explain_filters(self):
+        async def run():
+            collector = GPSCollector(None, {"v1": {"min_interval": 30, "min_movement": 25}}, dry_run=True)
+            start = datetime(2026, 1, 1, tzinfo=UTC)
+            await collector.async_process_event("v1", "home", {"latitude": 49, "longitude": 7, "gps_accuracy": 0, "timestamp": start})
+            await collector.async_process_event("v1", "home", {"latitude": 49, "longitude": 7, "gps_accuracy": 0, "timestamp": start + timedelta(seconds=10)})
+            report = collector.diagnostics("v1")
+            self.assertEqual(report["accepted_points"], 1)
+            self.assertEqual(report["discard_reasons"]["time_filter"], 1)
+            self.assertEqual(report["last_accepted_point_at"], start.isoformat())
+        asyncio.run(run())
+
+    def test_gap_finishes_open_drive_without_airline_distance(self):
+        async def run():
+            collector = GPSCollector(None, {"v1": {"max_gap": 10}}, dry_run=True)
+            start = datetime(2026, 1, 1, tzinfo=UTC)
+            for offset, longitude in ((0, 7.0), (30, 7.001), (60, 7.002)):
+                await collector.async_process_event("v1", "home", {"latitude": 49, "longitude": longitude, "timestamp": start + timedelta(seconds=offset)})
+            await collector.async_process_event("v1", "home", {"latitude": 49, "longitude": 7.003, "timestamp": start + timedelta(minutes=30)})
+            report = collector.diagnostics("v1")
+            self.assertGreaterEqual(collector.stats.gps_gaps, 1)
+            self.assertEqual(collector.stats.stops, 1)
+            self.assertLess(collector.stats.distance_m, 200)
+            self.assertEqual(report["drive_state"], "gps_gap")
+        asyncio.run(run())
+
     def test_retention_dry_run_does_not_delete(self):
         with tempfile.TemporaryDirectory() as directory:
             store = SQLiteStore(Path(directory) / "journal.db")
