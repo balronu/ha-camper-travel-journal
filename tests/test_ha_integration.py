@@ -78,8 +78,8 @@ else:
         hass.data[DATA_EXTRA_MODULE_URL] = UrlManager(lambda *_args: None, [])
         hass.http = Mock(async_register_static_paths=AsyncMock())
         stale_urls = {
-            "/camper_travel_journal/camper-travel-journal.js?v=0.1.0-beta.12",
-            "/camper_travel_journal/camper-travel-journal.js?v=0.1.0-beta.13",
+            f"/camper_travel_journal/camper-travel-journal.js?v=0.1.0-beta.{version}"
+            for version in range(2, 15)
         }
         for stale in stale_urls:
             add_extra_js_url(hass, stale)
@@ -95,6 +95,13 @@ else:
         assert FRONTEND_URL in urls
         assert stale_urls.isdisjoint(urls)
         assert not any(url.startswith("/camper_travel_journal/camper-travel-journal.js?v=") and url != FRONTEND_URL for url in urls)
+
+        # A second setup must perform the same cleanup, not merely short-circuit
+        # because the static path was already registered.
+        for stale in stale_urls:
+            add_extra_js_url(hass, stale)
+        assert await camper_travel_journal.async_setup(hass, {})
+        assert stale_urls.isdisjoint(hass.data[DATA_EXTRA_MODULE_URL].urls)
         assert await hass.config_entries.async_unload(entry.entry_id)
 
     async def test_websocket_commands_are_registered_after_entry_setup(

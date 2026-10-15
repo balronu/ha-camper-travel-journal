@@ -27,7 +27,7 @@ jobs:
         run: git diff --check
       - name: Build and test frontend
         working-directory: frontend
-        run: npm ci && npm run build && npm test
+        run: npm ci && npm run build && cd .. && git diff --exit-code -- custom_components/camper_travel_journal/frontend/camper-travel-journal.js && cd frontend && npm test
       - name: Run Chromium lifecycle regression
         run: |
           python3 -m http.server 8765 --bind 127.0.0.1 >/tmp/camper-travel-journal-http.log 2>&1 &
