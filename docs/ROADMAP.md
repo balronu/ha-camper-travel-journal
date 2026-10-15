@@ -1,7 +1,7 @@
 # Camper Travel Journal – Roadmap
 
 This roadmap separates implemented work, current limitations and planned
-features. It is based on the released `v0.1.0-beta.15` source tree and tests.
+features. It is based on the released `v0.1.0-beta.16` source tree and tests.
 A database
 table or WebSocket method is not treated as a finished user feature
 without a corresponding UI and test path.
@@ -21,7 +21,7 @@ without a corresponding UI and test path.
 - Expense CRUD, integer-cent totals, mixed-currency protection, inline editing
   and canonical category IDs, including the `camping` round-trip.
 
-## Current pre-release baseline: `v0.1.0-beta.15`
+## Current pre-release baseline: `v0.1.0-beta.16`
 
 This is a published development beta, not a stable release. CI covers the
 pinned Home Assistant environment and synthetic/isolated data. Beta 12 adds

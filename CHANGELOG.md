@@ -2,6 +2,13 @@
 
 🇩🇪 Deutsch | 🇬🇧 [English](README.en.md)
 
+## 0.1.0-beta.16 – veröffentlicht
+
+- Behebt den nicht build-konsistenten Beta-15-Frontend-Artefaktzustand.
+- Prüft in CI bytegenau, dass das eingecheckte Bundle dem reproduzierbaren Build entspricht.
+- Bereinigt historische Beta-2–15-Extra-JS-URLs idempotent und verwendet Cache-Busting für Beta 16.
+- Bewahrt GPX-Analyse und den ausdrücklich bestätigten, atomaren Import unverändert.
+
 ## 0.1.0-beta.15 – veröffentlicht
 
 - Ergänzt sicheren, begrenzten GPX-1.1-Import für historische PAJ-Fahrten.

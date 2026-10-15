@@ -1150,10 +1150,10 @@ function Ct(s) {
 }
 async function kt(s, e, t = xt) {
   const i = { state: "not_run", durationMs: null };
-  if (!s?.connection) return { version: "0.1.0-beta.15", connectionBefore: "unavailable", connectionAfter: "unavailable", authentication: i, vehicles: i, trips: i, vehicleId: W(e) };
+  if (!s?.connection) return { version: "0.1.0-beta.16", connectionBefore: "unavailable", connectionAfter: "unavailable", authentication: i, vehicles: i, trips: i, vehicleId: W(e) };
   const r = Ee(s), n = await X(s, { type: "auth/current_user" }, St, t), o = await X(s, { type: "camper_travel_journal/list_vehicles" }, At, t), d = o.value?.vehicles?.filter((Ne) => typeof Ne.vehicle_id == "string") ?? [], a = d.length === 1 ? d[0].vehicle_id : void 0, p = await X(s, { type: "camper_travel_journal/list", vehicle_id: a ?? e }, Ct, t), { value: u, ...v } = n, { value: $, ...D } = o, { value: Lt, ...Re } = p;
   return {
-    version: "0.1.0-beta.15",
+    version: "0.1.0-beta.16",
     connectionBefore: r,
     connectionAfter: Ee(s),
     authentication: v,
