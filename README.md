@@ -129,6 +129,11 @@ privaten Koordinaten, Tokens oder unredigierten Logs.
 - Mobile Safari/WebKit und produktive Installationen benötigen weiterhin
   Praxisvalidierung.
 
+Technische Hinweise zur versionierten Frontend-Auslieferung stehen in der
+[Frontend-Cache-Dokumentation](docs/frontend-cache.md). Historische
+Kompatibilitätsstände wie `0.1.0-beta.12` bleiben dort nachvollziehbar; die
+aktuelle Projektversion steht oben bei den Release-Badges.
+
 ## Roadmap
 
 Die statusgetrennte Roadmap steht in [docs/ROADMAP.md](docs/ROADMAP.md).

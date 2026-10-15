@@ -122,6 +122,11 @@ issues or tests.
 - Mobile Safari/WebKit and productive installations still need practical
   validation.
 
+Technical details about versioned frontend delivery are documented in the
+[frontend cache documentation](docs/frontend-cache.md). Historical
+compatibility states such as `0.1.0-beta.12` remain documented there; the
+current project version is shown by the release badges above.
+
 ## Roadmap
 
 See the status-separated [docs/ROADMAP.md](docs/ROADMAP.md). Planned work
