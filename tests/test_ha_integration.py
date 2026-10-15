@@ -77,8 +77,12 @@ else:
 
         hass.data[DATA_EXTRA_MODULE_URL] = UrlManager(lambda *_args: None, [])
         hass.http = Mock(async_register_static_paths=AsyncMock())
-        stale = "/camper_travel_journal/camper-travel-journal.js?v=0.1.0-beta.12"
-        add_extra_js_url(hass, stale)
+        stale_urls = {
+            "/camper_travel_journal/camper-travel-journal.js?v=0.1.0-beta.12",
+            "/camper_travel_journal/camper-travel-journal.js?v=0.1.0-beta.13",
+        }
+        for stale in stale_urls:
+            add_extra_js_url(hass, stale)
         assert await camper_travel_journal.async_setup(hass, {})
         tracker = "device_tracker.frontend_bundle"
         hass.states.async_set(tracker, "home", {"latitude": 49.0, "longitude": 7.0, "gps_accuracy": 5})
@@ -89,7 +93,7 @@ else:
         await hass.async_block_till_done()
         urls = hass.data[DATA_EXTRA_MODULE_URL].urls
         assert FRONTEND_URL in urls
-        assert stale not in urls
+        assert stale_urls.isdisjoint(urls)
         assert not any(url.startswith("/camper_travel_journal/camper-travel-journal.js?v=") and url != FRONTEND_URL for url in urls)
         assert await hass.config_entries.async_unload(entry.entry_id)
 
