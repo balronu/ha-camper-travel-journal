@@ -1,6 +1,6 @@
 # Lovelace-Frontend- und Cache-Standard
 
-Beta 18 enthält die Bereinigung aller seit Beta 2 bekannten historischen
+Der Stable-Stand enthält die Bereinigung aller seit Beta 2 bekannten historischen
 Camper-Bundle-URLs, bevor die aktuelle URL registriert wird. Diese Bereinigung
 wird bei jedem Domain- und Entry-Setup idempotent ausgeführt; dadurch bleiben
 nach wiederholten HACS-Updates nicht mehrere Beta-Module als Extra-Module
@@ -8,10 +8,12 @@ aktiv. Die versionierte URL bleibt für Browser-Cache-Busting erhalten.
 
 ## Aktueller Stand
 
-Der veröffentlichte Stand `v0.1.0-beta.18` enthält die Phase-3-Lovelace-Karten
+Der veröffentlichte Stand `v0.1.0` enthält die Phase-3-Lovelace-Karten
 und die GPX-Importvorschau,
 die optionale read-only-Diagnosekarte und registriert das Bundle
-über den öffentlichen HA-Mechanismus. Der historische Tag `v0.1.0-beta.1`
+über den öffentlichen HA-Mechanismus. Der vorherige historische Stand
+`v0.1.0-beta.18` bleibt als Release-Dokument erhalten; der noch ältere Tag
+`v0.1.0-beta.1`
 enthielt **keine** Lovelace-Karte.
 
 ## Bundle- und Cache-Vertrag
@@ -22,7 +24,7 @@ Resource-URL folgt dann
 diesem Muster:
 
 ```text
-/camper_travel_journal/camper-travel-journal.js?v=0.1.0-beta.18
+/camper_travel_journal/camper-travel-journal.js?v=0.1.0
 ```
 
 `<VERSION>` wird bei jeder Bundle-Änderung erhöht, auch zwischen stabilen

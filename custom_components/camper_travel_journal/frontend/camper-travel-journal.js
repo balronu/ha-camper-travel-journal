@@ -1222,10 +1222,10 @@ function At(s) {
 }
 async function Tt(s, e, t = Et) {
   const i = { state: "not_run", durationMs: null };
-  if (!s?.connection) return { version: "0.1.0-beta.18", connectionBefore: "unavailable", connectionAfter: "unavailable", authentication: i, vehicles: i, trips: i, vehicleId: Q(e) };
+  if (!s?.connection) return { version: "0.1.0", connectionBefore: "unavailable", connectionAfter: "unavailable", authentication: i, vehicles: i, trips: i, vehicleId: Q(e) };
   const r = we(s), n = await ee(s, { type: "auth/current_user" }, St, t), o = await ee(s, { type: "camper_travel_journal/list_vehicles" }, Ct, t), l = o.value?.vehicles?.filter((Oe) => typeof Oe.vehicle_id == "string") ?? [], a = l.length === 1 ? l[0].vehicle_id : void 0, p = await ee(s, { type: "camper_travel_journal/list", vehicle_id: a ?? e }, At, t), { value: u, ...v } = n, { value: f, ...w } = o, { value: Rt, ...Ne } = p;
   return {
-    version: "0.1.0-beta.18",
+    version: "0.1.0",
     connectionBefore: r,
     connectionAfter: we(s),
     authentication: v,

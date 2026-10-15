@@ -1,7 +1,7 @@
 # Camper Travel Journal – Roadmap
 
 This roadmap separates implemented work, current limitations and planned
-features. It is based on the released `v0.1.0-beta.18` source tree and tests.
+features. It is based on the released `v0.1.0` source tree and tests.
 A database
 table or WebSocket method is not treated as a finished user feature
 without a corresponding UI and test path.
@@ -21,11 +21,10 @@ without a corresponding UI and test path.
 - Expense CRUD, integer-cent totals, mixed-currency protection, inline editing
   and canonical category IDs, including the `camping` round-trip.
 
-## Current pre-release baseline: `v0.1.0-beta.18`
+## Current stable baseline: `v0.1.0`
 
-This is a published development beta, not a stable release. Beta 18 adds
-deterministic active-trip selection and persistent Summary Card trip selection.
-CI covers the
+The stable baseline includes deterministic active-trip selection, persistent
+Summary Card trip selection and the documented GPX import workflow. CI covers the
 pinned Home Assistant environment and synthetic/isolated data. Beta 12 adds
 trip periods, visible and assignable drives, manual-drive CRUD and atomic
 schema migration. Existing rows remain untouched until a user explicitly
@@ -100,11 +99,12 @@ the separate SQLite database. A separate spike must cover Recorder
 compatibility, custom tables, migration, concurrency, backup/restore,
 retention and performance. Documentation must not present this as decided.
 
-## `v1.0.0` – stable release gate
+## `v1.0.0` – future stable release gate
 
-Stable publication requires successful CI/Hassfest/HACS validation, complete
-user-facing travel and expense workflows, backup/restore evidence, mobile and
-desktop acceptance, and sufficient practical Home Assistant validation.
+The next major release requires successful CI/Hassfest/HACS validation,
+complete user-facing travel and expense workflows, backup/restore evidence,
+mobile and desktop acceptance, and sufficient practical Home Assistant
+validation.
 
 ## Evidence boundaries
 
