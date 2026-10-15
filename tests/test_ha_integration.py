@@ -64,11 +64,11 @@ else:
 
     async def test_setup_replaces_stale_frontend_bundle_urls(hass: HomeAssistant, enable_custom_integrations):
         """Only the current versioned card bundle remains registered after setup."""
-        from homeassistant.components import frontend
         from homeassistant.components.frontend import DATA_EXTRA_MODULE_URL, add_extra_js_url
+        from homeassistant.components.frontend import UrlManager
         from custom_components.camper_travel_journal.const import FRONTEND_URL
 
-        assert await frontend.async_setup(hass, {})
+        hass.data[DATA_EXTRA_MODULE_URL] = UrlManager(lambda *_args: None, [])
         stale = "/camper_travel_journal/camper-travel-journal.js?v=0.1.0-beta.12"
         add_extra_js_url(hass, stale)
         tracker = "device_tracker.frontend_bundle"
