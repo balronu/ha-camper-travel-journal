@@ -103,7 +103,7 @@ jobs:
           server_pid=$!
           trap 'kill "$server_pid"' EXIT
           sleep 0.3
-          chromium --headless --no-sandbox --disable-gpu --virtual-time-budget=5000 \
+          chromium --headless --no-sandbox --disable-gpu --virtual-time-budget=20000 \
             --dump-dom http://127.0.0.1:8765/frontend/tests/browser/gpx-import.html >/tmp/camper-travel-journal-gpx-dom.html
           node - <<'NODE'
           const fs = require('fs');
