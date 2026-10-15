@@ -1,52 +1,65 @@
-# Architecture proposal
+# Architecture – implemented Beta-10 boundary
 
-## Phase 2 travel API and cards
+This document describes the current implementation, not a proposal for
+features that are only planned.
 
-The backend remains the single source of truth. `api.py` exposes authenticated
-Home Assistant WebSocket commands for listing data, creating trips/stops/
-expenses, changing trip status and linking drives. Input is validated before
-the repository operation runs in the SQLite worker; the browser never opens
-the database.
+## Runtime flow
 
-`frontend/src/api.ts` is shared by the compact summary card and the manager
-card. Both custom elements are registered idempotently and served from the
-versioned static resource configured by `__init__.py`. The example dashboard
-view under `docs/examples/` is intentionally not applied to production.
+```text
+Home Assistant device_tracker state event
+        │
+        ▼
+Runtime → GPSCollector → validation/detector → AsyncSQLiteWorker
+                                      │
+                                      ▼
+                             drives / stays / points
 
-## Runtime boundary
+Lovelace cards → authenticated HA WebSocket API → same worker/database
+```
 
-`GPS Collector` receives state-change events for configured tracker entities.
-The future adapter should use `async_track_state_change_event` for ordinary
-state/attribute changes and evaluate whether a narrowly filtered
-`state_reported` listener is needed for attribute-only updates. The latter is
-high-volume and must never be subscribed globally.
+Recording is opt-in in the Config-/Options Flow. `Runtime` installs a state
+listener only when recording is enabled, restores a bounded recent point tail,
+and closes the listener and worker on unload.
 
-The collector normalizes timestamps to UTC, validates coordinates, rejects
-impossible jumps, applies the 30-second/25-metre filter, and sends accepted
-points to a single serialized storage worker. The detector consumes the same
-validated stream but never infers distance across a GPS gap.
+## Implemented components
 
-`Travel Manager` and `Expense Manager` are independent consumers of stored
-drives and do not change collector semantics. Their operations are exposed
-through the authenticated WebSocket API and remain backed by the same
-integration-owned schema.
+1. **Config-/Options-Flow** validates the selected `device_tracker` and exposes
+   recording thresholds for each vehicle entry.
+2. **GPS Collector and detector** normalize timestamps, validate coordinates,
+   reject duplicates and implausible jumps, apply movement/time filters and
+   protect against distance across a GPS gap.
+3. **SQLite worker** serializes blocking SQLite calls outside the HA event loop.
+   Schema 4 contains vehicles, points, drives, stays, trips, trip-drive links,
+   stops and expenses.
+4. **WebSocket API** registers 14 authenticated commands during both domain and
+   config-entry setup. Exact literal command schemas are used. Read commands
+   return trip, drive, stop and (for a selected trip) expense data.
+5. **Lovelace cards** are the Summary Card and Manager Card. The Manager Card
+   handles trip lifecycle, drive assignment and expense CRUD. The diagnostic
+   card is manual and read-only.
 
-## Components
+## Deliberate boundaries
 
-1. GPS Collector: HA event subscription, normalization and back-pressure.
-2. GPS Validation: coordinate/time/jump checks (`validation.py`).
-3. Trip Detector: conservative drive state machine (`detector.py`).
-4. Route Storage: SQLite repository (`storage.py`) behind an executor boundary.
-5. Retention Manager: eligibility decisions only; deletion requires a later
-   explicit, transactional job and is disabled in Phase 1C.
-6. Travel/Expense Managers: validated repository operations and beta UI/API.
-7. HA API/WebSocket and Lovelace UI: implemented for the beta cards; map/export
-   features remain future work.
+- No map renderer, statistics view, export path or Lovelace stop editor exists.
+- There is no manual drive creation form; drives originate in GPS detection.
+- Retention only computes candidates. It does not delete data in this beta.
+- The integration-owned SQLite file is separate from HA Recorder/MariaDB.
+  Replacing it is a future technical investigation, not an implemented option.
+- Existing expense categories are not migrated or automatically recategorized.
 
-## Standstill strategy
+## Data ownership and safety
 
-Do not write identical GPS rows every 30 seconds. A stay is represented by its
-start/end and one or more representative coordinates. A configurable 15-minute
-stay anchor may be written only if needed for restart/recovery diagnostics; it
-is never used to fabricate movement. Map rendering uses the last valid point
-and the stay interval.
+The browser never opens SQLite. WebSocket handlers validate input, call the
+worker and return sanitized data. Trip deletion removes assignment links but
+preserves detected drives. Mixed expense currencies are reported instead of
+being silently added.
+
+## Evidence
+
+The architecture is covered by offline domain/storage tests, pinned HA fixture
+tests, frontend contract tests, production bundle checks and a Chromium
+lifecycle harness. Those checks are not a substitute for general live-instance
+validation. The separate iOS `non-zero reserved bits` issue remains outside
+this architecture.
+
+Planned work is tracked in [ROADMAP.md](ROADMAP.md).

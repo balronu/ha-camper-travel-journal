@@ -1,34 +1,62 @@
-# Test plan
+# Test plan and evidence boundaries
 
-## Executable without Home Assistant
+The repository has separate offline, Home Assistant fixture, frontend and
+browser gates. A green automated gate does not equal a productive Home
+Assistant pilot.
 
-- coordinate ranges, aware timestamps and duplicate timestamps;
-- haversine distance and 30-second/25-metre filtering;
-- implausible jump rejection;
-- start candidate, drive start, stationary stop and drive distance;
-- GPS gap event with no air-line distance;
-- SQLite schema, foreign keys and assignment uniqueness;
-- 90-day retention eligibility and assigned-data exemption;
-- migration fixtures for every schema version.
+## Offline Python tests
 
-## Requires Home Assistant test fixtures
+- coordinate ranges, aware timestamps, accuracy and duplicate filtering;
+- haversine distance, movement/time thresholds and implausible jumps;
+- drive start/finish, stationary stops and GPS gaps without artificial distance;
+- SQLite schema, migrations, foreign keys and serialized worker;
+- restart tail recovery and multi-vehicle isolation;
+- retention candidate safety and assigned-data protection;
+- trip lifecycle, drive assignment and reversible links;
+- stop CRUD and expense CRUD, categories, integer cents and mixed currencies;
+- expense edit, delete, reload persistence and invalid-input rejection.
 
-- config flow/options validation and entity selection;
-- event listener lifecycle and unload cleanup;
-- `state_changed` and narrowly filtered `state_reported` behavior;
-- restart recovery and persisted detector state;
-- executor serialization under event bursts;
-- diagnostics, translations, service actions and Lovelace resources.
+## Home Assistant fixture tests
 
-Phase 1C could not execute this section because the workspace has no Home
-Assistant, pytest, pip, Docker, Podman or Hassfest installation. No productive
-instance was used as a substitute.
+The pinned CI environment uses Home Assistant 2026.10.1 and covers:
 
-## Product acceptance gates
+- Config-/Options-Flow validation and tracker selection;
+- entry setup/unload and recording listener lifecycle;
+- authenticated WebSocket registration after entry setup;
+- exact read command response shape and the complete command registry;
+- API validation and non-mutating diagnostic behavior.
 
-No production install until the Phase 1B tests prove that a restart cannot
-duplicate a point, a GPS outage cannot add distance, an assignment can be
-undone losslessly, and a migration has a tested rollback path.
+These tests use synthetic states and isolated databases. They do not access the
+productive installation.
 
-Phase 1C result: 18 synthetic offline tests passed. HA fixture tests,
-Hassfest, MariaDB, real backup/restore and productive tests remain open gates.
+## Frontend and emitted bundle
+
+Vitest and TypeScript cover:
+
+- card/editor registration and reload-loop guards;
+- vehicle discovery and stable YAML configuration;
+- localized labels and category IDs;
+- exact cent parsing and currency formatting;
+- trip-specific cost loading, inline category/amount editing and error UI;
+- diagnostic sequencing, masking and mobile-safe report fallback.
+
+The production bundle is rebuilt and checked into the integration. The
+Chromium lifecycle harness verifies editor selection, summary cost rendering,
+manual diagnostics and repeated Home Assistant state updates.
+
+## Practice and production gates
+
+The Beta-10 practice report found a `camping` expense-category round-trip bug;
+the Beta-11 fix must add a real selection → WebSocket → storage → response →
+reload regression path and narrow-layout interaction coverage.
+
+Still separate from automated tests:
+
+- broad live-instance validation across desktop/iOS/WebKit;
+- backup/restore against a real user backup;
+- destructive retention execution;
+- MariaDB/Recorder backend evaluation;
+- map/statistics/export acceptance.
+
+No test creates a productive travel, changes the productive database, restarts
+Home Assistant or changes VM 104.

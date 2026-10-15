@@ -1,145 +1,66 @@
 # Camper Travel Journal
 
-<p align="center">
-  <img src="https://raw.githubusercontent.com/balronu/ha-camper-travel-journal/main/assets/branding/readme-banner-de.png" alt="Camper Travel Journal — Dein digitales Wohnmobil-Reisetagebuch für Home Assistant" width="1200">
-</p>
-
-<p align="center">
-  <img src="https://raw.githubusercontent.com/balronu/ha-camper-travel-journal/main/assets/branding/logo.png" alt="Camper Travel Journal Logo" width="220">
-</p>
+Eine datenschutzbewusste Home-Assistant-Custom-Integration für **Dein digitales
+Wohnmobil-Reisetagebuch**. GPS-Punkte, erkannte Fahrten, Reisen, Zwischenstopps
+und Kosten werden in einer eigenen SQLite-Datei gespeichert.
 
 🇩🇪 Deutsch | 🇬🇧 [English](README.en.md)
 
-Eine frühe Home-Assistant-Custom-Integration für ein datenschutzbewusstes
-digitales Wohnmobil-Reisetagebuch. Langfristig sind GPS-Aufzeichnung,
-Fahrtenbuch, Reisen, Ausgaben, Karten, Statistiken und Exporte vorgesehen.
+> **Stand:** `v0.1.0-beta.10` – Entwickler-Beta. Nicht als stabile oder
+> allgemein produktiv validierte Version freigegeben.
 
-> **Status: `v0.1.0-beta.10` Kostenverwaltungs-Entwickler-Beta.** Nicht produktionsreif. Die
-> aktuelle Version wurde noch nicht in einer produktiven Home-Assistant-
-> Instanz validiert.
+## Tatsächlicher Funktionsstand
 
-## Aktueller Funktionsstand
+| Bereich | Beta-10-Stand | Lovelace? | Nachweis |
+| --- | --- | --- | --- |
+| Config-/Options-Flow | Fahrzeug, Tracker, Aufzeichnungsoptionen | Nein, HA-Einstellungen | HA-Fixtures/offline |
+| GPS-Aufzeichnung | Ereignis-Collector, Filter, Sprung-/Gap-Schutz | Indirekt über Optionen | Domain-/SQLite-Tests, CI |
+| Fahrterkennung | Konservativer Statusautomat und Distanz | Nein, Ergebnisdaten | Synthetische Tests |
+| Mehrere Fahrzeuge | Getrennte Config Entries | Karteneditor | HA-/Frontend-Tests |
+| Reisen | Anlegen, Titel ändern, löschen, Statuswechsel | Ja, Manager Card | API-/HA-/Frontend-Tests |
+| Fahrten | GPS-Ergebnis, Zuordnung/Lösen | Zuordnung | Storage-/API-Verträge |
+| Zwischenstopps | Schema und WebSocket-CRUD | Nein | Storage-/API-Tests |
+| Kosten | Kategorien, Cent-Beträge, Summen, Editieren, Löschen | Ja | Tests; `camping`-Praxiskorrektur offen |
+| Karten/Diagnose | Summary, Manager, Editor, manuelle Diagnose | Ja | Bundle/Vitest/Chromium |
+| Kartenansicht, Statistiken, Exporte | Nicht implementiert | Nein | Roadmap |
 
-| Bereich | Status |
-| --- | --- |
-| Config Flow / Options Flow | Implementiert; offline getestet, HA-Fixtures laufen in CI |
-| GPS-Validierung | Implementiert und mit synthetischen Daten getestet |
-| Ereignisbasierter Collector | Implementiert; echter HA-Lifecycle wird in CI geprüft |
-| Duplikate, Genauigkeit, Sprünge und GPS-Lücken | Implementiert und synthetisch getestet |
-| Adaptive Punktspeicherung | Implementiert und synthetisch getestet |
-| Mehrere Fahrzeuge | Implementiert und synthetisch getestet |
-| Eigene SQLite-Datenbank | Implementiert und synthetisch getestet |
-| Neustart-Wiederherstellung | Implementiert mit begrenztem Replay; HA-Neustart wird in CI geprüft |
-| Aufbewahrung | Nur Dry-Run; keine destruktive Löschung in der Beta |
-| Reise-/Ausgabenoberfläche | Summary-/Manager-Card implementiert; CI getestet, produktiver Pilot offen |
-| Reiseverwaltung | Reise-CRUD, Statuswechsel, manuelle Fahrtzuordnung und Aufhebung |
-| Zwischenstopps, Reisekosten | API-CRUD; Manager-Grundfunktionen, Kategorien und Summen je Kategorie |
-| Karten, Statistiken, Exporte | Kartenansicht und Exporte geplant; Kostenübersicht teilweise vorhanden |
+Die Tabelle unterscheidet bewusst Backend/API, Benutzeroberfläche, Tests und
+Praxisvalidierung. Eine Datenbanktabelle oder API-Methode ist nicht automatisch
+eine fertige Benutzerfunktion.
 
-## Installation
+## Installation über HACS
 
-Diese Beta ist für Entwicklungstests bestimmt. Produktive GPS-Quellen erst
-nach grünen CI-/Home-Assistant-Prüfungen und separater Backup-/Pilotfreigabe
-verbinden.
-
-### HACS-Custom-Repository
+Beta 10 ist für kontrollierte Entwicklungstests vorgesehen:
 
 1. **HACS → Integrationen → Benutzerdefinierte Repositories** öffnen.
-2. `https://github.com/balronu/ha-camper-travel-journal` als **Integration** hinzufügen.
-3. Für den Entwicklungsstand Beta 10 die Pre-Release-Version `v0.1.0-beta.10` auswählen; nicht den Entwicklungsstand `main` wählen.
-4. Home Assistant neu starten.
-5. **Einstellungen → Geräte & Dienste** öffnen und Camper Travel Journal hinzufügen.
+2. `https://github.com/balronu/ha-camper-travel-journal` als Integration
+   hinzufügen.
+3. Pre-Release `v0.1.0-beta.10` auswählen, nicht `main`.
+4. Home Assistant nach der Installation manuell neu starten.
+5. Die Integration unter **Einstellungen → Geräte & Dienste** hinzufügen.
 
-HACS verwaltet Pre-Releases pro Repository. Falls Beta 10 nicht angeboten wird,
-im HACS-Menü die Repository-Informationen aktualisieren und beim Repository die
-Pre-Release-Unterstützung aktivieren (in aktuellen HACS-Versionen über den
-Pre-Release-Schalter bzw. die Update-Entität). Diese Einstellung kann nicht
-zuverlässig durch Repository-Dateien erzwungen werden. Ein angezeigter
-`main`-Commit ist kein Beta-Release und darf nicht als Update installiert
-werden.
+Wenn HACS Beta 10 nicht anbietet, Repository-Informationen aktualisieren und
+die Pre-Release-Auswahl aktivieren. Ein `main`-Commit ist kein Beta-Release.
+Details: [HACS-/Release-Strategie](docs/HACS_RELEASE_STRATEGY.md).
 
-Die dauerhafte Beta-/Stable-Strategie, die HACS-Update-Logik und die Branding-
-Pfade sind in [`docs/HACS_RELEASE_STRATEGY.md`](docs/HACS_RELEASE_STRATEGY.md)
-dokumentiert.
+Manuell das Verzeichnis `custom_components/camper_travel_journal/` samt
+`translations/` kopieren und danach ebenfalls manuell neu starten.
 
-### Manuell
+## Einrichtung und GPS-Tracker
 
-`custom_components/camper_travel_journal`-Verzeichnis einschließlich seines
-Unterverzeichnisses `translations` in das
-Home-Assistant-Konfigurationsverzeichnis kopieren, Home Assistant neu starten
-und die Integration über die Oberfläche hinzufügen.
+Der Config Flow benötigt Fahrzeugname sowie eine `device_tracker`-Entität mit
+numerischen `latitude`-/`longitude`-Attributen. Aufzeichnung ist standardmäßig
+deaktiviert. Intervall, Mindestbewegung, Stopperkennung, GPS-Lücke, plausible
+Maximalgeschwindigkeit und Aufbewahrung unzugeordneter Punkte sind konfigurierbar.
+Mehrere Fahrzeuge werden über mehrere Config Entries getrennt geführt.
 
-## Konfiguration
+Der Collector reagiert auf State-Events, verwirft ungültige/unplausible Punkte,
+filtert Duplikate und berechnet über längere GPS-Lücken keine Luftlinie.
 
-Der Flow benötigt einen Fahrzeugnamen und eine `device_tracker`-Entität mit
-numerischen `latitude`- und `longitude`-Attributen. Zusätzlich werden
-Aufzeichnung, Mindestintervall (Standard 30 Sekunden), Mindestbewegung (25 m),
-Aufbewahrung unzugeordneter Daten (90 Tage), Stopperkennung (10 Minuten),
-GPS-Lücken und Plausibilitätsgrenzen konfiguriert.
+## Dashboard-Karten
 
-In diesem Entwicklungsstand ist die Aufzeichnung standardmäßig deaktiviert.
-Optionen können ohne Neuinstallation geändert werden. Mehrere Config Entries
-unterstützen mehrere Fahrzeuge.
-
-## Datenbank und Datenschutz
-
-Die Integration verwaltet `camper_travel_journal.db` im Home-Assistant-
-Konfigurationsverzeichnis. Die Recorder-Datenbank wird weder geändert noch
-geöffnet; Recorder-/MariaDB-Zugangsdaten werden nicht verwendet. SQLite-
-Zugriffe laufen über einen serialisierten Executor-Worker.
-
-Unzugeordnete GPS-Punkte werden im Retention-Dry-Run berücksichtigt; zugeordnete
-Routen bleiben geschützt. Destruktive Löschung ist in dieser Beta nicht
-implementiert. Reisen, Zwischenstopps und Ausgaben werden in der eigenen
-Datenbank aufbewahrt; die zusätzliche Datenbankdatei muss in Backups enthalten
-sein. Automatische Fahrtzuordnung erfolgt nur bei genau einer aktiven Reise
-und überschreibt keine bestehende manuelle Zuordnung.
-
-GPS-Daten sind sensibel. In Issues und Pull Requests nur synthetische
-Koordinaten verwenden; niemals exakte Orte, Adressen, Tokens oder unredigierte
-Home-Assistant-Logs veröffentlichen.
-
-## Fehlerbehebung
-
-- **Tracker nicht verfügbar:** Entitäts-ID und numerische Koordinaten prüfen.
-- **Keine Punkte:** Aufzeichnung und Schwellwerte prüfen.
-- **Keine Fahrt:** Die Erkennung ist konservativ und benötigt mehrere plausible Bewegungen.
-- **GPS-Lücke:** Die Lücke wird absichtlich nicht als Streckenkilometer berechnet.
-- **Datenbankfehler:** Logs prüfen und nur die separate Datenbank aus einem Backup wiederherstellen; Recorder nicht anfassen.
-- **HACS:** Dies ist eine frühe Custom-Repository-Beta, keine offizielle HACS-Standardlistung.
-
-## Entwicklung und Tests
-
-```bash
-pytest -q
-python -m compileall -q custom_components tests
-```
-
-GitHub Actions prüfen zusätzlich Home Assistant 2026.10.1, Coverage,
-Hassfest, JSON-/Strukturvalidierung und Gitleaks. Fehlende oder fehlgeschlagene
-Pflichtprüfungen blockieren eine Veröffentlichung.
-
-Siehe [Architektur](docs/architecture.md), [Datenbankschema](docs/database-schema.md),
-[Testplan](docs/test-plan.md), [Branding-Dokumentation](docs/BRANDING.md) und
-[Phase-1C-Bericht](docs/phase-1c-report.md).
-
-## Lovelace-Frontend und Cache
-
-Die Beta enthält eine kompakte Summary Card und eine breite Manager Card. Das
-Bundle wird automatisch über die Integration mit der versionsgebundenen URL
-`/camper_travel_journal/camper-travel-journal.js?v=0.1.0-beta.10` registriert.
-Eine zweite manuelle Resource darf nicht angelegt werden. Bei veralteter
-Anzeige zuerst Resource-Version prüfen und Dashboard neu laden; manuelles
-Cache-Leeren ist letzte Maßnahme. Eine installierbare, aber nicht produktiv
-angewendete Unterseitenvorlage steht in
-[dashboard-wohnmobil-reisetagebuch.yaml](docs/examples/dashboard-wohnmobil-reisetagebuch.yaml).
-Details: [Frontend-Cache-Standard](docs/frontend-cache.md).
-
-### Kontrollierte Erstinstallation
-
-Nach Auswahl von `v0.1.0-beta.10` als Pre-Release in HACS, Neustart und
-Einrichtung des Config-Flows kann im Wohnmobil-Dashboard zunächst eine
-Testansicht mit beiden Karten angelegt werden:
+Die Integration registriert ihr versioniertes Bundle selbst. Keine zweite
+manuelle Resource mit derselben Datei anlegen.
 
 ```yaml
 type: custom:camper-travel-journal-summary-card
@@ -151,37 +72,84 @@ type: custom:camper-travel-journal-manager-card
 vehicle_id: <config-entry-id>
 ```
 
-Die Beispiel-Unterseite in `docs/examples/dashboard-wohnmobil-reisetagebuch.yaml`
-ist nur eine Vorlage und wird nicht automatisch installiert.
+Die Summary Card zeigt aktuelle Reise, Status, Strecke, Fahrten, Stopps und
+Kosten. Die Manager Card verwaltet Reisen, Statuswechsel, Fahrtzuordnung und
+Kosten. Der visuelle Editor wählt bei genau einem Fahrzeug automatisch aus.
 
-Beide Karten sind zusätzlich im visuellen Kartenkatalog verfügbar. Nach Auswahl
-einer Karte wird das eingerichtete Wohnmobil im grafischen Editor ausgewählt;
-bei genau einem Hub erfolgt die Vorauswahl automatisch.
+Bundle-URL: `/camper_travel_journal/camper-travel-journal.js?v=0.1.0-beta.10`.
+Details: [Frontend-Cache-Standard](docs/frontend-cache.md).
 
-### Beta-9-Diagnosekarte
+## Reisen, Fahrten und Zwischenstopps
 
-Für die gezielte Analyse kann vorübergehend eine eigene Lovelace-Karte mit dem
-Typ `custom:camper-travel-journal-diagnostics-card` angelegt werden. Sie startet
-nicht automatisch. Auf dem iPhone **Diagnose starten** bzw. danach einmalig
-**Diagnose wiederholen** wählen und den bereinigten Bericht mit **Bericht
-kopieren** bereitstellen. Der Bericht enthält keine Tokens, Cookies,
-Koordinaten, Reiserouten oder privaten Reiseinhalte.
+Reisen können angelegt, umbenannt, gelöscht, gestartet, pausiert und
+abgeschlossen werden. GPS-Fahrten werden konservativ erkannt und können einer
+Reise zugeordnet bzw. wieder gelöst werden. Eine vollständige Routenkarte,
+manuelle Fahrtneuanlage und detaillierte Streckenansicht fehlen noch.
+
+Zwischenstopps existieren im Schema und in der authentifizierten WebSocket-API,
+sind aber noch nicht über Lovelace bedienbar.
+
+## Kostenverwaltung
+
+Die internen Kategorie-IDs sind `camping`, `fuel`, `toll`, `parking`, `food`,
+`activities` und `other`. Die deutschen Anzeigenamen sind Übersetzungen; der
+Schrägstrich in „Stellplatz/Campingplatz“ gehört nicht zum gespeicherten Wert.
+Kosten werden als ganzzahlige Cent-Beträge pro Reise summiert; unterschiedliche
+Währungen werden nicht stillschweigend addiert.
+
+**Beta-10-Praxispunkt:** Für `camping` wurde ein fehlerhafter Roundtrip
+gemeldet. Bestehende Einträge werden nicht automatisch umkategorisiert. Die
+Korrektur mit stabilen IDs und vollständigem Auswahl/WebSocket/Datenbank/
+Reload-Test ist für Beta 11 vorgesehen.
+
+## Datenbank, Datenschutz und Backups
+
+`camper_travel_journal.db` liegt im Home-Assistant-Konfigurationsverzeichnis
+und ist von Recorder/MariaDB getrennt. SQLite läuft über einen serialisierten
+Worker; aktuell ist Schema 4 aktiv. Destruktive Retention-Löschung ist in der
+Beta deaktiviert. Die zusätzliche Datenbankdatei muss in Backups enthalten
+sein. Siehe [Datenbankschema](docs/database-schema.md).
+
+GPS-Daten sind sensibel; in Issues und Tests nur synthetische Koordinaten,
+keine privaten Routen, Tokens oder unredigierten Logs verwenden.
+
+## Bekannte Einschränkungen
+
+- Keine stabile Freigabe und kein allgemeiner Produktiv-Pilot.
+- Zwischenstopps sind in Lovelace noch nicht bedienbar.
+- Keine Kartenansicht, Statistiken oder Exporte.
+- Retention berechnet Kandidaten, löscht aber nicht automatisch.
+- Nur die eigene SQLite-Persistenz ist implementiert; eine Nutzung des HA-
+  Recorder-/MariaDB-Backends ist nicht entschieden oder umgesetzt.
+- Die separaten iOS-WebSocket-Meldungen `non-zero reserved bits` wurden nicht
+  durch diese Integration behoben.
 
 ## Roadmap
 
-- `v0.1.x`: GPS-Grundlage und kontrollierte Beta-Validierung
-- `v0.1.x`: GPS-Grundlage, Reiseverwaltung und kontrollierte Beta-Validierung
-- `v0.2.x`: Kartenansicht, Statistiken und Datenexporte
-- `v1.0.0`: stabile Version nach produktiver Validierung
+Die verbindliche, statusgetrennte Roadmap steht in [docs/ROADMAP.md](docs/ROADMAP.md):
 
-## Support
+- **Beta 11:** Kostenkategorie-Roundtrip stabilisieren und `camping` komplett
+  nachweisen.
+- **Nächste Phase:** Fahrten, Strecken und Zwischenstopps vollständig zugänglich
+  machen.
+- **v0.2.x:** Kartenansicht, Reiseverlauf, Statistiken und Exporte.
+- **Später:** alternatives HA-Datenbank-Backend separat untersuchen.
+- **v1.0.0:** Stable erst nach ausreichender Praxisvalidierung.
+
+## Support, Entwicklung und Lizenz
 
 - [Fehler melden](https://github.com/balronu/ha-camper-travel-journal/issues/new?template=bug_report.yml)
 - [Feature vorschlagen](https://github.com/balronu/ha-camper-travel-journal/issues/new?template=feature_request.yml)
 - [Issues](https://github.com/balronu/ha-camper-travel-journal/issues)
 - [Releases](https://github.com/balronu/ha-camper-travel-journal/releases)
 - [Changelog](CHANGELOG.md)
+- [Architektur](docs/architecture.md) · [Testplan](docs/test-plan.md) · [Branding](docs/BRANDING.md)
 
-## Lizenz
+Lokale Prüfungen:
 
-MIT; siehe [LICENSE](LICENSE).
+```bash
+pytest -q
+python -m compileall -q custom_components tests
+```
+
+Lizenz: MIT, siehe [LICENSE](LICENSE).
