@@ -120,3 +120,9 @@
 - Lokale Tests sowie CI-, Hassfest-, HACS-Struktur- und Secret-Scan-Workflows.
 - Diese Beta wurde noch nicht in einer produktiven Home-Assistant-Instanz
   getestet und ist nicht produktionsreif.
+## 0.1.0-beta.15 – GPX-Import vorbereitet
+
+- Sicherer, begrenzter GPX-1.1-Parser für Tracks und Tracksegmente.
+- Read-only Vorschau mit UTC-Zeitstempeln, Fahrtenerkennung, Sprung-/Lückenhinweisen und Duplikatkonflikten.
+- Atomarer, idempotenter Import in bestehende Fahrzeuge und Reisen.
+- Manager-Karte mit Dateiauswahl, Vorschau und ausdrücklicher Bestätigung.

@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from datetime import date, datetime, timezone
+import base64
 from typing import Any
 
 try:
@@ -16,6 +17,7 @@ except ImportError:  # pragma: no cover - offline domain tests
     callback = lambda func: func
 
 from .models import Expense, Stop
+from .gpx_import import MAX_FILE_BYTES, analyze_gpx
 from .travel import validate_amount, validate_expense_category, validate_expense_currency, validate_transition
 
 
@@ -267,7 +269,36 @@ if websocket_api is not None:
             connection.send_result(msg["id"], {"success": True})
         except Exception as err: _send_error(connection, msg, err)
 
-    COMMANDS = (ws_list_vehicles, ws_list, ws_diagnostics, ws_create_trip, ws_update_trip, ws_delete_trip, ws_transition_trip, ws_link_drives, ws_unlink_drive, ws_create_manual_drive, ws_update_manual_drive, ws_delete_manual_drive, ws_create_stop, ws_update_stop, ws_delete_stop, ws_create_expense, ws_update_expense, ws_delete_expense)
+    @websocket_api.websocket_command({**_base("camper_travel_journal/analyze_gpx"), vol.Required("content_base64"): str})
+    @websocket_api.async_response
+    async def ws_analyze_gpx(hass, connection, msg):
+        """Analyze an authenticated file in memory; this command is read-only."""
+        try:
+            encoded = msg["content_base64"]
+            if len(encoded) > MAX_FILE_BYTES * 2:
+                raise ValueError("gpx_file_too_large")
+            data = base64.b64decode(encoded, validate=True)
+            preview = analyze_gpx(data, msg["vehicle_id"])
+            conflicts = await _call(hass, msg, "gpx_conflicts", msg["vehicle_id"], preview)
+            connection.send_result(msg["id"], {"file_hash": preview.file_hash, "warnings": list(preview.warnings), "duplicate_point_keys": list(preview.duplicate_point_keys), "conflicts": conflicts, "points": [{"key": item.key, "recorded_at": item.point.recorded_at.isoformat(), "latitude": item.point.latitude, "longitude": item.point.longitude} for item in preview.points], "drives": [{"key": item.key, "started_at": item.started_at.isoformat(), "ended_at": item.ended_at.isoformat(), "distance_m": item.distance_m, "duration_seconds": item.duration_seconds, "reason": item.reason} for item in preview.drives]})
+        except Exception as err: _send_error(connection, msg, err)
+
+    @websocket_api.websocket_command({**_base("camper_travel_journal/import_gpx"), vol.Required("content_base64"): str, vol.Required("file_hash"): str, vol.Optional("trip_id"): str, vol.Optional("drive_keys", default=[]): [str]})
+    @websocket_api.async_response
+    async def ws_import_gpx(hass, connection, msg):
+        """Re-analyze and atomically import only after explicit confirmation."""
+        try:
+            encoded = msg["content_base64"]
+            if len(encoded) > MAX_FILE_BYTES * 2:
+                raise ValueError("gpx_file_too_large")
+            preview = analyze_gpx(base64.b64decode(encoded, validate=True), msg["vehicle_id"])
+            if preview.file_hash != msg["file_hash"]:
+                raise ValueError("gpx_preview_mismatch")
+            result = await _call(hass, msg, "import_gpx", msg["vehicle_id"], preview, msg.get("trip_id"), _now(), msg.get("drive_keys"))
+            connection.send_result(msg["id"], result)
+        except Exception as err: _send_error(connection, msg, err)
+
+    COMMANDS = (ws_list_vehicles, ws_list, ws_diagnostics, ws_create_trip, ws_update_trip, ws_delete_trip, ws_transition_trip, ws_link_drives, ws_unlink_drive, ws_create_manual_drive, ws_update_manual_drive, ws_delete_manual_drive, ws_create_stop, ws_update_stop, ws_delete_stop, ws_create_expense, ws_update_expense, ws_delete_expense, ws_analyze_gpx, ws_import_gpx)
 else:
     COMMANDS = ()
 

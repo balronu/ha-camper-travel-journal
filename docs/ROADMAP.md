@@ -1,7 +1,7 @@
 # Camper Travel Journal – Roadmap
 
 This roadmap separates implemented work, current limitations and planned
-features. It is based on the prepared `v0.1.0-beta.14` source tree and tests.
+features. It is based on the prepared `v0.1.0-beta.15` source tree and tests.
 A database
 table or WebSocket method is not treated as a finished user feature
 without a corresponding UI and test path.
@@ -21,7 +21,7 @@ without a corresponding UI and test path.
 - Expense CRUD, integer-cent totals, mixed-currency protection, inline editing
   and canonical category IDs, including the `camping` round-trip.
 
-## Current prepared development baseline: `v0.1.0-beta.14`
+## Current prepared development baseline: `v0.1.0-beta.15`
 
 This is a prepared development beta, not yet a published release and not a
 stable release. CI covers the
@@ -117,3 +117,11 @@ desktop acceptance, and sufficient practical Home Assistant validation.
   immutable annotated tag and explicit release authorization.
 - Database-backend changes, destructive retention, migrations and Stable
   publication require separate explicit approval.
+## Beta 15 – GPX-Import historischer Fahrten (vorbereitet)
+
+Die Beta-15-Entwicklung ergänzt einen begrenzten GPX-1.1-Parser für PAJ-Exporte,
+eine read-only Importvorschau und einen atomaren, idempotenten Import. GPS-
+Entfernungen sind Punkt-zu-Punkt-Großkreisstrecken, keine Straßenrouten.
+Lücken und unrealistische Sprünge werden sichtbar markiert; Fahrtengrenzen
+bleiben überprüfbare Vorschläge. Die echte PAJ-Datei wurde nicht übernommen;
+Tests enthalten ausschließlich anonymisierte Daten.
