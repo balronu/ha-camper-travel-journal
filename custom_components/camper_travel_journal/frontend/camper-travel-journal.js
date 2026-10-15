@@ -562,6 +562,7 @@ const G = (i, e, t) => f(i, "camper_travel_journal/list", e, t ? { trip_id: t } 
   edit: "Bearbeiten",
   remove: "Löschen",
   details: "Details",
+  close: "Schließen",
   assignedDrives: "Fahrten dieser Reise",
   freeDrives: "Freie Fahrten",
   assign: "Zuordnen",
@@ -616,6 +617,7 @@ const G = (i, e, t) => f(i, "camper_travel_journal/list", e, t ? { trip_id: t } 
   edit: "Edit",
   remove: "Delete",
   details: "Details",
+  close: "Close",
   assignedDrives: "Drives in this trip",
   freeDrives: "Unassigned drives",
   assign: "Assign",
@@ -822,6 +824,13 @@ class Te extends ie {
         this.fail(u(this.hass).driveAssignError);
       }
   }
+  toggleTripDetails(e) {
+    if (this.selected === e) {
+      this.selected = "", this.requestUpdate();
+      return;
+    }
+    this.selected = e, this.refresh();
+  }
   async addExpense(e) {
     if (!this.hass) return;
     const t = u(this.hass), s = fe(this.amount);
@@ -896,9 +905,7 @@ class Te extends ie {
   }
   render() {
     const e = u(this.hass), t = this.snapshot?.trips ?? [], s = this.snapshot?.expenses ?? [], r = this.snapshot?.expense_summary, n = r?.mixed_currency ? e.mixedCurrency : r?.total_minor !== void 0 && r.currency ? T(r.total_minor, r.currency, this.hass) : T(0, "EUR", this.hass), a = this.loadError || this.actionError;
-    return l`<ha-card><h2>${e.manager}</h2>${a ? l`<p class="error" role="alert">${a}</p>` : ""}<section><h3>${e.newTrip}</h3><div class="actions"><input aria-label=${e.tripName} placeholder=${e.tripName} .value=${this.tripTitle} @input=${(c) => this.tripTitle = c.target.value}><input aria-label=${e.destination} placeholder=${e.destination} .value=${this.destination} @input=${(c) => this.destination = c.target.value}><button type="button" @click=${() => this.addTrip()}>${e.create}</button></div></section><section><h3>${e.trips}</h3>${t.length ? t.map((c) => l`<article class="trip"><div class="row"><strong>${c.title}</strong><span class="muted">${c.destination || ""} · ${ke(c.status, this.hass)}</span></div><div class="actions"><button type="button" class="secondary" @click=${() => this.editTrip(c)}>${e.edit}</button><button type="button" class="secondary" @click=${() => this.removeTrip(c.id)}>${e.remove}</button>${c.status === "planned" || c.status === "paused" ? l`<button type="button" @click=${() => this.changeStatus(c.id, "active")}>${e.resume}</button>` : ""}${c.status === "active" ? l`<button type="button" class="secondary" @click=${() => this.changeStatus(c.id, "paused")}>${e.pause}</button><button type="button" @click=${() => this.changeStatus(c.id, "completed")}>${e.complete}</button>` : ""}<button type="button" class="secondary" @click=${() => {
-      this.selected = c.id, this.refresh();
-    }}>${e.details}</button></div>${this.selected === c.id ? l`<div class="details"><h4>${e.assignedDrives}</h4>${(this.snapshot?.drives ?? []).map((o) => l`<div class="row"><span>${O(o.started_at, this.hass)} · ${(o.distance_m / 1e3).toFixed(1)} km</span>${o.trip_id === c.id ? l`<button type="button" class="link" @click=${() => this.hass && it(this.hass, this.vehicleId, c.id, o.id).then(() => this.refresh())}>${e.unassign}</button>` : ""}</div>`)}${(this.snapshot?.available_drives ?? []).length ? l`<h4>${e.freeDrives}</h4>${this.snapshot?.available_drives?.map((o) => l`<div class="row"><span>${O(o.started_at, this.hass)} · ${(o.distance_m / 1e3).toFixed(1)} km</span><button type="button" class="link" @click=${() => this.assignDrive(c.id, o.id)}>${e.assign}</button></div>`)}` : ""}<h4>${e.expenses}</h4><div class="expense-form create-form"><input aria-label=${e.amount} type="number" min="0" step="0.01" inputmode="decimal" placeholder="EUR" .value=${this.amount} @input=${(o) => this.setExpenseAmount(o.currentTarget.value)}><select aria-label=${e.category} .value=${this.category} @change=${(o) => this.setExpenseCategory(o.currentTarget.value)}>${P.map((o) => l`<option value=${o}>${V(o, this.hass)}</option>`)}</select><button type="button" @click=${() => this.addExpense(c.id)}>${e.save}</button></div>${s.map((o) => this.renderExpense(o, e))}<p class="total"><strong>${e.total}: ${n}</strong></p></div>` : ""}</article>`) : l`<p class="muted">${e.noTrip}</p>`}</section></ha-card>`;
+    return l`<ha-card><h2>${e.manager}</h2>${a ? l`<p class="error" role="alert">${a}</p>` : ""}<section><h3>${e.newTrip}</h3><div class="actions"><input aria-label=${e.tripName} placeholder=${e.tripName} .value=${this.tripTitle} @input=${(c) => this.tripTitle = c.target.value}><input aria-label=${e.destination} placeholder=${e.destination} .value=${this.destination} @input=${(c) => this.destination = c.target.value}><button type="button" @click=${() => this.addTrip()}>${e.create}</button></div></section><section><h3>${e.trips}</h3>${t.length ? t.map((c) => l`<article class="trip"><div class="row"><strong>${c.title}</strong><span class="muted">${c.destination || ""} · ${ke(c.status, this.hass)}</span></div><div class="actions"><button type="button" class="secondary" @click=${() => this.editTrip(c)}>${e.edit}</button><button type="button" class="secondary" @click=${() => this.removeTrip(c.id)}>${e.remove}</button>${c.status === "planned" || c.status === "paused" ? l`<button type="button" @click=${() => this.changeStatus(c.id, "active")}>${e.resume}</button>` : ""}${c.status === "active" ? l`<button type="button" class="secondary" @click=${() => this.changeStatus(c.id, "paused")}>${e.pause}</button><button type="button" @click=${() => this.changeStatus(c.id, "completed")}>${e.complete}</button>` : ""}<button type="button" class="secondary" @click=${() => this.toggleTripDetails(c.id)}>${this.selected === c.id ? e.close : e.details}</button></div>${this.selected === c.id ? l`<div class="details"><h4>${e.assignedDrives}</h4>${(this.snapshot?.drives ?? []).map((o) => l`<div class="row"><span>${O(o.started_at, this.hass)} · ${(o.distance_m / 1e3).toFixed(1)} km</span>${o.trip_id === c.id ? l`<button type="button" class="link" @click=${() => this.hass && it(this.hass, this.vehicleId, c.id, o.id).then(() => this.refresh())}>${e.unassign}</button>` : ""}</div>`)}${(this.snapshot?.available_drives ?? []).length ? l`<h4>${e.freeDrives}</h4>${this.snapshot?.available_drives?.map((o) => l`<div class="row"><span>${O(o.started_at, this.hass)} · ${(o.distance_m / 1e3).toFixed(1)} km}</span><button type="button" class="link" @click=${() => this.assignDrive(c.id, o.id)}>${e.assign}</button></div>`)}` : ""}<h4>${e.expenses}</h4><div class="expense-form create-form"><input aria-label=${e.amount} type="number" min="0" step="0.01" inputmode="decimal" placeholder="EUR" .value=${this.amount} @input=${(o) => this.setExpenseAmount(o.currentTarget.value)}><select aria-label=${e.category} .value=${this.category} @change=${(o) => this.setExpenseCategory(o.currentTarget.value)}>${P.map((o) => l`<option value=${o}>${V(o, this.hass)}</option>`)}</select><button type="button" @click=${() => this.addExpense(c.id)}>${e.save}</button></div>${s.map((o) => this.renderExpense(o, e))}<p class="total"><strong>${e.total}: ${n}</strong></p></div>` : ""}</article>`) : l`<p class="muted">${e.noTrip}</p>`}</section></ha-card>`;
   }
 }
 Te.styles = [ie.styles, j`section{margin-top:16px}.trip{display:grid;gap:8px;padding:12px 0;border-bottom:1px solid var(--divider-color)}.row,.expense-row{display:flex;justify-content:space-between;gap:8px;align-items:center;flex-wrap:wrap}.details{padding:8px;background:var(--secondary-background-color)}h4{margin:12px 0 4px}.link{min-height:30px;padding:4px 8px;font-size:.9em}.expense-form{display:grid;grid-template-columns:minmax(0,1fr) minmax(7rem,10rem) auto;gap:8px;align-items:center;width:100%}.expense-form input,.expense-form select{min-width:0;width:100%;box-sizing:border-box}.create-form{grid-template-columns:minmax(7rem,10rem) minmax(0,1fr) auto}.total{margin:12px 0 0;text-align:right}@media(max-width:500px){.expense-form,.create-form{grid-template-columns:1fr}.expense-form .actions{margin-top:0}.total{text-align:left}}`];

@@ -70,5 +70,6 @@ jobs:
           if (!result.total) throw new Error('camping expense total did not render');
           if (!result.summaryTotal) throw new Error('summary card did not refresh after expense creation');
           if (result.summaryListCalls < 2) throw new Error(`summary card did not perform its initial and synchronized trip loads: ${result.summaryListCalls}`);
+          if (!result.closedAfterSave || !result.reopened || !result.switchedTrip || !result.closedSecond) throw new Error(`details toggle regression: ${JSON.stringify(result)}`);
           console.log(JSON.stringify(result));
           NODE

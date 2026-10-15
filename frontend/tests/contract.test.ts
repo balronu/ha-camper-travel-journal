@@ -137,6 +137,8 @@ describe("frontend release contract", () => {
     expect(manager).toContain("setExpenseCategory");
     expect(manager).toContain("setExpenseAmount");
     expect(manager).toContain("notifyExpensesChanged");
+    expect(manager).toContain("toggleTripDetails");
+    expect(manager).toContain("lang.close");
     expect(summary).toContain("EXPENSES_CHANGED_EVENT");
   });
 });

@@ -10,12 +10,13 @@ let createdCategory = null;
 let listCalls = 0;
 let summaryListCalls = 0;
 const trip = { id: "trip-1", title: "Kostenprüfung", description: "", destination: "Bremen", status: "active", started_at: "2026-10-01T12:00:00Z" };
+const secondTrip = { id: "trip-2", title: "Zweite Reise", description: "", destination: "Kiel", status: "planned", started_at: "2026-10-02T12:00:00Z" };
 const connection = {
   async sendMessagePromise(message) {
     if (message.type === "camper_travel_journal/list") {
       listCalls += 1;
       if (message.trip_id) summaryListCalls += 1;
-      return { trips: [trip], drives: [], stops: [], expenses: message.trip_id ? [{ id: "expense-1", category: "camping", amount_minor: 2300, currency: "EUR", occurred_at: trip.started_at }] : [], expense_summary: { total_minor: 2300, currency: "EUR", mixed_currency: false } };
+      return { trips: [trip, secondTrip], drives: [], stops: [], expenses: message.trip_id === trip.id ? [{ id: "expense-1", trip_id: trip.id, category: "camping", amount_minor: 2300, currency: "EUR", occurred_at: trip.started_at }] : [], expense_summary: { total_minor: message.trip_id === trip.id ? 2300 : 0, currency: "EUR", mixed_currency: false } };
     }
     if (message.type === "camper_travel_journal/create_expense") {
       createdCategory = message.category;
@@ -51,13 +52,35 @@ await manager.updateComplete;
 manager.shadowRoot.querySelector(".create-form button")?.click();
 await new Promise((resolve) => setTimeout(resolve, 120));
 await new Promise((resolve) => setTimeout(resolve, 120));
+const managerCategoryLabel = manager.shadowRoot.textContent.includes("Stellplatz/Campingplatz");
+const managerTotal = manager.shadowRoot.textContent.includes("23,00");
+const closeAfterSave = [...manager.shadowRoot.querySelectorAll("button")].find((button) => button.textContent.trim() === "Schließen");
+closeAfterSave?.click();
+await manager.updateComplete;
+const closedAfterSave = !manager.shadowRoot.querySelector(".details");
+const reopen = [...manager.shadowRoot.querySelectorAll("button")].find((button) => button.textContent.trim() === "Details");
+reopen?.click();
+await new Promise((resolve) => setTimeout(resolve, 60));
+const reopened = Boolean(manager.shadowRoot.querySelector(".details"));
+const secondDetails = [...manager.shadowRoot.querySelectorAll("button")].find((button) => button.textContent.trim() === "Details");
+secondDetails?.click();
+await new Promise((resolve) => setTimeout(resolve, 60));
+const switchedTrip = manager.shadowRoot.querySelectorAll(".details").length === 1;
+const closeSecond = [...manager.shadowRoot.querySelectorAll("button")].find((button) => button.textContent.trim() === "Schließen");
+closeSecond?.click();
+await manager.updateComplete;
+const closedSecond = !manager.shadowRoot.querySelector(".details");
 result.textContent = JSON.stringify({
   createdCategory,
   initialSelectValue,
   listCalls,
-  categoryLabel: manager.shadowRoot.textContent.includes("Stellplatz/Campingplatz"),
-  total: manager.shadowRoot.textContent.includes("23,00"),
+  categoryLabel: managerCategoryLabel,
+  total: managerTotal,
   summaryTotal: summary.shadowRoot.textContent.includes("23,00"),
   summaryListCalls,
+  closedAfterSave,
+  reopened,
+  switchedTrip,
+  closedSecond,
 }, null, 2);
 </script>
