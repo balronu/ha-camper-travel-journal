@@ -20,27 +20,42 @@ PLATFORMS: list[str] = []
 CONFIG_SCHEMA = cv.config_entry_only_config_schema(DOMAIN) if cv else None
 
 
+async def _async_register_frontend(hass) -> None:
+    """Serve and register exactly the current frontend bundle."""
+    try:
+        from homeassistant.components.frontend import add_extra_js_url, remove_extra_js_url
+        from homeassistant.components.http import StaticPathConfig
+    except (ImportError, AttributeError):  # pragma: no cover - offline tests
+        return
+
+    domain_data = hass.data.setdefault(DOMAIN, {})
+    if not domain_data.get("frontend_static_path_registered"):
+        frontend_dir = Path(__file__).parent / "frontend"
+        try:
+            await hass.http.async_register_static_paths(
+                [StaticPathConfig(f"/{DOMAIN}", str(frontend_dir), False)]
+            )
+        except AttributeError:  # pragma: no cover - offline HA fixture
+            return
+        domain_data["frontend_static_path_registered"] = True
+
+    for version in LEGACY_FRONTEND_VERSIONS:
+        remove_extra_js_url(hass, f"/{DOMAIN}/camper-travel-journal.js?v={version}")
+    add_extra_js_url(hass, FRONTEND_URL)
+    domain_data["frontend_registered"] = True
+
+
 async def async_setup(hass, config):
     """Support YAML-less setup; config entries own runtime activation."""
     hass.data.setdefault(DOMAIN, {})
     async_register_api(hass)
-    if not hass.data[DOMAIN].get("frontend_registered"):
-        try:
-            from homeassistant.components.frontend import add_extra_js_url, remove_extra_js_url
-            from homeassistant.components.http import StaticPathConfig
-            frontend_dir = Path(__file__).parent / "frontend"
-            await hass.http.async_register_static_paths([StaticPathConfig(f"/{DOMAIN}", str(frontend_dir), False)])
-            for version in LEGACY_FRONTEND_VERSIONS:
-                remove_extra_js_url(hass, f"/{DOMAIN}/camper-travel-journal.js?v={version}")
-            add_extra_js_url(hass, FRONTEND_URL)
-            hass.data[DOMAIN]["frontend_registered"] = True
-        except (ImportError, AttributeError):  # pragma: no cover - offline tests
-            pass
+    await _async_register_frontend(hass)
     return True
 
 
 async def async_setup_entry(hass, entry):
     """Prepare an entry; recording remains opt-in through the entry option."""
+    await _async_register_frontend(hass)
     # Config-entry setup must be self-sufficient.  In particular, HA can set up
     # an entry after a reload without re-running the domain setup hook.  Keep
     # this idempotent call here so the authenticated websocket commands are

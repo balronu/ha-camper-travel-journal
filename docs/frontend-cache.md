@@ -1,9 +1,10 @@
 # Lovelace-Frontend- und Cache-Standard
 
-Beta 15 enthält die seit Beta 13 eingeführte Bereinigung historischer Camper-
-Bundle-URLs, bevor die aktuelle URL registriert wird. Dadurch bleiben nach
-einem HACS-Update nicht gleichzeitig Beta-12- und Beta-13-Module als Extra-
-Module aktiv. Die versionierte URL bleibt für Browser-Cache-Busting erhalten.
+Beta 15 enthält die Bereinigung aller seit Beta 2 bekannten historischen
+Camper-Bundle-URLs, bevor die aktuelle URL registriert wird. Diese Bereinigung
+wird bei jedem Domain- und Entry-Setup idempotent ausgeführt; dadurch bleiben
+nach wiederholten HACS-Updates nicht mehrere Beta-Module als Extra-Module
+aktiv. Die versionierte URL bleibt für Browser-Cache-Busting erhalten.
 
 ## Aktueller Stand
 
@@ -87,8 +88,10 @@ Gates erforderlich:
 
 Die Browser- und echte Dashboard-Verifikation bleibt für diese Beta offen;
 die statische Registrierung, Versionskennung und idempotente Elementdefinition
-sowie der Editor-Vertrag sind durch Code- und CI-Tests abgesichert. Eine echte
-iOS-/WebKit-Prüfung wurde nicht durchgeführt.
+sowie der Editor-Vertrag sind durch Code- und CI-Tests abgesichert. Der
+Release-Build muss zusätzlich bytegenau dem eingecheckten Bundle entsprechen;
+ein abweichendes Bundle lässt CI fehlschlagen. Eine echte iOS-/WebKit-Prüfung
+wurde nicht durchgeführt.
 
 ## Datumsdarstellung
 

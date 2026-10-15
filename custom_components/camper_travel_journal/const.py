@@ -6,16 +6,12 @@ DOMAIN = "camper_travel_journal"
 FRONTEND_VERSION = "0.1.0-beta.15"
 FRONTEND_URL = f"/{DOMAIN}/camper-travel-journal.js?v={FRONTEND_VERSION}"
 # HA keeps extra module URLs in memory until they are explicitly removed.  A
-# HACS update/reload can therefore leave the previous beta bundle registered
-# next to the new one.  Remove the known historical URLs before registering
-# the current bundle; the URL remains versioned for browser cache-busting.
-LEGACY_FRONTEND_VERSIONS = (
-    "0.1.0-beta.14",
-    "0.1.0-beta.13",
-    "0.1.0-beta.10",
-    "0.1.0-beta.11",
-    "0.1.0-beta.12",
-)
+# HACS update/reload can therefore leave any previous beta bundle registered
+# next to the new one.  The card has been versioned since beta 2, so derive the
+# complete historical set instead of maintaining an easy-to-forget subset.
+# Cleanup is intentionally repeated on every setup; a reload can discover a
+# URL that was added after the first domain setup.
+LEGACY_FRONTEND_VERSIONS = tuple(f"0.1.0-beta.{n}" for n in range(2, 15))
 DEFAULT_MIN_INTERVAL = timedelta(seconds=30)
 DEFAULT_MIN_MOVEMENT_M = 25.0
 DEFAULT_UNASSIGNED_RETENTION = timedelta(days=90)
