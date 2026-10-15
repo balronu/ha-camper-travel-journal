@@ -12,7 +12,7 @@ const bundle = resolve(root, "../custom_components/camper_travel_journal/fronten
 
 describe("frontend release contract", () => {
   it("keeps backend, npm metadata and beta bundle aligned", () => {
-    expect(manifest.version).toBe("0.1.0-beta.15");
+    expect(manifest.version).toBe("0.1.0-beta.18");
     expect(pkg.version).toBe(manifest.version);
     expect(existsSync(bundle)).toBe(true);
   });
@@ -67,6 +67,8 @@ describe("frontend release contract", () => {
     expect(messages({ locale: { language: "en-US" } } as any).editorChooseVehicle).toBe("Select camper");
     expect(messages({ locale: { language: "de-DE" } } as any).summaryChooseTrip).toBe("Reise auswählen");
     expect(messages({ locale: { language: "en-US" } } as any).summaryChooseTrip).toBe("Select trip");
+    expect(messages({ locale: { language: "de-DE" } } as any).start).toBe("Reise starten");
+    expect(messages({ locale: { language: "en-US" } } as any).start).toBe("Start trip");
   });
   it("translates the explicit GPX target controls", () => {
     expect(messages({ locale: { language: "de-DE" } } as any).gpxTargetTrip).toBe("Zielreise");

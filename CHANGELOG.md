@@ -2,6 +2,19 @@
 
 🇩🇪 Deutsch | 🇬🇧 [English](README.en.md)
 
+## 0.1.0-beta.18 – veröffentlicht
+
+- Bevorzugt in der Summary Card deterministisch eine aktive Reise vor
+  geplanten Reisen.
+- Ergänzt eine kompakte Reiseauswahl für geplante, aktive, pausierte und
+  abgeschlossene Reisen; die Auswahl bleibt bei Datenaktualisierungen erhalten.
+- Bezieht Kennzahlen, Kosten, Fahrten und Statusaktionen ausschließlich aus der
+  ausgewählten Reise.
+- Ergänzt deutsche/englische Beschriftungen, mobile Darstellung und
+  Chromium-/Bundle-Regressionsprüfungen.
+- Backend, GPX-Import, Datenbank und bestehende Produktivdaten bleiben
+  unverändert.
+
 ## 0.1.0-beta.15 – veröffentlicht
 
 - Ergänzt sicheren, begrenzten GPX-1.1-Import für historische PAJ-Fahrten.

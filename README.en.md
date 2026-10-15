@@ -1,74 +1,73 @@
 # Camper Travel Journal
 
-A privacy-conscious Home Assistant custom integration for **Your digital camper travel journal**. GPS points, detected drives, trips, stops and expenses are
-stored in an integration-owned SQLite database.
+<p align="center">
+  <img src="https://raw.githubusercontent.com/balronu/ha-camper-travel-journal/main/assets/branding/logo.png" alt="Camper Travel Journal logo" width="220">
+</p>
+
+<h1 align="center">Camper Travel Journal</h1>
+<p align="center">Your digital camper travel journal for Home Assistant</p>
+
+<p align="center">
+  <a href="https://github.com/balronu/ha-camper-travel-journal/releases/latest"><img src="https://img.shields.io/github/v/release/balronu/ha-camper-travel-journal?include_prereleases&label=Release" alt="Release"></a>
+  <a href="https://hacs.xyz/"><img src="https://img.shields.io/badge/HACS-Custom-orange" alt="HACS Custom Integration"></a>
+  <a href="https://github.com/balronu/ha-camper-travel-journal/actions/workflows/tests.yml"><img src="https://img.shields.io/github/actions/workflow/status/balronu/ha-camper-travel-journal/tests.yml?label=CI" alt="CI"></a>
+  <a href="https://github.com/balronu/ha-camper-travel-journal/actions/workflows/validate.yml"><img src="https://img.shields.io/github/actions/workflow/status/balronu/ha-camper-travel-journal/validate.yml?label=Hassfest%20%2F%20HACS" alt="Hassfest and HACS validation"></a>
+  <a href="https://github.com/balronu/ha-camper-travel-journal/blob/main/LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue" alt="MIT License"></a>
+</p>
 
 [🇩🇪 Deutsch](README.md) | 🇬🇧 English
 
-![Camper Travel Journal Logo](https://raw.githubusercontent.com/balronu/ha-camper-travel-journal/main/assets/branding/logo.png)
+## What is Camper Travel Journal?
 
-> **Status:** `v0.1.0-beta.15` – published pre-release. It contains the secure GPX import, localized calendar dates and
-> read-only GPS collector
-> diagnostics and Home Assistant 2026.10 compatibility hardening.
-> validation on iOS/Safari and a productive HA installation remains open.
+Camper Travel Journal collects and organizes camper travel information directly
+in Home Assistant. GPS points, detected drives, trips, stops and expenses are
+stored in an integration-owned local SQLite database. No external cloud service
+is required.
 
-## Actual feature status
+The current stable version is `v0.1.0`. The project is still actively evolving;
+practical validation on different mobile browsers and Home Assistant setups is
+important.
 
-| Area | Current status | Lovelace? | Evidence |
-| --- | --- | --- | --- |
-| Config-/Options Flow | Vehicle, tracker and recording options | No, HA settings | HA fixtures/offline |
-| GPS recording | Event collector, filters, jump/gap protection | Indirectly through options | Domain/SQLite tests, CI |
-| Drive detection | Conservative state machine and distance | No, result data | Synthetic tests |
-| Multiple vehicles | Separate config entries | Card editor | HA/frontend tests |
-| Trips | Create, edit title/period, delete, status changes | Yes, Manager Card | API/HA/frontend tests |
-| Drives | Display/link GPS drives; create, edit and delete manual drives | Yes, Manager Card | Beta 12 API/frontend tests |
-| Stops | Schema and WebSocket CRUD | No | Storage/API tests |
-| Expenses | Categories, cents, totals, edit, delete | Yes | Beta 11 round-trip tested |
-| Cards/diagnostics | Summary, Manager, editor, manual diagnostics | Yes | Bundle/Vitest/Chromium |
-| Maps, statistics, exports | Not implemented | No | Roadmap |
+## Features
 
-This table distinguishes backend/API, user interface, tests and practical
-validation. A database table or API method is not automatically a finished
-user feature.
+- GPS recording from a configured `device_tracker`, disabled by default.
+- Conservative drive detection with movement thresholds, duplicate filtering,
+  jump protection and GPS-gap protection.
+- Multiple campers through separate Home Assistant config entries.
+- Trip management with dates, destinations, statuses and editing.
+- Summary Card with active-trip priority and a compact selector for every trip
+  of the configured vehicle. Metrics and actions always use the same trip.
+- Manager Card for trips, drive assignment, manual drives and expenses.
+- Safe atomic PAJ GPX 1.1 import with preview, duplicate protection, period
+  warnings and explicit target-trip selection.
+- Expense management with stable categories, integer cents and currency checks.
+- German and English user interfaces.
 
 ## HACS installation
 
-The currently published and supported version is `v0.1.0-beta.15`. It has not been generally production-
-validated; Beta 11 remains available as a
-historical release (`v0.1.0-beta.12`).
-
-For the currently published Beta 15:
-
 1. Open **HACS → Integrations → Custom repositories**.
-2. Add `https://github.com/balronu/ha-camper-travel-journal` as an integration.
-3. Select the `v0.1.0-beta.15` pre-release, not `main`.
-4. Restart Home Assistant manually after installation.
+2. Add `https://github.com/balronu/ha-camper-travel-journal` as an
+   **Integration** repository.
+3. Install the stable `v0.1.0` release.
+4. Restart Home Assistant manually.
 5. Add the integration under **Settings → Devices & services**.
 
-A `main` commit is not a beta release. If HACS does not show the pre-release,
-enable pre-release selection and refresh the repository information. See
-[docs/HACS_RELEASE_STRATEGY.md](docs/HACS_RELEASE_STRATEGY.md).
+The integration registers its versioned frontend bundle automatically. Do not
+add a second Lovelace resource for the same JavaScript file. See
+[docs/HACS_RELEASE_STRATEGY.md](docs/HACS_RELEASE_STRATEGY.md) for release and
+HACS guidance.
 
-Manual installation copies `custom_components/camper_travel_journal/`,
-including `translations/`, into the Home Assistant configuration directory,
-followed by a manual restart.
+## First setup
 
-## Setup and GPS tracker
-
-The config flow requires a vehicle name and a `device_tracker` entity with
-numeric `latitude`/`longitude` attributes. Recording is disabled by default.
-Interval, movement threshold, stop detection, GPS gap, plausible maximum speed
-and unassigned retention are configurable. Multiple vehicles use separate
-config entries.
-
-The collector reacts to state events, rejects invalid or implausible points and
-duplicates, and never bridges a long GPS outage with artificial straight-line
-distance.
+Setup requires a vehicle name and a `device_tracker` entity with numeric
+`latitude` and `longitude` attributes. Enable recording only after checking the
+tracker and your privacy requirements. Interval, minimum movement, stop
+detection, GPS gap, plausible maximum speed and unassigned-point retention are
+configurable options.
 
 ## Dashboard cards
 
-The integration registers its versioned bundle automatically; do not add a
-second manual resource.
+Add the cards through the Lovelace visual editor or YAML:
 
 ```yaml
 type: custom:camper-travel-journal-summary-card
@@ -80,104 +79,72 @@ type: custom:camper-travel-journal-manager-card
 vehicle_id: <config-entry-id>
 ```
 
-The Summary Card shows the current trip, status, distance, drives, stops and
-costs. The Manager Card manages trips, status changes, drive assignment and
-expenses. The visual editor auto-selects the vehicle when exactly one exists.
+The Summary Card prefers active trips. When several trips are active, it makes
+a deterministic choice using the latest `started_at` and, for ties, the trip
+ID. With no active trip, the same rule applies to all trips. The selection
+survives refreshes, and title, period, status, metrics and actions always come
+from that selected trip.
 
-The Summary Card defaults to an active trip. If several trips are active, it
-deterministically chooses the one with the latest `started_at` timestamp and,
-for ties, the lexicographically greatest ID. If no trip is active, the same
-rule is applied to all trips. The compact selector exposes planned, paused and
-completed trips for the configured vehicle; manual selection survives data
-refreshes and falls back to the default rule only when the selected trip no
-longer exists.
+## GPS recording and GPX import
 
-Beta 15 bundle URL: `/camper_travel_journal/camper-travel-journal.js?v=0.1.0-beta.15`.
+Recording reacts to tracker events, rejects invalid points and keeps sensitive
+coordinates local.
 
-### GPX import (Beta 15)
+Use **Import GPX** in the Manager Card to analyze a PAJ GPX 1.1 file. The
+preview shows GPS points, drive sections, timestamps, distance, gaps and
+duplicate conflicts. The camper and target trip are visible before confirmation;
+the target trip can be selected or left empty to save free drives. Trip-period
+differences produce warnings but do not block the import. Only explicit
+confirmation writes atomically to the local database.
 
-PAJ GPX 1.1 files can be analyzed with **Import GPX** in the manager card. The
-preview shows sections, time, distance, duration, gaps, jumps and duplicate
-conflicts. The bound camper and target trip are visible before confirmation;
-the camper comes from the card configuration, while the target trip can be
-changed explicitly or left empty. Trip-period differences produce warnings
-only. Only explicit confirmation performs an atomic assignment to an existing
-trip. Distance is the GPS point-to-point track, not a road route.
-See [docs/frontend-cache.md](docs/frontend-cache.md).
+## Trip and expense management
 
-## Trips, drives and stops
+Trips can be created, edited, started, paused and completed. Detected drives can
+be linked to or unlinked from a trip, and manual drives can be stored separately.
+Expenses are summed per trip as integer cents. Mixed currencies are never added
+silently.
 
-Trips can be created, renamed, deleted, started, paused and completed; optional
-start/end dates can be edited. GPS drives are detected conservatively and shown
-with start/end, duration and distance. They can be linked to or unlinked from
-a trip. Manual drives with start location, destination, distance and optional
-duration are stored separately from GPS drives. There is no complete route map
-or detailed route view yet.
+## Privacy and local storage
 
-Stops exist in the schema and authenticated WebSocket API, but are not yet
-operable from Lovelace cards.
-
-## Expense management
-
-The internal category IDs are `camping`, `fuel`, `toll`, `parking`, `food`,
-`activities` and `other`. German labels are translations; the slash in
-“Stellplatz/Campingplatz” is not stored. Expenses use integer cents and are
-summed per trip; mixed currencies are not silently added.
-
-**Beta 11 correction:** `camping` uses a canonical internal ID that remains
-unchanged across selection, WebSocket, database, response and reload,
-independent of the German label. Unknown IDs are rejected; existing entries
-are not automatically recategorized.
-
-## Database, privacy and backups
-
-The integration owns `camper_travel_journal.db` in the Home Assistant
-configuration directory and never opens or changes Recorder/MariaDB. SQLite
-access is serialized; Beta 12 uses schema version 5. The migration adds
-optional trip dates and manual-drive metadata, preserves GPS rows and is
-backward-compatible and retryable as one transaction. Destructive retention
-deletion is disabled in this beta. Include the additional database file in
-backups; see [docs/database-schema.md](docs/database-schema.md).
-
-GPS data is sensitive. Use synthetic coordinates in issues and tests; never
-publish private routes, tokens or unredacted logs.
+The integration stores its data in `camper_travel_journal.db` in the Home
+Assistant configuration directory. It does not use Recorder or MariaDB and
+does not send GPS data to an external service. Include this SQLite file in your
+backups. Do not publish private coordinates, tokens or unredacted logs in
+issues or tests.
 
 ## Known limitations
 
-- No stable release or general production pilot.
-- Stops are not usable from Lovelace yet.
-- No maps, statistics or exports.
-- Retention only calculates candidates and does not delete automatically.
-- Only integration-owned SQLite exists; using HA Recorder/MariaDB is neither
-  decided nor implemented.
-- Separate iOS WebSocket `non-zero reserved bits` messages were not changed.
+- The scope is focused on the travel journal, drives, expenses and GPX import.
+- Maps, statistics and exports are not implemented yet.
+- Stops exist in the backend but are not fully manageable from Lovelace yet.
+- Retention calculates candidates but does not automatically delete in this
+  version.
+- Mobile Safari/WebKit and productive installations still need practical
+  validation.
+
+Technical details about versioned frontend delivery are documented in the
+[frontend cache documentation](docs/frontend-cache.md). Historical
+compatibility states such as `0.1.0-beta.12` remain documented there; the
+current project version is shown by the release badges above.
 
 ## Roadmap
 
-See the status-separated [docs/ROADMAP.md](docs/ROADMAP.md):
+See the status-separated [docs/ROADMAP.md](docs/ROADMAP.md). Planned work
+includes a route/map view, trip history, statistics, exports and complete
+Lovelace stop management.
 
-- **Beta 11:** stable expense-category IDs and the complete `camping` round-trip
-  are implemented and tested.
-- **Beta 12 prepared:** trip periods, visible/assignable drives and manual
-  drives; iOS/WebKit practice validation remains open.
-- **v0.2.x:** maps, trip history, statistics and exports.
-- **Later:** evaluate an alternative HA database backend separately.
-- **v1.0.0:** stable only after sufficient practical validation.
+## Support and contributing
 
-## Support, development and license
-
-- [Bug report](https://github.com/balronu/ha-camper-travel-journal/issues/new?template=bug_report.yml)
-- [Feature request](https://github.com/balronu/ha-camper-travel-journal/issues/new?template=feature_request.yml)
-- [Issues](https://github.com/balronu/ha-camper-travel-journal/issues)
+- [Report a bug](https://github.com/balronu/ha-camper-travel-journal/issues/new?template=bug_report.yml)
+- [Request a feature](https://github.com/balronu/ha-camper-travel-journal/issues/new?template=feature_request.yml)
+- [Issues and pull requests](https://github.com/balronu/ha-camper-travel-journal/issues)
 - [Releases](https://github.com/balronu/ha-camper-travel-journal/releases)
-- [Changelog](CHANGELOG.md)
-- [Architecture](docs/architecture.md) · [Test plan](docs/test-plan.md) · [Branding](docs/BRANDING.md)
+- [Architecture](docs/architecture.md) · [Test plan](docs/test-plan.md)
 
-Local checks:
+Contributions with synthetic test data, a clear problem statement and focused
+regression tests are especially welcome. Changes to GPS, trip or expense logic
+should preserve existing data and atomic backend validation.
 
-```bash
-pytest -q
-python -m compileall -q custom_components tests
-```
+## License
 
-License: MIT, see [LICENSE](LICENSE).
+Camper Travel Journal is released under the [MIT License](LICENSE).

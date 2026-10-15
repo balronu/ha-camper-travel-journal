@@ -23,7 +23,7 @@ const connection = {
     listCalls += 1;
     if (!message.trip_id) return { trips, drives: [], stops: [], expenses: [], expense_summary: { total_minor: 0, currency: "EUR", mixed_currency: false } };
     const trip = trips.find((item) => item.id === message.trip_id);
-    return { trips: trip ? [trip] : [], ...(snapshots[message.trip_id] ?? snapshots.planned) };
+    return { trips, ...(snapshots[message.trip_id] ?? snapshots.planned) };
   },
 };
 const hass = { connection, locale: { language: "de-DE" } };
@@ -48,7 +48,7 @@ const allTripsSelectable = selector()?.options.length === 5;
 selector().value = "planned";
 selector().dispatchEvent(new Event("change", { bubbles: true }));
 await waitFor(() => selector()?.value === "planned" && summary.shadowRoot.querySelector("h2")?.textContent === "Ligaspiel Hoffenheim – Mainz");
-const planned = { selected: selector()?.value, zeroDistance: text().includes("0.0 km"), resumeOnly: text().includes("Reise fortsetzen") && !text().includes("Pausieren") && !text().includes("Abschließen") };
+const planned = { selected: selector()?.value, zeroDistance: text().includes("0.0 km"), startOnly: text().includes("Reise starten") && !text().includes("Reise fortsetzen") && !text().includes("Pausieren") && !text().includes("Abschließen") };
 window.dispatchEvent(new CustomEvent("camper-travel-journal-data-changed", { detail: { vehicleId: "entry-wohnmobil", tripId: "planned" } }));
 await waitFor(() => listCalls >= 6 && selector()?.value === "planned" && summary.shadowRoot.querySelector("h2")?.textContent === "Ligaspiel Hoffenheim – Mainz");
 trips = trips.filter((trip) => trip.id !== "planned").map((trip) => ({ ...trip, status: trip.status === "active" ? "completed" : trip.status }));
@@ -62,7 +62,7 @@ const completed = { selected: selector()?.value, noActiveAction: !text().include
 result.textContent = JSON.stringify({
   allTripsSelectable,
   initialActive: initial.selected === "active-latest" && initial.title && initial.distance && initial.costs && initial.actions,
-  plannedSelection: planned.selected === "planned" && planned.zeroDistance && planned.resumeOnly,
+  plannedSelection: planned.selected === "planned" && planned.zeroDistance && planned.startOnly,
   noActiveFallback: noActiveFallback.selected === "active-latest" && noActiveFallback.fallbackIsLatestRelevant,
   completedSelection: completed.selected === "completed" && completed.noActiveAction,
   refreshedSelectionPersists: listCalls >= 4,

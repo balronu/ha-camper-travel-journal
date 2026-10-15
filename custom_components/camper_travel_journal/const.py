@@ -3,7 +3,7 @@
 from datetime import timedelta
 
 DOMAIN = "camper_travel_journal"
-FRONTEND_VERSION = "0.1.0-beta.15"
+FRONTEND_VERSION = "0.1.0-beta.18"
 FRONTEND_URL = f"/{DOMAIN}/camper-travel-journal.js?v={FRONTEND_VERSION}"
 # HA keeps extra module URLs in memory until they are explicitly removed.  A
 # HACS update/reload can therefore leave any previous beta bundle registered
@@ -11,7 +11,7 @@ FRONTEND_URL = f"/{DOMAIN}/camper-travel-journal.js?v={FRONTEND_VERSION}"
 # complete historical set instead of maintaining an easy-to-forget subset.
 # Cleanup is intentionally repeated on every setup; a reload can discover a
 # URL that was added after the first domain setup.
-LEGACY_FRONTEND_VERSIONS = tuple(f"0.1.0-beta.{n}" for n in range(2, 15))
+LEGACY_FRONTEND_VERSIONS = tuple(f"0.1.0-beta.{n}" for n in range(2, 18))
 DEFAULT_MIN_INTERVAL = timedelta(seconds=30)
 DEFAULT_MIN_MOVEMENT_M = 25.0
 DEFAULT_UNASSIGNED_RETENTION = timedelta(days=90)
