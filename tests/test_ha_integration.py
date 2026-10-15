@@ -62,6 +62,33 @@ else:
         assert await hass.config_entries.async_unload(entry.entry_id)
         assert entry.entry_id not in hass.data[DOMAIN]
 
+    async def test_setup_replaces_stale_frontend_bundle_urls(hass: HomeAssistant, enable_custom_integrations):
+        """Only the current versioned card bundle remains registered after setup."""
+        from unittest.mock import AsyncMock, Mock
+
+        from homeassistant.components.frontend import DATA_EXTRA_MODULE_URL, add_extra_js_url
+        from homeassistant.components.frontend import UrlManager
+        from custom_components import camper_travel_journal
+        from custom_components.camper_travel_journal.const import FRONTEND_URL
+
+        hass.data[DATA_EXTRA_MODULE_URL] = UrlManager(lambda *_args: None, [])
+        hass.http = Mock(async_register_static_paths=AsyncMock())
+        stale = "/camper_travel_journal/camper-travel-journal.js?v=0.1.0-beta.12"
+        add_extra_js_url(hass, stale)
+        assert await camper_travel_journal.async_setup(hass, {})
+        tracker = "device_tracker.frontend_bundle"
+        hass.states.async_set(tracker, "home", {"latitude": 49.0, "longitude": 7.0, "gps_accuracy": 5})
+        entry = MockConfigEntry(domain=DOMAIN, data=_data(tracker))
+        entry.add_to_hass(hass)
+
+        assert await hass.config_entries.async_setup(entry.entry_id)
+        await hass.async_block_till_done()
+        urls = hass.data[DATA_EXTRA_MODULE_URL].urls
+        assert FRONTEND_URL in urls
+        assert stale not in urls
+        assert not any(url.startswith("/camper_travel_journal/camper-travel-journal.js?v=") and url != FRONTEND_URL for url in urls)
+        assert await hass.config_entries.async_unload(entry.entry_id)
+
     async def test_websocket_commands_are_registered_after_entry_setup(
         hass: HomeAssistant, hass_ws_client, enable_custom_integrations
     ):

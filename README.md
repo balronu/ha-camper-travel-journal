@@ -8,6 +8,7 @@ und Kosten werden in einer eigenen SQLite-Datei gespeichert.
 ![Camper Travel Journal Logo](https://raw.githubusercontent.com/balronu/ha-camper-travel-journal/main/assets/branding/logo.png)
 
 > **Stand:** `v0.1.0-beta.12` – aktuell veröffentlichte Pre-Release-Version.
+> Beta 13 ist als Frontend-Hotfix vorbereitet, aber noch nicht veröffentlicht.
 > Die Praxisvalidierung auf iOS/Safari und in einer produktiven HA-Installation
 > bleibt offen.
 
@@ -83,7 +84,7 @@ Die Summary Card zeigt aktuelle Reise, Status, Strecke, Fahrten, Stopps und
 Kosten. Die Manager Card verwaltet Reisen, Statuswechsel, Fahrtzuordnung und
 Kosten. Der visuelle Editor wählt bei genau einem Fahrzeug automatisch aus.
 
-Bundle-URL des vorbereiteten Beta-12-Stands: `/camper_travel_journal/camper-travel-journal.js?v=0.1.0-beta.12`.
+Bundle-URL des vorbereiteten Beta-13-Stands: `/camper_travel_journal/camper-travel-journal.js?v=0.1.0-beta.13`.
 Details: [Frontend-Cache-Standard](docs/frontend-cache.md).
 
 ## Reisen, Fahrten und Zwischenstopps

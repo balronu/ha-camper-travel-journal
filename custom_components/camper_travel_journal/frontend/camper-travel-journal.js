@@ -247,8 +247,8 @@ let w = class extends HTMLElement {
   }
 };
 w.elementStyles = [], w.shadowRootOptions = { mode: "open" }, w[k("elementProperties")] = /* @__PURE__ */ new Map(), w[k("finalized")] = /* @__PURE__ */ new Map(), Vt?.({ ReactiveElement: w }), (j.reactiveElementVersions ??= []).push("2.1.2");
-const st = globalThis, ht = (s) => s, N = st.trustedTypes, ut = N ? N.createPolicy("lit-html", { createHTML: (s) => s }) : void 0, xt = "$lit$", _ = `lit$${Math.random().toFixed(9).slice(2)}$`, wt = "?" + _, Kt = `<${wt}>`, D = document, I = () => D.createComment(""), M = (s) => s === null || typeof s != "object" && typeof s != "function", rt = Array.isArray, Ft = (s) => rt(s) || typeof s?.[Symbol.iterator] == "function", q = `[
-\f\r]`, C = /<(?:(!--|\/[^a-zA-Z])|(\/?[a-zA-Z][^>\s]*)|(\/?$))/g, pt = /-->/g, gt = />/g, b = RegExp(`>|${q}(?:([^\\s"'>=/]+)(${q}*=${q}*(?:[^
+const st = globalThis, ht = (s) => s, N = st.trustedTypes, ut = N ? N.createPolicy("lit-html", { createHTML: (s) => s }) : void 0, xt = "$lit$", _ = `lit$${Math.random().toFixed(9).slice(2)}$`, wt = "?" + _, Kt = `<${wt}>`, D = document, I = () => D.createComment(""), M = (s) => s === null || typeof s != "object" && typeof s != "function", rt = Array.isArray, Ft = (s) => rt(s) || typeof s?.[Symbol.iterator] == "function", q = `[ 	
+\f\r]`, C = /<(?:(!--|\/[^a-zA-Z])|(\/?[a-zA-Z][^>\s]*)|(\/?$))/g, pt = /-->/g, gt = />/g, b = RegExp(`>|${q}(?:([^\\s"'>=/]+)(${q}*=${q}*(?:[^ 	
 \f\r"'\`<>=]|("|')|))|$)`, "g"), mt = /'/g, vt = /"/g, St = /^(?:script|style|textarea|title)$/i, Wt = (s) => (t, ...e) => ({ _$litType$: s, strings: t, values: e }), d = Wt(1), S = /* @__PURE__ */ Symbol.for("lit-noChange"), g = /* @__PURE__ */ Symbol.for("lit-nothing"), ft = /* @__PURE__ */ new WeakMap(), y = D.createTreeWalker(D, 129);
 function At(s, t) {
   if (!rt(s) || !s.hasOwnProperty("raw")) throw Error("invalid template strings array");
@@ -1089,10 +1089,10 @@ function we(s) {
 }
 async function Se(s, t, e = be) {
   const i = { state: "not_run", durationMs: null };
-  if (!s?.connection) return { version: "0.1.0-beta.12", connectionBefore: "unavailable", connectionAfter: "unavailable", authentication: i, vehicles: i, trips: i, vehicleId: W(t) };
+  if (!s?.connection) return { version: "0.1.0-beta.13", connectionBefore: "unavailable", connectionAfter: "unavailable", authentication: i, vehicles: i, trips: i, vehicleId: W(t) };
   const r = bt(s), n = await G(s, { type: "auth/current_user" }, De, e), o = await G(s, { type: "camper_travel_journal/list_vehicles" }, xe, e), c = o.value?.vehicles?.filter((Lt) => typeof Lt.vehicle_id == "string") ?? [], a = c.length === 1 ? c[0].vehicle_id : void 0, p = await G(s, { type: "camper_travel_journal/list", vehicle_id: a ?? t }, we, e), { value: h, ...v } = n, { value: f, ...x } = o, { value: Me, ...Ut } = p;
   return {
-    version: "0.1.0-beta.12",
+    version: "0.1.0-beta.13",
     connectionBefore: r,
     connectionAfter: bt(s),
     authentication: v,
