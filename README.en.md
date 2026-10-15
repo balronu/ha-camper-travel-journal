@@ -7,8 +7,8 @@ stored in an integration-owned SQLite database.
 
 ![Camper Travel Journal Logo](https://raw.githubusercontent.com/balronu/ha-camper-travel-journal/main/assets/branding/logo.png)
 
-> **Status:** `v0.1.0-beta.11` – development beta. Not a stable or generally
-> production-validated release.
+> **Status:** `v0.1.0-beta.11` – published development beta. Not a stable or
+> generally production-validated release.
 
 ## Actual feature status
 
@@ -31,21 +31,19 @@ user feature.
 
 ## HACS installation
 
-The currently published and supported version is `v0.1.0-beta.10`. Beta 11 is
-prepared on PR #8 but has not been published. Existing installations should
-continue to use Beta 10; Beta 11 becomes available only after a separate
-merge, tag and release step.
+The currently published and supported version is `v0.1.0-beta.11`. It remains
+a development beta and has not been generally production-validated.
 
-For the currently published Beta 10:
+For the currently published Beta 11:
 
 1. Open **HACS → Integrations → Custom repositories**.
 2. Add `https://github.com/balronu/ha-camper-travel-journal` as an integration.
-3. Select the `v0.1.0-beta.10` pre-release, not `main`.
+3. Select the `v0.1.0-beta.11` pre-release, not `main`.
 4. Restart Home Assistant manually after installation.
 5. Add the integration under **Settings → Devices & services**.
 
-The prepared Beta 11 will be offered by HACS only after explicit publication.
-A `main` commit is not a beta release. See
+A `main` commit is not a beta release. If HACS does not show the pre-release,
+enable pre-release selection and refresh the repository information. See
 [docs/HACS_RELEASE_STRATEGY.md](docs/HACS_RELEASE_STRATEGY.md).
 
 Manual installation copies `custom_components/camper_travel_journal/`,

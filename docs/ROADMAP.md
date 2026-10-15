@@ -1,8 +1,7 @@
 # Camper Travel Journal – Roadmap
 
 This roadmap separates implemented work, current limitations and planned
-features. It is based on the prepared, not yet published `v0.1.0-beta.11`
-source tree and tests; a
+features. It is based on the published `v0.1.0-beta.11` source tree and tests; a
 database table or WebSocket method is not treated as a finished user feature
 without a corresponding UI and test path.
 
@@ -21,11 +20,10 @@ without a corresponding UI and test path.
 - Expense CRUD, integer-cent totals, mixed-currency protection, inline editing
   and canonical category IDs, including the `camping` round-trip.
 
-## Prepared development baseline: `v0.1.0-beta.11`
+## Current published development baseline: `v0.1.0-beta.11`
 
-This is a development baseline, not a published release. The currently
-published version remains Beta 10. CI covers the pinned Home Assistant
-environment and synthetic/isolated data. Beta 11 adds the canonical `camping`
+This is a published development beta, not a stable release. CI covers the
+pinned Home Assistant environment and synthetic/isolated data. Beta 11 adds the canonical `camping`
 category ID, explicit select-state handling, and a browser/API/storage/reload
 regression path. Existing rows remain untouched until a user explicitly edits
 them.

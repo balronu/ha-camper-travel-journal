@@ -2,7 +2,7 @@
 
 🇩🇪 Deutsch | 🇬🇧 [English](README.en.md)
 
-## 0.1.0-beta.11 – vorbereitet, nicht veröffentlicht
+## 0.1.0-beta.11 – veröffentlicht
 
 - Korrigiert die initiale Kostenkategorie `camping`, die zuvor beim ersten
   Speichern als `other` übertragen werden konnte.
