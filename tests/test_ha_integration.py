@@ -149,5 +149,7 @@ else:
             "camper_travel_journal/create_expense",
             "camper_travel_journal/update_expense",
             "camper_travel_journal/delete_expense",
+            "camper_travel_journal/analyze_gpx",
+            "camper_travel_journal/import_gpx",
         ]
         assert await hass.config_entries.async_unload(entry.entry_id)

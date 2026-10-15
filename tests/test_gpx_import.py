@@ -27,6 +27,12 @@ class GPXImportTests(unittest.TestCase):
         bad = GPX.replace(b'lat="49.0000"', b'lat="190"')
         preview = analyze_gpx(bad, "v")
         self.assertTrue(any("gpx_coordinate_invalid" in item for item in preview.warnings))
+        with self.assertRaisesRegex(ValueError, "gpx_file_too_large"):
+            analyze_gpx(b"x" * (10 * 1024 * 1024 + 1), "v")
+        with self.assertRaisesRegex(ValueError, "gpx_version_unsupported"):
+            analyze_gpx(b'<gpx version="1.0"/>', "v")
+        with self.assertRaisesRegex(ValueError, "gpx_track_missing"):
+            analyze_gpx(b'<gpx version="1.1"/>', "v")
 
     def test_import_is_idempotent_and_transactional(self):
         preview = analyze_gpx(GPX, "v")
@@ -41,6 +47,20 @@ class GPXImportTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, "gpx_already_imported"):
                 store.import_gpx("v", preview, None, now)
             self.assertEqual(store.diagnostic_counts("v")["gps_points"], 3)
+            store.close()
+
+    def test_conflicts_report_duplicate_points_and_overlapping_drives(self):
+        preview = analyze_gpx(GPX, "v")
+        with TemporaryDirectory() as directory:
+            store = SQLiteStore(f"{directory}/journal.db")
+            store.open()
+            from datetime import datetime
+            now = datetime(2026, 10, 15, tzinfo=timezone.utc)
+            store.insert_vehicle("v", "Camper", "device_tracker.v", now)
+            result = store.gpx_conflicts("v", preview)
+            self.assertFalse(result["duplicate_file"])
+            self.assertEqual(result["duplicate_points"], 0)
+            self.assertEqual(result["overlapping_drives"], 0)
             store.close()
 
     def test_failed_target_assignment_rolls_back_import_metadata_and_points(self):
