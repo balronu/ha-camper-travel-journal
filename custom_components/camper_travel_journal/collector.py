@@ -2,7 +2,8 @@
 
 from __future__ import annotations
 
-from dataclasses import dataclass
+from collections import Counter
+from dataclasses import dataclass, field
 from datetime import datetime, timezone, timedelta
 import sqlite3
 from typing import Any
@@ -10,7 +11,7 @@ from typing import Any
 from .const import DEFAULT_MAX_GAP_MINUTES, DEFAULT_MAX_SPEED_KMH, DEFAULT_STOP_AFTER_MINUTES
 from .detector import DetectorConfig, DriveDetector
 from .models import GPSPoint
-from .validation import ensure_aware_utc, should_store_point, validate_point
+from .validation import ensure_aware_utc, point_filter_reason, validate_point
 
 
 @dataclass
@@ -25,6 +26,9 @@ class CollectorStats:
     stops: int = 0
     distance_m: float = 0.0
     errors: int = 0
+    reasons: Counter[str] = field(default_factory=Counter)
+    last_event_at: datetime | None = None
+    last_accepted_at: datetime | None = None
 
 
 class GPSCollector:
@@ -44,6 +48,7 @@ class GPSCollector:
                 max_speed_kmh=float(config.get("max_speed", DEFAULT_MAX_SPEED_KMH)),
             )) for vehicle_id, config in vehicles.items()
         }
+        self.started_at = datetime.now(timezone.utc)
 
     def restore_points(self, vehicle_id: str, rows: list[tuple]) -> None:
         """Replay a bounded persisted tail without emitting new writes."""
@@ -59,7 +64,10 @@ class GPSCollector:
 
     async def async_process_event(self, vehicle_id: str, state: str, attributes: dict[str, Any], event_time: datetime | None = None) -> None:
         self.stats.received += 1
+        received_at = self._event_time(event_time)
+        self.stats.last_event_at = received_at
         if state in {"unknown", "unavailable"}:
+            self.stats.reasons[f"state_{state}"] += 1
             return
         try:
             point = GPSPoint(vehicle_id, self._timestamp(attributes, event_time), float(attributes["latitude"]), float(attributes["longitude"]), self._float(attributes.get("gps_accuracy")), source_state=state, source_type=attributes.get("source_type"), raw_state=state)
@@ -67,12 +75,16 @@ class GPSCollector:
             if not validation.accepted:
                 self.stats.rejected_jump += validation.reason == "implausible_jump"
                 self.stats.invalid += validation.reason != "implausible_jump"
+                self.stats.reasons[validation.reason or "invalid"] += 1
                 return
             previous = self._last_stored.get(vehicle_id)
-            if previous is not None and not should_store_point(previous, point, int(self.vehicles[vehicle_id].get("min_interval", 30)), float(self.vehicles[vehicle_id].get("min_movement", 25))):
+            filter_reason = point_filter_reason(previous, point, int(self.vehicles[vehicle_id].get("min_interval", 30)), float(self.vehicles[vehicle_id].get("min_movement", 25)))
+            if filter_reason is not None:
                 self.stats.duplicate += 1
+                self.stats.reasons[filter_reason] += 1
             else:
                 self.stats.accepted += 1
+                self.stats.last_accepted_at = point.recorded_at
                 if not self.dry_run:
                     await self.storage.async_insert_point(point)
                 self._last_stored[vehicle_id] = point
@@ -88,10 +100,36 @@ class GPSCollector:
                             await self.storage.async_call("auto_assign_drive", vehicle_id, event.drive.id, event.drive.ended_at)
         except (KeyError, TypeError, ValueError, OverflowError, sqlite3.Error, OSError, RuntimeError):
             self.stats.errors += 1
+            self.stats.reasons["processing_error"] += 1
+
+    def diagnostics(self, vehicle_id: str) -> dict[str, Any]:
+        """Return counters and state without coordinates or private GPS data."""
+        detector = self._detectors[vehicle_id]
+        return {
+            "started_at": self.started_at.isoformat(),
+            "received_events": self.stats.received,
+            "accepted_points": self.stats.accepted,
+            "discarded_events": sum(self.stats.reasons.values()),
+            "discard_reasons": dict(sorted(self.stats.reasons.items())),
+            "last_tracker_event_at": self._iso(self.stats.last_event_at),
+            "last_accepted_point_at": self._iso(self.stats.last_accepted_at),
+            "drive_state": detector.state.value,
+            "start_candidate_samples": detector.start_count,
+            "open_drive": detector.drive_started is not None,
+            "gps_gap": detector.state.value == "gps_gap",
+        }
 
     @staticmethod
     def _float(value):
         return None if value is None else float(value)
+
+    @staticmethod
+    def _event_time(value: datetime | None) -> datetime:
+        return ensure_aware_utc(value) if value is not None else datetime.now(timezone.utc)
+
+    @staticmethod
+    def _iso(value: datetime | None) -> str | None:
+        return None if value is None else ensure_aware_utc(value).isoformat()
 
     @staticmethod
     def _timestamp(attributes, event_time):

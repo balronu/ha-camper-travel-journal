@@ -57,8 +57,12 @@ else:
         assert await hass.config_entries.async_setup(entry.entry_id)
         await hass.async_block_till_done()
         assert entry.entry_id in hass.data[DOMAIN]
+        runtime = hass.data[DOMAIN][entry.entry_id]
+        assert runtime.collector.stats.received >= 1  # startup sample
         hass.states.async_set(tracker, "home", {"latitude": 49.001, "longitude": 7.0, "gps_accuracy": 5})
         await hass.async_block_till_done()
+        assert hass.states.get(tracker).state == "home"
+        assert runtime.collector.stats.received >= 2  # state unchanged, GPS attributes changed
         assert await hass.config_entries.async_unload(entry.entry_id)
         assert entry.entry_id not in hass.data[DOMAIN]
 
@@ -112,6 +116,12 @@ else:
         assert listed["success"] is True
         assert set(listed["result"]) == {"trips", "drives", "stops"}
 
+        await client.send_json({"id": 3, "type": "camper_travel_journal/diagnostics", "vehicle_id": entry.entry_id})
+        diagnostics = await client.receive_json()
+        assert diagnostics["success"] is True
+        assert diagnostics["result"]["tracker_entity"] == tracker
+        assert "latitude" not in str(diagnostics["result"])
+
         # All write handlers are checked through the same registration list;
         # this test deliberately does not invoke a mutating command.
         from custom_components.camper_travel_journal import api
@@ -119,6 +129,7 @@ else:
         assert [command._ws_command for command in api.COMMANDS] == [
             "camper_travel_journal/list_vehicles",
             "camper_travel_journal/list",
+            "camper_travel_journal/diagnostics",
             "camper_travel_journal/create_trip",
             "camper_travel_journal/update_trip",
             "camper_travel_journal/delete_trip",

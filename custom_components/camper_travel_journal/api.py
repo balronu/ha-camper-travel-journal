@@ -107,6 +107,15 @@ if websocket_api is not None:
         except Exception as err:  # API boundary must not expose tracebacks
             _send_error(connection, msg, err)
 
+    @websocket_api.websocket_command(_base("camper_travel_journal/diagnostics"))
+    @websocket_api.async_response
+    async def ws_diagnostics(hass: HomeAssistant, connection, msg: dict) -> None:
+        """Return read-only collector health without GPS coordinates."""
+        try:
+            connection.send_result(msg["id"], await _runtime(hass, msg["vehicle_id"]).async_diagnostics())
+        except Exception as err:
+            _send_error(connection, msg, err)
+
     @websocket_api.websocket_command({**_base("camper_travel_journal/create_trip"), vol.Required("title"): str, vol.Optional("description", default=""): str, vol.Optional("destination", default=""): str, vol.Optional("started_at"): str, vol.Optional("start_date"): str, vol.Optional("end_date"): str})
     @websocket_api.async_response
     async def ws_create_trip(hass, connection, msg):
@@ -258,7 +267,7 @@ if websocket_api is not None:
             connection.send_result(msg["id"], {"success": True})
         except Exception as err: _send_error(connection, msg, err)
 
-    COMMANDS = (ws_list_vehicles, ws_list, ws_create_trip, ws_update_trip, ws_delete_trip, ws_transition_trip, ws_link_drives, ws_unlink_drive, ws_create_manual_drive, ws_update_manual_drive, ws_delete_manual_drive, ws_create_stop, ws_update_stop, ws_delete_stop, ws_create_expense, ws_update_expense, ws_delete_expense)
+    COMMANDS = (ws_list_vehicles, ws_list, ws_diagnostics, ws_create_trip, ws_update_trip, ws_delete_trip, ws_transition_trip, ws_link_drives, ws_unlink_drive, ws_create_manual_drive, ws_update_manual_drive, ws_delete_manual_drive, ws_create_stop, ws_update_stop, ws_delete_stop, ws_create_expense, ws_update_expense, ws_delete_expense)
 else:
     COMMANDS = ()
 

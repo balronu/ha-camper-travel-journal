@@ -40,7 +40,9 @@ class DomainTests(unittest.TestCase):
         distance_before_gap = detector.distance_m
         events = detector.ingest(point(start + timedelta(minutes=30), lon=8.0))
         self.assertTrue(any(event.kind == "gps_gap" for event in events))
-        self.assertEqual(detector.distance_m, distance_before_gap)
+        finished = next(event for event in events if event.kind == "drive_finished")
+        self.assertEqual(finished.drive.distance_m, distance_before_gap)
+        self.assertEqual(detector.distance_m, 0.0)
 
     def test_drive_start_and_stationary_finish(self) -> None:
         detector = DriveDetector("vehicle-1", DetectorConfig(stop_after=timedelta(minutes=5)))

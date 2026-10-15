@@ -6,7 +6,7 @@ features that are only planned.
 ## Runtime flow
 
 ```text
-Home Assistant device_tracker state event
+Home Assistant device_tracker state/state_reported event
         │
         ▼
 Runtime → GPSCollector → validation/detector → AsyncSQLiteWorker
@@ -17,9 +17,10 @@ Runtime → GPSCollector → validation/detector → AsyncSQLiteWorker
 Lovelace cards → authenticated HA WebSocket API → same worker/database
 ```
 
-Recording is opt-in in the Config-/Options Flow. `Runtime` installs a state
-listener only when recording is enabled, restores a bounded recent point tail,
-and closes the listener and worker on unload.
+Recording is opt-in in the Config-/Options Flow. `Runtime` installs a filtered
+state listener and a filtered `state_reported` listener only when recording is
+enabled, restores a bounded recent point tail, samples the current tracker
+state on startup, and closes both listeners and the worker on unload.
 
 ## Implemented components
 
@@ -37,6 +38,10 @@ and closes the listener and worker on unload.
 5. **Lovelace cards** are the Summary Card and Manager Card. The Manager Card
    handles trip lifecycle, drive assignment and expense CRUD. The diagnostic
    card is manual and read-only.
+6. **Collector diagnostics** are available through the authenticated,
+   read-only `camper_travel_journal/diagnostics` command. They expose counters,
+   timestamps, filter reasons, detector state and aggregate database counts,
+   but never GPS coordinates.
 
 ## Deliberate boundaries
 

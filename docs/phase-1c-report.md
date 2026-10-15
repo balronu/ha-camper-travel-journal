@@ -21,8 +21,9 @@ Die Implementierung enthält inzwischen:
 Unvollständig bzw. nicht produktionsreif bleiben:
 
 - Die HA-Integration wurde nicht in einer echten HA-2026.10.1-Instanz geladen.
-- `state_reported` für attribute-only GPS-Updates ist noch nicht integriert;
-  aktuell wird `async_track_state_change_event` verwendet.
+- `state_reported` wird zusätzlich entity-gefiltert abonniert; der bestehende
+  `async_track_state_change_event`-Listener verarbeitet weiterhin echte State-
+  oder Attributänderungen.
 - Echter HA-Config-/Options-Flow, Listener-Unload und Backup/Restore sind nur
   offline bzw. durch Codeprüfung abgedeckt.
 - MariaDB/PostgreSQL-Adapter existieren nicht.

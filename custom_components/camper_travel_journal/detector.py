@@ -47,7 +47,11 @@ class DriveDetector:
             if elapsed > self.config.max_gap:
                 if self.state == DriveState.DRIVING:
                     events.append(DetectionEvent("gps_gap", point.recorded_at, reason="gap_not_counted_as_distance"))
-                self.state = DriveState.GPS_GAP
+                    if self.previous is not None:
+                        events.append(self._finish(self.previous, "gps_gap"))
+                        self.state = DriveState.GPS_GAP
+                else:
+                    self.state = DriveState.GPS_GAP
                 self.start_count = 0
                 self.previous = point
                 return events
