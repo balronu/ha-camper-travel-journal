@@ -1,7 +1,6 @@
 # Camper Travel Journal
 
-A privacy-conscious Home Assistant custom integration for **Your digital camper
-travel journal**. GPS points, detected drives, trips, stops and expenses are
+A privacy-conscious Home Assistant custom integration for **Your digital camper travel journal**. GPS points, detected drives, trips, stops and expenses are
 stored in an integration-owned SQLite database.
 
 [Deutsch](README.md) | 🇬🇧 English
