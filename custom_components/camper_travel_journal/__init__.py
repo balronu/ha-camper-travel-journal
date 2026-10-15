@@ -14,7 +14,7 @@ from .runtime import Runtime
 from .storage import AsyncSQLiteWorker
 from .api import async_register as async_register_api
 
-VERSION = "0.1.0-beta.8"
+VERSION = "0.1.0-beta.9"
 
 PLATFORMS: list[str] = []
 CONFIG_SCHEMA = cv.config_entry_only_config_schema(DOMAIN) if cv else None
@@ -39,6 +39,11 @@ async def async_setup(hass, config):
 
 async def async_setup_entry(hass, entry):
     """Prepare an entry; recording remains opt-in through the entry option."""
+    # Config-entry setup must be self-sufficient.  In particular, HA can set up
+    # an entry after a reload without re-running the domain setup hook.  Keep
+    # this idempotent call here so the authenticated websocket commands are
+    # present whenever the integration has a loaded entry.
+    async_register_api(hass)
     path = Path(hass.config.path("camper_travel_journal.db"))
     worker = AsyncSQLiteWorker(path)
     await worker.async_open()
@@ -55,4 +60,4 @@ async def async_unload_entry(hass, entry):
     return True
 
 DOMAIN = "camper_travel_journal"
-VERSION = "0.1.0-beta.8"
+VERSION = "0.1.0-beta.9"

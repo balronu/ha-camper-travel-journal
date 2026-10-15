@@ -67,6 +67,8 @@ describe("read-only WebSocket diagnostics", () => {
     expect(card).toContain("Diagnose wiederholen");
     expect(card).toContain("Bericht kopieren");
     expect(card).toContain("navigator.clipboard");
+    expect(card).toContain("manuell auswählen");
+    expect(card).toContain("readonly");
     expect(summary).toContain('this.loadError = ""');
     expect(manager).toContain('this.loadError = ""');
     expect(manager).toContain("private actionError");

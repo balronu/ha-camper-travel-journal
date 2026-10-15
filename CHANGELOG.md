@@ -2,6 +2,13 @@
 
 🇩🇪 Deutsch | 🇬🇧 [English](README.en.md)
 
+## 0.1.0-beta.9 – WebSocket-Registrierung und iOS-Kopierfallback
+
+- Registriert die WebSocket-Befehle beim Laden eines Config Entries und ergänzt
+  einen echten HA-WebSocket-Regressionstest für `list` und `list_vehicles`.
+- Prüft die vollständige Befehlsliste ohne schreibende Testoperation.
+- Ergänzt eine manuell auswählbare Diagnosebericht-Ausgabe für iOS/Safari.
+
 ## 0.1.0-beta.8 – Read-only-WebSocket-Diagnose
 
 - Ergänzt eine manuell startbare Diagnosekarte für authentifizierte
