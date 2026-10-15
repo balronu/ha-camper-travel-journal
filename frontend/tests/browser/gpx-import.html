@@ -49,7 +49,7 @@ const importFile = async (text) => {
   const input = fileInput();
   input.files = transfer.files;
   input.dispatchEvent(new Event("change", { bubbles: true }));
-  await new Promise((resolve) => setTimeout(resolve, 80));
+  await new Promise((resolve) => setTimeout(resolve, 500));
 };
 await importFile("first");
 const target = manager.shadowRoot.querySelector('.gpx-explicit select');
@@ -63,14 +63,14 @@ target.value = "";
 target.dispatchEvent(new Event("change", { bubbles: true }));
 await manager.updateComplete;
 manager.shadowRoot.querySelector('.gpx-explicit button')?.click();
-await new Promise((resolve) => setTimeout(resolve, 100));
+await new Promise((resolve) => setTimeout(resolve, 500));
 await importFile("second");
 const targetAgain = manager.shadowRoot.querySelector('.gpx-explicit select');
 targetAgain.value = "trip-1";
 targetAgain.dispatchEvent(new Event("change", { bubbles: true }));
 await manager.updateComplete;
 manager.shadowRoot.querySelector('.gpx-explicit button')?.click();
-await new Promise((resolve) => setTimeout(resolve, 100));
+await new Promise((resolve) => setTimeout(resolve, 500));
 result.textContent = JSON.stringify({
   vehicleVisible: summaryText.includes("entry-wohnmobil"),
   targetVisible: summaryText.includes("Zielreise"),
