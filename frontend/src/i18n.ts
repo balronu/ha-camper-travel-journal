@@ -15,7 +15,10 @@ type Messages = {
   tripDeleteError: string; expenseCreateError: string; expenseEditError: string; expenseDeleteError: string;
   driveAssignError: string; categories: Record<string, string>; statuses: Record<string, string>;
   amountInvalid: string; categoryInvalid: string; mixedCurrency: string; cancel: string; saving: string; total: string;
-  editorVehicle: string; editorChooseVehicle: string; editorLoading: string; editorNoVehicle: string; editorLoadError: string;
+  editorVehicle: string; editorChooseVehicle: string; editorLoading: string; editorNoVehicle: string; editorLoadError: string; confirmDelete: string;
+  startDate: string; endDate: string; period: string; noDrives: string; driveStart: string; driveEnd: string; duration: string;
+  sourceGps: string; sourceManual: string; startLocation: string; endLocation: string; distanceKm: string; durationMinutes: string;
+  manualDrive: string; createDrive: string; driveCreateError: string; driveEditError: string; driveDeleteError: string; dateInvalid: string;
 };
 
 const de: Messages = {
@@ -23,7 +26,7 @@ const de: Messages = {
   loadError: "Reisedaten konnten nicht geladen werden.", statusError: "Reisestatus konnte nicht geändert werden.", distance: "Strecke", drives: "Fahrten", stops: "Zwischenstopps", costs: "Kosten", resume: "Reise fortsetzen", pause: "Pausieren", complete: "Abschließen",
   manager: "Reiseverwaltung", newTrip: "Neue Reise", tripName: "Reisename", destination: "Reiseziel", create: "Anlegen", trips: "Reisen", edit: "Bearbeiten", remove: "Löschen", details: "Details", close: "Schließen", assignedDrives: "Fahrten dieser Reise", freeDrives: "Freie Fahrten", assign: "Zuordnen", unassign: "Zuordnung lösen", expenses: "Kosten", amount: "Betrag", category: "Kategorie", save: "Speichern", deleteCost: "Kosten löschen?", tripDeleteConfirm: "Reise löschen? Zugehörige Fahrten bleiben erhalten.", expenseDeleteConfirm: "Kosten löschen?", tripCreateError: "Reise konnte nicht gespeichert werden.", tripEditError: "Reise konnte nicht bearbeitet werden.", tripDeleteError: "Reise konnte nicht gelöscht werden.", expenseCreateError: "Ausgabe konnte nicht gespeichert werden.", expenseEditError: "Kosten konnten nicht bearbeitet werden.", expenseDeleteError: "Kosten konnten nicht gelöscht werden.", driveAssignError: "Fahrt konnte nicht zugeordnet werden.",
   categories: { camping: "Stellplatz/Campingplatz", fuel: "Kraftstoff", toll: "Maut", parking: "Parkgebühren", food: "Verpflegung", activities: "Aktivitäten", other: "Sonstiges" }, statuses: { planned: "geplant", active: "aktiv", paused: "pausiert", completed: "abgeschlossen" }, amountInvalid: "Bitte einen gültigen Betrag mit höchstens zwei Nachkommastellen eingeben.", categoryInvalid: "Bitte eine gültige Kostenkategorie auswählen.", mixedCurrency: "Mehrere Währungen", cancel: "Abbrechen", saving: "Speichern …", total: "Gesamt",
-  editorVehicle: "Wohnmobil", editorChooseVehicle: "Wohnmobil auswählen", editorLoading: "Wohnmobile werden geladen …", editorNoVehicle: "Kein eingerichtetes Wohnmobil gefunden.", editorLoadError: "Wohnmobile konnten nicht geladen werden.",
+  editorVehicle: "Wohnmobil", editorChooseVehicle: "Wohnmobil auswählen", editorLoading: "Wohnmobile werden geladen …", editorNoVehicle: "Kein eingerichtetes Wohnmobil gefunden.", editorLoadError: "Wohnmobile konnten nicht geladen werden.", confirmDelete: "Nochmals zum Bestätigen klicken", startDate: "Beginn", endDate: "Ende", period: "Reisezeitraum", noDrives: "Noch keine Fahrten erfasst.", driveStart: "Start", driveEnd: "Ende", duration: "Dauer", sourceGps: "GPS-erkannt", sourceManual: "Manuell", startLocation: "Startort", endLocation: "Zielort", distanceKm: "Kilometer", durationMinutes: "Dauer in Minuten", manualDrive: "Manuelle Fahrt", createDrive: "Fahrt anlegen", driveCreateError: "Fahrt konnte nicht gespeichert werden.", driveEditError: "Manuelle Fahrt konnte nicht bearbeitet werden.", driveDeleteError: "Manuelle Fahrt konnte nicht gelöscht werden.", dateInvalid: "Bitte gültige Daten eingeben.",
 };
 
 const en: Messages = {
@@ -31,7 +34,7 @@ const en: Messages = {
   loadError: "Travel data could not be loaded.", statusError: "Trip status could not be changed.", distance: "Distance", drives: "Drives", stops: "Stops", costs: "Costs", resume: "Resume trip", pause: "Pause", complete: "Complete",
   manager: "Trip management", newTrip: "New trip", tripName: "Trip name", destination: "Destination", create: "Create", trips: "Trips", edit: "Edit", remove: "Delete", details: "Details", close: "Close", assignedDrives: "Drives in this trip", freeDrives: "Unassigned drives", assign: "Assign", unassign: "Unassign", expenses: "Costs", amount: "Amount", category: "Category", save: "Save", deleteCost: "Delete cost?", tripDeleteConfirm: "Delete trip? Assigned drives will be kept.", expenseDeleteConfirm: "Delete cost?", tripCreateError: "Trip could not be saved.", tripEditError: "Trip could not be edited.", tripDeleteError: "Trip could not be deleted.", expenseCreateError: "Cost could not be saved.", expenseEditError: "Cost could not be edited.", expenseDeleteError: "Cost could not be deleted.", driveAssignError: "Drive could not be assigned.",
   categories: { camping: "Camping site", fuel: "Fuel", toll: "Toll", parking: "Parking fees", food: "Food", activities: "Activities", other: "Other" }, statuses: { planned: "planned", active: "active", paused: "paused", completed: "completed" }, amountInvalid: "Enter a valid amount with no more than two decimal places.", categoryInvalid: "Select a valid cost category.", mixedCurrency: "Multiple currencies", cancel: "Cancel", saving: "Saving …", total: "Total",
-  editorVehicle: "Camper", editorChooseVehicle: "Select camper", editorLoading: "Loading campers …", editorNoVehicle: "No configured camper found.", editorLoadError: "Configured campers could not be loaded.",
+  editorVehicle: "Camper", editorChooseVehicle: "Select camper", editorLoading: "Loading campers …", editorNoVehicle: "No configured camper found.", editorLoadError: "Configured campers could not be loaded.", confirmDelete: "Click again to confirm", startDate: "Start", endDate: "End", period: "Travel period", noDrives: "No drives recorded yet.", driveStart: "Start", driveEnd: "End", duration: "Duration", sourceGps: "GPS detected", sourceManual: "Manual", startLocation: "Start location", endLocation: "Destination", distanceKm: "Distance in km", durationMinutes: "Duration in minutes", manualDrive: "Manual drive", createDrive: "Create drive", driveCreateError: "Drive could not be saved.", driveEditError: "Manual drive could not be edited.", driveDeleteError: "Manual drive could not be deleted.", dateInvalid: "Enter valid dates.",
 };
 
 export function messages(hass?: Hass): Messages {
@@ -42,6 +45,21 @@ export function messages(hass?: Hass): Messages {
 export function formatDate(value: string, hass?: Hass): string {
   const language = (hass?.locale?.language ?? "").toLowerCase().startsWith("de") ? "de-DE" : "en-US";
   return new Date(value).toLocaleDateString(language);
+}
+export function formatDateTime(value: string, hass?: Hass): string {
+  const language = (hass?.locale?.language ?? "").toLowerCase().startsWith("de") ? "de-DE" : "en-US";
+  return new Date(value).toLocaleString(language, { dateStyle: "short", timeStyle: "short" });
+}
+export function formatDuration(seconds: number | undefined, hass?: Hass): string {
+  const minutes = Math.max(0, Math.round((seconds ?? 0) / 60));
+  if (minutes < 60) return `${minutes} min`;
+  const hours = Math.floor(minutes / 60);
+  return `${hours} h ${minutes % 60} min`;
+}
+export function formatTripPeriod(trip: { start_date?: string | null; end_date?: string | null; started_at?: string; ended_at?: string | null }, hass?: Hass): string {
+  if (trip.start_date || trip.end_date) return [trip.start_date, trip.end_date].filter(Boolean).join(" – ") || "";
+  if (trip.started_at) return `${formatDate(trip.started_at, hass)}${trip.ended_at ? ` – ${formatDate(trip.ended_at, hass)}` : ""}`;
+  return "";
 }
 
 export function statusLabel(status: string, hass?: Hass): string { return messages(hass).statuses[status] ?? status; }

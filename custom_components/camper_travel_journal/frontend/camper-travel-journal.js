@@ -1,200 +1,200 @@
-const M = globalThis, Q = M.ShadowRoot && (M.ShadyCSS === void 0 || M.ShadyCSS.nativeShadow) && "adoptedStyleSheets" in Document.prototype && "replace" in CSSStyleSheet.prototype, Y = /* @__PURE__ */ Symbol(), re = /* @__PURE__ */ new WeakMap();
-let _e = class {
-  constructor(e, t, s) {
-    if (this._$cssResult$ = !0, s !== Y) throw Error("CSSResult is not constructable. Use `unsafeCSS` or `css` instead.");
-    this.cssText = e, this.t = t;
+const R = globalThis, et = R.ShadowRoot && (R.ShadyCSS === void 0 || R.ShadyCSS.nativeShadow) && "adoptedStyleSheets" in Document.prototype && "replace" in CSSStyleSheet.prototype, it = /* @__PURE__ */ Symbol(), ot = /* @__PURE__ */ new WeakMap();
+let Et = class {
+  constructor(t, e, i) {
+    if (this._$cssResult$ = !0, i !== it) throw Error("CSSResult is not constructable. Use `unsafeCSS` or `css` instead.");
+    this.cssText = t, this.t = e;
   }
   get styleSheet() {
-    let e = this.o;
-    const t = this.t;
-    if (Q && e === void 0) {
-      const s = t !== void 0 && t.length === 1;
-      s && (e = re.get(t)), e === void 0 && ((this.o = e = new CSSStyleSheet()).replaceSync(this.cssText), s && re.set(t, e));
+    let t = this.o;
+    const e = this.t;
+    if (et && t === void 0) {
+      const i = e !== void 0 && e.length === 1;
+      i && (t = ot.get(e)), t === void 0 && ((this.o = t = new CSSStyleSheet()).replaceSync(this.cssText), i && ot.set(e, t));
     }
-    return e;
+    return t;
   }
   toString() {
     return this.cssText;
   }
 };
-const Re = (i) => new _e(typeof i == "string" ? i : i + "", void 0, Y), j = (i, ...e) => {
-  const t = i.length === 1 ? i[0] : e.reduce((s, r, n) => s + ((a) => {
-    if (a._$cssResult$ === !0) return a.cssText;
-    if (typeof a == "number") return a;
-    throw Error("Value passed to 'css' function must be a 'css' function result: " + a + ". Use 'unsafeCSS' to pass non-literal values, but take care to ensure page security.");
-  })(r) + i[n + 1], i[0]);
-  return new _e(t, i, Y);
-}, Ie = (i, e) => {
-  if (Q) i.adoptedStyleSheets = e.map((t) => t instanceof CSSStyleSheet ? t : t.styleSheet);
-  else for (const t of e) {
-    const s = document.createElement("style"), r = M.litNonce;
-    r !== void 0 && s.setAttribute("nonce", r), s.textContent = t.cssText, i.appendChild(s);
+const Rt = (s) => new Et(typeof s == "string" ? s : s + "", void 0, it), O = (s, ...t) => {
+  const e = s.length === 1 ? s[0] : t.reduce((i, r, n) => i + ((o) => {
+    if (o._$cssResult$ === !0) return o.cssText;
+    if (typeof o == "number") return o;
+    throw Error("Value passed to 'css' function must be a 'css' function result: " + o + ". Use 'unsafeCSS' to pass non-literal values, but take care to ensure page security.");
+  })(r) + s[n + 1], s[0]);
+  return new Et(e, s, it);
+}, Nt = (s, t) => {
+  if (et) s.adoptedStyleSheets = t.map((e) => e instanceof CSSStyleSheet ? e : e.styleSheet);
+  else for (const e of t) {
+    const i = document.createElement("style"), r = R.litNonce;
+    r !== void 0 && i.setAttribute("nonce", r), i.textContent = e.cssText, s.appendChild(i);
   }
-}, ne = Q ? (i) => i : (i) => i instanceof CSSStyleSheet ? ((e) => {
-  let t = "";
-  for (const s of e.cssRules) t += s.cssText;
-  return Re(t);
-})(i) : i;
-const { is: Pe, defineProperty: Me, getOwnPropertyDescriptor: Ne, getOwnPropertyNames: Oe, getOwnPropertySymbols: je, getPrototypeOf: He } = Object, H = globalThis, ae = H.trustedTypes, Le = ae ? ae.emptyScript : "", ze = H.reactiveElementPolyfillSupport, k = (i, e) => i, J = { toAttribute(i, e) {
-  switch (e) {
+}, ct = et ? (s) => s : (s) => s instanceof CSSStyleSheet ? ((t) => {
+  let e = "";
+  for (const i of t.cssRules) e += i.cssText;
+  return Rt(e);
+})(s) : s;
+const { is: Pt, defineProperty: Ot, getOwnPropertyDescriptor: jt, getOwnPropertyNames: Ht, getOwnPropertySymbols: qt, getPrototypeOf: zt } = Object, j = globalThis, dt = j.trustedTypes, Bt = dt ? dt.emptyScript : "", Vt = j.reactiveElementPolyfillSupport, k = (s, t) => s, X = { toAttribute(s, t) {
+  switch (t) {
     case Boolean:
-      i = i ? Le : null;
+      s = s ? Bt : null;
       break;
     case Object:
     case Array:
-      i = i == null ? i : JSON.stringify(i);
+      s = s == null ? s : JSON.stringify(s);
   }
-  return i;
-}, fromAttribute(i, e) {
-  let t = i;
-  switch (e) {
+  return s;
+}, fromAttribute(s, t) {
+  let e = s;
+  switch (t) {
     case Boolean:
-      t = i !== null;
+      e = s !== null;
       break;
     case Number:
-      t = i === null ? null : Number(i);
+      e = s === null ? null : Number(s);
       break;
     case Object:
     case Array:
       try {
-        t = JSON.parse(i);
+        e = JSON.parse(s);
       } catch {
-        t = null;
+        e = null;
       }
   }
-  return t;
-} }, ye = (i, e) => !Pe(i, e), oe = { attribute: !0, type: String, converter: J, reflect: !1, useDefault: !1, hasChanged: ye };
-Symbol.metadata ??= /* @__PURE__ */ Symbol("metadata"), H.litPropertyMetadata ??= /* @__PURE__ */ new WeakMap();
+  return e;
+} }, Dt = (s, t) => !Pt(s, t), lt = { attribute: !0, type: String, converter: X, reflect: !1, useDefault: !1, hasChanged: Dt };
+Symbol.metadata ??= /* @__PURE__ */ Symbol("metadata"), j.litPropertyMetadata ??= /* @__PURE__ */ new WeakMap();
 let w = class extends HTMLElement {
-  static addInitializer(e) {
-    this._$Ei(), (this.l ??= []).push(e);
+  static addInitializer(t) {
+    this._$Ei(), (this.l ??= []).push(t);
   }
   static get observedAttributes() {
     return this.finalize(), this._$Eh && [...this._$Eh.keys()];
   }
-  static createProperty(e, t = oe) {
-    if (t.state && (t.attribute = !1), this._$Ei(), this.prototype.hasOwnProperty(e) && ((t = Object.create(t)).wrapped = !0), this.elementProperties.set(e, t), !t.noAccessor) {
-      const s = /* @__PURE__ */ Symbol(), r = this.getPropertyDescriptor(e, s, t);
-      r !== void 0 && Me(this.prototype, e, r);
+  static createProperty(t, e = lt) {
+    if (e.state && (e.attribute = !1), this._$Ei(), this.prototype.hasOwnProperty(t) && ((e = Object.create(e)).wrapped = !0), this.elementProperties.set(t, e), !e.noAccessor) {
+      const i = /* @__PURE__ */ Symbol(), r = this.getPropertyDescriptor(t, i, e);
+      r !== void 0 && Ot(this.prototype, t, r);
     }
   }
-  static getPropertyDescriptor(e, t, s) {
-    const { get: r, set: n } = Ne(this.prototype, e) ?? { get() {
-      return this[t];
-    }, set(a) {
-      this[t] = a;
+  static getPropertyDescriptor(t, e, i) {
+    const { get: r, set: n } = jt(this.prototype, t) ?? { get() {
+      return this[e];
+    }, set(o) {
+      this[e] = o;
     } };
-    return { get: r, set(a) {
+    return { get: r, set(o) {
       const c = r?.call(this);
-      n?.call(this, a), this.requestUpdate(e, c, s);
+      n?.call(this, o), this.requestUpdate(t, c, i);
     }, configurable: !0, enumerable: !0 };
   }
-  static getPropertyOptions(e) {
-    return this.elementProperties.get(e) ?? oe;
+  static getPropertyOptions(t) {
+    return this.elementProperties.get(t) ?? lt;
   }
   static _$Ei() {
     if (this.hasOwnProperty(k("elementProperties"))) return;
-    const e = He(this);
-    e.finalize(), e.l !== void 0 && (this.l = [...e.l]), this.elementProperties = new Map(e.elementProperties);
+    const t = zt(this);
+    t.finalize(), t.l !== void 0 && (this.l = [...t.l]), this.elementProperties = new Map(t.elementProperties);
   }
   static finalize() {
     if (this.hasOwnProperty(k("finalized"))) return;
     if (this.finalized = !0, this._$Ei(), this.hasOwnProperty(k("properties"))) {
-      const t = this.properties, s = [...Oe(t), ...je(t)];
-      for (const r of s) this.createProperty(r, t[r]);
+      const e = this.properties, i = [...Ht(e), ...qt(e)];
+      for (const r of i) this.createProperty(r, e[r]);
     }
-    const e = this[Symbol.metadata];
-    if (e !== null) {
-      const t = litPropertyMetadata.get(e);
-      if (t !== void 0) for (const [s, r] of t) this.elementProperties.set(s, r);
+    const t = this[Symbol.metadata];
+    if (t !== null) {
+      const e = litPropertyMetadata.get(t);
+      if (e !== void 0) for (const [i, r] of e) this.elementProperties.set(i, r);
     }
     this._$Eh = /* @__PURE__ */ new Map();
-    for (const [t, s] of this.elementProperties) {
-      const r = this._$Eu(t, s);
-      r !== void 0 && this._$Eh.set(r, t);
+    for (const [e, i] of this.elementProperties) {
+      const r = this._$Eu(e, i);
+      r !== void 0 && this._$Eh.set(r, e);
     }
     this.elementStyles = this.finalizeStyles(this.styles);
   }
-  static finalizeStyles(e) {
-    const t = [];
-    if (Array.isArray(e)) {
-      const s = new Set(e.flat(1 / 0).reverse());
-      for (const r of s) t.unshift(ne(r));
-    } else e !== void 0 && t.push(ne(e));
-    return t;
+  static finalizeStyles(t) {
+    const e = [];
+    if (Array.isArray(t)) {
+      const i = new Set(t.flat(1 / 0).reverse());
+      for (const r of i) e.unshift(ct(r));
+    } else t !== void 0 && e.push(ct(t));
+    return e;
   }
-  static _$Eu(e, t) {
-    const s = t.attribute;
-    return s === !1 ? void 0 : typeof s == "string" ? s : typeof e == "string" ? e.toLowerCase() : void 0;
+  static _$Eu(t, e) {
+    const i = e.attribute;
+    return i === !1 ? void 0 : typeof i == "string" ? i : typeof t == "string" ? t.toLowerCase() : void 0;
   }
   constructor() {
     super(), this._$Ep = void 0, this.isUpdatePending = !1, this.hasUpdated = !1, this._$Em = null, this._$Ev();
   }
   _$Ev() {
-    this._$ES = new Promise((e) => this.enableUpdating = e), this._$AL = /* @__PURE__ */ new Map(), this._$E_(), this.requestUpdate(), this.constructor.l?.forEach((e) => e(this));
+    this._$ES = new Promise((t) => this.enableUpdating = t), this._$AL = /* @__PURE__ */ new Map(), this._$E_(), this.requestUpdate(), this.constructor.l?.forEach((t) => t(this));
   }
-  addController(e) {
-    (this._$EO ??= /* @__PURE__ */ new Set()).add(e), this.renderRoot !== void 0 && this.isConnected && e.hostConnected?.();
+  addController(t) {
+    (this._$EO ??= /* @__PURE__ */ new Set()).add(t), this.renderRoot !== void 0 && this.isConnected && t.hostConnected?.();
   }
-  removeController(e) {
-    this._$EO?.delete(e);
+  removeController(t) {
+    this._$EO?.delete(t);
   }
   _$E_() {
-    const e = /* @__PURE__ */ new Map(), t = this.constructor.elementProperties;
-    for (const s of t.keys()) this.hasOwnProperty(s) && (e.set(s, this[s]), delete this[s]);
-    e.size > 0 && (this._$Ep = e);
+    const t = /* @__PURE__ */ new Map(), e = this.constructor.elementProperties;
+    for (const i of e.keys()) this.hasOwnProperty(i) && (t.set(i, this[i]), delete this[i]);
+    t.size > 0 && (this._$Ep = t);
   }
   createRenderRoot() {
-    const e = this.shadowRoot ?? this.attachShadow(this.constructor.shadowRootOptions);
-    return Ie(e, this.constructor.elementStyles), e;
+    const t = this.shadowRoot ?? this.attachShadow(this.constructor.shadowRootOptions);
+    return Nt(t, this.constructor.elementStyles), t;
   }
   connectedCallback() {
-    this.renderRoot ??= this.createRenderRoot(), this.enableUpdating(!0), this._$EO?.forEach((e) => e.hostConnected?.());
+    this.renderRoot ??= this.createRenderRoot(), this.enableUpdating(!0), this._$EO?.forEach((t) => t.hostConnected?.());
   }
-  enableUpdating(e) {
+  enableUpdating(t) {
   }
   disconnectedCallback() {
-    this._$EO?.forEach((e) => e.hostDisconnected?.());
+    this._$EO?.forEach((t) => t.hostDisconnected?.());
   }
-  attributeChangedCallback(e, t, s) {
-    this._$AK(e, s);
+  attributeChangedCallback(t, e, i) {
+    this._$AK(t, i);
   }
-  _$ET(e, t) {
-    const s = this.constructor.elementProperties.get(e), r = this.constructor._$Eu(e, s);
-    if (r !== void 0 && s.reflect === !0) {
-      const n = (s.converter?.toAttribute !== void 0 ? s.converter : J).toAttribute(t, s.type);
-      this._$Em = e, n == null ? this.removeAttribute(r) : this.setAttribute(r, n), this._$Em = null;
+  _$ET(t, e) {
+    const i = this.constructor.elementProperties.get(t), r = this.constructor._$Eu(t, i);
+    if (r !== void 0 && i.reflect === !0) {
+      const n = (i.converter?.toAttribute !== void 0 ? i.converter : X).toAttribute(e, i.type);
+      this._$Em = t, n == null ? this.removeAttribute(r) : this.setAttribute(r, n), this._$Em = null;
     }
   }
-  _$AK(e, t) {
-    const s = this.constructor, r = s._$Eh.get(e);
+  _$AK(t, e) {
+    const i = this.constructor, r = i._$Eh.get(t);
     if (r !== void 0 && this._$Em !== r) {
-      const n = s.getPropertyOptions(r), a = typeof n.converter == "function" ? { fromAttribute: n.converter } : n.converter?.fromAttribute !== void 0 ? n.converter : J;
+      const n = i.getPropertyOptions(r), o = typeof n.converter == "function" ? { fromAttribute: n.converter } : n.converter?.fromAttribute !== void 0 ? n.converter : X;
       this._$Em = r;
-      const c = a.fromAttribute(t, n.type);
+      const c = o.fromAttribute(e, n.type);
       this[r] = c ?? this._$Ej?.get(r) ?? c, this._$Em = null;
     }
   }
-  requestUpdate(e, t, s, r = !1, n) {
-    if (e !== void 0) {
-      const a = this.constructor;
-      if (r === !1 && (n = this[e]), s ??= a.getPropertyOptions(e), !((s.hasChanged ?? ye)(n, t) || s.useDefault && s.reflect && n === this._$Ej?.get(e) && !this.hasAttribute(a._$Eu(e, s)))) return;
-      this.C(e, t, s);
+  requestUpdate(t, e, i, r = !1, n) {
+    if (t !== void 0) {
+      const o = this.constructor;
+      if (r === !1 && (n = this[t]), i ??= o.getPropertyOptions(t), !((i.hasChanged ?? Dt)(n, e) || i.useDefault && i.reflect && n === this._$Ej?.get(t) && !this.hasAttribute(o._$Eu(t, i)))) return;
+      this.C(t, e, i);
     }
     this.isUpdatePending === !1 && (this._$ES = this._$EP());
   }
-  C(e, t, { useDefault: s, reflect: r, wrapped: n }, a) {
-    s && !(this._$Ej ??= /* @__PURE__ */ new Map()).has(e) && (this._$Ej.set(e, a ?? t ?? this[e]), n !== !0 || a !== void 0) || (this._$AL.has(e) || (this.hasUpdated || s || (t = void 0), this._$AL.set(e, t)), r === !0 && this._$Em !== e && (this._$Eq ??= /* @__PURE__ */ new Set()).add(e));
+  C(t, e, { useDefault: i, reflect: r, wrapped: n }, o) {
+    i && !(this._$Ej ??= /* @__PURE__ */ new Map()).has(t) && (this._$Ej.set(t, o ?? e ?? this[t]), n !== !0 || o !== void 0) || (this._$AL.has(t) || (this.hasUpdated || i || (e = void 0), this._$AL.set(t, e)), r === !0 && this._$Em !== t && (this._$Eq ??= /* @__PURE__ */ new Set()).add(t));
   }
   async _$EP() {
     this.isUpdatePending = !0;
     try {
       await this._$ES;
-    } catch (t) {
-      Promise.reject(t);
+    } catch (e) {
+      Promise.reject(e);
     }
-    const e = this.scheduleUpdate();
-    return e != null && await e, !this.isUpdatePending;
+    const t = this.scheduleUpdate();
+    return t != null && await t, !this.isUpdatePending;
   }
   scheduleUpdate() {
     return this.performUpdate();
@@ -206,25 +206,25 @@ let w = class extends HTMLElement {
         for (const [r, n] of this._$Ep) this[r] = n;
         this._$Ep = void 0;
       }
-      const s = this.constructor.elementProperties;
-      if (s.size > 0) for (const [r, n] of s) {
-        const { wrapped: a } = n, c = this[r];
-        a !== !0 || this._$AL.has(r) || c === void 0 || this.C(r, void 0, n, c);
+      const i = this.constructor.elementProperties;
+      if (i.size > 0) for (const [r, n] of i) {
+        const { wrapped: o } = n, c = this[r];
+        o !== !0 || this._$AL.has(r) || c === void 0 || this.C(r, void 0, n, c);
       }
     }
-    let e = !1;
-    const t = this._$AL;
+    let t = !1;
+    const e = this._$AL;
     try {
-      e = this.shouldUpdate(t), e ? (this.willUpdate(t), this._$EO?.forEach((s) => s.hostUpdate?.()), this.update(t)) : this._$EM();
-    } catch (s) {
-      throw e = !1, this._$EM(), s;
+      t = this.shouldUpdate(e), t ? (this.willUpdate(e), this._$EO?.forEach((i) => i.hostUpdate?.()), this.update(e)) : this._$EM();
+    } catch (i) {
+      throw t = !1, this._$EM(), i;
     }
-    e && this._$AE(t);
+    t && this._$AE(e);
   }
-  willUpdate(e) {
+  willUpdate(t) {
   }
-  _$AE(e) {
-    this._$EO?.forEach((t) => t.hostUpdated?.()), this.hasUpdated || (this.hasUpdated = !0, this.firstUpdated(e)), this.updated(e);
+  _$AE(t) {
+    this._$EO?.forEach((e) => e.hostUpdated?.()), this.hasUpdated || (this.hasUpdated = !0, this.firstUpdated(t)), this.updated(t);
   }
   _$EM() {
     this._$AL = /* @__PURE__ */ new Map(), this.isUpdatePending = !1;
@@ -235,81 +235,83 @@ let w = class extends HTMLElement {
   getUpdateComplete() {
     return this._$ES;
   }
-  shouldUpdate(e) {
+  shouldUpdate(t) {
     return !0;
   }
-  update(e) {
-    this._$Eq &&= this._$Eq.forEach((t) => this._$ET(t, this[t])), this._$EM();
+  update(t) {
+    this._$Eq &&= this._$Eq.forEach((e) => this._$ET(e, this[e])), this._$EM();
   }
-  updated(e) {
+  updated(t) {
   }
-  firstUpdated(e) {
+  firstUpdated(t) {
   }
 };
-w.elementStyles = [], w.shadowRootOptions = { mode: "open" }, w[k("elementProperties")] = /* @__PURE__ */ new Map(), w[k("finalized")] = /* @__PURE__ */ new Map(), ze?.({ ReactiveElement: w }), (H.reactiveElementVersions ??= []).push("2.1.2");
-const ee = globalThis, ce = (i) => i, N = ee.trustedTypes, le = N ? N.createPolicy("lit-html", { createHTML: (i) => i }) : void 0, be = "$lit$", $ = `lit$${Math.random().toFixed(9).slice(2)}$`, Ee = "?" + $, Ve = `<${Ee}>`, E = document, D = () => E.createComment(""), U = (i) => i === null || typeof i != "object" && typeof i != "function", te = Array.isArray, qe = (i) => te(i) || typeof i?.[Symbol.iterator] == "function", z = `[ 	\f\r]`, S = /<(?:(!--|\/[^a-zA-Z])|(\/?[a-zA-Z][^>\s]*)|(\/?$))/g, he = /-->/g, de = />/g, _ = RegExp(`>|${z}(?:([^\\s"'>=/]+)(${z}*=${z}*(?:[^ 	\f\r"'\`<>=]|("|')|))|$)`, "g"), ue = /'/g, pe = /"/g, xe = /^(?:script|style|textarea|title)$/i, Be = (i) => (e, ...t) => ({ _$litType$: i, strings: e, values: t }), l = Be(1), A = /* @__PURE__ */ Symbol.for("lit-noChange"), g = /* @__PURE__ */ Symbol.for("lit-nothing"), ge = /* @__PURE__ */ new WeakMap(), y = E.createTreeWalker(E, 129);
-function we(i, e) {
-  if (!te(i) || !i.hasOwnProperty("raw")) throw Error("invalid template strings array");
-  return le !== void 0 ? le.createHTML(e) : e;
+w.elementStyles = [], w.shadowRootOptions = { mode: "open" }, w[k("elementProperties")] = /* @__PURE__ */ new Map(), w[k("finalized")] = /* @__PURE__ */ new Map(), Vt?.({ ReactiveElement: w }), (j.reactiveElementVersions ??= []).push("2.1.2");
+const st = globalThis, ht = (s) => s, N = st.trustedTypes, ut = N ? N.createPolicy("lit-html", { createHTML: (s) => s }) : void 0, xt = "$lit$", _ = `lit$${Math.random().toFixed(9).slice(2)}$`, wt = "?" + _, Kt = `<${wt}>`, D = document, I = () => D.createComment(""), M = (s) => s === null || typeof s != "object" && typeof s != "function", rt = Array.isArray, Ft = (s) => rt(s) || typeof s?.[Symbol.iterator] == "function", q = `[
+\f\r]`, C = /<(?:(!--|\/[^a-zA-Z])|(\/?[a-zA-Z][^>\s]*)|(\/?$))/g, pt = /-->/g, gt = />/g, b = RegExp(`>|${q}(?:([^\\s"'>=/]+)(${q}*=${q}*(?:[^
+\f\r"'\`<>=]|("|')|))|$)`, "g"), mt = /'/g, vt = /"/g, St = /^(?:script|style|textarea|title)$/i, Wt = (s) => (t, ...e) => ({ _$litType$: s, strings: t, values: e }), d = Wt(1), S = /* @__PURE__ */ Symbol.for("lit-noChange"), g = /* @__PURE__ */ Symbol.for("lit-nothing"), ft = /* @__PURE__ */ new WeakMap(), y = D.createTreeWalker(D, 129);
+function At(s, t) {
+  if (!rt(s) || !s.hasOwnProperty("raw")) throw Error("invalid template strings array");
+  return ut !== void 0 ? ut.createHTML(t) : t;
 }
-const Fe = (i, e) => {
-  const t = i.length - 1, s = [];
-  let r, n = e === 2 ? "<svg>" : e === 3 ? "<math>" : "", a = S;
-  for (let c = 0; c < t; c++) {
-    const o = i[c];
-    let d, p, h = -1, m = 0;
-    for (; m < o.length && (a.lastIndex = m, p = a.exec(o), p !== null); ) m = a.lastIndex, a === S ? p[1] === "!--" ? a = he : p[1] !== void 0 ? a = de : p[2] !== void 0 ? (xe.test(p[2]) && (r = RegExp("</" + p[2], "g")), a = _) : p[3] !== void 0 && (a = _) : a === _ ? p[0] === ">" ? (a = r ?? S, h = -1) : p[1] === void 0 ? h = -2 : (h = a.lastIndex - p[2].length, d = p[1], a = p[3] === void 0 ? _ : p[3] === '"' ? pe : ue) : a === pe || a === ue ? a = _ : a === he || a === de ? a = S : (a = _, r = void 0);
-    const v = a === _ && i[c + 1].startsWith("/>") ? " " : "";
-    n += a === S ? o + Ve : h >= 0 ? (s.push(d), o.slice(0, h) + be + o.slice(h) + $ + v) : o + $ + (h === -2 ? c : v);
+const Gt = (s, t) => {
+  const e = s.length - 1, i = [];
+  let r, n = t === 2 ? "<svg>" : t === 3 ? "<math>" : "", o = C;
+  for (let c = 0; c < e; c++) {
+    const a = s[c];
+    let u, p, h = -1, v = 0;
+    for (; v < a.length && (o.lastIndex = v, p = o.exec(a), p !== null); ) v = o.lastIndex, o === C ? p[1] === "!--" ? o = pt : p[1] !== void 0 ? o = gt : p[2] !== void 0 ? (St.test(p[2]) && (r = RegExp("</" + p[2], "g")), o = b) : p[3] !== void 0 && (o = b) : o === b ? p[0] === ">" ? (o = r ?? C, h = -1) : p[1] === void 0 ? h = -2 : (h = o.lastIndex - p[2].length, u = p[1], o = p[3] === void 0 ? b : p[3] === '"' ? vt : mt) : o === vt || o === mt ? o = b : o === pt || o === gt ? o = C : (o = b, r = void 0);
+    const f = o === b && s[c + 1].startsWith("/>") ? " " : "";
+    n += o === C ? a + Kt : h >= 0 ? (i.push(u), a.slice(0, h) + xt + a.slice(h) + _ + f) : a + _ + (h === -2 ? c : f);
   }
-  return [we(i, n + (i[t] || "<?>") + (e === 2 ? "</svg>" : e === 3 ? "</math>" : "")), s];
+  return [At(s, n + (s[e] || "<?>") + (t === 2 ? "</svg>" : t === 3 ? "</math>" : "")), i];
 };
-class R {
-  constructor({ strings: e, _$litType$: t }, s) {
+class U {
+  constructor({ strings: t, _$litType$: e }, i) {
     let r;
     this.parts = [];
-    let n = 0, a = 0;
-    const c = e.length - 1, o = this.parts, [d, p] = Fe(e, t);
-    if (this.el = R.createElement(d, s), y.currentNode = this.el.content, t === 2 || t === 3) {
+    let n = 0, o = 0;
+    const c = t.length - 1, a = this.parts, [u, p] = Gt(t, e);
+    if (this.el = U.createElement(u, i), y.currentNode = this.el.content, e === 2 || e === 3) {
       const h = this.el.content.firstChild;
       h.replaceWith(...h.childNodes);
     }
-    for (; (r = y.nextNode()) !== null && o.length < c; ) {
+    for (; (r = y.nextNode()) !== null && a.length < c; ) {
       if (r.nodeType === 1) {
-        if (r.hasAttributes()) for (const h of r.getAttributeNames()) if (h.endsWith(be)) {
-          const m = p[a++], v = r.getAttribute(h).split($), x = /([.?@])?(.*)/.exec(m);
-          o.push({ type: 1, index: n, name: x[2], strings: v, ctor: x[1] === "." ? We : x[1] === "?" ? Ze : x[1] === "@" ? Je : L }), r.removeAttribute(h);
-        } else h.startsWith($) && (o.push({ type: 6, index: n }), r.removeAttribute(h));
-        if (xe.test(r.tagName)) {
-          const h = r.textContent.split($), m = h.length - 1;
-          if (m > 0) {
+        if (r.hasAttributes()) for (const h of r.getAttributeNames()) if (h.endsWith(xt)) {
+          const v = p[o++], f = r.getAttribute(h).split(_), x = /([.?@])?(.*)/.exec(v);
+          a.push({ type: 1, index: n, name: x[2], strings: f, ctor: x[1] === "." ? Jt : x[1] === "?" ? Xt : x[1] === "@" ? Yt : H }), r.removeAttribute(h);
+        } else h.startsWith(_) && (a.push({ type: 6, index: n }), r.removeAttribute(h));
+        if (St.test(r.tagName)) {
+          const h = r.textContent.split(_), v = h.length - 1;
+          if (v > 0) {
             r.textContent = N ? N.emptyScript : "";
-            for (let v = 0; v < m; v++) r.append(h[v], D()), y.nextNode(), o.push({ type: 2, index: ++n });
-            r.append(h[m], D());
+            for (let f = 0; f < v; f++) r.append(h[f], I()), y.nextNode(), a.push({ type: 2, index: ++n });
+            r.append(h[v], I());
           }
         }
-      } else if (r.nodeType === 8) if (r.data === Ee) o.push({ type: 2, index: n });
+      } else if (r.nodeType === 8) if (r.data === wt) a.push({ type: 2, index: n });
       else {
         let h = -1;
-        for (; (h = r.data.indexOf($, h + 1)) !== -1; ) o.push({ type: 7, index: n }), h += $.length - 1;
+        for (; (h = r.data.indexOf(_, h + 1)) !== -1; ) a.push({ type: 7, index: n }), h += _.length - 1;
       }
       n++;
     }
   }
-  static createElement(e, t) {
-    const s = E.createElement("template");
-    return s.innerHTML = e, s;
+  static createElement(t, e) {
+    const i = D.createElement("template");
+    return i.innerHTML = t, i;
   }
 }
-function C(i, e, t = i, s) {
-  if (e === A) return e;
-  let r = s !== void 0 ? t._$Co?.[s] : t._$Cl;
-  const n = U(e) ? void 0 : e._$litDirective$;
-  return r?.constructor !== n && (r?._$AO?.(!1), n === void 0 ? r = void 0 : (r = new n(i), r._$AT(i, t, s)), s !== void 0 ? (t._$Co ??= [])[s] = r : t._$Cl = r), r !== void 0 && (e = C(i, r._$AS(i, e.values), r, s)), e;
+function A(s, t, e = s, i) {
+  if (t === S) return t;
+  let r = i !== void 0 ? e._$Co?.[i] : e._$Cl;
+  const n = M(t) ? void 0 : t._$litDirective$;
+  return r?.constructor !== n && (r?._$AO?.(!1), n === void 0 ? r = void 0 : (r = new n(s), r._$AT(s, e, i)), i !== void 0 ? (e._$Co ??= [])[i] = r : e._$Cl = r), r !== void 0 && (t = A(s, r._$AS(s, t.values), r, i)), t;
 }
-class Ke {
-  constructor(e, t) {
-    this._$AV = [], this._$AN = void 0, this._$AD = e, this._$AM = t;
+class Zt {
+  constructor(t, e) {
+    this._$AV = [], this._$AN = void 0, this._$AD = t, this._$AM = e;
   }
   get parentNode() {
     return this._$AM.parentNode;
@@ -317,35 +319,35 @@ class Ke {
   get _$AU() {
     return this._$AM._$AU;
   }
-  u(e) {
-    const { el: { content: t }, parts: s } = this._$AD, r = (e?.creationScope ?? E).importNode(t, !0);
+  u(t) {
+    const { el: { content: e }, parts: i } = this._$AD, r = (t?.creationScope ?? D).importNode(e, !0);
     y.currentNode = r;
-    let n = y.nextNode(), a = 0, c = 0, o = s[0];
-    for (; o !== void 0; ) {
-      if (a === o.index) {
-        let d;
-        o.type === 2 ? d = new I(n, n.nextSibling, this, e) : o.type === 1 ? d = new o.ctor(n, o.name, o.strings, this, e) : o.type === 6 && (d = new Ge(n, this, e)), this._$AV.push(d), o = s[++c];
+    let n = y.nextNode(), o = 0, c = 0, a = i[0];
+    for (; a !== void 0; ) {
+      if (o === a.index) {
+        let u;
+        a.type === 2 ? u = new L(n, n.nextSibling, this, t) : a.type === 1 ? u = new a.ctor(n, a.name, a.strings, this, t) : a.type === 6 && (u = new Qt(n, this, t)), this._$AV.push(u), a = i[++c];
       }
-      a !== o?.index && (n = y.nextNode(), a++);
+      o !== a?.index && (n = y.nextNode(), o++);
     }
-    return y.currentNode = E, r;
+    return y.currentNode = D, r;
   }
-  p(e) {
-    let t = 0;
-    for (const s of this._$AV) s !== void 0 && (s.strings !== void 0 ? (s._$AI(e, s, t), t += s.strings.length - 2) : s._$AI(e[t])), t++;
+  p(t) {
+    let e = 0;
+    for (const i of this._$AV) i !== void 0 && (i.strings !== void 0 ? (i._$AI(t, i, e), e += i.strings.length - 2) : i._$AI(t[e])), e++;
   }
 }
-class I {
+class L {
   get _$AU() {
     return this._$AM?._$AU ?? this._$Cv;
   }
-  constructor(e, t, s, r) {
-    this.type = 2, this._$AH = g, this._$AN = void 0, this._$AA = e, this._$AB = t, this._$AM = s, this.options = r, this._$Cv = r?.isConnected ?? !0;
+  constructor(t, e, i, r) {
+    this.type = 2, this._$AH = g, this._$AN = void 0, this._$AA = t, this._$AB = e, this._$AM = i, this.options = r, this._$Cv = r?.isConnected ?? !0;
   }
   get parentNode() {
-    let e = this._$AA.parentNode;
-    const t = this._$AM;
-    return t !== void 0 && e?.nodeType === 11 && (e = t.parentNode), e;
+    let t = this._$AA.parentNode;
+    const e = this._$AM;
+    return e !== void 0 && t?.nodeType === 11 && (t = e.parentNode), t;
   }
   get startNode() {
     return this._$AA;
@@ -353,135 +355,135 @@ class I {
   get endNode() {
     return this._$AB;
   }
-  _$AI(e, t = this) {
-    e = C(this, e, t), U(e) ? e === g || e == null || e === "" ? (this._$AH !== g && this._$AR(), this._$AH = g) : e !== this._$AH && e !== A && this._(e) : e._$litType$ !== void 0 ? this.$(e) : e.nodeType !== void 0 ? this.T(e) : qe(e) ? this.k(e) : this._(e);
+  _$AI(t, e = this) {
+    t = A(this, t, e), M(t) ? t === g || t == null || t === "" ? (this._$AH !== g && this._$AR(), this._$AH = g) : t !== this._$AH && t !== S && this._(t) : t._$litType$ !== void 0 ? this.$(t) : t.nodeType !== void 0 ? this.T(t) : Ft(t) ? this.k(t) : this._(t);
   }
-  O(e) {
-    return this._$AA.parentNode.insertBefore(e, this._$AB);
+  O(t) {
+    return this._$AA.parentNode.insertBefore(t, this._$AB);
   }
-  T(e) {
-    this._$AH !== e && (this._$AR(), this._$AH = this.O(e));
+  T(t) {
+    this._$AH !== t && (this._$AR(), this._$AH = this.O(t));
   }
-  _(e) {
-    this._$AH !== g && U(this._$AH) ? this._$AA.nextSibling.data = e : this.T(E.createTextNode(e)), this._$AH = e;
+  _(t) {
+    this._$AH !== g && M(this._$AH) ? this._$AA.nextSibling.data = t : this.T(D.createTextNode(t)), this._$AH = t;
   }
-  $(e) {
-    const { values: t, _$litType$: s } = e, r = typeof s == "number" ? this._$AC(e) : (s.el === void 0 && (s.el = R.createElement(we(s.h, s.h[0]), this.options)), s);
-    if (this._$AH?._$AD === r) this._$AH.p(t);
+  $(t) {
+    const { values: e, _$litType$: i } = t, r = typeof i == "number" ? this._$AC(t) : (i.el === void 0 && (i.el = U.createElement(At(i.h, i.h[0]), this.options)), i);
+    if (this._$AH?._$AD === r) this._$AH.p(e);
     else {
-      const n = new Ke(r, this), a = n.u(this.options);
-      n.p(t), this.T(a), this._$AH = n;
+      const n = new Zt(r, this), o = n.u(this.options);
+      n.p(e), this.T(o), this._$AH = n;
     }
   }
-  _$AC(e) {
-    let t = ge.get(e.strings);
-    return t === void 0 && ge.set(e.strings, t = new R(e)), t;
+  _$AC(t) {
+    let e = ft.get(t.strings);
+    return e === void 0 && ft.set(t.strings, e = new U(t)), e;
   }
-  k(e) {
-    te(this._$AH) || (this._$AH = [], this._$AR());
-    const t = this._$AH;
-    let s, r = 0;
-    for (const n of e) r === t.length ? t.push(s = new I(this.O(D()), this.O(D()), this, this.options)) : s = t[r], s._$AI(n), r++;
-    r < t.length && (this._$AR(s && s._$AB.nextSibling, r), t.length = r);
+  k(t) {
+    rt(this._$AH) || (this._$AH = [], this._$AR());
+    const e = this._$AH;
+    let i, r = 0;
+    for (const n of t) r === e.length ? e.push(i = new L(this.O(I()), this.O(I()), this, this.options)) : i = e[r], i._$AI(n), r++;
+    r < e.length && (this._$AR(i && i._$AB.nextSibling, r), e.length = r);
   }
-  _$AR(e = this._$AA.nextSibling, t) {
-    for (this._$AP?.(!1, !0, t); e !== this._$AB; ) {
-      const s = ce(e).nextSibling;
-      ce(e).remove(), e = s;
+  _$AR(t = this._$AA.nextSibling, e) {
+    for (this._$AP?.(!1, !0, e); t !== this._$AB; ) {
+      const i = ht(t).nextSibling;
+      ht(t).remove(), t = i;
     }
   }
-  setConnected(e) {
-    this._$AM === void 0 && (this._$Cv = e, this._$AP?.(e));
+  setConnected(t) {
+    this._$AM === void 0 && (this._$Cv = t, this._$AP?.(t));
   }
 }
-class L {
+class H {
   get tagName() {
     return this.element.tagName;
   }
   get _$AU() {
     return this._$AM._$AU;
   }
-  constructor(e, t, s, r, n) {
-    this.type = 1, this._$AH = g, this._$AN = void 0, this.element = e, this.name = t, this._$AM = r, this.options = n, s.length > 2 || s[0] !== "" || s[1] !== "" ? (this._$AH = Array(s.length - 1).fill(new String()), this.strings = s) : this._$AH = g;
+  constructor(t, e, i, r, n) {
+    this.type = 1, this._$AH = g, this._$AN = void 0, this.element = t, this.name = e, this._$AM = r, this.options = n, i.length > 2 || i[0] !== "" || i[1] !== "" ? (this._$AH = Array(i.length - 1).fill(new String()), this.strings = i) : this._$AH = g;
   }
-  _$AI(e, t = this, s, r) {
+  _$AI(t, e = this, i, r) {
     const n = this.strings;
-    let a = !1;
-    if (n === void 0) e = C(this, e, t, 0), a = !U(e) || e !== this._$AH && e !== A, a && (this._$AH = e);
+    let o = !1;
+    if (n === void 0) t = A(this, t, e, 0), o = !M(t) || t !== this._$AH && t !== S, o && (this._$AH = t);
     else {
-      const c = e;
-      let o, d;
-      for (e = n[0], o = 0; o < n.length - 1; o++) d = C(this, c[s + o], t, o), d === A && (d = this._$AH[o]), a ||= !U(d) || d !== this._$AH[o], d === g ? e = g : e !== g && (e += (d ?? "") + n[o + 1]), this._$AH[o] = d;
+      const c = t;
+      let a, u;
+      for (t = n[0], a = 0; a < n.length - 1; a++) u = A(this, c[i + a], e, a), u === S && (u = this._$AH[a]), o ||= !M(u) || u !== this._$AH[a], u === g ? t = g : t !== g && (t += (u ?? "") + n[a + 1]), this._$AH[a] = u;
     }
-    a && !r && this.j(e);
+    o && !r && this.j(t);
   }
-  j(e) {
-    e === g ? this.element.removeAttribute(this.name) : this.element.setAttribute(this.name, e ?? "");
+  j(t) {
+    t === g ? this.element.removeAttribute(this.name) : this.element.setAttribute(this.name, t ?? "");
   }
 }
-class We extends L {
+class Jt extends H {
   constructor() {
     super(...arguments), this.type = 3;
   }
-  j(e) {
-    this.element[this.name] = e === g ? void 0 : e;
+  j(t) {
+    this.element[this.name] = t === g ? void 0 : t;
   }
 }
-class Ze extends L {
+class Xt extends H {
   constructor() {
     super(...arguments), this.type = 4;
   }
-  j(e) {
-    this.element.toggleAttribute(this.name, !!e && e !== g);
+  j(t) {
+    this.element.toggleAttribute(this.name, !!t && t !== g);
   }
 }
-class Je extends L {
-  constructor(e, t, s, r, n) {
-    super(e, t, s, r, n), this.type = 5;
+class Yt extends H {
+  constructor(t, e, i, r, n) {
+    super(t, e, i, r, n), this.type = 5;
   }
-  _$AI(e, t = this) {
-    if ((e = C(this, e, t, 0) ?? g) === A) return;
-    const s = this._$AH, r = e === g && s !== g || e.capture !== s.capture || e.once !== s.once || e.passive !== s.passive, n = e !== g && (s === g || r);
-    r && this.element.removeEventListener(this.name, this, s), n && this.element.addEventListener(this.name, this, e), this._$AH = e;
+  _$AI(t, e = this) {
+    if ((t = A(this, t, e, 0) ?? g) === S) return;
+    const i = this._$AH, r = t === g && i !== g || t.capture !== i.capture || t.once !== i.once || t.passive !== i.passive, n = t !== g && (i === g || r);
+    r && this.element.removeEventListener(this.name, this, i), n && this.element.addEventListener(this.name, this, t), this._$AH = t;
   }
-  handleEvent(e) {
-    typeof this._$AH == "function" ? this._$AH.call(this.options?.host ?? this.element, e) : this._$AH.handleEvent(e);
+  handleEvent(t) {
+    typeof this._$AH == "function" ? this._$AH.call(this.options?.host ?? this.element, t) : this._$AH.handleEvent(t);
   }
 }
-class Ge {
-  constructor(e, t, s) {
-    this.element = e, this.type = 6, this._$AN = void 0, this._$AM = t, this.options = s;
+class Qt {
+  constructor(t, e, i) {
+    this.element = t, this.type = 6, this._$AN = void 0, this._$AM = e, this.options = i;
   }
   get _$AU() {
     return this._$AM._$AU;
   }
-  _$AI(e) {
-    C(this, e);
+  _$AI(t) {
+    A(this, t);
   }
 }
-const Xe = ee.litHtmlPolyfillSupport;
-Xe?.(R, I), (ee.litHtmlVersions ??= []).push("3.3.3");
-const Qe = (i, e, t) => {
-  const s = t?.renderBefore ?? e;
-  let r = s._$litPart$;
+const te = st.litHtmlPolyfillSupport;
+te?.(U, L), (st.litHtmlVersions ??= []).push("3.3.3");
+const ee = (s, t, e) => {
+  const i = e?.renderBefore ?? t;
+  let r = i._$litPart$;
   if (r === void 0) {
-    const n = t?.renderBefore ?? null;
-    s._$litPart$ = r = new I(e.insertBefore(D(), n), n, void 0, t ?? {});
+    const n = e?.renderBefore ?? null;
+    i._$litPart$ = r = new L(t.insertBefore(I(), n), n, void 0, e ?? {});
   }
-  return r._$AI(i), r;
+  return r._$AI(s), r;
 };
-const se = globalThis;
-class b extends w {
+const nt = globalThis;
+class E extends w {
   constructor() {
     super(...arguments), this.renderOptions = { host: this }, this._$Do = void 0;
   }
   createRenderRoot() {
-    const e = super.createRenderRoot();
-    return this.renderOptions.renderBefore ??= e.firstChild, e;
+    const t = super.createRenderRoot();
+    return this.renderOptions.renderBefore ??= t.firstChild, t;
   }
-  update(e) {
-    const t = this.render();
-    this.hasUpdated || (this.renderOptions.isConnected = this.isConnected), super.update(e), this._$Do = Qe(t, this.renderRoot, this.renderOptions);
+  update(t) {
+    const e = this.render();
+    this.hasUpdated || (this.renderOptions.isConnected = this.isConnected), super.update(t), this._$Do = ee(e, this.renderRoot, this.renderOptions);
   }
   connectedCallback() {
     super.connectedCallback(), this._$Do?.setConnected(!0);
@@ -490,17 +492,17 @@ class b extends w {
     super.disconnectedCallback(), this._$Do?.setConnected(!1);
   }
   render() {
-    return A;
+    return S;
   }
 }
-b._$litElement$ = !0, b.finalized = !0, se.litElementHydrateSupport?.({ LitElement: b });
-const Ye = se.litElementPolyfillSupport;
-Ye?.({ LitElement: b });
-(se.litElementVersions ??= []).push("4.2.2");
-class ie extends b {
+E._$litElement$ = !0, E.finalized = !0, nt.litElementHydrateSupport?.({ LitElement: E });
+const ie = nt.litElementPolyfillSupport;
+ie?.({ LitElement: E });
+(nt.litElementVersions ??= []).push("4.2.2");
+class at extends E {
   _hass;
   config = {};
-  static styles = j`
+  static styles = O`
     :host { display:block; color:var(--primary-text-color); } ha-card { padding:16px; background:var(--ha-card-background,var(--card-background-color)); }
     h2,h3 { margin:0 0 12px; } .muted { color:var(--secondary-text-color); } .error { color:var(--error-color); }
     button { min-height:40px; border:0; border-radius:8px; padding:8px 12px; cursor:pointer; color:var(--text-primary-color,#fff); background:var(--primary-color); }
@@ -512,12 +514,12 @@ class ie extends b {
   get hass() {
     return this._hass;
   }
-  set hass(e) {
-    const t = this._hass?.connection !== e?.connection;
-    this._hass = e, t && this.onHassConnectionChanged(), this.requestUpdate();
+  set hass(t) {
+    const e = this._hass?.connection !== t?.connection;
+    this._hass = t, e && this.onHassConnectionChanged(), this.requestUpdate();
   }
-  setConfig(e) {
-    this.config.vehicle_id !== e.vehicle_id && (this.config = { ...e }, this.onConfigChanged(), this.requestUpdate());
+  setConfig(t) {
+    this.config.vehicle_id !== t.vehicle_id && (this.config = { ...t }, this.onConfigChanged(), this.requestUpdate());
   }
   onHassConnectionChanged() {
   }
@@ -533,13 +535,13 @@ class ie extends b {
     return this.config.vehicle_id ?? "";
   }
 }
-function Ae(i, e) {
-  customElements.get(i) || customElements.define(i, e);
+function Ct(s, t) {
+  customElements.get(s) || customElements.define(s, t);
 }
-async function f(i, e, t, s = {}) {
-  return i.connection.sendMessagePromise({ type: e, vehicle_id: t, ...s });
+async function m(s, t, e, i = {}) {
+  return s.connection.sendMessagePromise({ type: t, vehicle_id: e, ...i });
 }
-const G = (i, e, t) => f(i, "camper_travel_journal/list", e, t ? { trip_id: t } : {}), Ce = (i, e, t, s) => f(i, "camper_travel_journal/transition_trip", e, { trip_id: t, status: s }), et = (i, e, t, s, r = "") => f(i, "camper_travel_journal/create_trip", e, { title: t, started_at: s, destination: r }), tt = (i, e, t, s) => f(i, "camper_travel_journal/update_trip", e, { trip_id: t, ...s }), st = (i, e, t) => f(i, "camper_travel_journal/delete_trip", e, { trip_id: t }), it = (i, e, t, s) => f(i, "camper_travel_journal/unlink_drive", e, { trip_id: t, drive_id: s }), rt = (i, e, t, s) => f(i, "camper_travel_journal/link_drives", e, { trip_id: t, drive_ids: s }), nt = (i, e, t, s) => f(i, "camper_travel_journal/create_expense", e, { trip_id: t, ...s }), at = (i, e, t, s) => f(i, "camper_travel_journal/update_expense", e, { expense_id: t, ...s }), ot = (i, e, t) => f(i, "camper_travel_journal/delete_expense", e, { expense_id: t }), ct = async (i) => (await i.connection.sendMessagePromise({ type: "camper_travel_journal/list_vehicles" })).vehicles ?? [], Se = ["camping", "fuel", "toll", "parking", "food", "activities", "other"], P = Se, lt = {
+const Y = (s, t, e) => m(s, "camper_travel_journal/list", t, e ? { trip_id: e } : {}), kt = (s, t, e, i) => m(s, "camper_travel_journal/transition_trip", t, { trip_id: e, status: i }), se = (s, t, e, i = "", r = "", n = "") => m(s, "camper_travel_journal/create_trip", t, { title: e, start_date: i || void 0, end_date: r || void 0, destination: n }), re = (s, t, e, i) => m(s, "camper_travel_journal/update_trip", t, { trip_id: e, ...i }), ne = (s, t, e) => m(s, "camper_travel_journal/delete_trip", t, { trip_id: e }), ae = (s, t, e, i) => m(s, "camper_travel_journal/unlink_drive", t, { trip_id: e, drive_id: i }), oe = (s, t, e, i) => m(s, "camper_travel_journal/link_drives", t, { trip_id: e, drive_ids: i }), ce = (s, t, e) => m(s, "camper_travel_journal/create_manual_drive", t, e), de = (s, t, e, i) => m(s, "camper_travel_journal/update_manual_drive", t, { drive_id: e, ...i }), le = (s, t, e) => m(s, "camper_travel_journal/delete_manual_drive", t, { drive_id: e }), he = (s, t, e, i) => m(s, "camper_travel_journal/create_expense", t, { trip_id: e, ...i }), ue = (s, t, e, i) => m(s, "camper_travel_journal/update_expense", t, { expense_id: e, ...i }), pe = (s, t, e) => m(s, "camper_travel_journal/delete_expense", t, { expense_id: e }), ge = async (s) => (await s.connection.sendMessagePromise({ type: "camper_travel_journal/list_vehicles" })).vehicles ?? [], Tt = ["camping", "fuel", "toll", "parking", "food", "activities", "other"], z = Tt, me = {
   title: "Reisetagebuch",
   noDestination: "Kein Reiseziel",
   loading: "Reisedaten werden geladen …",
@@ -593,8 +595,28 @@ const G = (i, e, t) => f(i, "camper_travel_journal/list", e, t ? { trip_id: t } 
   editorChooseVehicle: "Wohnmobil auswählen",
   editorLoading: "Wohnmobile werden geladen …",
   editorNoVehicle: "Kein eingerichtetes Wohnmobil gefunden.",
-  editorLoadError: "Wohnmobile konnten nicht geladen werden."
-}, ht = {
+  editorLoadError: "Wohnmobile konnten nicht geladen werden.",
+  confirmDelete: "Nochmals zum Bestätigen klicken",
+  startDate: "Beginn",
+  endDate: "Ende",
+  period: "Reisezeitraum",
+  noDrives: "Noch keine Fahrten erfasst.",
+  driveStart: "Start",
+  driveEnd: "Ende",
+  duration: "Dauer",
+  sourceGps: "GPS-erkannt",
+  sourceManual: "Manuell",
+  startLocation: "Startort",
+  endLocation: "Zielort",
+  distanceKm: "Kilometer",
+  durationMinutes: "Dauer in Minuten",
+  manualDrive: "Manuelle Fahrt",
+  createDrive: "Fahrt anlegen",
+  driveCreateError: "Fahrt konnte nicht gespeichert werden.",
+  driveEditError: "Manuelle Fahrt konnte nicht bearbeitet werden.",
+  driveDeleteError: "Manuelle Fahrt konnte nicht gelöscht werden.",
+  dateInvalid: "Bitte gültige Daten eingeben."
+}, ve = {
   title: "Travel journal",
   noDestination: "No destination",
   loading: "Loading travel data …",
@@ -648,51 +670,85 @@ const G = (i, e, t) => f(i, "camper_travel_journal/list", e, t ? { trip_id: t } 
   editorChooseVehicle: "Select camper",
   editorLoading: "Loading campers …",
   editorNoVehicle: "No configured camper found.",
-  editorLoadError: "Configured campers could not be loaded."
+  editorLoadError: "Configured campers could not be loaded.",
+  confirmDelete: "Click again to confirm",
+  startDate: "Start",
+  endDate: "End",
+  period: "Travel period",
+  noDrives: "No drives recorded yet.",
+  driveStart: "Start",
+  driveEnd: "End",
+  duration: "Duration",
+  sourceGps: "GPS detected",
+  sourceManual: "Manual",
+  startLocation: "Start location",
+  endLocation: "Destination",
+  distanceKm: "Distance in km",
+  durationMinutes: "Duration in minutes",
+  manualDrive: "Manual drive",
+  createDrive: "Create drive",
+  driveCreateError: "Drive could not be saved.",
+  driveEditError: "Manual drive could not be edited.",
+  driveDeleteError: "Manual drive could not be deleted.",
+  dateInvalid: "Enter valid dates."
 };
-function u(i) {
-  return (i?.locale?.language?.toLowerCase() ?? "de").startsWith("de") ? lt : ht;
+function l(s) {
+  return (s?.locale?.language?.toLowerCase() ?? "de").startsWith("de") ? me : ve;
 }
-function O(i, e) {
-  const t = (e?.locale?.language ?? "").toLowerCase().startsWith("de") ? "de-DE" : "en-US";
-  return new Date(i).toLocaleDateString(t);
+function P(s, t) {
+  const e = (t?.locale?.language ?? "").toLowerCase().startsWith("de") ? "de-DE" : "en-US";
+  return new Date(s).toLocaleDateString(e);
 }
-function ke(i, e) {
-  return u(e).statuses[i] ?? i;
+function $t(s, t) {
+  const e = (t?.locale?.language ?? "").toLowerCase().startsWith("de") ? "de-DE" : "en-US";
+  return new Date(s).toLocaleString(e, { dateStyle: "short", timeStyle: "short" });
 }
-function V(i, e) {
-  return u(e).categories[i] ?? i;
+function fe(s, t) {
+  const e = Math.max(0, Math.round((s ?? 0) / 60));
+  return e < 60 ? `${e} min` : `${Math.floor(e / 60)} h ${e % 60} min`;
 }
-function me(i) {
-  return Se.includes(i);
+function $e(s, t) {
+  return s.start_date || s.end_date ? [s.start_date, s.end_date].filter(Boolean).join(" – ") || "" : s.started_at ? `${P(s.started_at, t)}${s.ended_at ? ` – ${P(s.ended_at, t)}` : ""}` : "";
 }
-function T(i, e, t) {
-  const s = (t?.locale?.language ?? "").toLowerCase().startsWith("de") ? "de-DE" : "en-US";
-  return new Intl.NumberFormat(s, { style: "currency", currency: e, minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(i / 100);
+function It(s, t) {
+  return l(t).statuses[s] ?? s;
 }
-function fe(i) {
-  const e = i.trim().replace(",", ".");
-  if (!/^\d+(?:\.\d{1,2})?$/.test(e)) return null;
-  const [t, s = ""] = e.split("."), r = Number(t) * 100 + Number((s + "00").slice(0, 2));
+function B(s, t) {
+  return l(t).categories[s] ?? s;
+}
+function V(s) {
+  return Tt.includes(s);
+}
+function T(s, t, e) {
+  const i = (e?.locale?.language ?? "").toLowerCase().startsWith("de") ? "de-DE" : "en-US";
+  return new Intl.NumberFormat(i, { style: "currency", currency: t, minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(s / 100);
+}
+function _t(s) {
+  const t = s.trim().replace(",", ".");
+  if (!/^\d+(?:\.\d{1,2})?$/.test(t)) return null;
+  const [e, i = ""] = t.split("."), r = Number(e) * 100 + Number((i + "00").slice(0, 2));
   return Number.isSafeInteger(r) ? r : null;
 }
-const X = "camper-travel-journal-expenses-changed";
-function q(i) {
-  window.dispatchEvent(new CustomEvent(X, { detail: i }));
+const Q = "camper-travel-journal-expenses-changed", tt = "camper-travel-journal-data-changed";
+function K(s) {
+  window.dispatchEvent(new CustomEvent(Q, { detail: s }));
 }
-class dt extends ie {
+function $(s) {
+  window.dispatchEvent(new CustomEvent(tt, { detail: s }));
+}
+class _e extends at {
   snapshot;
   loading = !1;
   loadError = "";
   actionError = "";
-  onExpensesChanged = (e) => {
-    e.detail?.vehicleId === this.vehicleId && this.refresh();
+  onDataChanged = (t) => {
+    t.detail?.vehicleId === this.vehicleId && this.refresh();
   };
   connectedCallback() {
-    super.connectedCallback(), window.addEventListener(X, this.onExpensesChanged), this.refresh();
+    super.connectedCallback(), window.addEventListener(Q, this.onDataChanged), window.addEventListener(tt, this.onDataChanged), this.refresh();
   }
   disconnectedCallback() {
-    window.removeEventListener(X, this.onExpensesChanged), super.disconnectedCallback();
+    window.removeEventListener(Q, this.onDataChanged), window.removeEventListener(tt, this.onDataChanged), super.disconnectedCallback();
   }
   onHassConnectionChanged() {
     this.refresh();
@@ -704,42 +760,65 @@ class dt extends ie {
     if (!this.hass || !this.vehicleId) return !1;
     this.loading = !0, this.requestUpdate();
     try {
-      const e = await G(this.hass, this.vehicleId), t = e.trips[0];
-      return this.snapshot = t ? await G(this.hass, this.vehicleId, t.id) : e, this.loadError = "", !0;
+      const t = await Y(this.hass, this.vehicleId), e = t.trips[0];
+      return this.snapshot = e ? await Y(this.hass, this.vehicleId, e.id) : t, this.loadError = "", !0;
     } catch {
-      return this.loadError = u(this.hass).loadError, !1;
+      return this.loadError = l(this.hass).loadError, !1;
     } finally {
       this.loading = !1, this.requestUpdate();
     }
   }
-  async setStatus(e) {
-    const t = this.snapshot?.trips[0];
-    if (!(!this.hass || !t))
+  async setStatus(t) {
+    const e = this.snapshot?.trips[0];
+    if (!(!this.hass || !e))
       try {
-        await Ce(this.hass, this.vehicleId, t.id, e), this.actionError = "", await this.refresh();
+        await kt(this.hass, this.vehicleId, e.id, t), this.actionError = "", await this.refresh();
       } catch {
-        this.actionError = u(this.hass).statusError, this.requestUpdate();
+        this.actionError = l(this.hass).statusError, this.requestUpdate();
       }
   }
   render() {
-    const e = u(this.hass), t = this.snapshot?.trips[0], s = (this.snapshot?.drives ?? []).reduce((c, o) => c + o.distance_m, 0) / 1e3, r = this.snapshot?.expense_summary, n = r?.mixed_currency ? e.mixedCurrency : r?.total_minor !== void 0 && r.currency ? T(r.total_minor, r.currency, this.hass) : T(0, "EUR", this.hass), a = this.loadError || this.actionError;
-    return l`<ha-card><h2>${t?.title ?? e.title}</h2>${a ? l`<p class="error" role="alert">${a}</p>` : t ? l`<p class="muted">${t.destination || e.noDestination} · ${ke(t.status, this.hass)} · ${O(t.started_at, this.hass)}${t.ended_at ? ` – ${O(t.ended_at, this.hass)}` : ""}</p><div class="grid"><div class="metric"><span class="muted">${e.distance}</span><span class="value">${s.toFixed(1)} km</span></div><div class="metric"><span class="muted">${e.drives}</span><span class="value">${this.snapshot?.drives.length ?? 0}</span></div><div class="metric"><span class="muted">${e.stops}</span><span class="value">${this.snapshot?.stops.length ?? 0}</span></div><div class="metric"><span class="muted">${e.costs}</span><span class="value">${n}</span></div></div><div class="actions">${t.status === "planned" || t.status === "paused" ? l`<button @click=${() => this.setStatus("active")}>${e.resume}</button>` : ""}${t.status === "active" ? l`<button class="secondary" @click=${() => this.setStatus("paused")}>${e.pause}</button><button @click=${() => this.setStatus("completed")}>${e.complete}</button>` : ""}</div>` : l`<p class="muted">${e.noTrip}</p>`}${this.loading ? l`<p class="muted">${e.loading}</p>` : ""}</ha-card>`;
+    const t = l(this.hass), e = this.snapshot?.trips[0], i = (this.snapshot?.drives ?? []).reduce((a, u) => a + u.distance_m, 0) / 1e3, r = this.snapshot?.expense_summary, n = r?.mixed_currency ? t.mixedCurrency : r?.total_minor !== void 0 && r.currency ? T(r.total_minor, r.currency, this.hass) : T(0, "EUR", this.hass), o = this.loadError || this.actionError, c = e ? [e.start_date, e.end_date].filter(Boolean).join(" – ") || (e.started_at ? `${P(e.started_at, this.hass)}${e.ended_at ? ` – ${P(e.ended_at, this.hass)}` : ""}` : "") : "";
+    return d`<ha-card><h2>${e?.title ?? t.title}</h2>${o ? d`<p class="error" role="alert">${o}</p>` : e ? d`<p class="muted">${e.destination || t.noDestination} · ${It(e.status, this.hass)} · ${c}</p><div class="grid"><div class="metric"><span class="muted">${t.distance}</span><span class="value">${i.toFixed(1)} km</span></div><div class="metric"><span class="muted">${t.drives}</span><span class="value">${this.snapshot?.drives.length ?? 0}</span></div><div class="metric"><span class="muted">${t.stops}</span><span class="value">${this.snapshot?.stops.length ?? 0}</span></div><div class="metric"><span class="muted">${t.costs}</span><span class="value">${n}</span></div></div><div class="actions">${e.status === "planned" || e.status === "paused" ? d`<button @click=${() => this.setStatus("active")}>${t.resume}</button>` : ""}${e.status === "active" ? d`<button class="secondary" @click=${() => this.setStatus("paused")}>${t.pause}</button><button @click=${() => this.setStatus("completed")}>${t.complete}</button>` : ""}</div>` : d`<p class="muted">${t.noTrip}</p>`}${this.loading ? d`<p class="muted">${t.loading}</p>` : ""}</ha-card>`;
   }
 }
-Ae("camper-travel-journal-summary-card", dt);
-class Te extends ie {
+Ct("camper-travel-journal-summary-card", _e);
+class Mt extends at {
   snapshot;
   loadError = "";
   actionError = "";
   tripTitle = "";
   destination = "";
+  tripStartDate = "";
+  tripEndDate = "";
+  editingTripId = "";
+  editingTripTitle = "";
+  editingDestination = "";
+  editingStartDate = "";
+  editingEndDate = "";
+  confirmingTripId = "";
+  confirmingExpenseId = "";
   amount = "";
-  category = P[0];
+  category = z[0];
   selected = "";
   editingExpenseId = "";
   editingAmount = "";
   editingCategory = "other";
   expenseSavingId = "";
+  manualOccurredAt = "";
+  manualStartLocation = "";
+  manualEndLocation = "";
+  manualDistanceKm = "";
+  manualDurationMinutes = "";
+  manualSaving = !1;
+  editingDriveId = "";
+  editingDriveOccurredAt = "";
+  editingDriveStartLocation = "";
+  editingDriveEndLocation = "";
+  editingDriveDistanceKm = "";
+  editingDriveDurationMinutes = "";
+  driveSavingId = "";
+  confirmingDriveId = "";
   connectedCallback() {
     super.connectedCallback(), this.refresh();
   }
@@ -752,232 +831,286 @@ class Te extends ie {
   async refresh() {
     if (!this.hass || !this.vehicleId) return !1;
     try {
-      return this.snapshot = await G(this.hass, this.vehicleId, this.selected || void 0), this.loadError = "", this.requestUpdate(), !0;
+      return this.snapshot = await Y(this.hass, this.vehicleId, this.selected || void 0), this.loadError = "", this.requestUpdate(), !0;
     } catch {
-      return this.loadError = u(this.hass).loadError, this.requestUpdate(), !1;
+      return this.loadError = l(this.hass).loadError, this.requestUpdate(), !1;
     }
   }
-  fail(e) {
-    this.actionError = e, this.requestUpdate();
+  fail(t) {
+    this.actionError = t, this.requestUpdate();
   }
-  setExpenseAmount(e) {
-    this.amount = e, this.requestUpdate();
+  setExpenseAmount(t) {
+    this.amount = t, this.requestUpdate();
   }
-  setEditingExpenseAmount(e) {
-    this.editingAmount = e, this.requestUpdate();
+  setEditingExpenseAmount(t) {
+    this.editingAmount = t, this.requestUpdate();
   }
-  setExpenseCategory(e) {
-    if (!me(e)) {
-      this.fail(u(this.hass).categoryInvalid);
-      return;
-    }
-    this.category = e, this.requestUpdate();
+  setExpenseCategory(t) {
+    if (!V(t)) return this.fail(l(this.hass).categoryInvalid);
+    this.category = t, this.requestUpdate();
   }
-  setEditingExpenseCategory(e) {
-    if (!me(e)) {
-      this.fail(u(this.hass).categoryInvalid);
-      return;
-    }
-    this.editingCategory = e, this.requestUpdate();
+  setEditingExpenseCategory(t) {
+    if (!V(t)) return this.fail(l(this.hass).categoryInvalid);
+    this.editingCategory = t, this.requestUpdate();
   }
   async addTrip() {
-    if (!(!this.hass || !this.tripTitle.trim()))
+    if (!(!this.hass || !this.tripTitle.trim())) {
+      if (this.tripStartDate && this.tripEndDate && this.tripEndDate < this.tripStartDate) return this.fail(l(this.hass).dateInvalid);
       try {
-        await et(this.hass, this.vehicleId, this.tripTitle, (/* @__PURE__ */ new Date()).toISOString(), this.destination), this.actionError = "", this.tripTitle = "", this.destination = "", await this.refresh();
+        await se(this.hass, this.vehicleId, this.tripTitle, this.tripStartDate, this.tripEndDate, this.destination), this.actionError = "", this.tripTitle = "", this.destination = "", this.tripStartDate = "", this.tripEndDate = "", await this.refresh(), $({ vehicleId: this.vehicleId, tripId: this.selected });
       } catch {
-        this.fail(u(this.hass).tripCreateError);
+        this.fail(l(this.hass).tripCreateError);
       }
-  }
-  async editTrip(e) {
-    if (!this.hass) return;
-    const t = u(this.hass), s = window.prompt(t.tripName, e.title);
-    if (!(s === null || !s.trim()))
-      try {
-        await tt(this.hass, this.vehicleId, e.id, { title: s }), await this.refresh();
-      } catch {
-        this.fail(t.tripEditError);
-      }
-  }
-  async removeTrip(e) {
-    if (!this.hass) return;
-    const t = u(this.hass);
-    if (window.confirm(t.tripDeleteConfirm))
-      try {
-        await st(this.hass, this.vehicleId, e), this.selected === e && (this.selected = ""), await this.refresh();
-      } catch {
-        this.fail(t.tripDeleteError);
-      }
-  }
-  async changeStatus(e, t) {
-    if (this.hass)
-      try {
-        await Ce(this.hass, this.vehicleId, e, t), await this.refresh();
-      } catch {
-        this.fail(u(this.hass).statusError);
-      }
-  }
-  async assignDrive(e, t) {
-    if (this.hass)
-      try {
-        await rt(this.hass, this.vehicleId, e, [t]), await this.refresh();
-      } catch {
-        this.fail(u(this.hass).driveAssignError);
-      }
-  }
-  toggleTripDetails(e) {
-    if (this.selected === e) {
-      this.selected = "", this.requestUpdate();
-      return;
     }
-    this.selected = e, this.refresh();
   }
-  async addExpense(e) {
-    if (!this.hass) return;
-    const t = u(this.hass), s = fe(this.amount);
-    if (s === null) {
-      this.fail(t.amountInvalid);
-      return;
-    }
+  startTripEdit(t) {
+    this.actionError = "", this.editingTripId = t.id, this.editingTripTitle = t.title, this.editingDestination = t.destination || "", this.editingStartDate = t.start_date || "", this.editingEndDate = t.end_date || "", this.requestUpdate();
+  }
+  cancelTripEdit() {
+    this.editingTripId = "", this.actionError = "", this.requestUpdate();
+  }
+  async saveTrip(t) {
+    if (!this.hass || !this.editingTripTitle.trim()) return this.fail(l(this.hass).tripEditError);
+    if (this.editingStartDate && this.editingEndDate && this.editingEndDate < this.editingStartDate) return this.fail(l(this.hass).dateInvalid);
     try {
-      await nt(this.hass, this.vehicleId, e, { occurred_at: (/* @__PURE__ */ new Date()).toISOString(), category: this.category, amount_minor: s, currency: "EUR" }), this.actionError = "", await this.refresh() && (this.amount = "", q({ vehicleId: this.vehicleId, tripId: e }));
+      await re(this.hass, this.vehicleId, t.id, { title: this.editingTripTitle, destination: this.editingDestination, start_date: this.editingStartDate, end_date: this.editingEndDate }), this.actionError = "", this.editingTripId = "", await this.refresh(), $({ vehicleId: this.vehicleId, tripId: t.id });
     } catch {
-      this.fail(t.expenseCreateError);
+      this.fail(l(this.hass).tripEditError);
     }
   }
-  startExpenseEdit(e) {
-    this.actionError = "", this.editingExpenseId = e.id, this.editingAmount = (e.amount_minor / 100).toFixed(2), this.editingCategory = e.category, this.requestUpdate();
+  async removeTrip(t) {
+    if (this.hass) {
+      if (this.confirmingTripId !== t) {
+        this.confirmingTripId = t, this.requestUpdate();
+        return;
+      }
+      try {
+        await ne(this.hass, this.vehicleId, t), this.confirmingTripId = "", this.selected === t && (this.selected = ""), await this.refresh(), $({ vehicleId: this.vehicleId, tripId: t });
+      } catch {
+        this.fail(l(this.hass).tripDeleteError);
+      }
+    }
+  }
+  async changeStatus(t, e) {
+    if (this.hass)
+      try {
+        await kt(this.hass, this.vehicleId, t, e), this.actionError = "", await this.refresh(), $({ vehicleId: this.vehicleId, tripId: t });
+      } catch {
+        this.fail(l(this.hass).statusError);
+      }
+  }
+  async assignDrive(t, e) {
+    if (this.hass)
+      try {
+        await oe(this.hass, this.vehicleId, t, [e]), this.actionError = "", await this.refresh(), $({ vehicleId: this.vehicleId, tripId: t });
+      } catch {
+        this.fail(l(this.hass).driveAssignError);
+      }
+  }
+  async unassignDrive(t, e) {
+    if (this.hass)
+      try {
+        await ae(this.hass, this.vehicleId, t, e), this.actionError = "", await this.refresh(), $({ vehicleId: this.vehicleId, tripId: t });
+      } catch {
+        this.fail(l(this.hass).driveAssignError);
+      }
+  }
+  toggleTripDetails(t) {
+    this.selected = this.selected === t ? "" : t, this.selected ? this.refresh() : this.requestUpdate();
+  }
+  async addManualDrive(t) {
+    if (!this.hass || this.manualSaving) return;
+    const e = Number(this.manualDistanceKm.replace(",", ".")), i = this.manualDurationMinutes ? Number(this.manualDurationMinutes) : void 0;
+    if (!this.manualOccurredAt || !this.manualStartLocation.trim() || !this.manualEndLocation.trim() || !Number.isFinite(e) || e < 0 || i !== void 0 && (!Number.isInteger(i) || i < 0)) return this.fail(l(this.hass).dateInvalid);
+    this.manualSaving = !0;
+    try {
+      await ce(this.hass, this.vehicleId, { trip_id: t, occurred_at: new Date(this.manualOccurredAt).toISOString(), start_location: this.manualStartLocation, end_location: this.manualEndLocation, distance_km: e, ...i === void 0 ? {} : { duration_minutes: i } }), this.actionError = "", this.manualStartLocation = "", this.manualEndLocation = "", this.manualDistanceKm = "", this.manualDurationMinutes = "", await this.refresh(), $({ vehicleId: this.vehicleId, tripId: t });
+    } catch {
+      this.fail(l(this.hass).driveCreateError);
+    } finally {
+      this.manualSaving = !1, this.requestUpdate();
+    }
+  }
+  localDateTime(t) {
+    const e = new Date(t), i = (r) => String(r).padStart(2, "0");
+    return `${e.getFullYear()}-${i(e.getMonth() + 1)}-${i(e.getDate())}T${i(e.getHours())}:${i(e.getMinutes())}`;
+  }
+  startManualDriveEdit(t) {
+    this.actionError = "", this.editingDriveId = t.id, this.editingDriveOccurredAt = this.localDateTime(t.started_at), this.editingDriveStartLocation = t.start_label || "", this.editingDriveEndLocation = t.end_label || "", this.editingDriveDistanceKm = (t.distance_m / 1e3).toFixed(1), this.editingDriveDurationMinutes = t.duration_seconds ? String(Math.round(t.duration_seconds / 60)) : "", this.requestUpdate();
+  }
+  cancelManualDriveEdit() {
+    this.editingDriveId = "", this.actionError = "", this.requestUpdate();
+  }
+  async saveManualDrive(t, e) {
+    if (!this.hass || this.driveSavingId) return;
+    const i = Number(this.editingDriveDistanceKm.replace(",", ".")), r = this.editingDriveDurationMinutes ? Number(this.editingDriveDurationMinutes) : void 0;
+    if (!this.editingDriveOccurredAt || !this.editingDriveStartLocation.trim() || !this.editingDriveEndLocation.trim() || !Number.isFinite(i) || i < 0 || r !== void 0 && (!Number.isInteger(r) || r < 0)) return this.fail(l(this.hass).dateInvalid);
+    this.driveSavingId = t.id;
+    try {
+      await de(this.hass, this.vehicleId, t.id, { occurred_at: new Date(this.editingDriveOccurredAt).toISOString(), start_location: this.editingDriveStartLocation, end_location: this.editingDriveEndLocation, distance_km: i, ...r === void 0 ? {} : { duration_minutes: r } }), this.actionError = "", this.cancelManualDriveEdit(), await this.refresh(), $({ vehicleId: this.vehicleId, tripId: e });
+    } catch {
+      this.fail(l(this.hass).driveEditError);
+    } finally {
+      this.driveSavingId = "", this.requestUpdate();
+    }
+  }
+  async removeManualDrive(t, e) {
+    if (!(!this.hass || this.driveSavingId)) {
+      if (this.confirmingDriveId !== e) {
+        this.confirmingDriveId = e, this.requestUpdate();
+        return;
+      }
+      this.driveSavingId = e;
+      try {
+        await le(this.hass, this.vehicleId, e), this.confirmingDriveId = "", this.actionError = "", await this.refresh(), $({ vehicleId: this.vehicleId, tripId: t });
+      } catch {
+        this.fail(l(this.hass).driveDeleteError);
+      } finally {
+        this.driveSavingId = "", this.requestUpdate();
+      }
+    }
+  }
+  async addExpense(t) {
+    if (!this.hass) return;
+    const e = l(this.hass), i = _t(this.amount);
+    if (i === null) return this.fail(e.amountInvalid);
+    try {
+      await he(this.hass, this.vehicleId, t, { occurred_at: (/* @__PURE__ */ new Date()).toISOString(), category: this.category, amount_minor: i, currency: "EUR" }), this.actionError = "", await this.refresh() && (this.amount = "", K({ vehicleId: this.vehicleId, tripId: t }));
+    } catch {
+      this.fail(e.expenseCreateError);
+    }
+  }
+  startExpenseEdit(t) {
+    this.actionError = "", this.editingExpenseId = t.id, this.editingAmount = (t.amount_minor / 100).toFixed(2), this.editingCategory = t.category, this.requestUpdate();
   }
   cancelExpenseEdit() {
     this.editingExpenseId = "", this.editingAmount = "", this.editingCategory = "other", this.actionError = "", this.requestUpdate();
   }
-  async saveExpense(e) {
+  async saveExpense(t) {
     if (!this.hass || this.expenseSavingId) return;
-    const t = u(this.hass), s = fe(this.editingAmount);
-    if (s === null) {
-      this.fail(t.amountInvalid);
-      return;
-    }
-    if (!P.includes(this.editingCategory)) {
-      this.fail(t.categoryInvalid);
-      return;
-    }
-    this.expenseSavingId = e.id;
+    const e = l(this.hass), i = _t(this.editingAmount);
+    if (i === null) return this.fail(e.amountInvalid);
+    if (!V(this.editingCategory)) return this.fail(e.categoryInvalid);
+    this.expenseSavingId = t.id;
     try {
-      await at(this.hass, this.vehicleId, e.id, { amount_minor: s, category: this.editingCategory }), this.actionError = "", await this.refresh() && (this.cancelExpenseEdit(), q({ vehicleId: this.vehicleId, tripId: e.trip_id ?? this.selected }));
+      await ue(this.hass, this.vehicleId, t.id, { amount_minor: i, category: this.editingCategory }), this.actionError = "", await this.refresh() && (this.cancelExpenseEdit(), K({ vehicleId: this.vehicleId, tripId: t.trip_id ?? this.selected }));
     } catch {
-      this.fail(t.expenseEditError);
+      this.fail(e.expenseEditError);
     } finally {
       this.expenseSavingId = "", this.requestUpdate();
     }
   }
-  async removeExpense(e) {
-    if (!this.hass || this.expenseSavingId) return;
-    const t = u(this.hass);
-    if (window.confirm(t.expenseDeleteConfirm)) {
-      this.expenseSavingId = e;
+  async removeExpense(t) {
+    if (!(!this.hass || this.expenseSavingId)) {
+      if (this.confirmingExpenseId !== t) {
+        this.confirmingExpenseId = t, this.requestUpdate();
+        return;
+      }
+      this.expenseSavingId = t;
       try {
-        await ot(this.hass, this.vehicleId, e), this.actionError = "", await this.refresh() && q({ vehicleId: this.vehicleId, tripId: this.selected });
+        await pe(this.hass, this.vehicleId, t), this.confirmingExpenseId = "", this.actionError = "", await this.refresh() && K({ vehicleId: this.vehicleId, tripId: this.selected });
       } catch {
-        this.fail(t.expenseDeleteError);
+        this.fail(l(this.hass).expenseDeleteError);
       } finally {
         this.expenseSavingId = "", this.requestUpdate();
       }
     }
   }
-  categoryOptions(e) {
-    const t = [...P];
-    return e && !t.includes(e) && t.unshift(e), t;
+  categoryOptions(t) {
+    const e = [...z];
+    return t && !e.includes(t) && e.unshift(t), e;
   }
-  renderExpense(e, t) {
-    const s = this.editingExpenseId === e.id, r = this.expenseSavingId === e.id;
-    return l`<div class="expense-row">
-      ${s ? l`<form class="expense-form" @submit=${(n) => {
-      n.preventDefault(), this.saveExpense(e);
-    }}>
-        <select aria-label=${t.category} .value=${this.editingCategory} @change=${(n) => this.setEditingExpenseCategory(n.currentTarget.value)}>
-          ${this.categoryOptions(this.editingCategory).map((n) => l`<option value=${n}>${V(n, this.hass)}</option>`)}
-        </select>
-        <input aria-label=${t.amount} type="number" min="0" step="0.01" inputmode="decimal" .value=${this.editingAmount} @input=${(n) => this.setEditingExpenseAmount(n.currentTarget.value)}>
-        <div class="actions"><button type="submit" ?disabled=${r}>${r ? t.saving : t.save}</button><button type="button" class="secondary" @click=${() => this.cancelExpenseEdit()} ?disabled=${r}>${t.cancel}</button></div>
-      </form>` : l`<span>${V(e.category, this.hass)}: ${T(e.amount_minor, e.currency, this.hass)}</span>
-        <span class="actions"><button type="button" class="link" @click=${() => this.startExpenseEdit(e)} ?disabled=${!!this.expenseSavingId}>${t.edit}</button><button type="button" class="link" @click=${() => this.removeExpense(e.id)} ?disabled=${!!this.expenseSavingId}>${t.remove}</button></span>`}
-    </div>`;
+  renderExpense(t, e) {
+    const i = this.editingExpenseId === t.id, r = this.expenseSavingId === t.id;
+    return d`<div class="expense-row">${i ? d`<form class="expense-form" @submit=${(n) => {
+      n.preventDefault(), this.saveExpense(t);
+    }}><select aria-label=${e.category} .value=${this.editingCategory} @change=${(n) => this.setEditingExpenseCategory(n.currentTarget.value)}>${this.categoryOptions(this.editingCategory).map((n) => d`<option value=${n}>${B(n, this.hass)}</option>`)}</select><input aria-label=${e.amount} type="number" min="0" step="0.01" inputmode="decimal" .value=${this.editingAmount} @input=${(n) => this.setEditingExpenseAmount(n.currentTarget.value)}><div class="actions"><button type="submit" ?disabled=${r}>${r ? e.saving : e.save}</button><button type="button" class="secondary" @click=${() => this.cancelExpenseEdit()} ?disabled=${r}>${e.cancel}</button></div></form>` : d`<span>${B(t.category, this.hass)}: ${T(t.amount_minor, t.currency, this.hass)}</span><span class="actions"><button type="button" class="link" @click=${() => this.startExpenseEdit(t)} ?disabled=${!!this.expenseSavingId}>${e.edit}</button><button type="button" class="link" @click=${() => this.removeExpense(t.id)}>${this.confirmingExpenseId === t.id ? e.confirmDelete : e.remove}</button></span>`}</div>`;
+  }
+  renderDrive(t, e, i) {
+    const r = t.source === "manual" ? i.sourceManual : i.sourceGps, n = t.source === "manual" ? `${t.start_label || "—"} → ${t.end_label || "—"}` : `${i.driveStart}: ${$t(t.started_at, this.hass)} · ${i.driveEnd}: ${$t(t.ended_at, this.hass)}`;
+    if (this.editingDriveId === t.id) return d`<form class="form-grid drive-edit-form" @submit=${(a) => {
+      a.preventDefault(), this.saveManualDrive(t, e);
+    }}><label>${i.driveStart}<input type="datetime-local" .value=${this.editingDriveOccurredAt} @input=${(a) => this.editingDriveOccurredAt = a.currentTarget.value}></label><input aria-label=${i.startLocation} .value=${this.editingDriveStartLocation} @input=${(a) => this.editingDriveStartLocation = a.currentTarget.value}><input aria-label=${i.endLocation} .value=${this.editingDriveEndLocation} @input=${(a) => this.editingDriveEndLocation = a.currentTarget.value}><input aria-label=${i.distanceKm} type="number" min="0" step="0.1" inputmode="decimal" .value=${this.editingDriveDistanceKm} @input=${(a) => this.editingDriveDistanceKm = a.currentTarget.value}><input aria-label=${i.durationMinutes} type="number" min="0" step="1" .value=${this.editingDriveDurationMinutes} @input=${(a) => this.editingDriveDurationMinutes = a.currentTarget.value}><button type="submit" ?disabled=${this.driveSavingId === t.id}>${this.driveSavingId === t.id ? i.saving : i.save}</button><button type="button" class="secondary" @click=${() => this.cancelManualDriveEdit()} ?disabled=${!!this.driveSavingId}>${i.cancel}</button></form>`;
+    const o = t.trip_id === e ? d`<button type="button" class="link" @click=${() => this.unassignDrive(e, t.id)}>${i.unassign}</button>` : d`<button type="button" class="link" @click=${() => this.assignDrive(e, t.id)}>${i.assign}</button>`, c = t.source === "manual" ? d`<button type="button" class="link" @click=${() => this.startManualDriveEdit(t)} ?disabled=${!!this.driveSavingId}>${i.edit}</button><button type="button" class="link" @click=${() => this.removeManualDrive(e, t.id)} ?disabled=${!!this.driveSavingId}>${this.confirmingDriveId === t.id ? i.confirmDelete : i.remove}</button>` : "";
+    return d`<div class="drive-row"><div><strong>${r}</strong> · ${n}<br><span class="muted">${(t.distance_m / 1e3).toFixed(1)} km · ${fe(t.duration_seconds, this.hass)} · ${t.assignment_status === "assigned" ? i.assignedDrives : i.freeDrives}</span></div><span class="actions">${c}${o}</span></div>`;
   }
   render() {
-    const e = u(this.hass), t = this.snapshot?.trips ?? [], s = this.snapshot?.expenses ?? [], r = this.snapshot?.expense_summary, n = r?.mixed_currency ? e.mixedCurrency : r?.total_minor !== void 0 && r.currency ? T(r.total_minor, r.currency, this.hass) : T(0, "EUR", this.hass), a = this.loadError || this.actionError;
-    return l`<ha-card><h2>${e.manager}</h2>${a ? l`<p class="error" role="alert">${a}</p>` : ""}<section><h3>${e.newTrip}</h3><div class="actions"><input aria-label=${e.tripName} placeholder=${e.tripName} .value=${this.tripTitle} @input=${(c) => this.tripTitle = c.target.value}><input aria-label=${e.destination} placeholder=${e.destination} .value=${this.destination} @input=${(c) => this.destination = c.target.value}><button type="button" @click=${() => this.addTrip()}>${e.create}</button></div></section><section><h3>${e.trips}</h3>${t.length ? t.map((c) => l`<article class="trip"><div class="row"><strong>${c.title}</strong><span class="muted">${c.destination || ""} · ${ke(c.status, this.hass)}</span></div><div class="actions"><button type="button" class="secondary" @click=${() => this.editTrip(c)}>${e.edit}</button><button type="button" class="secondary" @click=${() => this.removeTrip(c.id)}>${e.remove}</button>${c.status === "planned" || c.status === "paused" ? l`<button type="button" @click=${() => this.changeStatus(c.id, "active")}>${e.resume}</button>` : ""}${c.status === "active" ? l`<button type="button" class="secondary" @click=${() => this.changeStatus(c.id, "paused")}>${e.pause}</button><button type="button" @click=${() => this.changeStatus(c.id, "completed")}>${e.complete}</button>` : ""}<button type="button" class="secondary" @click=${() => this.toggleTripDetails(c.id)}>${this.selected === c.id ? e.close : e.details}</button></div>${this.selected === c.id ? l`<div class="details"><h4>${e.assignedDrives}</h4>${(this.snapshot?.drives ?? []).map((o) => l`<div class="row"><span>${O(o.started_at, this.hass)} · ${(o.distance_m / 1e3).toFixed(1)} km</span>${o.trip_id === c.id ? l`<button type="button" class="link" @click=${() => this.hass && it(this.hass, this.vehicleId, c.id, o.id).then(() => this.refresh())}>${e.unassign}</button>` : ""}</div>`)}${(this.snapshot?.available_drives ?? []).length ? l`<h4>${e.freeDrives}</h4>${this.snapshot?.available_drives?.map((o) => l`<div class="row"><span>${O(o.started_at, this.hass)} · ${(o.distance_m / 1e3).toFixed(1)} km}</span><button type="button" class="link" @click=${() => this.assignDrive(c.id, o.id)}>${e.assign}</button></div>`)}` : ""}<h4>${e.expenses}</h4><div class="expense-form create-form"><input aria-label=${e.amount} type="number" min="0" step="0.01" inputmode="decimal" placeholder="EUR" .value=${this.amount} @input=${(o) => this.setExpenseAmount(o.currentTarget.value)}><select aria-label=${e.category} .value=${this.category} @change=${(o) => this.setExpenseCategory(o.currentTarget.value)}>${P.map((o) => l`<option value=${o}>${V(o, this.hass)}</option>`)}</select><button type="button" @click=${() => this.addExpense(c.id)}>${e.save}</button></div>${s.map((o) => this.renderExpense(o, e))}<p class="total"><strong>${e.total}: ${n}</strong></p></div>` : ""}</article>`) : l`<p class="muted">${e.noTrip}</p>`}</section></ha-card>`;
+    const t = l(this.hass), e = this.snapshot?.trips ?? [], i = this.snapshot?.expenses ?? [], r = this.snapshot?.expense_summary, n = r?.mixed_currency ? t.mixedCurrency : r?.total_minor !== void 0 && r.currency ? T(r.total_minor, r.currency, this.hass) : T(0, "EUR", this.hass), o = this.loadError || this.actionError;
+    return d`<ha-card><h2>${t.manager}</h2>${o ? d`<p class="error" role="alert">${o}</p>` : ""}<section><h3>${t.newTrip}</h3><div class="form-grid"><input aria-label=${t.tripName} placeholder=${t.tripName} .value=${this.tripTitle} @input=${(c) => this.tripTitle = c.target.value}><input aria-label=${t.destination} placeholder=${t.destination} .value=${this.destination} @input=${(c) => this.destination = c.target.value}><label>${t.startDate}<input type="date" .value=${this.tripStartDate} @input=${(c) => this.tripStartDate = c.currentTarget.value}></label><label>${t.endDate}<input type="date" .value=${this.tripEndDate} @input=${(c) => this.tripEndDate = c.currentTarget.value}></label><button type="button" @click=${() => this.addTrip()}>${t.create}</button></div></section><section><h3>${t.trips}</h3>${e.length ? e.map((c) => d`<article class="trip"><div class="row"><strong>${c.title}</strong><span class="muted">${c.destination || ""} · ${It(c.status, this.hass)} · ${$e(c, this.hass) || t.period}</span></div>${this.editingTripId === c.id ? d`<form class="form-grid" @submit=${(a) => {
+      a.preventDefault(), this.saveTrip(c);
+    }}><input aria-label=${t.tripName} .value=${this.editingTripTitle} @input=${(a) => this.editingTripTitle = a.currentTarget.value}><input aria-label=${t.destination} .value=${this.editingDestination} @input=${(a) => this.editingDestination = a.currentTarget.value}><label>${t.startDate}<input type="date" .value=${this.editingStartDate} @input=${(a) => this.editingStartDate = a.currentTarget.value}></label><label>${t.endDate}<input type="date" .value=${this.editingEndDate} @input=${(a) => this.editingEndDate = a.currentTarget.value}></label><button type="submit">${t.save}</button><button type="button" class="secondary" @click=${() => this.cancelTripEdit()}>${t.cancel}</button></form>` : d`<div class="actions"><button type="button" class="secondary" @click=${() => this.startTripEdit(c)}>${t.edit}</button><button type="button" class="secondary" @click=${() => this.removeTrip(c.id)}>${this.confirmingTripId === c.id ? t.confirmDelete : t.remove}</button>${c.status === "planned" || c.status === "paused" ? d`<button type="button" @click=${() => this.changeStatus(c.id, "active")}>${t.resume}</button>` : ""}${c.status === "active" ? d`<button type="button" class="secondary" @click=${() => this.changeStatus(c.id, "paused")}>${t.pause}</button><button type="button" @click=${() => this.changeStatus(c.id, "completed")}>${t.complete}</button>` : ""}<button type="button" class="secondary" @click=${() => this.toggleTripDetails(c.id)}>${this.selected === c.id ? t.close : t.details}</button></div>`}${this.selected === c.id ? d`<div class="details"><h4>${t.assignedDrives}</h4>${(this.snapshot?.drives ?? []).length ? (this.snapshot?.drives ?? []).map((a) => this.renderDrive(a, c.id, t)) : d`<p class="muted">${t.noDrives}</p>`}<h4>${t.freeDrives}</h4>${(this.snapshot?.available_drives ?? []).length ? (this.snapshot?.available_drives ?? []).map((a) => this.renderDrive(a, c.id, t)) : d`<p class="muted">${t.noDrives}</p>`}<h4>${t.manualDrive}</h4><div class="form-grid"><label>${t.driveStart}<input type="datetime-local" .value=${this.manualOccurredAt} @input=${(a) => this.manualOccurredAt = a.currentTarget.value}></label><input aria-label=${t.startLocation} placeholder=${t.startLocation} .value=${this.manualStartLocation} @input=${(a) => this.manualStartLocation = a.currentTarget.value}><input aria-label=${t.endLocation} placeholder=${t.endLocation} .value=${this.manualEndLocation} @input=${(a) => this.manualEndLocation = a.currentTarget.value}><input aria-label=${t.distanceKm} type="number" min="0" step="0.1" inputmode="decimal" placeholder=${t.distanceKm} .value=${this.manualDistanceKm} @input=${(a) => this.manualDistanceKm = a.currentTarget.value}><input aria-label=${t.durationMinutes} type="number" min="0" step="1" placeholder=${t.durationMinutes} .value=${this.manualDurationMinutes} @input=${(a) => this.manualDurationMinutes = a.currentTarget.value}><button type="button" @click=${() => this.addManualDrive(c.id)} ?disabled=${this.manualSaving}>${this.manualSaving ? t.saving : t.createDrive}</button></div><h4>${t.expenses}</h4><div class="expense-form create-form"><input aria-label=${t.amount} type="number" min="0" step="0.01" inputmode="decimal" placeholder="EUR" .value=${this.amount} @input=${(a) => this.setExpenseAmount(a.currentTarget.value)}><select aria-label=${t.category} .value=${this.category} @change=${(a) => this.setExpenseCategory(a.currentTarget.value)}>${z.map((a) => d`<option value=${a}>${B(a, this.hass)}</option>`)}</select><button type="button" @click=${() => this.addExpense(c.id)}>${t.save}</button></div>${i.map((a) => this.renderExpense(a, t))}<p class="total"><strong>${t.total}: ${n}</strong></p></div>` : ""}</article>`) : d`<p class="muted">${t.noTrip}</p>`}</section></ha-card>`;
   }
 }
-Te.styles = [ie.styles, j`section{margin-top:16px}.trip{display:grid;gap:8px;padding:12px 0;border-bottom:1px solid var(--divider-color)}.row,.expense-row{display:flex;justify-content:space-between;gap:8px;align-items:center;flex-wrap:wrap}.details{padding:8px;background:var(--secondary-background-color)}h4{margin:12px 0 4px}.link{min-height:30px;padding:4px 8px;font-size:.9em}.expense-form{display:grid;grid-template-columns:minmax(0,1fr) minmax(7rem,10rem) auto;gap:8px;align-items:center;width:100%}.expense-form input,.expense-form select{min-width:0;width:100%;box-sizing:border-box}.create-form{grid-template-columns:minmax(7rem,10rem) minmax(0,1fr) auto}.total{margin:12px 0 0;text-align:right}@media(max-width:500px){.expense-form,.create-form{grid-template-columns:1fr}.expense-form .actions{margin-top:0}.total{text-align:left}}`];
-Ae("camper-travel-journal-manager-card", Te);
-const ut = 1e4;
-function B() {
+Mt.styles = [at.styles, O`section{margin-top:16px}.trip{display:grid;gap:8px;padding:12px 0;border-bottom:1px solid var(--divider-color)}.row,.expense-row,.drive-row{display:flex;justify-content:space-between;gap:8px;align-items:center;flex-wrap:wrap}.details{padding:8px;background:var(--secondary-background-color)}h4{margin:12px 0 4px}.link{min-height:30px;padding:4px 8px;font-size:.9em}.form-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(9rem,1fr));gap:8px;align-items:end}.form-grid input,.form-grid select{min-width:0;width:100%;box-sizing:border-box}.form-grid label{display:grid;gap:4px;font-size:.9em}.expense-form{display:grid;grid-template-columns:minmax(0,1fr) minmax(7rem,10rem) auto;gap:8px;align-items:center;width:100%}.expense-form input,.expense-form select{min-width:0;width:100%;box-sizing:border-box}.create-form{grid-template-columns:minmax(7rem,10rem) minmax(0,1fr) auto}.total{margin:12px 0 0;text-align:right}@media(max-width:500px){.expense-form,.create-form,.drive-edit-form{grid-template-columns:1fr}.expense-form .actions{margin-top:0}.total{text-align:left}}`];
+Ct("camper-travel-journal-manager-card", Mt);
+const be = 1e4;
+function F() {
   return typeof performance < "u" ? performance.now() : Date.now();
 }
-function F(i) {
-  return i.length <= 8 ? "••••" : `${i.slice(0, 4)}…${i.slice(-4)}`;
+function W(s) {
+  return s.length <= 8 ? "••••" : `${s.slice(0, 4)}…${s.slice(-4)}`;
 }
-function ve(i) {
-  return i?.connection ? i.connection.connected === !0 ? "available" : i.connection.connected === !1 ? "unavailable" : "unknown" : "unavailable";
+function bt(s) {
+  return s?.connection ? s.connection.connected === !0 ? "available" : s.connection.connected === !1 ? "unavailable" : "unknown" : "unavailable";
 }
-function pt(i) {
-  const e = i, t = typeof e?.code == "string" ? e.code.replace(/[^a-zA-Z0-9_.-]/g, "_").slice(0, 80) : "promise_rejected", s = typeof e?.message == "string" ? e.message.replace(/bearer\s+[^\s]+/gi, "Bearer [maskiert]").replace(/(token|cookie|authorization|password)\s*[:=]\s*[^\s,;]+/gi, "$1=[maskiert]").slice(0, 240) : "Die Anfrage wurde abgelehnt.";
-  return { errorCode: t, errorMessage: s };
+function ye(s) {
+  const t = s, e = typeof t?.code == "string" ? t.code.replace(/[^a-zA-Z0-9_.-]/g, "_").slice(0, 80) : "promise_rejected", i = typeof t?.message == "string" ? t.message.replace(/bearer\s+[^\s]+/gi, "Bearer [maskiert]").replace(/(token|cookie|authorization|password)\s*[:=]\s*[^\s,;]+/gi, "$1=[maskiert]").slice(0, 240) : "Die Anfrage wurde abgelehnt.";
+  return { errorCode: e, errorMessage: i };
 }
-function gt(i, e) {
-  return new Promise((t, s) => {
-    const r = setTimeout(() => s(Object.assign(new Error("Zeitüberschreitung"), { code: "timeout" })), e);
-    i.then((n) => {
-      clearTimeout(r), t(n);
+function Ee(s, t) {
+  return new Promise((e, i) => {
+    const r = setTimeout(() => i(Object.assign(new Error("Zeitüberschreitung"), { code: "timeout" })), t);
+    s.then((n) => {
+      clearTimeout(r), e(n);
     }, (n) => {
-      clearTimeout(r), s(n);
+      clearTimeout(r), i(n);
     });
   });
 }
-async function K(i, e, t, s) {
-  const r = B();
+async function G(s, t, e, i) {
+  const r = F();
   try {
-    const n = await gt(i.connection.sendMessagePromise(e), s);
-    return { ...t(n), durationMs: Math.round(B() - r), value: n };
+    const n = await Ee(s.connection.sendMessagePromise(t), i);
+    return { ...e(n), durationMs: Math.round(F() - r), value: n };
   } catch (n) {
-    return { state: "failed", durationMs: Math.round(B() - r), ...pt(n) };
+    return { state: "failed", durationMs: Math.round(F() - r), ...ye(n) };
   }
 }
-function mt(i) {
-  return i && typeof i == "object" ? { state: "success", structure: "ok" } : { state: "failed", structure: "invalid" };
+function De(s) {
+  return s && typeof s == "object" ? { state: "success", structure: "ok" } : { state: "failed", structure: "invalid" };
 }
-function ft(i) {
-  const e = i?.vehicles;
-  return Array.isArray(e) && e.every((t) => t && typeof t == "object" && typeof t.vehicle_id == "string") ? { state: "success", structure: "ok", count: e.length } : { state: "failed", structure: "invalid", errorCode: "invalid_response", errorMessage: "Fahrzeugantwort hat eine ungültige Struktur." };
+function xe(s) {
+  const t = s?.vehicles;
+  return Array.isArray(t) && t.every((e) => e && typeof e == "object" && typeof e.vehicle_id == "string") ? { state: "success", structure: "ok", count: t.length } : { state: "failed", structure: "invalid", errorCode: "invalid_response", errorMessage: "Fahrzeugantwort hat eine ungültige Struktur." };
 }
-function vt(i) {
-  const e = i;
-  return Array.isArray(e?.trips) && Array.isArray(e?.drives) && Array.isArray(e?.stops) ? { state: "success", structure: "ok", count: e.trips.length, drivesCount: e.drives.length, stopsCount: e.stops.length } : { state: "failed", structure: "invalid", errorCode: "invalid_response", errorMessage: "Reisedatenantwort hat eine ungültige Struktur." };
+function we(s) {
+  const t = s;
+  return Array.isArray(t?.trips) && Array.isArray(t?.drives) && Array.isArray(t?.stops) ? { state: "success", structure: "ok", count: t.trips.length, drivesCount: t.drives.length, stopsCount: t.stops.length } : { state: "failed", structure: "invalid", errorCode: "invalid_response", errorMessage: "Reisedatenantwort hat eine ungültige Struktur." };
 }
-async function $t(i, e, t = ut) {
-  const s = { state: "not_run", durationMs: null };
-  if (!i?.connection) return { version: "0.1.0-beta.11", connectionBefore: "unavailable", connectionAfter: "unavailable", authentication: s, vehicles: s, trips: s, vehicleId: F(e) };
-  const r = ve(i), n = await K(i, { type: "auth/current_user" }, mt, t), a = await K(i, { type: "camper_travel_journal/list_vehicles" }, ft, t), c = a.value?.vehicles?.filter((Ue) => typeof Ue.vehicle_id == "string") ?? [], o = c.length === 1 ? c[0].vehicle_id : void 0, p = await K(i, { type: "camper_travel_journal/list", vehicle_id: o ?? e }, vt, t), { value: h, ...m } = n, { value: v, ...x } = a, { value: wt, ...De } = p;
+async function Se(s, t, e = be) {
+  const i = { state: "not_run", durationMs: null };
+  if (!s?.connection) return { version: "0.1.0-beta.12", connectionBefore: "unavailable", connectionAfter: "unavailable", authentication: i, vehicles: i, trips: i, vehicleId: W(t) };
+  const r = bt(s), n = await G(s, { type: "auth/current_user" }, De, e), o = await G(s, { type: "camper_travel_journal/list_vehicles" }, xe, e), c = o.value?.vehicles?.filter((Lt) => typeof Lt.vehicle_id == "string") ?? [], a = c.length === 1 ? c[0].vehicle_id : void 0, p = await G(s, { type: "camper_travel_journal/list", vehicle_id: a ?? t }, we, e), { value: h, ...v } = n, { value: f, ...x } = o, { value: Me, ...Ut } = p;
   return {
-    version: "0.1.0-beta.11",
+    version: "0.1.0-beta.12",
     connectionBefore: r,
-    connectionAfter: ve(i),
-    authentication: m,
+    connectionAfter: bt(s),
+    authentication: v,
     vehicles: x,
-    trips: De,
-    vehicleId: F(e),
-    ...o ? { resolvedVehicleId: F(o) } : {}
+    trips: Ut,
+    vehicleId: W(t),
+    ...a ? { resolvedVehicleId: W(a) } : {}
   };
 }
-function W(i) {
-  return JSON.stringify(i, null, 2);
+function Z(s) {
+  return JSON.stringify(s, null, 2);
 }
-function Z(i) {
-  return i.state === "success" ? "erfolgreich" : i.state === "failed" ? "fehlgeschlagen" : "nicht geprüft";
+function J(s) {
+  return s.state === "success" ? "erfolgreich" : s.state === "failed" ? "fehlgeschlagen" : "nicht geprüft";
 }
-const $e = "01M4XW0KD3GQ0KASAYHQ29840P";
-class _t extends b {
-  static styles = j`
+const yt = "01M4XW0KD3GQ0KASAYHQ29840P";
+class Ae extends E {
+  static styles = O`
     :host { display: block; color: var(--primary-text-color); }
     ha-card { padding: 16px; }
     h2 { margin: 0 0 12px; }
@@ -994,15 +1127,15 @@ class _t extends b {
   running = !1;
   error = "";
   manualCopy = !1;
-  config = { vehicle_id: $e };
-  set hass(e) {
-    this._hass = e, this.requestUpdate();
+  config = { vehicle_id: yt };
+  set hass(t) {
+    this._hass = t, this.requestUpdate();
   }
   get hass() {
     return this._hass;
   }
-  setConfig(e) {
-    this.config = { vehicle_id: e.vehicle_id || $e };
+  setConfig(t) {
+    this.config = { vehicle_id: t.vehicle_id || yt };
   }
   async start() {
     if (!this._hass || this.running) {
@@ -1011,7 +1144,7 @@ class _t extends b {
     }
     this.running = !0, this.error = "", this.manualCopy = !1, this.requestUpdate();
     try {
-      this.report = await $t(this._hass, this.config.vehicle_id);
+      this.report = await Se(this._hass, this.config.vehicle_id);
     } catch {
       this.error = "Diagnose konnte nicht gestartet werden.";
     } finally {
@@ -1020,13 +1153,13 @@ class _t extends b {
   }
   async copyReport() {
     if (!this.report) return;
-    const e = W(this.report);
+    const t = Z(this.report);
     if (!navigator.clipboard?.writeText) {
       this.manualCopy = !0, this.error = "Bitte den eingeblendeten Bericht manuell auswählen und kopieren.", this.requestUpdate();
       return;
     }
     try {
-      await navigator.clipboard.writeText(e), this.manualCopy = !1, this.error = "";
+      await navigator.clipboard.writeText(t), this.manualCopy = !1, this.error = "";
     } catch {
       this.manualCopy = !0, this.error = "Automatisches Kopieren ist in diesem Browser nicht verfügbar. Bitte den Bericht manuell auswählen und kopieren.";
     }
@@ -1036,32 +1169,32 @@ class _t extends b {
     this.shadowRoot?.querySelector('textarea[aria-label="Diagnosebericht zum manuellen Kopieren"]')?.select();
   }
   render() {
-    const e = this.report;
-    return l`<ha-card><h2>Camper Travel Journal – Diagnose</h2>
-      ${this.error ? l`<p class="error" role="alert">${this.error}</p>` : ""}
-      ${this.running ? l`<p class="muted" aria-live="polite">Diagnose läuft …</p>` : ""}
-      ${e ? l`<dl>
-        <dt>Version</dt><dd>${e.version}</dd>
-        <dt>Verbindung vorher</dt><dd>${e.connectionBefore}</dd>
-        <dt>Verbindung nachher</dt><dd>${e.connectionAfter}</dd>
-        <dt>Authentifizierung</dt><dd>${Z(e.authentication)}</dd>
-        <dt>Fahrzeugabfrage</dt><dd>${Z(e.vehicles)}${e.vehicles.durationMs === null ? "" : ` (${e.vehicles.durationMs} ms)`}</dd>
-        <dt>Reisedatenabfrage</dt><dd>${Z(e.trips)}${e.trips.durationMs === null ? "" : ` (${e.trips.durationMs} ms)`}${e.trips.state === "success" ? ` · ${e.trips.count ?? 0} Reisen / ${e.trips.drivesCount ?? 0} Fahrten / ${e.trips.stopsCount ?? 0} Stopps` : ""}</dd>
-        <dt>Strukturprüfung</dt><dd>${e.vehicles.structure === "ok" && e.trips.structure === "ok" ? "ok" : "siehe Bericht"}</dd>
-      </dl><pre aria-label="Diagnosebericht">${W(e)}</pre>${this.manualCopy ? l`<textarea aria-label="Diagnosebericht zum manuellen Kopieren" readonly rows="8" @click=${() => this.selectReport()}>${W(e)}</textarea>` : ""}` : ""}
-      <div class="actions"><button @click=${() => this.start()} ?disabled=${this.running}>${e ? "Diagnose wiederholen" : "Diagnose starten"}</button>${e ? l`<button class="secondary" @click=${() => this.copyReport()}>Bericht kopieren</button>${this.manualCopy ? l`<button class="secondary" @click=${() => this.selectReport()}>Bericht auswählen</button>` : ""}` : ""}</div>
+    const t = this.report;
+    return d`<ha-card><h2>Camper Travel Journal – Diagnose</h2>
+      ${this.error ? d`<p class="error" role="alert">${this.error}</p>` : ""}
+      ${this.running ? d`<p class="muted" aria-live="polite">Diagnose läuft …</p>` : ""}
+      ${t ? d`<dl>
+        <dt>Version</dt><dd>${t.version}</dd>
+        <dt>Verbindung vorher</dt><dd>${t.connectionBefore}</dd>
+        <dt>Verbindung nachher</dt><dd>${t.connectionAfter}</dd>
+        <dt>Authentifizierung</dt><dd>${J(t.authentication)}</dd>
+        <dt>Fahrzeugabfrage</dt><dd>${J(t.vehicles)}${t.vehicles.durationMs === null ? "" : ` (${t.vehicles.durationMs} ms)`}</dd>
+        <dt>Reisedatenabfrage</dt><dd>${J(t.trips)}${t.trips.durationMs === null ? "" : ` (${t.trips.durationMs} ms)`}${t.trips.state === "success" ? ` · ${t.trips.count ?? 0} Reisen / ${t.trips.drivesCount ?? 0} Fahrten / ${t.trips.stopsCount ?? 0} Stopps` : ""}</dd>
+        <dt>Strukturprüfung</dt><dd>${t.vehicles.structure === "ok" && t.trips.structure === "ok" ? "ok" : "siehe Bericht"}</dd>
+      </dl><pre aria-label="Diagnosebericht">${Z(t)}</pre>${this.manualCopy ? d`<textarea aria-label="Diagnosebericht zum manuellen Kopieren" readonly rows="8" @click=${() => this.selectReport()}>${Z(t)}</textarea>` : ""}` : ""}
+      <div class="actions"><button @click=${() => this.start()} ?disabled=${this.running}>${t ? "Diagnose wiederholen" : "Diagnose starten"}</button>${t ? d`<button class="secondary" @click=${() => this.copyReport()}>Bericht kopieren</button>${this.manualCopy ? d`<button class="secondary" @click=${() => this.selectReport()}>Bericht auswählen</button>` : ""}` : ""}</div>
     </ha-card>`;
   }
 }
-typeof customElements < "u" && !customElements.get("camper-travel-journal-diagnostics-card") && customElements.define("camper-travel-journal-diagnostics-card", _t);
-function yt(i, e) {
-  return i.vehicle_id || e.length !== 1 ? i : { ...i, vehicle_id: e[0].vehicle_id };
+typeof customElements < "u" && !customElements.get("camper-travel-journal-diagnostics-card") && customElements.define("camper-travel-journal-diagnostics-card", Ae);
+function Ce(s, t) {
+  return s.vehicle_id || t.length !== 1 ? s : { ...s, vehicle_id: t[0].vehicle_id };
 }
-function bt(i, e) {
-  return i.type === e.type && i.vehicle_id === e.vehicle_id;
+function ke(s, t) {
+  return s.type === t.type && s.vehicle_id === t.vehicle_id;
 }
-class Et extends b {
-  static styles = j`
+class Te extends E {
+  static styles = O`
     :host { display: block; color: var(--primary-text-color); }
     .field { display: flex; flex-direction: column; gap: 6px; margin: 8px 0; }
     label { font-weight: 500; }
@@ -1076,29 +1209,29 @@ class Et extends b {
   error = "";
   loadedConnection;
   loadingPromise;
-  set hass(e) {
-    const t = this._hass?.connection !== e?.connection;
-    this._hass = e, t && e && this.loadVehicles(), this.requestUpdate();
+  set hass(t) {
+    const e = this._hass?.connection !== t?.connection;
+    this._hass = t, e && t && this.loadVehicles(), this.requestUpdate();
   }
   get hass() {
     return this._hass;
   }
-  setConfig(e) {
-    bt(this._config, e) || (this._config = { ...e }, this._hass && !this.loadedConnection && this.loadVehicles(), this.requestUpdate());
+  setConfig(t) {
+    ke(this._config, t) || (this._config = { ...t }, this._hass && !this.loadedConnection && this.loadVehicles(), this.requestUpdate());
   }
   async loadVehicles() {
     if (!this._hass) return;
     if (this.loadingPromise) return this.loadingPromise;
     if (this.loadedConnection === this._hass.connection) return;
     this.loading = !0, this.error = "", this.requestUpdate();
-    const e = this._hass;
+    const t = this._hass;
     return this.loadingPromise = (async () => {
       try {
-        this.vehicles = await ct(e), this.loadedConnection = e.connection;
-        const t = yt(this._config, this.vehicles);
-        t.vehicle_id !== this._config.vehicle_id && (this._config = t, this.fireConfigChanged());
+        this.vehicles = await ge(t), this.loadedConnection = t.connection;
+        const e = Ce(this._config, this.vehicles);
+        e.vehicle_id !== this._config.vehicle_id && (this._config = e, this.fireConfigChanged());
       } catch {
-        this.error = u(e).editorLoadError;
+        this.error = l(t).editorLoadError;
       } finally {
         this.loading = !1, this.loadingPromise = void 0, this.requestUpdate();
       }
@@ -1107,32 +1240,32 @@ class Et extends b {
   fireConfigChanged() {
     this.dispatchEvent(new CustomEvent("config-changed", { bubbles: !0, composed: !0, detail: { config: { ...this._config } } }));
   }
-  selectVehicle(e) {
-    const t = e.target.value;
-    this._config = { ...this._config, vehicle_id: t }, this.fireConfigChanged();
+  selectVehicle(t) {
+    const e = t.target.value;
+    this._config = { ...this._config, vehicle_id: e }, this.fireConfigChanged();
   }
   render() {
-    const e = u(this._hass);
-    return l`
+    const t = l(this._hass);
+    return d`
       <div class="field">
-        <label for="vehicle">${e.editorVehicle}</label>
-        ${this.loading ? l`<span class="muted">${e.editorLoading}</span>` : l`
-          <select id="vehicle" aria-label=${e.editorVehicle} @change=${this.selectVehicle}>
-            <option value="" ?selected=${!this._config.vehicle_id}>${e.editorChooseVehicle}</option>
-            ${this.vehicles.map((t) => l`<option value=${t.vehicle_id} ?selected=${t.vehicle_id === this._config.vehicle_id}>${t.name || t.title}</option>`)}
+        <label for="vehicle">${t.editorVehicle}</label>
+        ${this.loading ? d`<span class="muted">${t.editorLoading}</span>` : d`
+          <select id="vehicle" aria-label=${t.editorVehicle} @change=${this.selectVehicle}>
+            <option value="" ?selected=${!this._config.vehicle_id}>${t.editorChooseVehicle}</option>
+            ${this.vehicles.map((e) => d`<option value=${e.vehicle_id} ?selected=${e.vehicle_id === this._config.vehicle_id}>${e.name || e.title}</option>`)}
           </select>
         `}
-        ${this.error ? l`<span class="error" role="alert">${this.error}</span>` : ""}
-        ${!this.loading && !this.error && !this.vehicles.length ? l`<span class="error" role="alert">${e.editorNoVehicle}</span>` : ""}
+        ${this.error ? d`<span class="error" role="alert">${this.error}</span>` : ""}
+        ${!this.loading && !this.error && !this.vehicles.length ? d`<span class="error" role="alert">${t.editorNoVehicle}</span>` : ""}
       </div>
     `;
   }
 }
-typeof customElements < "u" && !customElements.get("camper-travel-journal-card-editor") && customElements.define("camper-travel-journal-card-editor", Et);
-const xt = [
+typeof customElements < "u" && !customElements.get("camper-travel-journal-card-editor") && customElements.define("camper-travel-journal-card-editor", Te);
+const Ie = [
   { type: "camper-travel-journal-summary-card", name: "Camper Travel Journal – Reiseübersicht", description: "Zeigt die aktuelle Reise, Fahrten, Strecke und Reisekosten kompakt an.", documentationURL: "https://github.com/balronu/ha-camper-travel-journal" },
   { type: "camper-travel-journal-manager-card", name: "Camper Travel Journal – Reiseverwaltung", description: "Reisen erstellen, bearbeiten und verwalten.", documentationURL: "https://github.com/balronu/ha-camper-travel-journal" },
   { type: "camper-travel-journal-diagnostics-card", name: "Camper Travel Journal – Diagnose", description: "Startet manuell eine bereinigte, ausschließlich lesende WebSocket-Diagnose.", documentationURL: "https://github.com/balronu/ha-camper-travel-journal" }
 ];
 window.customCards ??= [];
-for (const i of xt) window.customCards.some((e) => e.type === i.type) || window.customCards.push(i);
+for (const s of Ie) window.customCards.some((t) => t.type === s.type) || window.customCards.push(s);

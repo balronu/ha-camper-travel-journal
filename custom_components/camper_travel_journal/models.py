@@ -41,6 +41,9 @@ class Drive:
     distance_m: float
     end_reason: str
     manual_distance_km: float | None = None
+    source: str = "gps"
+    start_label: str | None = None
+    end_label: str | None = None
 
 
 @dataclass(frozen=True, slots=True)
@@ -65,6 +68,8 @@ class Trip:
     destination: str = ""
     created_at: datetime | None = None
     updated_at: datetime | None = None
+    start_date: str | None = None
+    end_date: str | None = None
 
 
 @dataclass(frozen=True, slots=True)

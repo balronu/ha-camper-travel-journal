@@ -32,6 +32,8 @@ class FakeWorker:
             return {"total_minor": 0}
         if method == "create_trip":
             return "t-new"
+        if method == "create_manual_drive":
+            return "d-manual"
         return None
 
 
@@ -86,6 +88,22 @@ async def test_create_trip_command_validates_and_returns_id():
     await api.ws_create_trip.__wrapped__(hass, connection, {"id": 1, "vehicle_id": "v1", "title": "Alpen", "description": "", "destination": "Berge", "started_at": "2026-10-01T12:00:00Z"})
     assert connection.results == [(1, {"trip_id": "t-new"})]
     assert connection.errors == []
+
+
+@pytest.mark.asyncio
+async def test_create_trip_accepts_optional_dates_and_manual_drive_command():
+    hass = FakeHass()
+    connection = FakeConnection()
+    await api.ws_create_trip.__wrapped__(hass, connection, {"id": 15, "vehicle_id": "v1", "title": "Sommer", "start_date": "2026-07-01", "end_date": "2026-07-14"})
+    assert connection.errors == []
+    method, _args, kwargs = hass.worker.calls[-1]
+    assert method == "create_trip"
+    assert kwargs["start_date"] == "2026-07-01"
+    await api.ws_create_manual_drive.__wrapped__(hass, connection, {"id": 16, "vehicle_id": "v1", "occurred_at": "2026-07-01T08:00:00Z", "start_location": "Bremen", "end_location": "Hamburg", "distance_km": 123.4, "duration_minutes": 90, "trip_id": "t1"})
+    assert connection.results[-1] == (16, {"drive_id": "d-manual"})
+    await api.ws_update_manual_drive.__wrapped__(hass, connection, {"id": 17, "vehicle_id": "v1", "drive_id": "d-manual", "occurred_at": "2026-07-01T09:00:00Z", "start_location": "Bremen Hbf", "end_location": "Hamburg Hbf", "distance_km": 125.0, "duration_minutes": 95})
+    await api.ws_delete_manual_drive.__wrapped__(hass, connection, {"id": 18, "vehicle_id": "v1", "drive_id": "d-manual"})
+    assert connection.results[-1] == (18, {"success": True})
 
 
 @pytest.mark.asyncio

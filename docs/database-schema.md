@@ -37,6 +37,19 @@ transaction. The worker opens SQLite with WAL mode, a 30-second busy timeout,
 foreign keys, and `BEGIN IMMEDIATE` for writes; this protects the file when
 more than one executor or backup reader is present.
 
+## Phase 4 schema additions (version 5)
+
+Migration 5 adds nullable `start_date` and `end_date` columns to `trips` and
+adds `source`, `start_label` and `end_label` to `drives`. Existing trips keep
+their legacy operational timestamps and existing GPS drives receive
+`source='gps'`. Manual drives use `source='manual'`, store neutral user-entered
+location labels and never create synthetic GPS points. The migration is
+additive, preserves existing rows and runs in one explicit SQLite transaction
+together with the schema-version update. If an `ALTER TABLE` step fails, the
+transaction rolls back and the database remains at schema version 4; a retry
+also handles already-present version-5 columns. Rollback means restoring the
+backed-up integration database; no destructive down-migration is attempted.
+
 All changes run through the serialized executor worker. A database newer than
 the supported version fails closed. No Recorder tables or migrations are
 touched, and retention remains non-destructive in this beta.

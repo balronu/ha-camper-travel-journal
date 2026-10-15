@@ -10,12 +10,12 @@ import sqlite3
 import uuid
 from collections.abc import Iterator
 from contextlib import contextmanager
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 from .travel import validate_amount, validate_expense_category, validate_expense_currency
 
-SCHEMA_VERSION = 4
+SCHEMA_VERSION = 5
 SCHEMA_SQL = """
 PRAGMA foreign_keys = ON;
 CREATE TABLE IF NOT EXISTS schema_meta (key TEXT PRIMARY KEY, value TEXT NOT NULL);
@@ -33,7 +33,8 @@ CREATE INDEX IF NOT EXISTS idx_gps_vehicle_time ON gps_points(vehicle_id, record
 CREATE TABLE IF NOT EXISTS drives (
   id TEXT PRIMARY KEY, vehicle_id TEXT NOT NULL REFERENCES vehicles(id), started_at TEXT NOT NULL,
   ended_at TEXT NOT NULL, distance_m REAL NOT NULL, end_reason TEXT NOT NULL,
-  manual_distance_km REAL, created_at TEXT NOT NULL
+  manual_distance_km REAL, source TEXT NOT NULL DEFAULT 'gps', start_label TEXT, end_label TEXT,
+  created_at TEXT NOT NULL
 );
 CREATE INDEX IF NOT EXISTS idx_drives_vehicle_time ON drives(vehicle_id, started_at, ended_at);
 CREATE TABLE IF NOT EXISTS stays (
@@ -43,7 +44,8 @@ CREATE TABLE IF NOT EXISTS stays (
 CREATE TABLE IF NOT EXISTS trips (
   id TEXT PRIMARY KEY, vehicle_id TEXT NOT NULL REFERENCES vehicles(id), title TEXT NOT NULL,
   started_at TEXT NOT NULL, ended_at TEXT, status TEXT NOT NULL, created_at TEXT NOT NULL, updated_at TEXT NOT NULL,
-  description TEXT NOT NULL DEFAULT '', destination TEXT NOT NULL DEFAULT ''
+  description TEXT NOT NULL DEFAULT '', destination TEXT NOT NULL DEFAULT '',
+  start_date TEXT, end_date TEXT
 );
 CREATE TABLE IF NOT EXISTS trip_drives (
   trip_id TEXT NOT NULL REFERENCES trips(id) ON DELETE CASCADE,
@@ -99,12 +101,14 @@ class SQLiteStore:
             if current is not None and int(current[0]) > SCHEMA_VERSION:
                 raise RuntimeError(f"database schema {current[0]} is newer than supported {SCHEMA_VERSION}")
             previous = int(current[0]) if current is not None else 0
-            if previous < 3:
-                self._migrate_v3()
-            if previous < 4:
-                self._migrate_v4()
-            self.connection.execute("INSERT OR REPLACE INTO schema_meta(key, value) VALUES('version', ?)", (str(SCHEMA_VERSION),))
-            self.connection.commit()
+            with self.transaction() as connection:
+                if previous < 3:
+                    self._migrate_v3()
+                if previous < 4:
+                    self._migrate_v4()
+                if previous < 5:
+                    self._migrate_v5()
+                connection.execute("INSERT OR REPLACE INTO schema_meta(key, value) VALUES('version', ?)", (str(SCHEMA_VERSION),))
         except Exception:
             self.close()
             raise
@@ -143,6 +147,23 @@ class SQLiteStore:
             if "updated_at" not in columns:
                 self.connection.execute(f"ALTER TABLE {table} ADD COLUMN updated_at TEXT")
                 self.connection.execute(f"UPDATE {table} SET updated_at=created_at WHERE updated_at IS NULL")
+
+    def _migrate_v5(self) -> None:
+        """Add optional trip dates and explicit manual-drive metadata."""
+        if self.connection is None:
+            raise RuntimeError("store is not open")
+        trip_columns = {row[1] for row in self.connection.execute("PRAGMA table_info(trips)")}
+        if "start_date" not in trip_columns:
+            self.connection.execute("ALTER TABLE trips ADD COLUMN start_date TEXT")
+        if "end_date" not in trip_columns:
+            self.connection.execute("ALTER TABLE trips ADD COLUMN end_date TEXT")
+        drive_columns = {row[1] for row in self.connection.execute("PRAGMA table_info(drives)")}
+        if "source" not in drive_columns:
+            self.connection.execute("ALTER TABLE drives ADD COLUMN source TEXT NOT NULL DEFAULT 'gps'")
+        if "start_label" not in drive_columns:
+            self.connection.execute("ALTER TABLE drives ADD COLUMN start_label TEXT")
+        if "end_label" not in drive_columns:
+            self.connection.execute("ALTER TABLE drives ADD COLUMN end_label TEXT")
 
     def close(self) -> None:
         if self.connection is not None:
@@ -191,7 +212,7 @@ class SQLiteStore:
     def insert_drive(self, drive) -> None:
         with self.transaction() as connection:
             stamp = utc_iso(drive.ended_at)
-            connection.execute("INSERT OR IGNORE INTO drives(id,vehicle_id,started_at,ended_at,distance_m,end_reason,manual_distance_km,created_at) VALUES(?,?,?,?,?,?,?,?)", (drive.id, drive.vehicle_id, utc_iso(drive.started_at), stamp, drive.distance_m, drive.end_reason, drive.manual_distance_km, stamp))
+            connection.execute("INSERT OR IGNORE INTO drives(id,vehicle_id,started_at,ended_at,distance_m,end_reason,manual_distance_km,source,start_label,end_label,created_at) VALUES(?,?,?,?,?,?,?,?,?,?,?)", (drive.id, drive.vehicle_id, utc_iso(drive.started_at), utc_iso(drive.ended_at), drive.distance_m, drive.end_reason, drive.manual_distance_km, drive.source, drive.start_label, drive.end_label, stamp))
 
     def save_runtime_state(self, vehicle_id: str, state_json: str, now: datetime) -> None:
         with self.transaction() as connection:
@@ -207,11 +228,11 @@ class SQLiteStore:
         rows = self.connection.execute("SELECT id FROM gps_points WHERE recorded_at < ? AND NOT EXISTS (SELECT 1 FROM drives d JOIN trip_drives td ON td.drive_id=d.id WHERE d.vehicle_id=gps_points.vehicle_id AND d.started_at <= gps_points.recorded_at AND d.ended_at >= gps_points.recorded_at) ORDER BY id LIMIT ?", (utc_iso(cutoff), limit)).fetchall()
         return [row[0] for row in rows]
 
-    def create_trip(self, vehicle_id: str, title: str, started_at: datetime, now: datetime, *, description: str = "", destination: str = "", status: str = "planned") -> str:
+    def create_trip(self, vehicle_id: str, title: str, started_at: datetime | None, now: datetime, *, description: str = "", destination: str = "", status: str = "planned", start_date: str | None = None, end_date: str | None = None) -> str:
         trip_id = str(uuid.uuid4())
         with self.transaction() as connection:
             stamp = utc_iso(now)
-            connection.execute("INSERT INTO trips(id,vehicle_id,title,started_at,status,created_at,updated_at,description,destination) VALUES(?,?,?,?,?,?,?,?,?)", (trip_id, vehicle_id, title.strip(), utc_iso(started_at), status, stamp, stamp, description.strip(), destination.strip()))
+            connection.execute("INSERT INTO trips(id,vehicle_id,title,started_at,status,created_at,updated_at,description,destination,start_date,end_date) VALUES(?,?,?,?,?,?,?,?,?,?,?)", (trip_id, vehicle_id, title.strip(), utc_iso(started_at or now), status, stamp, stamp, description.strip(), destination.strip(), start_date, end_date))
         return trip_id
 
     def list_trips(self, vehicle_id: str | None = None) -> list[dict]:
@@ -224,14 +245,21 @@ class SQLiteStore:
         return [dict(row) for row in rows]
 
     def update_trip(self, trip_id: str, now: datetime, **fields) -> None:
-        allowed = {"title", "description", "destination", "started_at", "ended_at", "status"}
-        changes = {key: value for key, value in fields.items() if key in allowed and value is not None}
+        allowed = {"title", "description", "destination", "started_at", "ended_at", "status", "start_date", "end_date"}
+        changes = {key: value for key, value in fields.items() if key in allowed}
         if not changes: return
         if "started_at" in changes and isinstance(changes["started_at"], datetime): changes["started_at"] = utc_iso(changes["started_at"])
         if "ended_at" in changes and isinstance(changes["ended_at"], datetime): changes["ended_at"] = utc_iso(changes["ended_at"])
         changes["updated_at"] = utc_iso(now)
         assignments = ",".join(f"{key}=?" for key in changes)
         with self.transaction() as connection:
+            current = connection.execute("SELECT start_date, end_date FROM trips WHERE id=?", (trip_id,)).fetchone()
+            if current is None:
+                raise ValueError("trip_not_found")
+            proposed_start = changes.get("start_date", current[0])
+            proposed_end = changes.get("end_date", current[1])
+            if proposed_start and proposed_end and proposed_end < proposed_start:
+                raise ValueError("trip_date_range_invalid")
             cursor = connection.execute(f"UPDATE trips SET {assignments} WHERE id=?", (*changes.values(), trip_id))
             if cursor.rowcount != 1: raise ValueError("trip_not_found")
 
@@ -261,11 +289,78 @@ class SQLiteStore:
         query = "SELECT d.*, td.trip_id FROM drives d LEFT JOIN trip_drives td ON td.drive_id=d.id WHERE d.vehicle_id=?"
         args: list = [vehicle_id]
         if trip_id: query += " AND td.trip_id=?"; args.append(trip_id)
-        return [dict(row) for row in self.connection.execute(query + " ORDER BY d.started_at DESC", args).fetchall()]
+        return [self._drive_dict(row) for row in self.connection.execute(query + " ORDER BY d.started_at DESC", args).fetchall()]
 
     def list_available_drives(self, vehicle_id: str) -> list[dict]:
         if self.connection is None: raise RuntimeError("store is not open")
-        return [dict(row) for row in self.connection.execute("SELECT d.*, NULL AS trip_id FROM drives d LEFT JOIN trip_drives td ON td.drive_id=d.id WHERE d.vehicle_id=? AND td.drive_id IS NULL ORDER BY d.started_at DESC", (vehicle_id,)).fetchall()]
+        return [self._drive_dict(row) for row in self.connection.execute("SELECT d.*, NULL AS trip_id FROM drives d LEFT JOIN trip_drives td ON td.drive_id=d.id WHERE d.vehicle_id=? AND td.drive_id IS NULL ORDER BY d.started_at DESC", (vehicle_id,)).fetchall()]
+
+    @staticmethod
+    def _drive_dict(row) -> dict:
+        result = dict(row)
+        try:
+            started = datetime.fromisoformat(result["started_at"])
+            ended = datetime.fromisoformat(result["ended_at"])
+            result["duration_seconds"] = max(0, int((ended - started).total_seconds()))
+        except (KeyError, TypeError, ValueError):
+            result["duration_seconds"] = 0
+        result["assignment_status"] = "assigned" if result.get("trip_id") else "unassigned"
+        result.setdefault("source", "gps")
+        return result
+
+    def create_manual_drive(self, vehicle_id: str, started_at: datetime, start_label: str, end_label: str, distance_km: float, duration_minutes: int | None, now: datetime, trip_id: str | None = None) -> str:
+        if not start_label.strip() or not end_label.strip():
+            raise ValueError("drive_location_required")
+        if distance_km < 0:
+            raise ValueError("drive_distance_invalid")
+        if duration_minutes is not None and duration_minutes < 0:
+            raise ValueError("drive_duration_invalid")
+        drive_id = str(uuid.uuid4())
+        ended_at = started_at + timedelta(minutes=duration_minutes or 0)
+        with self.transaction() as connection:
+            if connection.execute("SELECT 1 FROM vehicles WHERE id=?", (vehicle_id,)).fetchone() is None:
+                raise ValueError("vehicle_not_found")
+            if trip_id is not None:
+                trip = connection.execute("SELECT vehicle_id FROM trips WHERE id=?", (trip_id,)).fetchone()
+                if trip is None:
+                    raise ValueError("trip_not_found")
+                if trip[0] != vehicle_id:
+                    raise ValueError("vehicle_mismatch")
+            stamp = utc_iso(now)
+            connection.execute("INSERT INTO drives(id,vehicle_id,started_at,ended_at,distance_m,end_reason,manual_distance_km,source,start_label,end_label,created_at) VALUES(?,?,?,?,?,?,?,?,?,?,?)", (drive_id, vehicle_id, utc_iso(started_at), utc_iso(ended_at), distance_km * 1000, "manual", distance_km, "manual", start_label.strip(), end_label.strip(), stamp))
+            if trip_id is not None:
+                connection.execute("INSERT INTO trip_drives(trip_id,drive_id,linked_at) VALUES(?,?,?)", (trip_id, drive_id, stamp))
+        return drive_id
+
+    def update_manual_drive(self, drive_id: str, vehicle_id: str, started_at: datetime, start_label: str, end_label: str, distance_km: float, duration_minutes: int | None, now: datetime) -> None:
+        if not start_label.strip() or not end_label.strip():
+            raise ValueError("drive_location_required")
+        if distance_km < 0:
+            raise ValueError("drive_distance_invalid")
+        if duration_minutes is not None and duration_minutes < 0:
+            raise ValueError("drive_duration_invalid")
+        ended_at = started_at + timedelta(minutes=duration_minutes or 0)
+        with self.transaction() as connection:
+            drive = connection.execute("SELECT vehicle_id, source FROM drives WHERE id=?", (drive_id,)).fetchone()
+            if drive is None:
+                raise ValueError("drive_not_found")
+            if drive[0] != vehicle_id:
+                raise ValueError("vehicle_mismatch")
+            if drive[1] != "manual":
+                raise ValueError("drive_not_manual")
+            connection.execute("UPDATE drives SET started_at=?, ended_at=?, distance_m=?, manual_distance_km=?, start_label=?, end_label=? WHERE id=?", (utc_iso(started_at), utc_iso(ended_at), distance_km * 1000, distance_km, start_label.strip(), end_label.strip(), drive_id))
+
+    def delete_manual_drive(self, drive_id: str, vehicle_id: str) -> None:
+        with self.transaction() as connection:
+            drive = connection.execute("SELECT vehicle_id, source FROM drives WHERE id=?", (drive_id,)).fetchone()
+            if drive is None:
+                raise ValueError("drive_not_found")
+            if drive[0] != vehicle_id:
+                raise ValueError("vehicle_mismatch")
+            if drive[1] != "manual":
+                raise ValueError("drive_not_manual")
+            connection.execute("DELETE FROM trip_drives WHERE drive_id=?", (drive_id,))
+            connection.execute("DELETE FROM drives WHERE id=?", (drive_id,))
 
     def create_stop(self, stop, now: datetime) -> str:
         stop_id = stop.id or str(uuid.uuid4())

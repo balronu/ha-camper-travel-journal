@@ -12,7 +12,7 @@ const bundle = resolve(root, "../custom_components/camper_travel_journal/fronten
 
 describe("frontend release contract", () => {
   it("keeps backend, npm metadata and beta bundle aligned", () => {
-    expect(manifest.version).toBe("0.1.0-beta.11");
+    expect(manifest.version).toBe("0.1.0-beta.12");
     expect(pkg.version).toBe(manifest.version);
     expect(existsSync(bundle)).toBe(true);
   });
@@ -93,7 +93,7 @@ describe("frontend release contract", () => {
     expect(api).toContain("deleteTrip");
     expect(api).toContain("linkDrives");
     expect(api).toContain("updateExpense");
-    expect(manager).toContain("window.confirm");
+    expect(manager).not.toContain("window.confirm");
     expect(manager).toContain("role=\"alert\"");
     expect(manager).toContain("statusLabel");
     expect(manager).toContain("categoryLabel");
@@ -140,5 +140,23 @@ describe("frontend release contract", () => {
     expect(manager).toContain("toggleTripDetails");
     expect(manager).toContain("lang.close");
     expect(summary).toContain("EXPENSES_CHANGED_EVENT");
+  });
+  it("exposes beta 12 trip dates, drive management and cross-card refresh contracts", () => {
+    const api = readFileSync(resolve(root, "src/api.ts"), "utf8");
+    const manager = readFileSync(resolve(root, "src/manager-card.ts"), "utf8");
+    const summary = readFileSync(resolve(root, "src/summary-card.ts"), "utf8");
+    expect(api).toContain("createManualDrive");
+    expect(api).toContain("updateManualDrive");
+    expect(api).toContain("deleteManualDrive");
+    expect(api).toContain("start_date");
+    expect(api).toContain("end_date");
+    expect(manager).toContain("type=\"date\"");
+    expect(manager).toContain("type=\"datetime-local\"");
+    expect(manager).toContain("notifyTravelChanged");
+    expect(manager).toContain("formatDuration");
+    expect(manager).toContain("sourceManual");
+    expect(manager).toContain("saveManualDrive");
+    expect(manager).toContain("removeManualDrive");
+    expect(summary).toContain("TRAVEL_DATA_CHANGED_EVENT");
   });
 });

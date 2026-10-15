@@ -7,8 +7,8 @@ stored in an integration-owned SQLite database.
 
 ![Camper Travel Journal Logo](https://raw.githubusercontent.com/balronu/ha-camper-travel-journal/main/assets/branding/logo.png)
 
-> **Status:** `v0.1.0-beta.11` – published development beta. Not a stable or
-> generally production-validated release.
+> **Status:** `v0.1.0-beta.12` – prepared, not published. Beta 11 remains the
+> currently supported pre-release.
 
 ## Actual feature status
 
@@ -18,8 +18,8 @@ stored in an integration-owned SQLite database.
 | GPS recording | Event collector, filters, jump/gap protection | Indirectly through options | Domain/SQLite tests, CI |
 | Drive detection | Conservative state machine and distance | No, result data | Synthetic tests |
 | Multiple vehicles | Separate config entries | Card editor | HA/frontend tests |
-| Trips | Create, edit title, delete, status changes | Yes, Manager Card | API/HA/frontend tests |
-| Drives | GPS result, link/unlink | Assignment | Storage/API contracts |
+| Trips | Create, edit title/period, delete, status changes | Yes, Manager Card | API/HA/frontend tests |
+| Drives | Display/link GPS drives; create, edit and delete manual drives | Yes, Manager Card | Beta 12 API/frontend tests |
 | Stops | Schema and WebSocket CRUD | No | Storage/API tests |
 | Expenses | Categories, cents, totals, edit, delete | Yes | Beta 11 round-trip tested |
 | Cards/diagnostics | Summary, Manager, editor, manual diagnostics | Yes | Bundle/Vitest/Chromium |
@@ -31,8 +31,9 @@ user feature.
 
 ## HACS installation
 
-The currently published and supported version is `v0.1.0-beta.11`. It remains
-a development beta and has not been generally production-validated.
+The currently published and supported version is `v0.1.0-beta.11`. Beta 12 is
+prepared on this development branch but has not been published. It has not
+been generally production-validated.
 
 For the currently published Beta 11:
 
@@ -81,15 +82,17 @@ The Summary Card shows the current trip, status, distance, drives, stops and
 costs. The Manager Card manages trips, status changes, drive assignment and
 expenses. The visual editor auto-selects the vehicle when exactly one exists.
 
-Bundle URL: `/camper_travel_journal/camper-travel-journal.js?v=0.1.0-beta.11`.
+Prepared Beta 12 bundle URL: `/camper_travel_journal/camper-travel-journal.js?v=0.1.0-beta.12`.
 See [docs/frontend-cache.md](docs/frontend-cache.md).
 
 ## Trips, drives and stops
 
-Trips can be created, renamed, deleted, started, paused and completed. GPS
-drives are detected conservatively and can be linked to or unlinked from a
-trip. There is no complete route map, manual drive creation or detailed route
-view yet.
+Trips can be created, renamed, deleted, started, paused and completed; optional
+start/end dates can be edited. GPS drives are detected conservatively and shown
+with start/end, duration and distance. They can be linked to or unlinked from
+a trip. Manual drives with start location, destination, distance and optional
+duration are stored separately from GPS drives. There is no complete route map
+or detailed route view yet.
 
 Stops exist in the schema and authenticated WebSocket API, but are not yet
 operable from Lovelace cards.
@@ -110,7 +113,9 @@ are not automatically recategorized.
 
 The integration owns `camper_travel_journal.db` in the Home Assistant
 configuration directory and never opens or changes Recorder/MariaDB. SQLite
-access is serialized; the current schema is version 4. Destructive retention
+access is serialized; Beta 12 uses schema version 5. The migration adds
+optional trip dates and manual-drive metadata, preserves GPS rows and is
+backward-compatible and retryable as one transaction. Destructive retention
 deletion is disabled in this beta. Include the additional database file in
 backups; see [docs/database-schema.md](docs/database-schema.md).
 
@@ -133,7 +138,8 @@ See the status-separated [docs/ROADMAP.md](docs/ROADMAP.md):
 
 - **Beta 11:** stable expense-category IDs and the complete `camping` round-trip
   are implemented and tested.
-- **Next phase:** make drives, routes and stops fully user-accessible.
+- **Beta 12 prepared:** trip periods, visible/assignable drives and manual
+  drives; iOS/WebKit practice validation remains open.
 - **v0.2.x:** maps, trip history, statistics and exports.
 - **Later:** evaluate an alternative HA database backend separately.
 - **v1.0.0:** stable only after sufficient practical validation.
