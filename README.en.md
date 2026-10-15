@@ -6,7 +6,7 @@ stored in an integration-owned SQLite database.
 
 [Deutsch](README.md) | 🇬🇧 English
 
-> **Status:** `v0.1.0-beta.10` – development beta. Not a stable or generally
+> **Status:** `v0.1.0-beta.11` – development beta. Not a stable or generally
 > production-validated release.
 
 ## Actual feature status
@@ -20,7 +20,7 @@ stored in an integration-owned SQLite database.
 | Trips | Create, edit title, delete, status changes | Yes, Manager Card | API/HA/frontend tests |
 | Drives | GPS result, link/unlink | Assignment | Storage/API contracts |
 | Stops | Schema and WebSocket CRUD | No | Storage/API tests |
-| Expenses | Categories, cents, totals, edit, delete | Yes | Tests; `camping` practice fix open |
+| Expenses | Categories, cents, totals, edit, delete | Yes | Beta 11 round-trip tested |
 | Cards/diagnostics | Summary, Manager, editor, manual diagnostics | Yes | Bundle/Vitest/Chromium |
 | Maps, statistics, exports | Not implemented | No | Roadmap |
 
@@ -34,11 +34,11 @@ Beta 10 is intended for controlled development testing:
 
 1. Open **HACS → Integrations → Custom repositories**.
 2. Add `https://github.com/balronu/ha-camper-travel-journal` as an integration.
-3. Select the `v0.1.0-beta.10` pre-release, not `main`.
+3. Select the `v0.1.0-beta.11` pre-release, not `main`.
 4. Restart Home Assistant manually after installation.
 5. Add the integration under **Settings → Devices & services**.
 
-If HACS does not offer Beta 10, refresh repository information and enable
+If HACS does not offer Beta 11, refresh repository information and enable
 pre-release selection. A `main` commit is not the beta release. See
 [docs/HACS_RELEASE_STRATEGY.md](docs/HACS_RELEASE_STRATEGY.md).
 
@@ -77,7 +77,7 @@ The Summary Card shows the current trip, status, distance, drives, stops and
 costs. The Manager Card manages trips, status changes, drive assignment and
 expenses. The visual editor auto-selects the vehicle when exactly one exists.
 
-Bundle URL: `/camper_travel_journal/camper-travel-journal.js?v=0.1.0-beta.10`.
+Bundle URL: `/camper_travel_journal/camper-travel-journal.js?v=0.1.0-beta.11`.
 See [docs/frontend-cache.md](docs/frontend-cache.md).
 
 ## Trips, drives and stops
@@ -97,9 +97,10 @@ The internal category IDs are `camping`, `fuel`, `toll`, `parking`, `food`,
 “Stellplatz/Campingplatz” is not stored. Expenses use integer cents and are
 summed per trip; mixed currencies are not silently added.
 
-**Beta 10 practice issue:** A broken `camping` round-trip was reported.
-Existing entries are not automatically recategorized. Beta 11 will stabilize
-the IDs and add a complete selection/WebSocket/database/reload test.
+**Beta 11 correction:** `camping` uses a canonical internal ID that remains
+unchanged across selection, WebSocket, database, response and reload,
+independent of the German label. Unknown IDs are rejected; existing entries
+are not automatically recategorized.
 
 ## Database, privacy and backups
 
@@ -126,7 +127,8 @@ publish private routes, tokens or unredacted logs.
 
 See the status-separated [docs/ROADMAP.md](docs/ROADMAP.md):
 
-- **Beta 11:** stabilize the expense-category round-trip and prove `camping`.
+- **Beta 11:** stable expense-category IDs and the complete `camping` round-trip
+  are implemented and tested.
 - **Next phase:** make drives, routes and stops fully user-accessible.
 - **v0.2.x:** maps, trip history, statistics and exports.
 - **Later:** evaluate an alternative HA database backend separately.

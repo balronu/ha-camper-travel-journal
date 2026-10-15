@@ -117,6 +117,18 @@ async def test_transition_and_write_commands_complete():
 
 
 @pytest.mark.asyncio
+async def test_create_expense_preserves_canonical_camping_id_over_websocket():
+    hass = FakeHass()
+    connection = FakeConnection()
+    await api.ws_create_expense.__wrapped__(hass, connection, {"id": 14, "vehicle_id": "v1", "trip_id": "t1", "occurred_at": "2026-10-01T12:00:00Z", "category": "camping", "amount_minor": 2300, "currency": "EUR"})
+    assert connection.errors == []
+    method, args, _kwargs = hass.worker.calls[-1]
+    assert method == "create_expense"
+    assert args[0].category == "camping"
+    assert args[0].amount_minor == 2300
+
+
+@pytest.mark.asyncio
 async def test_phase3_crud_and_assignment_commands_complete():
     hass = FakeHass()
     connection = FakeConnection()

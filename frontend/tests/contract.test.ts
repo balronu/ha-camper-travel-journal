@@ -1,7 +1,7 @@
 import { existsSync, readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { describe, expect, it } from "vitest";
-import { categoryLabel, EXPENSE_CATEGORIES, formatMoneyMinor, messages, parseAmountMinor, statusLabel } from "../src/i18n";
+import { categoryLabel, EXPENSE_CATEGORIES, EXPENSE_CATEGORY_IDS, formatMoneyMinor, isExpenseCategory, messages, parseAmountMinor, statusLabel } from "../src/i18n";
 import { autoSelectVehicle, sameCardConfig } from "../src/card-editor";
 import { listVehicles } from "../src/api";
 
@@ -12,7 +12,7 @@ const bundle = resolve(root, "../custom_components/camper_travel_journal/fronten
 
 describe("frontend release contract", () => {
   it("keeps backend, npm metadata and beta bundle aligned", () => {
-    expect(manifest.version).toBe("0.1.0-beta.10");
+    expect(manifest.version).toBe("0.1.0-beta.11");
     expect(pkg.version).toBe(manifest.version);
     expect(existsSync(bundle)).toBe(true);
   });
@@ -118,7 +118,10 @@ describe("frontend release contract", () => {
     expect(parseAmountMinor("-1")).toBeNull();
     expect(parseAmountMinor("23.456")).toBeNull();
     expect(formatMoneyMinor(2300, "EUR", { locale: { language: "de-DE" } } as any)).toBe("23,00 €");
-    expect(EXPENSE_CATEGORIES).toEqual(["camping", "fuel", "toll", "parking", "food", "activities", "other"]);
+    expect(EXPENSE_CATEGORY_IDS).toEqual(["camping", "fuel", "toll", "parking", "food", "activities", "other"]);
+    expect(EXPENSE_CATEGORIES).toEqual(EXPENSE_CATEGORY_IDS);
+    expect(isExpenseCategory("camping")).toBe(true);
+    expect(isExpenseCategory("Stellplatz/Campingplatz")).toBe(false);
   });
   it("uses the trip-specific cost response and an inline edit form", () => {
     const summary = readFileSync(resolve(root, "src/summary-card.ts"), "utf8");
@@ -130,5 +133,10 @@ describe("frontend release contract", () => {
     expect(manager).toContain("expense-form");
     expect(manager).not.toContain("window.prompt(lang.amount");
     expect(manager).toContain("category: this.editingCategory");
+    expect(manager).toContain("event.currentTarget as HTMLSelectElement");
+    expect(manager).toContain("setExpenseCategory");
+    expect(manager).toContain("setExpenseAmount");
+    expect(manager).toContain("notifyExpensesChanged");
+    expect(summary).toContain("EXPENSES_CHANGED_EVENT");
   });
 });

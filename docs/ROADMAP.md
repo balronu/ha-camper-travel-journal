@@ -1,7 +1,7 @@
 # Camper Travel Journal – Roadmap
 
 This roadmap separates implemented work, current limitations and planned
-features. It is based on the source tree and tests at `v0.1.0-beta.10`; a
+features. It is based on the source tree and tests at `v0.1.0-beta.11`; a
 database table or WebSocket method is not treated as a finished user feature
 without a corresponding UI and test path.
 
@@ -17,27 +17,25 @@ without a corresponding UI and test path.
   WebSocket API and Manager Card.
 - Summary Card, Manager Card, visual card editor and manual read-only
   diagnostic card.
-- Expense CRUD, integer-cent totals, mixed-currency protection and inline
-  expense editing. The `camping` practical round-trip is the active Beta 11
-  correction item.
+- Expense CRUD, integer-cent totals, mixed-currency protection, inline editing
+  and canonical category IDs, including the `camping` round-trip.
 
-## Current Beta: `v0.1.0-beta.10`
+## Current Beta: `v0.1.0-beta.11`
 
 This is a development beta. CI covers the pinned Home Assistant environment and
-synthetic/isolated data. A manual Beta 10 practice test confirmed that the
-total could be displayed, but reported that `Stellplatz/Campingplatz` was
-stored/displayed as `Sonstiges`. Existing rows must remain untouched until a
-user explicitly edits them.
+synthetic/isolated data. Beta 11 adds the canonical `camping` category ID,
+explicit select-state handling, and a browser/API/storage/reload regression
+path. Existing rows remain untouched until a user explicitly edits them.
 
-## Beta 11 – expense-category correction
+## Beta 11 – expense-category correction (completed)
 
-1. Use stable internal IDs independently from German labels.
+1. Use stable internal IDs independently from German labels. **Done.**
 2. Test every category through select input, WebSocket payload, storage,
    response, display and reload; give `camping` a dedicated regression path.
-3. Reject unknown category IDs; never fall back silently to `other`.
-4. Add browser interaction checks at desktop and narrow/mobile widths.
+3. Reject unknown category IDs; never fall back silently to `other`. **Done.**
+4. Add browser interaction checks at desktop and narrow/mobile widths. **Done.**
 5. Preserve existing expenses and avoid schema migration or automatic
-   recategorization.
+   recategorization. **Done.**
 
 ## Next development phase
 

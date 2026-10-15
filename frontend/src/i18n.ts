@@ -1,7 +1,10 @@
 import type { Hass } from "./api";
 
 type Language = "de" | "en";
-export const EXPENSE_CATEGORIES = ["camping", "fuel", "toll", "parking", "food", "activities", "other"] as const;
+/** Canonical wire/database IDs; labels must never be sent to the backend. */
+export const EXPENSE_CATEGORY_IDS = ["camping", "fuel", "toll", "parking", "food", "activities", "other"] as const;
+export type ExpenseCategory = typeof EXPENSE_CATEGORY_IDS[number];
+export const EXPENSE_CATEGORIES = EXPENSE_CATEGORY_IDS;
 type Messages = {
   title: string; noDestination: string; loading: string; noTrip: string; loadError: string; statusError: string;
   distance: string; drives: string; stops: string; costs: string; resume: string; pause: string; complete: string;
@@ -43,6 +46,7 @@ export function formatDate(value: string, hass?: Hass): string {
 
 export function statusLabel(status: string, hass?: Hass): string { return messages(hass).statuses[status] ?? status; }
 export function categoryLabel(category: string, hass?: Hass): string { return messages(hass).categories[category] ?? category; }
+export function isExpenseCategory(value: string): value is ExpenseCategory { return (EXPENSE_CATEGORY_IDS as readonly string[]).includes(value); }
 export function formatMoneyMinor(amountMinor: number, currency: string, hass?: Hass): string {
   const language = (hass?.locale?.language ?? "").toLowerCase().startsWith("de") ? "de-DE" : "en-US";
   return new Intl.NumberFormat(language, { style: "currency", currency, minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(amountMinor / 100);

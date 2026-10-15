@@ -2,6 +2,15 @@
 
 🇩🇪 Deutsch | 🇬🇧 [English](README.en.md)
 
+## 0.1.0-beta.11 – Kostenkategorie-Roundtrip
+
+- Verwendet kanonische interne Kostenkategorie-IDs unabhängig von den
+  deutschen Anzeigenamen.
+- Bewahrt `camping` über Auswahl, WebSocket, SQLite, Antwort und Reload; lehnt
+  unbekannte Kategorien ohne Fallback auf `other` ab.
+- Ergänzt API-, Storage-, Frontend- und Browser-Regressionstests ohne Migration
+  oder automatische Änderung bestehender Einträge.
+
 ## 0.1.0-beta.10 – Vollständige Kostenverwaltung
 
 - Korrigiert Kostenkategorien, Beträge und Reisezuordnung über die gesamte

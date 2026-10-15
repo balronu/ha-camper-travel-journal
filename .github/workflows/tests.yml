@@ -54,3 +54,21 @@ jobs:
           if (!result.diagnosticReport) throw new Error('diagnostic report did not render');
           console.log(JSON.stringify(result));
           NODE
+      - name: Run expense category interaction regression
+        run: |
+          chromium --headless --no-sandbox --disable-gpu --virtual-time-budget=1000 \
+            --dump-dom http://127.0.0.1:8765/frontend/tests/browser/expense-category.html >/tmp/camper-travel-journal-expense-dom.html
+          node - <<'NODE'
+          const fs = require('fs');
+          const html = fs.readFileSync('/tmp/camper-travel-journal-expense-dom.html', 'utf8');
+          const match = html.match(/<pre id="result">([\s\S]*?)<\/pre>/);
+          if (!match) throw new Error('expense harness returned no result');
+          const result = JSON.parse(match[1]);
+          if (result.initialSelectValue !== 'camping') throw new Error(`expected initial camping selection, got ${result.initialSelectValue}`);
+          if (result.createdCategory !== 'camping') throw new Error(`expected camping payload, got ${result.createdCategory}`);
+          if (!result.categoryLabel) throw new Error('camping label did not render');
+          if (!result.total) throw new Error('camping expense total did not render');
+          if (!result.summaryTotal) throw new Error('summary card did not refresh after expense creation');
+          if (result.summaryListCalls < 2) throw new Error(`summary card did not perform its initial and synchronized trip loads: ${result.summaryListCalls}`);
+          console.log(JSON.stringify(result));
+          NODE

@@ -6,7 +6,7 @@ und Kosten werden in einer eigenen SQLite-Datei gespeichert.
 
 🇩🇪 Deutsch | 🇬🇧 [English](README.en.md)
 
-> **Stand:** `v0.1.0-beta.10` – Entwickler-Beta. Nicht als stabile oder
+> **Stand:** `v0.1.0-beta.11` – Entwickler-Beta. Nicht als stabile oder
 > allgemein produktiv validierte Version freigegeben.
 
 ## Tatsächlicher Funktionsstand
@@ -20,7 +20,7 @@ und Kosten werden in einer eigenen SQLite-Datei gespeichert.
 | Reisen | Anlegen, Titel ändern, löschen, Statuswechsel | Ja, Manager Card | API-/HA-/Frontend-Tests |
 | Fahrten | GPS-Ergebnis, Zuordnung/Lösen | Zuordnung | Storage-/API-Verträge |
 | Zwischenstopps | Schema und WebSocket-CRUD | Nein | Storage-/API-Tests |
-| Kosten | Kategorien, Cent-Beträge, Summen, Editieren, Löschen | Ja | Tests; `camping`-Praxiskorrektur offen |
+| Kosten | Kategorien, Cent-Beträge, Summen, Editieren, Löschen | Ja | Beta-11-Roundtrip getestet |
 | Karten/Diagnose | Summary, Manager, Editor, manuelle Diagnose | Ja | Bundle/Vitest/Chromium |
 | Kartenansicht, Statistiken, Exporte | Nicht implementiert | Nein | Roadmap |
 
@@ -35,11 +35,11 @@ Beta 10 ist für kontrollierte Entwicklungstests vorgesehen:
 1. **HACS → Integrationen → Benutzerdefinierte Repositories** öffnen.
 2. `https://github.com/balronu/ha-camper-travel-journal` als Integration
    hinzufügen.
-3. Pre-Release `v0.1.0-beta.10` auswählen, nicht `main`.
+3. Pre-Release `v0.1.0-beta.11` auswählen, nicht `main`.
 4. Home Assistant nach der Installation manuell neu starten.
 5. Die Integration unter **Einstellungen → Geräte & Dienste** hinzufügen.
 
-Wenn HACS Beta 10 nicht anbietet, Repository-Informationen aktualisieren und
+Wenn HACS Beta 11 nicht anbietet, Repository-Informationen aktualisieren und
 die Pre-Release-Auswahl aktivieren. Ein `main`-Commit ist kein Beta-Release.
 Details: [HACS-/Release-Strategie](docs/HACS_RELEASE_STRATEGY.md).
 
@@ -76,7 +76,7 @@ Die Summary Card zeigt aktuelle Reise, Status, Strecke, Fahrten, Stopps und
 Kosten. Die Manager Card verwaltet Reisen, Statuswechsel, Fahrtzuordnung und
 Kosten. Der visuelle Editor wählt bei genau einem Fahrzeug automatisch aus.
 
-Bundle-URL: `/camper_travel_journal/camper-travel-journal.js?v=0.1.0-beta.10`.
+Bundle-URL: `/camper_travel_journal/camper-travel-journal.js?v=0.1.0-beta.11`.
 Details: [Frontend-Cache-Standard](docs/frontend-cache.md).
 
 ## Reisen, Fahrten und Zwischenstopps
@@ -97,10 +97,10 @@ Schrägstrich in „Stellplatz/Campingplatz“ gehört nicht zum gespeicherten W
 Kosten werden als ganzzahlige Cent-Beträge pro Reise summiert; unterschiedliche
 Währungen werden nicht stillschweigend addiert.
 
-**Beta-10-Praxispunkt:** Für `camping` wurde ein fehlerhafter Roundtrip
-gemeldet. Bestehende Einträge werden nicht automatisch umkategorisiert. Die
-Korrektur mit stabilen IDs und vollständigem Auswahl/WebSocket/Datenbank/
-Reload-Test ist für Beta 11 vorgesehen.
+**Beta-11-Korrektur:** `camping` verwendet eine kanonische interne ID, die
+unabhängig vom deutschen Label über Auswahl, WebSocket, Datenbank, Antwort und
+Reload erhalten bleibt. Unbekannte IDs werden abgewiesen; bestehende Einträge
+werden nicht automatisch umkategorisiert.
 
 ## Datenbank, Datenschutz und Backups
 
@@ -128,8 +128,7 @@ keine privaten Routen, Tokens oder unredigierten Logs verwenden.
 
 Die verbindliche, statusgetrennte Roadmap steht in [docs/ROADMAP.md](docs/ROADMAP.md):
 
-- **Beta 11:** Kostenkategorie-Roundtrip stabilisieren und `camping` komplett
-  nachweisen.
+- **Beta 11:** Kostenkategorie-Roundtrip mit stabilen IDs abgeschlossen.
 - **Nächste Phase:** Fahrten, Strecken und Zwischenstopps vollständig zugänglich
   machen.
 - **v0.2.x:** Kartenansicht, Reiseverlauf, Statistiken und Exporte.
