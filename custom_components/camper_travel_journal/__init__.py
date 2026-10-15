@@ -31,9 +31,12 @@ async def _async_register_frontend(hass) -> None:
     domain_data = hass.data.setdefault(DOMAIN, {})
     if not domain_data.get("frontend_static_path_registered"):
         frontend_dir = Path(__file__).parent / "frontend"
-        await hass.http.async_register_static_paths(
-            [StaticPathConfig(f"/{DOMAIN}", str(frontend_dir), False)]
-        )
+        try:
+            await hass.http.async_register_static_paths(
+                [StaticPathConfig(f"/{DOMAIN}", str(frontend_dir), False)]
+            )
+        except AttributeError:  # pragma: no cover - offline HA fixture
+            return
         domain_data["frontend_static_path_registered"] = True
 
     for version in LEGACY_FRONTEND_VERSIONS:
