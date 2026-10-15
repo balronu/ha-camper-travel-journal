@@ -3,7 +3,7 @@
 Eine datenschutzbewusste Home-Assistant-Custom-Integration für **Dein digitales Wohnmobil-Reisetagebuch**. GPS-Punkte, erkannte Fahrten, Reisen, Zwischenstopps
 und Kosten werden in einer eigenen SQLite-Datei gespeichert.
 
-🇩🇪 Deutsch | 🇬🇧 [English](README.en.md)
+🇩🇪 **Deutsch** | [🇬🇧 English](README.en.md)
 
 ![Camper Travel Journal Logo](https://raw.githubusercontent.com/balronu/ha-camper-travel-journal/main/assets/branding/logo.png)
 
