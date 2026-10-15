@@ -7,8 +7,8 @@ und Kosten werden in einer eigenen SQLite-Datei gespeichert.
 
 ![Camper Travel Journal Logo](https://raw.githubusercontent.com/balronu/ha-camper-travel-journal/main/assets/branding/logo.png)
 
-> **Stand:** `v0.1.0-beta.12` – aktuell veröffentlichte Pre-Release-Version.
-> Beta 13 ist als Frontend-Hotfix vorbereitet, aber noch nicht veröffentlicht.
+> **Stand:** `v0.1.0-beta.13` – aktuell veröffentlichte Pre-Release-Version.
+> Beta 13 enthält den Frontend-Hotfix gegen veraltete Bundle-Registrierungen.
 > Die Praxisvalidierung auf iOS/Safari und in einer produktiven HA-Installation
 > bleibt offen.
 
@@ -33,16 +33,16 @@ eine fertige Benutzerfunktion.
 
 ## Installation über HACS
 
-Aktuell veröffentlicht und unterstützt ist `v0.1.0-beta.12`. Sie ist nicht
+Aktuell veröffentlicht und unterstützt ist `v0.1.0-beta.13`. Sie ist nicht
 allgemein produktiv validiert; Beta 11 bleibt als historischer Release
-verfügbar (`v0.1.0-beta.11`).
+verfügbar (`v0.1.0-beta.12`).
 
-Für die aktuell veröffentlichte Beta 12:
+Für die aktuell veröffentlichte Beta 13:
 
 1. **HACS → Integrationen → Benutzerdefinierte Repositories** öffnen.
 2. `https://github.com/balronu/ha-camper-travel-journal` als Integration
    hinzufügen.
-3. Pre-Release `v0.1.0-beta.12` auswählen, nicht `main`.
+3. Pre-Release `v0.1.0-beta.13` auswählen, nicht `main`.
 4. Home Assistant nach der Installation manuell neu starten.
 5. Die Integration unter **Einstellungen → Geräte & Dienste** hinzufügen.
 
@@ -84,7 +84,7 @@ Die Summary Card zeigt aktuelle Reise, Status, Strecke, Fahrten, Stopps und
 Kosten. Die Manager Card verwaltet Reisen, Statuswechsel, Fahrtzuordnung und
 Kosten. Der visuelle Editor wählt bei genau einem Fahrzeug automatisch aus.
 
-Bundle-URL des vorbereiteten Beta-13-Stands: `/camper_travel_journal/camper-travel-journal.js?v=0.1.0-beta.13`.
+Bundle-URL des veröffentlichten Beta-13-Stands: `/camper_travel_journal/camper-travel-journal.js?v=0.1.0-beta.13`.
 Details: [Frontend-Cache-Standard](docs/frontend-cache.md).
 
 ## Reisen, Fahrten und Zwischenstopps

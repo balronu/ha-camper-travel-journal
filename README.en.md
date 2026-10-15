@@ -7,8 +7,8 @@ stored in an integration-owned SQLite database.
 
 ![Camper Travel Journal Logo](https://raw.githubusercontent.com/balronu/ha-camper-travel-journal/main/assets/branding/logo.png)
 
-> **Status:** `v0.1.0-beta.12` – currently published pre-release. Practical
-> Beta 13 is prepared as a frontend hotfix but has not been published.
+> **Status:** `v0.1.0-beta.13` – currently published pre-release. It contains
+> the frontend hotfix for stale bundle registrations.
 > validation on iOS/Safari and a productive HA installation remains open.
 
 ## Actual feature status
@@ -32,15 +32,15 @@ user feature.
 
 ## HACS installation
 
-The currently published and supported version is `v0.1.0-beta.12`. It has not
+The currently published and supported version is `v0.1.0-beta.13`. It has not
 been generally production-validated; Beta 11 remains available as a
-historical release (`v0.1.0-beta.11`).
+historical release (`v0.1.0-beta.12`).
 
-For the currently published Beta 12:
+For the currently published Beta 13:
 
 1. Open **HACS → Integrations → Custom repositories**.
 2. Add `https://github.com/balronu/ha-camper-travel-journal` as an integration.
-3. Select the `v0.1.0-beta.12` pre-release, not `main`.
+3. Select the `v0.1.0-beta.13` pre-release, not `main`.
 4. Restart Home Assistant manually after installation.
 5. Add the integration under **Settings → Devices & services**.
 
@@ -83,7 +83,7 @@ The Summary Card shows the current trip, status, distance, drives, stops and
 costs. The Manager Card manages trips, status changes, drive assignment and
 expenses. The visual editor auto-selects the vehicle when exactly one exists.
 
-Prepared Beta 13 bundle URL: `/camper_travel_journal/camper-travel-journal.js?v=0.1.0-beta.13`.
+Published Beta 13 bundle URL: `/camper_travel_journal/camper-travel-journal.js?v=0.1.0-beta.13`.
 See [docs/frontend-cache.md](docs/frontend-cache.md).
 
 ## Trips, drives and stops
