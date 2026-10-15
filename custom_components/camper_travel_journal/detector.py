@@ -100,3 +100,13 @@ class DriveDetector:
         self.distance_m = 0.0
         self.start_count = 0
         return DetectionEvent("drive_finished", point.recorded_at, drive=drive)
+
+    def finish_at_end(self) -> list[DetectionEvent]:
+        """Close an open import preview at its last observed point.
+
+        End-of-file is a boundary, not evidence of a stationary pause; the
+        event is therefore labelled ``track_end`` and never bridges a gap.
+        """
+        if self.state != DriveState.DRIVING or self.previous is None:
+            return []
+        return [self._finish(self.previous, "track_end")]

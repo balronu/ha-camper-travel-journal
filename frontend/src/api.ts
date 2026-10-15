@@ -5,6 +5,7 @@ export type Drive = { id: string; started_at: string; ended_at: string; duration
 export type Stop = { id: string; trip_id?: string; name: string; description: string; occurred_at: string; stop_type: string };
 export type Expense = { id: string; trip_id?: string; category: string; amount_minor: number; currency: string; occurred_at: string; note?: string };
 export type Snapshot = { trips: Trip[]; drives: Drive[]; available_drives?: Drive[]; stops: Stop[]; expenses?: Expense[]; expense_summary?: { total_minor?: number; by_category?: Record<string, number>; currency?: string | null; mixed_currency?: boolean } };
+export type GPXPreview = { file_hash: string; warnings: string[]; duplicate_point_keys: string[]; conflicts: { duplicate_file: boolean; duplicate_points: number; overlapping_drives: number }; points: Array<{ key: string; recorded_at: string; latitude: number; longitude: number }>; drives: Array<{ key: string; started_at: string; ended_at: string; distance_m: number; duration_seconds: number; reason: string }> };
 export async function command<T>(hass: Hass, type: string, vehicleId: string, data: Record<string, unknown> = {}): Promise<T> { return hass.connection.sendMessagePromise<T>({ type, vehicle_id: vehicleId, ...data }); }
 export const list = (hass: Hass, vehicleId: string, tripId?: string) => command<Snapshot>(hass, "camper_travel_journal/list", vehicleId, tripId ? { trip_id: tripId } : {});
 export const transition = (hass: Hass, vehicleId: string, tripId: string, status: Trip["status"]) => command(hass, "camper_travel_journal/transition_trip", vehicleId, { trip_id: tripId, status });
@@ -23,3 +24,5 @@ export const listVehicles = async (hass: Hass): Promise<Vehicle[]> => {
   const result = await hass.connection.sendMessagePromise<{ vehicles?: Vehicle[] }>({ type: "camper_travel_journal/list_vehicles" });
   return result.vehicles ?? [];
 };
+export const analyzeGPX = (hass: Hass, vehicleId: string, content_base64: string) => command<GPXPreview>(hass, "camper_travel_journal/analyze_gpx", vehicleId, { content_base64 });
+export const importGPX = (hass: Hass, vehicleId: string, content_base64: string, file_hash: string, drive_keys: string[], trip_id?: string) => command<{ points_imported: number; drives_imported: number }>(hass, "camper_travel_journal/import_gpx", vehicleId, { content_base64, file_hash, drive_keys, trip_id });

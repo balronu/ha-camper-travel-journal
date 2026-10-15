@@ -15,7 +15,7 @@ from pathlib import Path
 
 from .travel import validate_amount, validate_expense_category, validate_expense_currency
 
-SCHEMA_VERSION = 5
+SCHEMA_VERSION = 6
 SCHEMA_SQL = """
 PRAGMA foreign_keys = ON;
 CREATE TABLE IF NOT EXISTS schema_meta (key TEXT PRIMARY KEY, value TEXT NOT NULL);
@@ -70,6 +70,19 @@ CREATE TABLE IF NOT EXISTS runtime_state (
   vehicle_id TEXT PRIMARY KEY REFERENCES vehicles(id) ON DELETE CASCADE,
   state_json TEXT NOT NULL, updated_at TEXT NOT NULL
 );
+CREATE TABLE IF NOT EXISTS gpx_imports (
+  file_hash TEXT PRIMARY KEY, vehicle_id TEXT NOT NULL REFERENCES vehicles(id),
+  imported_at TEXT NOT NULL, point_count INTEGER NOT NULL, drive_count INTEGER NOT NULL
+);
+CREATE TABLE IF NOT EXISTS gpx_import_points (
+  point_key TEXT PRIMARY KEY, file_hash TEXT NOT NULL REFERENCES gpx_imports(file_hash) ON DELETE CASCADE,
+  gps_point_id INTEGER REFERENCES gps_points(id) ON DELETE SET NULL
+);
+CREATE TABLE IF NOT EXISTS gpx_import_drives (
+  drive_key TEXT PRIMARY KEY, file_hash TEXT NOT NULL REFERENCES gpx_imports(file_hash) ON DELETE CASCADE,
+  drive_id TEXT NOT NULL REFERENCES drives(id) ON DELETE CASCADE
+);
+CREATE INDEX IF NOT EXISTS idx_gpx_imports_vehicle ON gpx_imports(vehicle_id, imported_at);
 """
 
 
@@ -108,6 +121,8 @@ class SQLiteStore:
                     self._migrate_v4()
                 if previous < 5:
                     self._migrate_v5()
+                if previous < 6:
+                    self._migrate_v6()
                 connection.execute("INSERT OR REPLACE INTO schema_meta(key, value) VALUES('version', ?)", (str(SCHEMA_VERSION),))
         except Exception:
             self.close()
@@ -164,6 +179,26 @@ class SQLiteStore:
             self.connection.execute("ALTER TABLE drives ADD COLUMN start_label TEXT")
         if "end_label" not in drive_columns:
             self.connection.execute("ALTER TABLE drives ADD COLUMN end_label TEXT")
+
+    def _migrate_v6(self) -> None:
+        """Add GPX provenance and idempotency tables only."""
+        if self.connection is None:
+            raise RuntimeError("store is not open")
+        self.connection.executescript("""
+        CREATE TABLE IF NOT EXISTS gpx_imports (
+          file_hash TEXT PRIMARY KEY, vehicle_id TEXT NOT NULL REFERENCES vehicles(id), imported_at TEXT NOT NULL,
+          point_count INTEGER NOT NULL, drive_count INTEGER NOT NULL
+        );
+        CREATE TABLE IF NOT EXISTS gpx_import_points (
+          point_key TEXT PRIMARY KEY, file_hash TEXT NOT NULL REFERENCES gpx_imports(file_hash) ON DELETE CASCADE,
+          gps_point_id INTEGER REFERENCES gps_points(id) ON DELETE SET NULL
+        );
+        CREATE TABLE IF NOT EXISTS gpx_import_drives (
+          drive_key TEXT PRIMARY KEY, file_hash TEXT NOT NULL REFERENCES gpx_imports(file_hash) ON DELETE CASCADE,
+          drive_id TEXT NOT NULL REFERENCES drives(id) ON DELETE CASCADE
+        );
+        CREATE INDEX IF NOT EXISTS idx_gpx_imports_vehicle ON gpx_imports(vehicle_id, imported_at);
+        """)
 
     def close(self) -> None:
         if self.connection is not None:
@@ -459,6 +494,53 @@ class SQLiteStore:
         rows = self.connection.execute("SELECT currency, SUM(amount_minor) total, category FROM expenses WHERE trip_id=? GROUP BY currency, category", (trip_id,)).fetchall()
         currencies = {row[0] for row in rows}
         return {"currency": next(iter(currencies)) if len(currencies) == 1 else None, "total_minor": sum(row[1] for row in rows) if len(currencies) <= 1 else None, "by_category": {row[2]: row[1] for row in rows} if len(currencies) <= 1 else {}, "mixed_currency": len(currencies) > 1}
+
+    def gpx_conflicts(self, vehicle_id: str, preview) -> dict:
+        """Return safe conflict metadata for a preview; never return coordinates."""
+        if self.connection is None: raise RuntimeError("store is not open")
+        duplicate_file = self.connection.execute("SELECT 1 FROM gpx_imports WHERE file_hash=?", (preview.file_hash,)).fetchone() is not None
+        duplicate_points = sum(1 for item in preview.points if self.connection.execute("SELECT 1 FROM gpx_import_points WHERE point_key=?", (item.key,)).fetchone())
+        overlaps = 0
+        for drive in preview.drives:
+            overlaps += self.connection.execute("SELECT count(*) FROM drives WHERE vehicle_id=? AND started_at < ? AND ended_at > ?", (vehicle_id, utc_iso(drive.ended_at), utc_iso(drive.started_at))).fetchone()[0]
+        return {"duplicate_file": duplicate_file, "duplicate_points": duplicate_points, "overlapping_drives": overlaps}
+
+    def import_gpx(self, vehicle_id: str, preview, trip_id: str | None, now: datetime, drive_keys: list[str] | None = None) -> dict:
+        """Atomically import a confirmed preview with stable provenance."""
+        from uuid import uuid5, NAMESPACE_URL
+        with self.transaction() as connection:
+            if connection.execute("SELECT 1 FROM vehicles WHERE id=?", (vehicle_id,)).fetchone() is None:
+                raise ValueError("vehicle_not_found")
+            if trip_id is not None:
+                trip = connection.execute("SELECT vehicle_id FROM trips WHERE id=?", (trip_id,)).fetchone()
+                if trip is None: raise ValueError("trip_not_found")
+                if trip[0] != vehicle_id: raise ValueError("vehicle_mismatch")
+            existing = connection.execute("SELECT 1 FROM gpx_imports WHERE file_hash=?", (preview.file_hash,)).fetchone()
+            if existing is not None:
+                raise ValueError("gpx_already_imported")
+            stamp = utc_iso(now)
+            selected = set(drive_keys) if drive_keys is not None else {item.key for item in preview.drives}
+            selected_drives = [item for item in preview.drives if item.key in selected]
+            for item in selected_drives:
+                if connection.execute("SELECT 1 FROM drives WHERE vehicle_id=? AND started_at < ? AND ended_at > ? LIMIT 1", (vehicle_id, utc_iso(item.ended_at), utc_iso(item.started_at))).fetchone():
+                    raise ValueError("gpx_overlap_conflict")
+            connection.execute("INSERT INTO gpx_imports(file_hash,vehicle_id,imported_at,point_count,drive_count) VALUES(?,?,?,?,?)", (preview.file_hash, vehicle_id, stamp, len(preview.points), len(selected_drives)))
+            point_count = 0
+            for item in preview.points:
+                cursor = connection.execute("INSERT OR IGNORE INTO gps_points(vehicle_id,recorded_at,latitude,longitude,accuracy_m,source_state,source_type) VALUES(?,?,?,?,?,?,?)", (vehicle_id, utc_iso(item.point.recorded_at), item.point.latitude, item.point.longitude, item.point.accuracy_m, item.point.source_state, "gpx"))
+                row = connection.execute("SELECT id FROM gps_points WHERE vehicle_id=? AND recorded_at=? AND latitude=? AND longitude=?", (vehicle_id, utc_iso(item.point.recorded_at), item.point.latitude, item.point.longitude)).fetchone()
+                connection.execute("INSERT INTO gpx_import_points(point_key,file_hash,gps_point_id) VALUES(?,?,?)", (item.key, preview.file_hash, row[0] if row else None))
+                point_count += cursor.rowcount
+            drive_count = 0
+            for item in selected_drives:
+                drive_id = str(uuid5(NAMESPACE_URL, f"camper-travel-journal:gpx:{preview.file_hash}:{item.key}"))
+                drive = type("ImportedDrive", (), {"id": drive_id, "vehicle_id": vehicle_id, "started_at": item.started_at, "ended_at": item.ended_at, "distance_m": item.distance_m, "end_reason": item.reason, "manual_distance_km": None, "source": "gpx", "start_label": None, "end_label": None})()
+                connection.execute("INSERT INTO drives(id,vehicle_id,started_at,ended_at,distance_m,end_reason,manual_distance_km,source,start_label,end_label,created_at) VALUES(?,?,?,?,?,?,?,?,?,?,?)", (drive.id, vehicle_id, utc_iso(drive.started_at), utc_iso(drive.ended_at), drive.distance_m, drive.end_reason, None, "gpx", None, None, stamp))
+                connection.execute("INSERT INTO gpx_import_drives(drive_key,file_hash,drive_id) VALUES(?,?,?)", (item.key, preview.file_hash, drive_id))
+                if trip_id is not None:
+                    connection.execute("INSERT INTO trip_drives(trip_id,drive_id,linked_at) VALUES(?,?,?)", (trip_id, drive_id, stamp))
+                drive_count += 1
+            return {"file_hash": preview.file_hash, "points_imported": point_count, "drives_imported": drive_count, "trip_id": trip_id}
 
 
 class AsyncSQLiteWorker:
