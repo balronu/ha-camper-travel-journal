@@ -17,7 +17,8 @@ lädt nach erfolgreichen Kostenänderungen den aktuellen Backend-Stand neu.
 Der Details-Button der Manager Card ist ein echter Auf-/Zu-Umschalter.
 
 Aktuell veröffentlicht und unterstützt ist `v0.1.0-beta.12`; die Version ist
-nicht allgemein produktiv validiert. Keine Installation, kein Reload
+nicht allgemein produktiv validiert; `v0.1.0-beta.11` bleibt als historischer
+Release verfügbar. Keine Installation, kein Reload
 und keine Änderung an VM 104, Proxmox, Recorder oder produktiven Dashboards
 ist Bestandteil dieses Releases.
 

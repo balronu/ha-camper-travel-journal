@@ -33,7 +33,7 @@ user feature.
 
 The currently published and supported version is `v0.1.0-beta.12`. It has not
 been generally production-validated; Beta 11 remains available as a
-historical release.
+historical release (`v0.1.0-beta.11`).
 
 For the currently published Beta 12:
 

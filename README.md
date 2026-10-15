@@ -34,7 +34,7 @@ eine fertige Benutzerfunktion.
 
 Aktuell veröffentlicht und unterstützt ist `v0.1.0-beta.12`. Sie ist nicht
 allgemein produktiv validiert; Beta 11 bleibt als historischer Release
-verfügbar.
+verfügbar (`v0.1.0-beta.11`).
 
 Für die aktuell veröffentlichte Beta 12:
 
