@@ -1,10 +1,11 @@
 # Camper Travel Journal
 
-Eine datenschutzbewusste Home-Assistant-Custom-Integration für **Dein digitales
-Wohnmobil-Reisetagebuch**. GPS-Punkte, erkannte Fahrten, Reisen, Zwischenstopps
+Eine datenschutzbewusste Home-Assistant-Custom-Integration für **Dein digitales Wohnmobil-Reisetagebuch**. GPS-Punkte, erkannte Fahrten, Reisen, Zwischenstopps
 und Kosten werden in einer eigenen SQLite-Datei gespeichert.
 
 🇩🇪 Deutsch | 🇬🇧 [English](README.en.md)
+
+![Camper Travel Journal Logo](https://raw.githubusercontent.com/balronu/ha-camper-travel-journal/main/assets/branding/logo.png)
 
 > **Stand:** `v0.1.0-beta.11` – Entwickler-Beta. Nicht als stabile oder
 > allgemein produktiv validierte Version freigegeben.
@@ -30,7 +31,7 @@ eine fertige Benutzerfunktion.
 
 ## Installation über HACS
 
-Beta 10 ist für kontrollierte Entwicklungstests vorgesehen:
+Beta 11 ist für kontrollierte Entwicklungstests vorgesehen:
 
 1. **HACS → Integrationen → Benutzerdefinierte Repositories** öffnen.
 2. `https://github.com/balronu/ha-camper-travel-journal` als Integration

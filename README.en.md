@@ -6,6 +6,8 @@ stored in an integration-owned SQLite database.
 
 [Deutsch](README.md) | 🇬🇧 English
 
+![Camper Travel Journal Logo](https://raw.githubusercontent.com/balronu/ha-camper-travel-journal/main/assets/branding/logo.png)
+
 > **Status:** `v0.1.0-beta.11` – development beta. Not a stable or generally
 > production-validated release.
 
@@ -30,7 +32,7 @@ user feature.
 
 ## HACS installation
 
-Beta 10 is intended for controlled development testing:
+Beta 11 is intended for controlled development testing:
 
 1. Open **HACS → Integrations → Custom repositories**.
 2. Add `https://github.com/balronu/ha-camper-travel-journal` as an integration.
