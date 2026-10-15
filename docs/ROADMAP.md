@@ -1,8 +1,8 @@
 # Camper Travel Journal – Roadmap
 
 This roadmap separates implemented work, current limitations and planned
-features. It is based on the published `v0.1.0-beta.11` source tree and tests;
-a Beta-12 candidate may contain additional work before publication. A database
+features. It is based on the published `v0.1.0-beta.12` source tree and tests.
+A database
 table or WebSocket method is not treated as a finished user feature
 without a corresponding UI and test path.
 
@@ -21,18 +21,17 @@ without a corresponding UI and test path.
 - Expense CRUD, integer-cent totals, mixed-currency protection, inline editing
   and canonical category IDs, including the `camping` round-trip.
 
-## Current published development baseline: `v0.1.0-beta.11`
+## Current published development baseline: `v0.1.0-beta.12`
 
 This is a published development beta, not a stable release. CI covers the
-pinned Home Assistant environment and synthetic/isolated data. Beta 11 adds the canonical `camping`
-category ID, explicit select-state handling, and a browser/API/storage/reload
-regression path. Existing rows remain untouched until a user explicitly edits
-them.
+pinned Home Assistant environment and synthetic/isolated data. Beta 12 adds
+trip periods, visible and assignable drives, manual-drive CRUD and atomic
+schema migration. Existing rows remain untouched until a user explicitly
+edits them.
 
-## Beta 12 candidate: travel periods and drives
+## Beta 12 – travel periods and drives (published)
 
-The current development branch prepares, but does not publish, `v0.1.0-beta.12`.
-It adds optional trip start/end dates, inline editing, visible detected drives,
+`v0.1.0-beta.12` adds optional trip start/end dates, inline editing, visible detected drives,
 vehicle-bound assignment/unassignment, and separate manual drives with source,
 locations, distance, optional duration, editing and deletion. The schema-5
 migration is transactional and preserves existing GPS rows and trips without

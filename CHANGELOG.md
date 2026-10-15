@@ -20,7 +20,7 @@
 - Ergänzt API-, Storage-, Frontend- und Browser-Regressionstests ohne Migration
   oder automatische Änderung bestehender Einträge.
 
-## 0.1.0-beta.12 – vorbereitet, nicht veröffentlicht
+## 0.1.0-beta.12 – veröffentlicht
 
 - Ergänzt optionale Start- und Enddaten für Reisen inklusive Bearbeitung und
   Anzeige in Manager- und Summary Card.
@@ -34,7 +34,7 @@
   manuelle Fahrtmetadaten ein; die Migration ist transaktional und bei Fehlern
   wiederholbar.
 - Aktualisiert die Summary Card nach bestätigten Reise-/Fahrtänderungen und
-  dokumentiert Beta 12 als vorbereitet, nicht veröffentlicht.
+  dokumentiert Beta 12 als veröffentlichten Entwicklungsstand.
 
 ## 0.1.0-beta.10 – Vollständige Kostenverwaltung
 

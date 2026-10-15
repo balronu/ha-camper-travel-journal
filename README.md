@@ -7,8 +7,9 @@ und Kosten werden in einer eigenen SQLite-Datei gespeichert.
 
 ![Camper Travel Journal Logo](https://raw.githubusercontent.com/balronu/ha-camper-travel-journal/main/assets/branding/logo.png)
 
-> **Stand:** `v0.1.0-beta.12` – vorbereitet, noch nicht veröffentlicht. Beta 11
-> bleibt die aktuell unterstützte Pre-Release-Version.
+> **Stand:** `v0.1.0-beta.12` – aktuell veröffentlichte Pre-Release-Version.
+> Die Praxisvalidierung auf iOS/Safari und in einer produktiven HA-Installation
+> bleibt offen.
 
 ## Tatsächlicher Funktionsstand
 
@@ -31,16 +32,16 @@ eine fertige Benutzerfunktion.
 
 ## Installation über HACS
 
-Aktuell veröffentlicht und unterstützt ist `v0.1.0-beta.11`. Beta 12 ist auf
-diesem Entwicklungs-Branch vorbereitet, aber noch nicht veröffentlicht. Sie
-ist nicht allgemein produktiv validiert.
+Aktuell veröffentlicht und unterstützt ist `v0.1.0-beta.12`. Sie ist nicht
+allgemein produktiv validiert; Beta 11 bleibt als historischer Release
+verfügbar (`v0.1.0-beta.11`).
 
-Für die aktuell veröffentlichte Beta 11:
+Für die aktuell veröffentlichte Beta 12:
 
 1. **HACS → Integrationen → Benutzerdefinierte Repositories** öffnen.
 2. `https://github.com/balronu/ha-camper-travel-journal` als Integration
    hinzufügen.
-3. Pre-Release `v0.1.0-beta.11` auswählen, nicht `main`.
+3. Pre-Release `v0.1.0-beta.12` auswählen, nicht `main`.
 4. Home Assistant nach der Installation manuell neu starten.
 5. Die Integration unter **Einstellungen → Geräte & Dienste** hinzufügen.
 
