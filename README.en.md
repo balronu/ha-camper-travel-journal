@@ -90,8 +90,11 @@ Beta 15 bundle URL: `/camper_travel_journal/camper-travel-journal.js?v=0.1.0-bet
 
 PAJ GPX 1.1 files can be analyzed with **Import GPX** in the manager card. The
 preview shows sections, time, distance, duration, gaps, jumps and duplicate
-conflicts. Only explicit confirmation performs an atomic assignment to an
-existing trip. Distance is the GPS point-to-point track, not a road route.
+conflicts. The bound camper and target trip are visible before confirmation;
+the camper comes from the card configuration, while the target trip can be
+changed explicitly or left empty. Trip-period differences produce warnings
+only. Only explicit confirmation performs an atomic assignment to an existing
+trip. Distance is the GPS point-to-point track, not a road route.
 See [docs/frontend-cache.md](docs/frontend-cache.md).
 
 ## Trips, drives and stops

@@ -1,0 +1,95 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>Camper Travel Journal GPX import test</title>
+<div id="summary-host"></div>
+<div id="manager-host"></div>
+<pre id="result">starting</pre>
+<script type="module">
+const result = document.querySelector("#result");
+const trips = [
+  { id: "trip-1", title: "Länderspiel Deutschland – Japan", description: "", destination: "Bremen", status: "active", started_at: "2026-10-13T12:00:00Z", start_date: "2026-10-13", end_date: "2026-10-14" },
+  { id: "trip-2", title: "Zweite Reise", description: "", destination: "Kiel", status: "planned", started_at: "2026-10-01T12:00:00Z", start_date: "2026-10-01", end_date: "2026-10-02" },
+];
+let importMessages = [];
+let listCalls = 0;
+const connection = {
+  async sendMessagePromise(message) {
+    if (message.type === "camper_travel_journal/list") {
+      listCalls += 1;
+      return { trips, drives: [], stops: [], available_drives: [], expenses: [], expense_summary: { total_minor: 0, currency: "EUR", mixed_currency: false } };
+    }
+    if (message.type === "camper_travel_journal/analyze_gpx") {
+      return { file_hash: `hash-${message.content_base64.length}`, warnings: ["gpx_gap_possible_drive_boundary"], duplicate_point_keys: [], conflicts: { duplicate_file: false, duplicate_points: 0, overlapping_drives: 0 }, points: [{ key: "p1", recorded_at: "2026-10-13T08:00:00+00:00", latitude: 49, longitude: 7 }, { key: "p2", recorded_at: "2026-10-14T08:00:00+00:00", latitude: 49.1, longitude: 7.1 }], drives: [{ key: "d1", started_at: "2026-10-13T08:00:00+00:00", ended_at: "2026-10-13T10:00:00+00:00", distance_m: 1118.7 * 1000, duration_seconds: 7200, reason: "stop" }] };
+    }
+    if (message.type === "camper_travel_journal/import_gpx") {
+      importMessages.push(message);
+      return { points_imported: 2, drives_imported: 1, trip_id: message.trip_id ?? null };
+    }
+    throw new Error(`unexpected command ${message.type}`);
+  },
+};
+const hass = { connection, locale: { language: "de-DE" } };
+await import("/custom_components/camper_travel_journal/frontend/camper-travel-journal.js");
+await customElements.whenDefined("camper-travel-journal-manager-card");
+await customElements.whenDefined("camper-travel-journal-summary-card");
+const summary = document.createElement("camper-travel-journal-summary-card");
+summary.setConfig({ vehicle_id: "entry-wohnmobil" });
+document.querySelector("#summary-host").append(summary);
+summary.hass = hass;
+const manager = document.createElement("camper-travel-journal-manager-card");
+manager.setConfig({ vehicle_id: "entry-wohnmobil" });
+document.querySelector("#manager-host").append(manager);
+manager.hass = hass;
+await new Promise((resolve) => setTimeout(resolve, 80));
+const fileInput = () => manager.shadowRoot.querySelector('.gpx-explicit input[type="file"]');
+const waitFor = async (predicate) => {
+  for (let attempt = 0; attempt < 80; attempt += 1) {
+    if (predicate()) return;
+    await new Promise((resolve) => setTimeout(resolve, 25));
+  }
+  throw new Error("GPX harness timed out waiting for state");
+};
+let fileNumber = 0;
+const importFile = async (text) => {
+  const transfer = new DataTransfer();
+  transfer.items.add(new File([text], `test-${++fileNumber}.gpx`, { type: "application/gpx+xml" }));
+  const input = fileInput();
+  input.files = transfer.files;
+  input.dispatchEvent(new Event("change", { bubbles: true }));
+  await waitFor(() => Boolean(manager.gpxPreview) && !manager.gpxBusy);
+};
+await importFile("first");
+const target = manager.shadowRoot.querySelector('.gpx-explicit select');
+target.value = "trip-2";
+target.dispatchEvent(new Event("change", { bubbles: true }));
+await manager.updateComplete;
+const summaryText = manager.shadowRoot.querySelector('.gpx-explicit')?.textContent ?? "";
+const warningText = summaryText.includes("Der GPX-Zeitraum liegt teilweise außerhalb");
+const gapText = summaryText.includes("Mögliche neue Fahrt nach längerer GPS-Lücke");
+target.value = "";
+target.dispatchEvent(new Event("change", { bubbles: true }));
+await manager.updateComplete;
+manager.shadowRoot.querySelector('.gpx-explicit button')?.click();
+await waitFor(() => importMessages.length === 1 && !manager.gpxPreview && !manager.gpxBusy);
+await importFile("second");
+const targetAgain = manager.shadowRoot.querySelector('.gpx-explicit select');
+targetAgain.value = "trip-1";
+targetAgain.dispatchEvent(new Event("change", { bubbles: true }));
+await manager.updateComplete;
+manager.shadowRoot.querySelector('.gpx-explicit button')?.click();
+await waitFor(() => importMessages.length === 2 && !manager.gpxPreview && !manager.gpxBusy);
+result.textContent = JSON.stringify({
+  vehicleVisible: summaryText.includes("entry-wohnmobil"),
+  targetVisible: summaryText.includes("Zielreise"),
+  summaryVisible: summaryText.includes("2 GPS-Punkte") && summaryText.includes("1 ausgewählte Fahrten"),
+  periodWarning: warningText,
+  gapWarning: gapText,
+  freeImportHasNoTrip: importMessages[0]?.trip_id === undefined,
+  explicitImportHasTrip: importMessages[1]?.trip_id === "trip-1",
+  importTripIds: importMessages.map((message) => message.trip_id ?? null),
+  selectedTripWasNotSticky: importMessages[0]?.trip_id !== "trip-2",
+  summaryRefresh: listCalls >= 3,
+  noVisibleBullets: !manager.shadowRoot.querySelector('.gpx-explicit ul'),
+  visibleTemplateLeak: [manager, summary].some((card) => /lit\$\d|=>\s*this\.|currentTarget\.value/.test(card.shadowRoot?.textContent ?? "")),
+}, null, 2);
+</script>

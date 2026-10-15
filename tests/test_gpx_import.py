@@ -48,9 +48,42 @@ class GPXImportTests(unittest.TestCase):
             store.insert_vehicle("v", "Camper", "device_tracker.v", now)
             first = store.import_gpx("v", preview, None, now)
             self.assertEqual(first["points_imported"], 3)
+            self.assertIsNone(first["trip_id"])
+            self.assertEqual(store.list_drives("v")[0]["assignment_status"], "unassigned")
             with self.assertRaisesRegex(ValueError, "gpx_already_imported"):
                 store.import_gpx("v", preview, None, now)
             self.assertEqual(store.diagnostic_counts("v")["gps_points"], 3)
+            store.close()
+
+    def test_import_explicitly_assigns_selected_trip(self):
+        preview = analyze_gpx(GPX, "v")
+        with TemporaryDirectory() as directory:
+            store = SQLiteStore(f"{directory}/journal.db")
+            store.open()
+            from datetime import datetime
+            now = datetime(2026, 10, 15, tzinfo=timezone.utc)
+            store.insert_vehicle("v", "Camper", "device_tracker.v", now)
+            trip = store.create_trip("v", "Länderspiel", now, now, status="active", start_date="2026-10-13", end_date="2026-10-14")
+            result = store.import_gpx("v", preview, trip, now)
+            self.assertEqual(result["trip_id"], trip)
+            self.assertEqual(store.connection.execute("SELECT count(*) FROM trip_drives WHERE trip_id=?", (trip,)).fetchone()[0], 1)
+            self.assertEqual(store.connection.execute("SELECT count(*) FROM gps_points WHERE vehicle_id=?", ("v",)).fetchone()[0], 3)
+            store.close()
+
+    def test_import_rejects_trip_from_another_vehicle_without_writes(self):
+        preview = analyze_gpx(GPX, "v")
+        with TemporaryDirectory() as directory:
+            store = SQLiteStore(f"{directory}/journal.db")
+            store.open()
+            from datetime import datetime
+            now = datetime(2026, 10, 15, tzinfo=timezone.utc)
+            store.insert_vehicle("v", "Camper", "device_tracker.v", now)
+            store.insert_vehicle("other", "Other", "device_tracker.other", now)
+            trip = store.create_trip("other", "Andere Reise", now, now)
+            with self.assertRaisesRegex(ValueError, "vehicle_mismatch"):
+                store.import_gpx("v", preview, trip, now)
+            self.assertIsNone(store.connection.execute("SELECT 1 FROM gpx_imports").fetchone())
+            self.assertEqual(store.connection.execute("SELECT count(*) FROM gps_points").fetchone()[0], 0)
             store.close()
 
     def test_conflicts_report_duplicate_points_and_overlapping_drives(self):

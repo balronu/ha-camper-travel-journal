@@ -90,7 +90,10 @@ Die Beta-15-Bundle-URL lautet: `/camper_travel_journal/camper-travel-journal.js?
 
 PAJ-GPX-1.1-Dateien können über **GPX importieren** in der Manager-Karte
 analysiert werden. Die Vorschau zeigt Abschnitte, Zeit, Kilometer, Dauer,
-Lücken, Sprünge und Duplikatkonflikte. Erst nach ausdrücklicher Bestätigung
+Lücken, Sprünge und Duplikatkonflikte. Fahrzeug und Zielreise werden vor der
+Bestätigung sichtbar angezeigt; die Fahrzeugbindung stammt aus der
+Kartenkonfiguration, die Zielreise kann explizit geändert oder leer gelassen
+werden. Reisezeiträume erzeugen nur Warnungen. Erst nach ausdrücklicher Bestätigung
 werden Daten atomar einer vorhandenen Reise zugeordnet. Die Entfernung ist
 eine GPS-Punktstrecke, keine Straßenroute; echte Koordinaten gehören nicht in
 Repository oder CI.
