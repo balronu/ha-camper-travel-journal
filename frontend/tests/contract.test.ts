@@ -12,7 +12,7 @@ const bundle = resolve(root, "../custom_components/camper_travel_journal/fronten
 
 describe("frontend release contract", () => {
   it("keeps backend, npm metadata and beta bundle aligned", () => {
-    expect(manifest.version).toBe("0.1.0");
+    expect(manifest.version).toBe("0.2.0-beta.1");
     expect(pkg.version).toBe(manifest.version);
     expect(existsSync(bundle)).toBe(true);
   });
@@ -23,6 +23,7 @@ describe("frontend release contract", () => {
     expect(source).toContain("camper-travel-journal-summary-card");
     expect(source).toContain("camper-travel-journal-manager-card");
     expect(source).toContain("camper-travel-journal-diagnostics-card");
+    expect(source).toContain("camper-travel-journal-map-card");
     expect(source).toContain("Diagnose");
     expect(source).toContain("Reiseübersicht");
     expect(source).toContain("Reiseverwaltung");
@@ -110,6 +111,15 @@ describe("frontend release contract", () => {
     expect(i18n).toContain("const de");
     expect(i18n).toContain("const en");
     expect(i18n).toContain("language");
+  });
+  it("exposes the read-only route contract and map lifecycle", () => {
+    const api = readFileSync(resolve(root, "src/api.ts"), "utf8");
+    const map = readFileSync(resolve(root, "src/map-card.ts"), "utf8");
+    expect(api).toContain("camper_travel_journal/route");
+    expect(map).toContain("L.polyline");
+    expect(map).toContain("disconnectedCallback");
+    expect(map).toContain("OpenStreetMap contributors");
+    expect(map).not.toContain("routing");
   });
   it("localizes visible status and category labels for German and English", () => {
     const german = { locale: { language: "de-DE" } } as any;

@@ -2,6 +2,21 @@
 
 🇩🇪 Deutsch | 🇬🇧 [English](README.en.md)
 
+## 0.2.0-beta.1 – erste Karten-Beta
+
+- Ergänzt die additive Schema-7-Tabelle `drive_gps_points` für explizite
+  GPS-Punkt-zu-Fahrt-Zuordnungen.
+- Speichert GPX-Punktmitgliedschaften innerhalb des atomaren Imports exakt und
+  kennzeichnet historische Intervall-Rekonstruktionen getrennt.
+- Ergänzt den read-only WebSocket-Befehl `camper_travel_journal/route` mit
+  Fahrtfiltern, Bounds, GPS-Lücken, Punktlimit und response-seitiger
+  Vereinfachung.
+- Ergänzt die eigenständige Leaflet-Karte
+  `custom:camper-travel-journal-map-card` mit Reiseauswahl, Segmentfarben,
+  Start-/Endmarkern und sichtbarer Karten-Attribution.
+- Keine Routing- oder Geocoding-Anfragen; Originalkoordinaten werden nicht
+  verändert.
+
 ## 0.1.0 – veröffentlicht
 
 - Stabilisiert die Summary Card: Titel, Ziel, Zeitraum, Status, Kennzahlen und

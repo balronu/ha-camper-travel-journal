@@ -1,0 +1,43 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>Camper Travel Journal map lifecycle test</title>
+<div id="map-host"></div>
+<pre id="result">starting</pre>
+<script type="module">
+const result = document.querySelector("#result");
+let routeCalls = 0;
+const trips = [{ id: "trip-1", title: "Synthetische Reise", description: "", destination: "Bremen", status: "active", started_at: "2026-10-13T12:00:00Z" }];
+const drives = [{ id: "drive-1", started_at: "2026-10-13T08:00:00Z", ended_at: "2026-10-13T10:00:00Z", distance_m: 1200, trip_id: "trip-1", assignment_status: "assigned" }];
+const connection = {
+  async sendMessagePromise(message) {
+    if (message.type === "camper_travel_journal/list") return { trips, drives, stops: [], expenses: [], expense_summary: { total_minor: 0, currency: "EUR", mixed_currency: false } };
+    if (message.type === "camper_travel_journal/route") {
+      routeCalls += 1;
+      return { vehicle_id: "entry-wohnmobil", trip_id: "trip-1", segments: [{ drive_id: "drive-1", association_source: "gpx_exact", points: [{ id: 1, recorded_at: "2026-10-13T08:00:00Z", latitude: 53.1, longitude: 8.8 }, { id: 2, recorded_at: "2026-10-13T09:00:00Z", latitude: 53.2, longitude: 8.9 }], gaps: [{ from: "2026-10-13T08:00:00Z", to: "2026-10-13T09:00:00Z", seconds: 3600 }], total_points: 2, returned_points: 2, simplified: false }], total_points: 2, returned_points: 2, bounds: { min_latitude: 53.1, min_longitude: 8.8, max_latitude: 53.2, max_longitude: 8.9 }, gaps: [{ drive_id: "drive-1", from: "2026-10-13T08:00:00Z", to: "2026-10-13T09:00:00Z", seconds: 3600 }], simplified: false, truncated: false, association_semantics: "explicit_only" };
+    }
+    throw new Error(`unexpected command ${message.type}`);
+  },
+};
+const hass = { connection, locale: { language: "en-US" } };
+await import("/custom_components/camper_travel_journal/frontend/camper-travel-journal.js");
+await customElements.whenDefined("camper-travel-journal-map-card");
+const card = document.createElement("camper-travel-journal-map-card");
+card.setConfig({ vehicle_id: "entry-wohnmobil", tile_url: "/synthetic/{z}/{x}/{y}.png" });
+document.querySelector("#map-host").append(card);
+card.hass = hass;
+for (let attempt = 0; attempt < 120; attempt += 1) {
+  if (routeCalls && card.shadowRoot?.querySelector(".leaflet-container")) break;
+  await new Promise((resolve) => setTimeout(resolve, 25));
+}
+const text = card.shadowRoot?.textContent ?? "";
+result.textContent = JSON.stringify({
+  routeCalls,
+  hasLeafletMap: Boolean(card.shadowRoot?.querySelector(".leaflet-container")),
+  englishTitle: text.includes("Camper Travel Journal – Map"),
+  englishSegments: text.includes("Drive segments"),
+  routeImageLabel: card.shadowRoot?.querySelector(".map")?.getAttribute("aria-label") === "GPS route map",
+  hasRouteLayer: Boolean(card.shadowRoot?.querySelector(".leaflet-overlay-pane path")),
+  visibleTemplateLeak: /lit\$\d|=>\s*this\.|currentTarget\.value/.test(text),
+}, null, 2);
+card.remove();
+</script>

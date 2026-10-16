@@ -140,6 +140,7 @@ else:
         assert [command._ws_command for command in api.COMMANDS] == [
             "camper_travel_journal/list_vehicles",
             "camper_travel_journal/list",
+            "camper_travel_journal/route",
             "camper_travel_journal/diagnostics",
             "camper_travel_journal/create_trip",
             "camper_travel_journal/update_trip",
