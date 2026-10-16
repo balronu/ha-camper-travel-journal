@@ -48,6 +48,7 @@ else:
         assert result["type"] == "create_entry"
         assert result["data"][CONF_MIN_INTERVAL] == 60
         assert result["data"][CONF_RETENTION_DAYS] == 180
+        await hass.async_block_till_done()
         assert await hass.config_entries.async_unload(entry.entry_id)
 
     async def test_setup_unload_listener_lifecycle(hass: HomeAssistant, enable_custom_integrations):
@@ -66,6 +67,33 @@ else:
         assert runtime.collector.stats.received >= 2  # state unchanged, GPS attributes changed
         assert await hass.config_entries.async_unload(entry.entry_id)
         assert entry.entry_id not in hass.data[DOMAIN]
+
+    async def test_options_update_reloads_runtime_without_duplicate_listener(
+        hass: HomeAssistant, enable_custom_integrations
+    ):
+        tracker = "device_tracker.options_reload"
+        hass.states.async_set(tracker, "home", {"latitude": 49.0, "longitude": 7.0, "gps_accuracy": 5})
+        entry = MockConfigEntry(domain=DOMAIN, data=_data(tracker))
+        entry.add_to_hass(hass)
+        assert await hass.config_entries.async_setup(entry.entry_id)
+        await hass.async_block_till_done()
+        first_runtime = hass.data[DOMAIN][entry.entry_id]
+
+        configured_key = "fixture-key"
+        updated_options = {**entry.options, "map_provider": "carto", "carto_api_key": configured_key}
+        hass.config_entries.async_update_entry(entry, options=updated_options)
+        await hass.async_block_till_done()
+        second_runtime = hass.data[DOMAIN][entry.entry_id]
+        assert second_runtime is not first_runtime
+        assert second_runtime.values["map_provider"] == "carto"
+        assert second_runtime.values["carto_api_key"] == configured_key
+
+        hass.config_entries.async_update_entry(entry, options={**entry.options, "map_provider": "none"})
+        await hass.async_block_till_done()
+        third_runtime = hass.data[DOMAIN][entry.entry_id]
+        assert third_runtime is not second_runtime
+        assert "carto_api_key" in third_runtime.values
+        assert await hass.config_entries.async_unload(entry.entry_id)
 
     async def test_setup_replaces_stale_frontend_bundle_urls(hass: HomeAssistant, enable_custom_integrations):
         """Only the current versioned card bundle remains registered after setup."""

@@ -14,7 +14,7 @@ from .runtime import Runtime
 from .storage import AsyncSQLiteWorker
 from .api import async_register as async_register_api
 
-VERSION = "0.2.0-beta.3"
+VERSION = "0.2.0-beta.4"
 
 PLATFORMS: list[str] = []
 CONFIG_SCHEMA = cv.config_entry_only_config_schema(DOMAIN) if cv else None
@@ -67,7 +67,13 @@ async def async_setup_entry(hass, entry):
     runtime = Runtime(hass, entry, worker)
     await runtime.async_start()
     hass.data.setdefault(DOMAIN, {})[entry.entry_id] = runtime
+    entry.async_on_unload(entry.add_update_listener(_async_options_updated))
     return True
+
+
+async def _async_options_updated(hass, entry) -> None:
+    """Reload the runtime once after an options flow has committed."""
+    await hass.config_entries.async_reload(entry.entry_id)
 
 
 async def async_unload_entry(hass, entry):
@@ -77,4 +83,4 @@ async def async_unload_entry(hass, entry):
     return True
 
 DOMAIN = "camper_travel_journal"
-VERSION = "0.2.0-beta.3"
+VERSION = "0.2.0-beta.4"

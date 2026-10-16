@@ -2,6 +2,13 @@
 
 🇩🇪 Deutsch | 🇬🇧 [English](README.en.md)
 
+## 0.2.0-beta.4 – Options-Lebenszyklus
+
+- CARTO-Optionen werden bei Änderungen zuverlässig in der laufenden Integration wirksam.
+- Leere Passwortfelder behalten vorhandene Schlüssel; explizites Entfernen bleibt möglich.
+- Config-Entry-Reloads sind unload-gebunden und werden nicht doppelt registriert.
+- WebSocket- und Frontend-Regressionsabdeckung für Optionsänderungen ergänzt.
+
 ## 0.2.0-beta.3 – CARTO Basemaps
 
 - Ergänzt CARTO Basemaps als optionalen Anbieter im Integrations-Optionsflow.

@@ -1240,10 +1240,10 @@ function ra(u) {
 }
 async function aa(u, s, r = ea) {
   const h = { state: "not_run", durationMs: null };
-  if (!u?.connection) return { version: "0.2.0-beta.3", connectionBefore: "unavailable", connectionAfter: "unavailable", authentication: h, vehicles: h, trips: h, vehicleId: Hi(s) };
+  if (!u?.connection) return { version: "0.2.0-beta.4", connectionBefore: "unavailable", connectionAfter: "unavailable", authentication: h, vehicles: h, trips: h, vehicleId: Hi(s) };
   const c = $s(u), m = await Fi(u, { type: "auth/current_user" }, sa, r), g = await Fi(u, { type: "camper_travel_journal/list_vehicles" }, oa, r), b = g.value?.vehicles?.filter((Ye) => typeof Ye.vehicle_id == "string") ?? [], f = b.length === 1 ? b[0].vehicle_id : void 0, D = await Fi(u, { type: "camper_travel_journal/list", vehicle_id: f ?? s }, ra, r), { value: P, ...R } = m, { value: j, ...Y } = g, { value: Z, ...we } = D;
   return {
-    version: "0.2.0-beta.3",
+    version: "0.2.0-beta.4",
     connectionBefore: c,
     connectionAfter: $s(u),
     authentication: R,
