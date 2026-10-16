@@ -79,18 +79,25 @@ type: custom:camper-travel-journal-manager-card
 vehicle_id: <config-entry-id>
 ```
 
-The first `v0.2.0-beta.1` card adds a read-only GPS map. It displays stored GPS
+The `v0.2.0-beta.2` card adds a read-only GPS map. It displays stored GPS
 lines and drive segments, does not calculate road routes, and uses no geocoding
 or routing service:
 
 ```yaml
 type: custom:camper-travel-journal-map-card
 vehicle_id: <config-entry-id>
+tile_url: https://your-authorized-tile-provider.example/{z}/{x}/{y}.png
+tile_attribution: © Tile provider · © OpenStreetMap contributors
 ```
 
-The card displays map attribution and requests only tiles for the visible map.
-GPS coordinates are not sent to the tile provider. Historical points without an
-unambiguous drive membership are not presented as exact assignments.
+`tile_url` and `tile_attribution` must belong to a tile provider authorized for
+your use. Without `tile_url`, no external background map is requested and the
+GPS route remains visible. Missing or blocked tiles are shown as a clear
+message instead of a wall of error tiles. The official
+`tile.openstreetmap.org` policy requires correct attribution, Referer/User-Agent
+identification and caching; this integration does not bypass blocks.
+Historical points without an unambiguous drive membership are not presented as
+exact assignments.
 
 The Summary Card prefers active trips. When several trips are active, it makes
 a deterministic choice using the latest `started_at` and, for ties, the trip
@@ -137,7 +144,7 @@ issues or tests.
 ## Known limitations
 
 - The scope is focused on the travel journal, drives, expenses and GPX import.
-- The map view is an initial beta feature in `v0.2.0-beta.1`; statistics and
+- The map view is a beta feature in `v0.2.0-beta.2`; statistics and
   exports are not implemented yet.
 - Stops exist in the backend but are not fully manageable from Lovelace yet.
 - Retention calculates candidates but does not automatically delete in this

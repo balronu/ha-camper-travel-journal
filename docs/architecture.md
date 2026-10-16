@@ -1,4 +1,4 @@
-# Architecture – implemented v0.2.0-beta.1 boundary
+# Architecture – implemented v0.2.0-beta.2 boundary
 
 This document describes the current implementation, not a proposal for
 features that are only planned.

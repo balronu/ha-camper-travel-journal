@@ -22,7 +22,7 @@ const hass = { connection, locale: { language: "en-US" } };
 await import("/custom_components/camper_travel_journal/frontend/camper-travel-journal.js");
 await customElements.whenDefined("camper-travel-journal-map-card");
 const card = document.createElement("camper-travel-journal-map-card");
-card.setConfig({ vehicle_id: "entry-wohnmobil", tile_url: "/synthetic/{z}/{x}/{y}.png" });
+card.setConfig({ vehicle_id: "entry-wohnmobil", tile_url: "/missing-tiles/{z}/{x}/{y}.png", tile_attribution: "Synthetic provider" });
 document.querySelector("#map-host").append(card);
 card.hass = hass;
 for (let attempt = 0; attempt < 120; attempt += 1) {
@@ -35,6 +35,8 @@ result.textContent = JSON.stringify({
   hasLeafletMap: Boolean(card.shadowRoot?.querySelector(".leaflet-container")),
   englishTitle: text.includes("Camper Travel Journal – Map"),
   englishSegments: text.includes("Drive segments"),
+  tileErrorMessage: text.includes("background map could not be loaded"),
+  configuredAttribution: text.includes("Synthetic provider"),
   routeImageLabel: card.shadowRoot?.querySelector(".map")?.getAttribute("aria-label") === "GPS route map",
   hasRouteLayer: Boolean(card.shadowRoot?.querySelector(".leaflet-overlay-pane path")),
   visibleTemplateLeak: /lit\$\d|=>\s*this\.|currentTarget\.value/.test(text),

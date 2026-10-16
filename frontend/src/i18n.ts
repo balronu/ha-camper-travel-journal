@@ -21,7 +21,7 @@ type Messages = {
   manualDrive: string; createDrive: string; driveCreateError: string; driveEditError: string; driveDeleteError: string; dateInvalid: string;
   gpxImport: string; gpxPrivacy: string; gpxAnalyzeError: string; gpxImportError: string; gpxConfirm: string; gpxDuplicate: string; gpxSections: string; gpxPoints: string; gpxWarnings: string;
   gpxVehicle: string; gpxVehicleFixed: string; gpxTargetTrip: string; gpxNoTrip: string; gpxSelectTrip: string; gpxSummary: string; gpxSelectedDrives: string; gpxDistance: string; gpxPeriod: string; gpxPeriodWarning: string; gpxGapBoundary: string;
-  mapTitle: string; mapDriveSegments: string; mapStart: string; mapEnd: string; mapGap: string; mapTruncated: string; mapNoPoints: string; mapRouteImageAlt: string; mapAttribution: string;
+  mapTitle: string; mapDriveSegments: string; mapStart: string; mapEnd: string; mapGap: string; mapTruncated: string; mapNoPoints: string; mapRouteImageAlt: string; mapAttribution: string; mapTilesNotConfigured?: string; mapTilesUnavailable?: string;
 };
 
 const de: Messages = {

@@ -2,6 +2,13 @@
 
 🇩🇪 Deutsch | 🇬🇧 [English](README.en.md)
 
+## 0.2.0-beta.2 – regelkonforme Kartenprovider
+
+- OSM-Kacheln werden nicht mehr ungefragt als Standardprovider verwendet.
+- `tile_url` und `tile_attribution` bleiben für einen autorisierten Provider konfigurierbar.
+- Kachelfehler entfernen die Hintergrundebene und lassen GPS-Routen sichtbar.
+- Fahrtabschnitte werden chronologisch aufsteigend angezeigt.
+
 ## 0.2.0-beta.1 – erste Karten-Beta
 
 - Ergänzt die additive Schema-7-Tabelle `drive_gps_points` für explizite
