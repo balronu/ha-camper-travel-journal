@@ -10,6 +10,7 @@ const trips = [{ id: "trip-1", title: "Synthetische Reise", description: "", des
 const drives = [{ id: "drive-1", started_at: "2026-10-13T08:00:00Z", ended_at: "2026-10-13T10:00:00Z", distance_m: 1200, trip_id: "trip-1", assignment_status: "assigned" }];
 const connection = {
   async sendMessagePromise(message) {
+    if (message.type === "camper_travel_journal/list_vehicles") return { vehicles: [{ vehicle_id: "entry-wohnmobil", name: "Wohnmobil", title: "Camper Travel Journal" }] };
     if (message.type === "camper_travel_journal/list") return { trips, drives, stops: [], expenses: [], expense_summary: { total_minor: 0, currency: "EUR", mixed_currency: false } };
     if (message.type === "camper_travel_journal/route") {
       routeCalls += 1;
@@ -30,15 +31,28 @@ for (let attempt = 0; attempt < 120; attempt += 1) {
   await new Promise((resolve) => setTimeout(resolve, 25));
 }
 const text = card.shadowRoot?.textContent ?? "";
+const details = card.shadowRoot?.querySelector("details");
+if (details) { details.open = true; details.dispatchEvent(new Event("toggle")); }
+const detailsOpened = Boolean(details?.open);
+const selectNone = card.shadowRoot?.querySelectorAll("button")[1];
+selectNone?.click();
+await new Promise((resolve) => setTimeout(resolve, 50));
+const noneSelected = [...(card.shadowRoot?.querySelectorAll("input[type=checkbox]") ?? [])].every((input) => !(input instanceof HTMLInputElement) || !input.checked);
+card.shadowRoot?.querySelector("button")?.click();
+await new Promise((resolve) => setTimeout(resolve, 50));
+const allSelected = [...(card.shadowRoot?.querySelectorAll("input[type=checkbox]") ?? [])].every((input) => !(input instanceof HTMLInputElement) || input.checked);
 result.textContent = JSON.stringify({
   routeCalls,
   hasLeafletMap: Boolean(card.shadowRoot?.querySelector(".leaflet-container")),
-  englishTitle: text.includes("Camper Travel Journal – Map"),
-  englishSegments: text.includes("Drive segments"),
+  englishTitle: text.includes("Travel map"),
+  englishSegments: text.includes("Drive sections"),
   tileErrorMessage: text.includes("background map could not be loaded"),
   configuredAttribution: text.includes("Synthetic provider"),
   routeImageLabel: card.shadowRoot?.querySelector(".map")?.getAttribute("aria-label") === "GPS route map",
   hasRouteLayer: Boolean(card.shadowRoot?.querySelector(".leaflet-overlay-pane path")),
+  detailsOpened,
+  noneSelected,
+  allSelected,
   visibleTemplateLeak: /lit\$\d|=>\s*this\.|currentTarget\.value/.test(text),
 }, null, 2);
 card.remove();

@@ -2,6 +2,14 @@
 
 🇩🇪 Deutsch | 🇬🇧 [English](README.en.md)
 
+## 0.2.0-beta.5 – kompakte responsive Reisekarte
+
+- Kompakter Kartenkopf mit Reiseauswahl und Fahrzeugkontext.
+- Dynamische Kilometer-, Auswahl- und Zeitraum-Kennzahlen.
+- Einklappbare Fahrtabschnitte mit Einzel-, Alle-auswählen- und Alle-abwählen-Steuerung.
+- Responsive Kartenhöhe, Touch-freundliche Bedienung, Fokuszustände und stabiler Leaflet-Lifecycle.
+- CARTO, manuelle Tile-Overrides, GPS-Routen, Marker und Lücken bleiben unverändert.
+
 ## 0.2.0-beta.4 – Options-Lebenszyklus
 
 - CARTO-Optionen werden bei Änderungen zuverlässig in der laufenden Integration wirksam.

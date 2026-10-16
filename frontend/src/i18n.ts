@@ -21,7 +21,7 @@ type Messages = {
   manualDrive: string; createDrive: string; driveCreateError: string; driveEditError: string; driveDeleteError: string; dateInvalid: string;
   gpxImport: string; gpxPrivacy: string; gpxAnalyzeError: string; gpxImportError: string; gpxConfirm: string; gpxDuplicate: string; gpxSections: string; gpxPoints: string; gpxWarnings: string;
   gpxVehicle: string; gpxVehicleFixed: string; gpxTargetTrip: string; gpxNoTrip: string; gpxSelectTrip: string; gpxSummary: string; gpxSelectedDrives: string; gpxDistance: string; gpxPeriod: string; gpxPeriodWarning: string; gpxGapBoundary: string;
-  mapTitle: string; mapDriveSegments: string; mapStart: string; mapEnd: string; mapGap: string; mapTruncated: string; mapNoPoints: string; mapRouteImageAlt: string; mapAttribution: string; mapTilesNotConfigured?: string; mapTilesUnavailable?: string;
+  mapTitle: string; mapVehicle?: string; mapTrip?: string; mapTotalDistance?: string; mapSelectedDrives?: string; mapTripPeriod?: string; mapDriveSegments: string; mapExpandSegments?: string; mapCollapseSegments?: string; mapSelectAll?: string; mapSelectNone?: string; mapStart: string; mapEnd: string; mapGap: string; mapTruncated: string; mapNoPoints: string; mapRouteImageAlt: string; mapAttribution: string; mapTilesNotConfigured?: string; mapTilesUnavailable?: string;
 };
 
 const de: Messages = {
@@ -40,9 +40,22 @@ const en: Messages = {
   editorVehicle: "Camper", editorChooseVehicle: "Select camper", editorLoading: "Loading campers …", editorNoVehicle: "No configured camper found.", editorLoadError: "Configured campers could not be loaded.", confirmDelete: "Click again to confirm", startDate: "Start", endDate: "End", period: "Travel period", noDrives: "No drives recorded yet.", driveStart: "Start", driveEnd: "End", duration: "Duration", sourceGps: "GPS detected", sourceManual: "Manual", startLocation: "Start location", endLocation: "Destination", distanceKm: "Distance in km", durationMinutes: "Duration", manualDrive: "Manual drive", createDrive: "Create drive", driveCreateError: "Drive could not be saved.", driveEditError: "Manual drive could not be edited.", driveDeleteError: "Drive could not be deleted.", dateInvalid: "Enter valid dates.", gpxImport: "Import GPX", gpxPrivacy: "The file is analyzed locally; data is written only after confirmation.", gpxAnalyzeError: "The GPX file could not be analyzed.", gpxImportError: "The GPX import could not be completed.", gpxConfirm: "Import GPX drives", gpxDuplicate: "This file was already imported.", gpxSections: "drive sections", gpxPoints: "GPS points", gpxWarnings: "Notes", gpxVehicle: "Camper", gpxVehicleFixed: "fixed by this card", gpxTargetTrip: "Target trip", gpxNoTrip: "No trip – unassigned drives", gpxSelectTrip: "Select trip …", gpxSummary: "Summary", gpxSelectedDrives: "selected drives", gpxDistance: "kilometers", gpxPeriod: "GPX period", gpxPeriodWarning: "The GPX period is partly outside the trip period.", gpxGapBoundary: "Possible new drive after a long GPS gap", mapTitle: "Camper Travel Journal – Map", mapDriveSegments: "Drive segments", mapStart: "Start", mapEnd: "End", mapGap: "GPS gap", mapTruncated: "Route truncated", mapNoPoints: "No associated GPS points for this trip.", mapRouteImageAlt: "GPS route map", mapAttribution: "© OpenStreetMap contributors · GPS track, no road routing",
 };
 
+const mapLabels: Record<"de" | "en", Partial<Messages>> = {
+  de: {
+    mapTitle: "Reisekarte", mapVehicle: "Fahrzeug", mapTrip: "Reise", mapTotalDistance: "Kilometer",
+    mapSelectedDrives: "Fahrtabschnitte", mapTripPeriod: "Reisezeitraum", mapExpandSegments: "Fahrtabschnitte aufklappen",
+    mapCollapseSegments: "Fahrtabschnitte zuklappen", mapSelectAll: "Alle auswählen", mapSelectNone: "Alle abwählen",
+  },
+  en: {
+    mapTitle: "Travel map", mapVehicle: "Camper", mapTrip: "Trip", mapTotalDistance: "Kilometers",
+    mapSelectedDrives: "Drive sections", mapTripPeriod: "Trip period", mapExpandSegments: "Expand drive sections",
+    mapCollapseSegments: "Collapse drive sections", mapSelectAll: "Select all", mapSelectNone: "Select none",
+  },
+};
+
 export function messages(hass?: Hass): Messages {
   const language = hass?.locale?.language?.toLowerCase() ?? "de";
-  return language.startsWith("de") ? de : en;
+  return { ...(language.startsWith("de") ? de : en), ...(language.startsWith("de") ? mapLabels.de : mapLabels.en) };
 }
 
 function localeFor(hass?: Hass): string {
@@ -60,6 +73,9 @@ export function formatDate(value: string, hass?: Hass): string {
 }
 export function formatDateTime(value: string, hass?: Hass): string {
   return new Date(value).toLocaleString(localeFor(hass), { dateStyle: "short", timeStyle: "short" });
+}
+export function formatTime(value: string, hass?: Hass): string {
+  return new Date(value).toLocaleTimeString(localeFor(hass), { hour: "2-digit", minute: "2-digit" });
 }
 export function formatDuration(seconds: number | undefined, hass?: Hass): string {
   const minutes = Math.max(0, Math.round((seconds ?? 0) / 60));

@@ -13,7 +13,7 @@ const bundle = resolve(root, "../custom_components/camper_travel_journal/fronten
 
 describe("frontend release contract", () => {
   it("keeps backend, npm metadata and beta bundle aligned", () => {
-    expect(manifest.version).toBe("0.2.0-beta.4");
+    expect(manifest.version).toBe("0.2.0-beta.5");
     expect(pkg.version).toBe(manifest.version);
     expect(existsSync(bundle)).toBe(true);
   });
@@ -127,6 +127,22 @@ describe("frontend release contract", () => {
     expect(readFileSync(resolve(root, "../custom_components/camper_travel_journal/const.py"), "utf8")).toContain("basemaps.cartocdn.com");
     expect(map).not.toContain("tile.openstreetmap.org/{z}/{x}/{y}.png");
     expect(map).not.toContain("routing");
+  });
+  it("keeps the compact responsive map presentation contract", () => {
+    const map = readFileSync(resolve(root, "src/map-card.ts"), "utf8");
+    expect(map).toContain('mapTitle');
+    expect(map).toContain('mapTotalDistance');
+    expect(map).toContain('mapSelectedDrives');
+    expect(map).toContain('mapTripPeriod');
+    expect(map).toContain('<details class="drive-details"');
+    expect(map).toContain('mapSelectAll');
+    expect(map).toContain('mapSelectNone');
+    expect(map).toContain('matchMedia("(min-width: 700px)")');
+    expect(map).toContain('fitMapPending');
+    expect(map).toContain('this.map?.remove()');
+    expect(map).toContain('height: clamp(');
+    expect(map).toContain('focus-visible');
+    expect(map).toContain('tile_attribution');
   });
   it("sorts map drive segments in ascending start-time order", () => {
     expect(sortDrivesChronologically([
