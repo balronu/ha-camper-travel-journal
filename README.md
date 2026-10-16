@@ -175,9 +175,10 @@ Projektversion steht oben bei den Release-Badges.
 ## Roadmap
 
 Die statusgetrennte Roadmap steht in [docs/ROADMAP.md](docs/ROADMAP.md).
-Geplant sind unter anderem eine Routen-/Kartenansicht, Reiseverlauf,
-Statistiken, Exporte und eine vollständige Lovelace-Verwaltung der
-Zwischenstopps.
+Weiter geplant sind unter anderem erweiterte Statistiken, Exporte und
+vollständige Lovelace-Verwaltung von Zwischenstopps. Die read-only-
+Kartenansicht und der authentifizierte PDF-Reisebericht sind im aktuellen
+Beta-Zweig bereits vorhanden.
 
 ## Support und Mitwirkung
 

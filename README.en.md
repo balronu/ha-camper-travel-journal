@@ -165,8 +165,9 @@ version is shown by the release badges above.
 ## Roadmap
 
 See the status-separated [docs/ROADMAP.md](docs/ROADMAP.md). Planned work
-includes a route/map view, trip history, statistics, exports and complete
-Lovelace stop management.
+includes expanded statistics, exports and complete Lovelace stop management.
+The read-only map view and authenticated PDF travel reports are already
+available in the current beta line.
 
 ## Support and contributing
 
