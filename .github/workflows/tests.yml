@@ -137,3 +137,24 @@ jobs:
           if (result.visibleTemplateLeak) throw new Error('frontend template source leaked into visible DOM');
           console.log(JSON.stringify(result));
           NODE
+      - name: Run map lifecycle regression
+        run: |
+          python3 -m http.server 8765 --bind 127.0.0.1 >/tmp/camper-travel-journal-map-http.log 2>&1 &
+          server_pid=$!
+          trap 'kill "$server_pid"' EXIT
+          sleep 0.3
+          chromium --headless --no-sandbox --disable-gpu --virtual-time-budget=5000 \
+            --dump-dom http://127.0.0.1:8765/frontend/tests/browser/map.html >/tmp/camper-travel-journal-map-dom.html
+          node - <<'NODE'
+          const fs = require('fs');
+          const html = fs.readFileSync('/tmp/camper-travel-journal-map-dom.html', 'utf8');
+          const match = html.match(/<pre id="result">([\s\S]*?)<\/pre>/);
+          if (!match) throw new Error('map harness returned no result');
+          const result = JSON.parse(match[1]);
+          for (const [key, value] of Object.entries(result)) {
+            if (key !== 'visibleTemplateLeak' && value !== true && key !== 'routeCalls') throw new Error(`${key}=${value}`);
+          }
+          if (result.routeCalls < 1) throw new Error('map did not request route data');
+          if (result.visibleTemplateLeak) throw new Error('frontend template source leaked into visible DOM');
+          console.log(JSON.stringify(result));
+          NODE

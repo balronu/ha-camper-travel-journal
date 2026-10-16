@@ -1,7 +1,7 @@
 import { css, html, unsafeCSS } from "lit";
 import { TravelCard, defineOnce } from "./base-card";
 import { list, route, type RouteResponse, type Snapshot } from "./api";
-import { messages } from "./i18n";
+import { formatDateTime, messages } from "./i18n";
 import * as L from "leaflet";
 import leafletCss from "leaflet/dist/leaflet.css?inline";
 
@@ -90,12 +90,13 @@ export class MapCard extends TravelCard {
         const line = L.polyline(points, { color: COLORS[index % COLORS.length], weight: 4, opacity: 0.85 }).addTo(this.map);
         this.layers.push(line);
         points.forEach((point) => bounds.extend(point));
-        const start = L.circleMarker(points[0], { radius: 6, color: COLORS[index % COLORS.length], fillOpacity: 1 }).bindTooltip("Start").addTo(this.map);
-        const end = L.circleMarker(points[points.length - 1], { radius: 6, color: "#111", fillColor: COLORS[index % COLORS.length], fillOpacity: 1 }).bindTooltip("End").addTo(this.map);
+        const lang = messages(this.hass);
+        const start = L.circleMarker(points[0], { radius: 6, color: COLORS[index % COLORS.length], fillOpacity: 1 }).bindTooltip(lang.mapStart).addTo(this.map);
+        const end = L.circleMarker(points[points.length - 1], { radius: 6, color: "#111", fillColor: COLORS[index % COLORS.length], fillOpacity: 1 }).bindTooltip(lang.mapEnd).addTo(this.map);
         this.layers.push(start, end);
         for (const gap of segment.gaps) {
           const gapPoint = points[Math.max(0, Math.floor(points.length / 2))];
-          const marker = L.circleMarker(gapPoint, { radius: 8, color: "#f57c00", fillOpacity: 0.9 }).bindTooltip(`GPS-Lücke: ${gap.seconds}s`).addTo(this.map);
+          const marker = L.circleMarker(gapPoint, { radius: 8, color: "#f57c00", fillOpacity: 0.9 }).bindTooltip(`${lang.mapGap}: ${gap.seconds}s`).addTo(this.map);
           this.layers.push(marker);
         }
       }
@@ -119,14 +120,14 @@ export class MapCard extends TravelCard {
 
   render() {
     const lang = messages(this.hass);
-    return html`<ha-card><h2>Camper Travel Journal – Karte</h2>
+    return html`<ha-card><h2>${lang.mapTitle}</h2>
       ${this.trips.length ? html`<label class="selector">${lang.summaryChooseTrip}<select @change=${(event: Event) => void this.selectTrip(event)} .value=${this.selectedTripId}>${this.trips.map((trip) => html`<option value=${trip.id}>${trip.title} · ${trip.status}</option>`)}</select></label>` : ""}
-      ${this.drives.length ? html`<fieldset class="drives"><legend>Fahrtabschnitte</legend>${this.drives.map((drive) => html`<label><input type="checkbox" value=${drive.id} .checked=${this.selectedDriveIds.includes(drive.id)} @change=${(event: Event) => void this.toggleDrive(event)}> ${new Date(drive.started_at).toLocaleString()} · ${(drive.distance_m / 1000).toFixed(1)} km</label>`)}</fieldset>` : ""}
+      ${this.drives.length ? html`<fieldset class="drives"><legend>${lang.mapDriveSegments}</legend>${this.drives.map((drive) => html`<label><input type="checkbox" value=${drive.id} .checked=${this.selectedDriveIds.includes(drive.id)} @change=${(event: Event) => void this.toggleDrive(event)}> ${formatDateTime(drive.started_at, this.hass)} · ${(drive.distance_m / 1000).toFixed(1)} km</label>`)}</fieldset>` : ""}
       ${this.error ? html`<p class="error" role="alert">${this.error}</p>` : ""}
-      ${this.data?.truncated ? html`<p class="muted">Route gekürzt: ${this.data.returned_points} von ${this.data.total_points} Punkten.</p>` : ""}
-      ${!this.loading && !this.data?.segments.length ? html`<p class="muted">Keine zugeordneten GPS-Punkte für diese Reise.</p>` : ""}
-      <div class="map" role="img" aria-label="GPS-Routenkarte"></div>
-      <p class="attribution">© OpenStreetMap contributors · GPS-Route, keine Straßenberechnung</p>
+      ${this.data?.truncated ? html`<p class="muted">${lang.mapTruncated}: ${this.data.returned_points} / ${this.data.total_points}</p>` : ""}
+      ${!this.loading && !this.data?.segments.length ? html`<p class="muted">${lang.mapNoPoints}</p>` : ""}
+      <div class="map" role="img" aria-label=${lang.mapRouteImageAlt}></div>
+      <p class="attribution">${lang.mapAttribution}</p>
       ${this.loading ? html`<p class="muted">${lang.loading}</p>` : ""}
     </ha-card>`;
   }
