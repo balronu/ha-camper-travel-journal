@@ -53,8 +53,8 @@ def defaults(source: dict[str, Any] | None = None) -> dict[str, Any]:
 
 def normalize_options(current: dict[str, Any], submitted: dict[str, Any]) -> dict[str, Any]:
     """Merge options while keeping an existing secret out of the form value."""
-    result = {**defaults(current), **submitted}
-    result[CONF_MAP_PROVIDER] = submitted.get(CONF_MAP_PROVIDER, MAP_PROVIDER_NONE)
+    result = {**defaults(current), **current, **submitted}
+    result[CONF_MAP_PROVIDER] = submitted.get(CONF_MAP_PROVIDER, current.get(CONF_MAP_PROVIDER, MAP_PROVIDER_NONE))
     new_key = str(submitted.get(CONF_CARTO_API_KEY, "") or "").strip()
     if submitted.get(CONF_REMOVE_CARTO_API_KEY):
         result.pop(CONF_CARTO_API_KEY, None)
