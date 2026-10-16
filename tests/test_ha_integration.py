@@ -126,7 +126,8 @@ else:
         await client.send_json({"id": 2, "type": "camper_travel_journal/list", "vehicle_id": entry.entry_id})
         listed = await client.receive_json()
         assert listed["success"] is True
-        assert set(listed["result"]) == {"trips", "drives", "stops"}
+        assert set(listed["result"]) == {"trips", "drives", "stops", "map_config"}
+        assert listed["result"]["map_config"] == {"provider": "none", "tile_url": None, "tile_attribution": None}
 
         await client.send_json({"id": 3, "type": "camper_travel_journal/diagnostics", "vehicle_id": entry.entry_id})
         diagnostics = await client.receive_json()
