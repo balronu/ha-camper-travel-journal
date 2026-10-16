@@ -83,24 +83,25 @@ type: custom:camper-travel-journal-manager-card
 vehicle_id: <config-entry-id>
 ```
 
-Die `v0.2.0-beta.2`-Karte ergänzt eine read-only GPS-Ansicht. Sie zeigt
+Die `v0.2.0-beta.3`-Karte ergänzt eine read-only GPS-Ansicht. Sie zeigt
 gespeicherte GPS-Linien und Fahrtsegmente, berechnet keine Straßenroute und
 verwendet keine Geocoding- oder Routing-Dienste:
 
 ```yaml
 type: custom:camper-travel-journal-map-card
 vehicle_id: <config-entry-id>
-tile_url: https://your-authorized-tile-provider.example/{z}/{x}/{y}.png
-tile_attribution: © Kartenanbieter · © OpenStreetMap-Mitwirkende
 ```
 
-`tile_url` und `tile_attribution` müssen zu einem für die eigene Nutzung
-zugelassenen Tile-Provider gehören. Ohne `tile_url` wird keine externe
-Hintergrundkarte geladen; die GPS-Route bleibt sichtbar. Fehlende oder
-gesperrte Kacheln werden als verständlicher Hinweis angezeigt und nicht durch
-großflächige Fehlerkacheln ersetzt. Für `tile.openstreetmap.org` gelten die
-offiziellen Nutzungsbedingungen einschließlich korrekter Attribution,
-Referer/User-Agent und Caching; diese Integration umgeht keine Sperren.
+Der Kartenanbieter wird unter **Einstellungen → Geräte & Dienste → Camper
+Travel Journal → Konfigurieren** ausgewählt. CARTO Basemaps verwendet die
+offizielle Voyager-Raster-URL und die Attribution `© OpenStreetMap contributors,
+© CARTO`. Der API-Schlüssel wird als Passwortfeld gespeichert, beim Bearbeiten
+nicht vorbefüllt und für Browser-Tile-Anfragen an den Browser übergeben; er ist
+daher in den Browser-Netzwerktools sichtbar. Ein Schlüssel kann geändert oder
+entfernt werden. Ohne Anbieter wird keine externe Hintergrundkarte geladen;
+die GPS-Route bleibt sichtbar. Fehlende oder gesperrte Kacheln werden als
+verständlicher Hinweis angezeigt. Manuelle `tile_url`/`tile_attribution`-Werte
+bleiben für fortgeschrittene Kartenkonfigurationen kompatibel.
 Historische Punkte ohne eindeutige Fahrtmitgliedschaft werden nicht als exakt
 zugeordnet ausgegeben.
 
@@ -153,7 +154,7 @@ privaten Koordinaten, Tokens oder unredigierten Logs.
 
 - Der Funktionsumfang ist auf Reisetagebuch, Fahrten, Kosten und den GPX-Import
   konzentriert.
-- Die Kartenansicht befindet sich in `v0.2.0-beta.2` weiterhin in der Beta-Phase;
+- Die Kartenansicht befindet sich in `v0.2.0-beta.3` weiterhin in der Beta-Phase;
   Statistiken und Exporte sind noch nicht implementiert.
 - Zwischenstopps sind im Backend vorhanden, aber noch nicht vollständig über
   Lovelace bedienbar.

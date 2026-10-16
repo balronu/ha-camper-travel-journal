@@ -20,6 +20,7 @@ else:
             CONF_VEHICLE_NAME: "Synthetic Camper",
             CONF_TRACKER_ENTITY: entity,
             CONF_RECORDING_ENABLED: False,
+            "map_provider": "none",
             CONF_MIN_INTERVAL: 30,
             CONF_MIN_MOVEMENT: 25.0,
             CONF_RETENTION_DAYS: 90,

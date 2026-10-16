@@ -191,6 +191,19 @@ async def test_list_vehicles_exposes_only_editor_safe_hub_metadata():
 
 
 @pytest.mark.asyncio
+async def test_carto_map_config_uses_official_url_and_never_enters_diagnostics():
+    hass = FakeHass()
+    hass.data["camper_travel_journal"]["v1"].values = {"vehicle_name": "Wohnmobil", "map_provider": "carto", "carto_api_key": "key/with spaces"}
+    connection = FakeConnection()
+    await api.ws_list.__wrapped__(hass, connection, {"id": 22, "vehicle_id": "v1"})
+    config = connection.results[0][1]["map_config"]
+    assert config["tile_url"] == "https://basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}.png?key=key%2Fwith%20spaces"
+    assert config["tile_attribution"] == "© OpenStreetMap contributors, © CARTO"
+    await api.ws_diagnostics.__wrapped__(hass, connection, {"id": 23, "vehicle_id": "v1"})
+    assert "carto_api_key" not in str(connection.results[-1])
+
+
+@pytest.mark.asyncio
 async def test_transition_and_write_commands_complete():
     hass = FakeHass()
     connection = FakeConnection()

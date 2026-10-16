@@ -79,23 +79,24 @@ type: custom:camper-travel-journal-manager-card
 vehicle_id: <config-entry-id>
 ```
 
-The `v0.2.0-beta.2` card adds a read-only GPS map. It displays stored GPS
+The `v0.2.0-beta.3` card adds a read-only GPS map. It displays stored GPS
 lines and drive segments, does not calculate road routes, and uses no geocoding
 or routing service:
 
 ```yaml
 type: custom:camper-travel-journal-map-card
 vehicle_id: <config-entry-id>
-tile_url: https://your-authorized-tile-provider.example/{z}/{x}/{y}.png
-tile_attribution: © Tile provider · © OpenStreetMap contributors
 ```
 
-`tile_url` and `tile_attribution` must belong to a tile provider authorized for
-your use. Without `tile_url`, no external background map is requested and the
-GPS route remains visible. Missing or blocked tiles are shown as a clear
-message instead of a wall of error tiles. The official
-`tile.openstreetmap.org` policy requires correct attribution, Referer/User-Agent
-identification and caching; this integration does not bypass blocks.
+Choose the provider under **Settings → Devices & services → Camper Travel
+Journal → Configure**. CARTO Basemaps uses the official Voyager raster URL and
+the attribution `© OpenStreetMap contributors, © CARTO`. The API key is stored
+in a password field, is never prefilled when editing, and is passed to the
+browser for tile requests; it is therefore visible in browser network tools.
+The key can be changed or removed. Without a provider, no external background
+map is requested and the GPS route remains visible. Manual
+`tile_url`/`tile_attribution` values remain compatible for advanced card
+configuration.
 Historical points without an unambiguous drive membership are not presented as
 exact assignments.
 
@@ -144,7 +145,7 @@ issues or tests.
 ## Known limitations
 
 - The scope is focused on the travel journal, drives, expenses and GPX import.
-- The map view is a beta feature in `v0.2.0-beta.2`; statistics and
+- The map view is a beta feature in `v0.2.0-beta.3`; statistics and
   exports are not implemented yet.
 - Stops exist in the backend but are not fully manageable from Lovelace yet.
 - Retention calculates candidates but does not automatically delete in this

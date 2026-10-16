@@ -20,7 +20,24 @@ except ImportError:  # pragma: no cover - offline domain tests
 from .models import Expense, Stop
 from .gpx_import import MAX_FILE_BYTES, analyze_gpx
 from .travel import validate_amount, validate_expense_category, validate_expense_currency, validate_transition
-from .const import DEFAULT_MAX_GPS_GAP
+from .const import (
+    CARTO_TILE_ATTRIBUTION, CARTO_TILE_URL, CONF_CARTO_API_KEY,
+    CONF_MAP_PROVIDER, DEFAULT_MAX_GPS_GAP, MAP_PROVIDER_CARTO,
+)
+
+
+def _map_config(values: dict[str, Any]) -> dict[str, Any]:
+    """Build browser configuration without ever logging or diagnosing the key."""
+    provider = values.get(CONF_MAP_PROVIDER)
+    key = str(values.get(CONF_CARTO_API_KEY, "") or "")
+    if provider == MAP_PROVIDER_CARTO and key:
+        from urllib.parse import quote
+        return {
+            "provider": MAP_PROVIDER_CARTO,
+            "tile_url": CARTO_TILE_URL.replace("{key}", quote(key, safe="")),
+            "tile_attribution": CARTO_TILE_ATTRIBUTION,
+        }
+    return {"provider": provider or "none", "tile_url": None, "tile_attribution": None}
 
 
 def _now() -> datetime:
@@ -168,6 +185,7 @@ if websocket_api is not None:
                 "drives": await _call(hass, msg, "list_drives", msg["vehicle_id"], trip_id=trip_id) if trip_id else await _call(hass, msg, "list_drives", msg["vehicle_id"]),
                 "stops": await _call(hass, msg, "list_stops", msg["vehicle_id"], trip_id=trip_id),
             }
+            result["map_config"] = _map_config(_runtime(hass, msg["vehicle_id"]).values)
             if trip_id:
                 result["available_drives"] = await _call(hass, msg, "list_available_drives", msg["vehicle_id"])
                 result["expenses"] = await _call(hass, msg, "list_expenses", trip_id)

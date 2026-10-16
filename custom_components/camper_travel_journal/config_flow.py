@@ -13,6 +13,8 @@ from .const import (
     DEFAULT_UNASSIGNED_RETENTION, MAX_INTERVAL_SECONDS, MAX_MOVEMENT_METERS,
     MAX_RETENTION_DAYS, MIN_INTERVAL_SECONDS, MIN_MOVEMENT_METERS,
     MIN_RETENTION_DAYS,
+    CONF_CARTO_API_KEY, CONF_MAP_PROVIDER,
+    CONF_REMOVE_CARTO_API_KEY, MAP_PROVIDER_CARTO, MAP_PROVIDER_NONE,
 )
 
 try:  # Imported by Home Assistant; pure helpers remain testable offline.
@@ -45,7 +47,23 @@ def defaults(source: dict[str, Any] | None = None) -> dict[str, Any]:
         CONF_STOP_AFTER: int(source.get(CONF_STOP_AFTER, DEFAULT_STOP_AFTER_MINUTES)),
         CONF_MAX_GAP: int(source.get(CONF_MAX_GAP, DEFAULT_MAX_GAP_MINUTES)),
         CONF_MAX_SPEED: float(source.get(CONF_MAX_SPEED, DEFAULT_MAX_SPEED_KMH)),
+        CONF_MAP_PROVIDER: source.get(CONF_MAP_PROVIDER, MAP_PROVIDER_NONE),
     }
+
+
+def normalize_options(current: dict[str, Any], submitted: dict[str, Any]) -> dict[str, Any]:
+    """Merge options while keeping an existing secret out of the form value."""
+    result = {**defaults(current), **submitted}
+    result[CONF_MAP_PROVIDER] = submitted.get(CONF_MAP_PROVIDER, MAP_PROVIDER_NONE)
+    new_key = str(submitted.get(CONF_CARTO_API_KEY, "") or "").strip()
+    if submitted.get(CONF_REMOVE_CARTO_API_KEY):
+        result.pop(CONF_CARTO_API_KEY, None)
+    elif new_key:
+        result[CONF_CARTO_API_KEY] = new_key
+    elif current.get(CONF_CARTO_API_KEY):
+        result[CONF_CARTO_API_KEY] = current[CONF_CARTO_API_KEY]
+    result.pop(CONF_REMOVE_CARTO_API_KEY, None)
+    return result
 
 
 def validate_submission(hass: Any, data: dict[str, Any]) -> dict[str, str]:
@@ -90,6 +108,13 @@ def _schema(value: dict[str, Any] | None = None) -> dict[str, Any]:
         vol.Required(CONF_MAX_SPEED, default=current[CONF_MAX_SPEED]): selector.NumberSelector(
             selector.NumberSelectorConfig(min=20, max=400, step=1, mode=selector.NumberSelectorMode.BOX)
         ),
+        vol.Required(CONF_MAP_PROVIDER, default=current[CONF_MAP_PROVIDER]): selector.SelectSelector(
+            selector.SelectSelectorConfig(options=[MAP_PROVIDER_NONE, MAP_PROVIDER_CARTO], mode=selector.SelectSelectorMode.DROPDOWN)
+        ),
+        vol.Optional(CONF_CARTO_API_KEY, default=""): selector.TextSelector(
+            selector.TextSelectorConfig(type=selector.TextSelectorType.PASSWORD)
+        ),
+        vol.Optional(CONF_REMOVE_CARTO_API_KEY, default=False): bool,
     }
 
 
@@ -108,7 +133,7 @@ if config_entries is not None:
                 if not errors:
                     await self.async_set_unique_id(user_input[CONF_TRACKER_ENTITY])
                     self._abort_if_unique_id_configured()
-                    return self.async_create_entry(title=user_input[CONF_VEHICLE_NAME], data=user_input)
+                    return self.async_create_entry(title=user_input[CONF_VEHICLE_NAME], data=normalize_options({}, user_input))
             return self.async_show_form(step_id="user", data_schema=vol.Schema(_schema()), errors=errors)
 
         @staticmethod
@@ -124,7 +149,8 @@ if config_entries is not None:
             if user_input is not None:
                 errors = validate_submission(self.hass, user_input)
                 if not errors:
-                    return self.async_create_entry(title="", data=defaults(user_input))
+                    current = {**self.config_entry.data, **self.config_entry.options}
+                    return self.async_create_entry(title="", data=normalize_options(current, user_input))
             return self.async_show_form(step_id="init", data_schema=vol.Schema(_schema({**self.config_entry.data, **self.config_entry.options})), errors=errors)
 
 else:
