@@ -79,7 +79,7 @@ remain outside the repository and CI artifacts.
 
 ## Next development phase
 
-- `v0.2.0-beta.1` provides the first map/route detail view with explicit GPS
+- `v0.2.0-beta.2` provides the map/route detail view with explicit GPS
   point-to-drive membership and neutral handling of ambiguous historical data.
 - Continue map hardening with richer drive filtering, point pagination and
   mobile acceptance before a stable map release.

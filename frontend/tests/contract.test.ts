@@ -4,6 +4,7 @@ import { describe, expect, it } from "vitest";
 import { categoryLabel, EXPENSE_CATEGORIES, EXPENSE_CATEGORY_IDS, formatDate, formatMoneyMinor, formatTripPeriod, isExpenseCategory, messages, parseAmountMinor, statusLabel } from "../src/i18n";
 import { autoSelectVehicle, sameCardConfig } from "../src/card-editor";
 import { listVehicles } from "../src/api";
+import { sortDrivesChronologically } from "../src/map-utils";
 
 const root = resolve(import.meta.dirname, "..");
 const manifest = JSON.parse(readFileSync(resolve(root, "../custom_components/camper_travel_journal/manifest.json"), "utf8"));
@@ -12,7 +13,7 @@ const bundle = resolve(root, "../custom_components/camper_travel_journal/fronten
 
 describe("frontend release contract", () => {
   it("keeps backend, npm metadata and beta bundle aligned", () => {
-    expect(manifest.version).toBe("0.2.0-beta.1");
+    expect(manifest.version).toBe("0.2.0-beta.2");
     expect(pkg.version).toBe(manifest.version);
     expect(existsSync(bundle)).toBe(true);
   });
@@ -119,7 +120,18 @@ describe("frontend release contract", () => {
     expect(map).toContain("L.polyline");
     expect(map).toContain("disconnectedCallback");
     expect(map).toContain("OpenStreetMap contributors");
+    expect(map).toContain("tile_attribution");
+    expect(map).toContain("tileerror");
+    expect(map).toContain("mapTilesUnavailable");
+    expect(map).not.toContain("tile.openstreetmap.org/{z}/{x}/{y}.png");
     expect(map).not.toContain("routing");
+  });
+  it("sorts map drive segments in ascending start-time order", () => {
+    expect(sortDrivesChronologically([
+      { id: "late", started_at: "2026-10-13T12:00:00Z" },
+      { id: "early", started_at: "2026-10-13T08:00:00Z" },
+      { id: "unknown", started_at: null },
+    ]).map((drive) => drive.id)).toEqual(["early", "late", "unknown"]);
   });
   it("localizes visible status and category labels for German and English", () => {
     const german = { locale: { language: "de-DE" } } as any;

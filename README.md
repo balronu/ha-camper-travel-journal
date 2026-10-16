@@ -83,19 +83,26 @@ type: custom:camper-travel-journal-manager-card
 vehicle_id: <config-entry-id>
 ```
 
-Die erste `v0.2.0-beta.1`-Karte ergänzt eine read-only GPS-Ansicht. Sie zeigt
+Die `v0.2.0-beta.2`-Karte ergänzt eine read-only GPS-Ansicht. Sie zeigt
 gespeicherte GPS-Linien und Fahrtsegmente, berechnet keine Straßenroute und
 verwendet keine Geocoding- oder Routing-Dienste:
 
 ```yaml
 type: custom:camper-travel-journal-map-card
 vehicle_id: <config-entry-id>
+tile_url: https://your-authorized-tile-provider.example/{z}/{x}/{y}.png
+tile_attribution: © Kartenanbieter · © OpenStreetMap-Mitwirkende
 ```
 
-Die Karte benötigt sichtbare Karten-Attribution. Standardmäßig werden nur die
-für die aktuelle Ansicht benötigten OpenStreetMap-Kacheln geladen; GPS-
-Koordinaten werden nicht an den Kachel-Anbieter übertragen. Historische Punkte
-ohne eindeutige Fahrtmitgliedschaft werden nicht als exakt zugeordnet ausgegeben.
+`tile_url` und `tile_attribution` müssen zu einem für die eigene Nutzung
+zugelassenen Tile-Provider gehören. Ohne `tile_url` wird keine externe
+Hintergrundkarte geladen; die GPS-Route bleibt sichtbar. Fehlende oder
+gesperrte Kacheln werden als verständlicher Hinweis angezeigt und nicht durch
+großflächige Fehlerkacheln ersetzt. Für `tile.openstreetmap.org` gelten die
+offiziellen Nutzungsbedingungen einschließlich korrekter Attribution,
+Referer/User-Agent und Caching; diese Integration umgeht keine Sperren.
+Historische Punkte ohne eindeutige Fahrtmitgliedschaft werden nicht als exakt
+zugeordnet ausgegeben.
 
 Die Summary Card bevorzugt aktive Reisen. Bei mehreren aktiven Reisen wird
 deterministisch nach dem neuesten `started_at` und bei Gleichstand nach der ID
@@ -146,7 +153,7 @@ privaten Koordinaten, Tokens oder unredigierten Logs.
 
 - Der Funktionsumfang ist auf Reisetagebuch, Fahrten, Kosten und den GPX-Import
   konzentriert.
-- Die Kartenansicht befindet sich in `v0.2.0-beta.1` in der ersten Beta-Phase;
+- Die Kartenansicht befindet sich in `v0.2.0-beta.2` weiterhin in der Beta-Phase;
   Statistiken und Exporte sind noch nicht implementiert.
 - Zwischenstopps sind im Backend vorhanden, aber noch nicht vollständig über
   Lovelace bedienbar.
