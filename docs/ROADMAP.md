@@ -79,8 +79,10 @@ remain outside the repository and CI artifacts.
 
 ## Next development phase
 
-- Provide a map/route detail view with coordinates or neutral labels where no
-  place name exists.
+- `v0.2.0-beta.1` provides the first map/route detail view with explicit GPS
+  point-to-drive membership and neutral handling of ambiguous historical data.
+- Continue map hardening with richer drive filtering, point pagination and
+  mobile acceptance before a stable map release.
 - Add richer drive filtering and date-range selection without mixing vehicles.
 - Add complete stop creation, editing and deletion to Lovelace.
 - Add acceptance tests for reload, empty data, failures and mobile layout.

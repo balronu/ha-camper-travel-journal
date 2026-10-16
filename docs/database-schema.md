@@ -11,6 +11,7 @@ The schema is versioned via `schema_meta`. All timestamps are ISO-8601 UTC.
 | `vehicles` | Multiple tracked vehicles | `tracker_entity_id` unique |
 | `gps_points` | Validated raw positions | vehicle + time index, de-duplication key |
 | `drives` | Detected drive intervals and distance | belongs to vehicle |
+| `drive_gps_points` | Ordered point membership per drive | additive v7 link; exact or reconstructed source |
 | `stays` | Intervals without repeated identical points | belongs to vehicle |
 | `trips` | User-managed journeys, independent of GPS | belongs to vehicle |
 | `trip_drives` | Reversible assignment | unique drive assignment, FK cascade only from trip |
@@ -53,6 +54,18 @@ backed-up integration database; no destructive down-migration is attempted.
 All changes run through the serialized executor worker. A database newer than
 the supported version fails closed. No Recorder tables or migrations are
 touched, and retention remains non-destructive in this release.
+
+## Schema version 7 – route membership
+
+Migration 7 adds `drive_gps_points` without rewriting or deleting existing
+`gps_points`, `drives`, trips or expenses. New GPX imports store the parser's
+exact point keys with `association_source='gpx_exact'`. Newly detected live
+drives associate their existing interval points as `live_detector`.
+
+Where old intervals do not overlap another drive, migration 7 may add
+`association_source='interval_reconstructed'`. Overlapping intervals are left
+unassigned; the route API does not present them as exact. The migration is
+transactional and idempotent.
 
 ## Schema versioning and recovery
 

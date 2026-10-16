@@ -18,7 +18,7 @@ def test_beta_contains_the_versioned_lovelace_bundle():
     for command in (
         "list", "create_trip", "update_trip", "delete_trip", "transition_trip",
         "link_drives", "unlink_drive", "create_manual_drive", "update_manual_drive", "delete_manual_drive", "create_stop", "update_stop", "delete_stop",
-        "create_expense", "update_expense", "delete_expense", "analyze_gpx", "import_gpx",
+        "create_expense", "update_expense", "delete_expense", "analyze_gpx", "import_gpx", "route",
     ):
         assert f'camper_travel_journal/{command}' in api
 
@@ -30,7 +30,7 @@ def test_frontend_contract_is_linked_from_both_primary_readmes():
 
 
 def test_release_version_is_aligned_across_project_and_readmes():
-    assert 'version = "0.1.0"' in (ROOT / "pyproject.toml").read_text(encoding="utf-8")
+    assert 'version = "0.2.0-beta.1"' in (ROOT / "pyproject.toml").read_text(encoding="utf-8")
     for name in ("README.md", "README.de.md", "README.en.md"):
         text = (ROOT / name).read_text(encoding="utf-8")
         assert "v0.1.0" in text

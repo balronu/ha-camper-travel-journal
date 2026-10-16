@@ -1,6 +1,6 @@
 """Home Assistant WebSocket API tests with an isolated in-memory runtime."""
 
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 import asyncio
 import base64
 import unittest
@@ -31,6 +31,8 @@ class FakeWorker:
             return []
         if method == "expense_summary":
             return {"total_minor": 0}
+        if method == "route_segments":
+            return [{"drive_id": "d1", "started_at": "2026-10-01T08:00:00+00:00", "ended_at": "2026-10-01T09:00:00+00:00", "source": "gpx", "association_sources": ["gpx_exact"], "points": [{"recorded_at": "2026-10-01T08:00:00+00:00", "latitude": 49.0, "longitude": 7.0, "accuracy_m": 5, "association_source": "gpx_exact"}, {"recorded_at": "2026-10-01T08:05:00+00:00", "latitude": 49.01, "longitude": 7.0, "accuracy_m": 5, "association_source": "gpx_exact"}]}]
         if method == "create_trip":
             return "t-new"
         if method == "create_manual_drive":
@@ -96,6 +98,30 @@ async def test_create_trip_command_validates_and_returns_id():
     await api.ws_create_trip.__wrapped__(hass, connection, {"id": 1, "vehicle_id": "v1", "title": "Alpen", "description": "", "destination": "Berge", "started_at": "2026-10-01T12:00:00Z"})
     assert connection.results == [(1, {"trip_id": "t-new"})]
     assert connection.errors == []
+
+
+@pytest.mark.asyncio
+async def test_route_command_is_read_only_and_returns_bounds():
+    hass = FakeHass()
+    connection = FakeConnection()
+    await api.ws_route.__wrapped__(hass, connection, {"id": 40, "vehicle_id": "v1", "max_points": 10, "simplify_tolerance_m": 0})
+    assert connection.errors == []
+    result = connection.results[0][1]
+    assert result["total_points"] == 2
+    assert result["returned_points"] == 2
+    assert result["bounds"] == {"south": 49.0, "west": 7.0, "north": 49.01, "east": 7.0}
+    assert result["segments"][0]["association_sources"] == ["gpx_exact"]
+    assert [method for method, _, _ in hass.worker.calls if method == "route_segments"] == ["route_segments"]
+
+
+def test_route_response_caps_large_synthetic_fixture_without_mutating_points():
+    start = datetime(2026, 1, 1, tzinfo=timezone.utc)
+    points = [{"recorded_at": (start + timedelta(seconds=index)).isoformat(), "latitude": 49.0 + index * 0.000001, "longitude": 7.0, "accuracy_m": 5, "association_source": "gpx_exact"} for index in range(100_000)]
+    result = api._route_response([{"drive_id": "large", "started_at": points[0]["recorded_at"], "ended_at": points[-1]["recorded_at"], "source": "gpx", "association_sources": ["gpx_exact"], "points": points}], 5000, 0)
+    assert result["total_points"] == 100_000
+    assert result["returned_points"] == 5000
+    assert result["truncated"] is True
+    assert len(points) == 100_000
 
 
 @pytest.mark.asyncio

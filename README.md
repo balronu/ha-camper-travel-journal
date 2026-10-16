@@ -83,6 +83,20 @@ type: custom:camper-travel-journal-manager-card
 vehicle_id: <config-entry-id>
 ```
 
+Die erste `v0.2.0-beta.1`-Karte ergänzt eine read-only GPS-Ansicht. Sie zeigt
+gespeicherte GPS-Linien und Fahrtsegmente, berechnet keine Straßenroute und
+verwendet keine Geocoding- oder Routing-Dienste:
+
+```yaml
+type: custom:camper-travel-journal-map-card
+vehicle_id: <config-entry-id>
+```
+
+Die Karte benötigt sichtbare Karten-Attribution. Standardmäßig werden nur die
+für die aktuelle Ansicht benötigten OpenStreetMap-Kacheln geladen; GPS-
+Koordinaten werden nicht an den Kachel-Anbieter übertragen. Historische Punkte
+ohne eindeutige Fahrtmitgliedschaft werden nicht als exakt zugeordnet ausgegeben.
+
 Die Summary Card bevorzugt aktive Reisen. Bei mehreren aktiven Reisen wird
 deterministisch nach dem neuesten `started_at` und bei Gleichstand nach der ID
 entschieden. Ohne aktive Reise gilt dieselbe Regel für alle Reisen. Die Auswahl
@@ -132,7 +146,8 @@ privaten Koordinaten, Tokens oder unredigierten Logs.
 
 - Der Funktionsumfang ist auf Reisetagebuch, Fahrten, Kosten und den GPX-Import
   konzentriert.
-- Eine Kartenansicht, Statistiken und Exporte sind noch nicht implementiert.
+- Die Kartenansicht befindet sich in `v0.2.0-beta.1` in der ersten Beta-Phase;
+  Statistiken und Exporte sind noch nicht implementiert.
 - Zwischenstopps sind im Backend vorhanden, aber noch nicht vollständig über
   Lovelace bedienbar.
 - Die Retention-Funktion berechnet Kandidaten, löscht in dieser Version aber

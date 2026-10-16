@@ -79,6 +79,19 @@ type: custom:camper-travel-journal-manager-card
 vehicle_id: <config-entry-id>
 ```
 
+The first `v0.2.0-beta.1` card adds a read-only GPS map. It displays stored GPS
+lines and drive segments, does not calculate road routes, and uses no geocoding
+or routing service:
+
+```yaml
+type: custom:camper-travel-journal-map-card
+vehicle_id: <config-entry-id>
+```
+
+The card displays map attribution and requests only tiles for the visible map.
+GPS coordinates are not sent to the tile provider. Historical points without an
+unambiguous drive membership are not presented as exact assignments.
+
 The Summary Card prefers active trips. When several trips are active, it makes
 a deterministic choice using the latest `started_at` and, for ties, the trip
 ID. With no active trip, the same rule applies to all trips. The selection
@@ -124,7 +137,8 @@ issues or tests.
 ## Known limitations
 
 - The scope is focused on the travel journal, drives, expenses and GPX import.
-- Maps, statistics and exports are not implemented yet.
+- The map view is an initial beta feature in `v0.2.0-beta.1`; statistics and
+  exports are not implemented yet.
 - Stops exist in the backend but are not fully manageable from Lovelace yet.
 - Retention calculates candidates but does not automatically delete in this
   version.

@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from datetime import date, datetime, timezone
 import base64
+from math import cos, hypot, radians
 from typing import Any
 
 try:
@@ -19,6 +20,7 @@ except ImportError:  # pragma: no cover - offline domain tests
 from .models import Expense, Stop
 from .gpx_import import MAX_FILE_BYTES, analyze_gpx
 from .travel import validate_amount, validate_expense_category, validate_expense_currency, validate_transition
+from .const import DEFAULT_MAX_GPS_GAP
 
 
 def _now() -> datetime:
@@ -71,6 +73,71 @@ def _send_error(connection, msg: dict, error: Exception) -> None:
     connection.send_error(msg["id"], getattr(error, "args", ["request_failed"])[0], str(error))
 
 
+def _simplify_points(points: list[dict], tolerance_m: float) -> list[dict]:
+    """Simplify only the response copy; persisted GPS points are untouched."""
+    if tolerance_m <= 0 or len(points) < 3:
+        return points
+    lat_scale = 111_320.0
+    lon_scale = 111_320.0 * max(0.1, abs(cos(radians(points[0]["latitude"]))))
+    xy = [(point["longitude"] * lon_scale, point["latitude"] * lat_scale) for point in points]
+
+    def distance(index: int, start: int, end: int) -> float:
+        x, y = xy[index]
+        x1, y1 = xy[start]
+        x2, y2 = xy[end]
+        if x1 == x2 and y1 == y2:
+            return hypot(x - x1, y - y1)
+        return abs((y2 - y1) * x - (x2 - x1) * y + x2 * y1 - y2 * x1) / hypot(y2 - y1, x2 - x1)
+
+    keep = {0, len(points) - 1}
+
+    def recurse(start: int, end: int) -> None:
+        if end <= start + 1:
+            return
+        farthest = max(range(start + 1, end), key=lambda index: distance(index, start, end))
+        if distance(farthest, start, end) > tolerance_m:
+            keep.add(farthest)
+            recurse(start, farthest)
+            recurse(farthest, end)
+
+    recurse(0, len(points) - 1)
+    return [point for index, point in enumerate(points) if index in keep]
+
+
+def _route_response(segments: list[dict], max_points: int, tolerance_m: float) -> dict:
+    total_points = sum(len(segment["points"]) for segment in segments)
+    returned = 0
+    remaining = max_points
+    bounds: list[float] = []
+    output = []
+    for segment in segments:
+        points = [dict(point) for point in segment["points"]]
+        simplified = _simplify_points(points, tolerance_m)
+        simplified_by_tolerance = len(simplified) < len(points)
+        truncated = False
+        if len(simplified) > remaining:
+            simplified = simplified[:remaining]
+            truncated = True
+        remaining = max(0, remaining - len(simplified))
+        returned += len(simplified)
+        for point in simplified:
+            bounds.extend((point["latitude"], point["longitude"]))
+        gaps = []
+        for left, right in zip(points, points[1:]):
+            elapsed = datetime.fromisoformat(right["recorded_at"]) - datetime.fromisoformat(left["recorded_at"])
+            if elapsed > DEFAULT_MAX_GPS_GAP:
+                gaps.append({"from": left["recorded_at"], "to": right["recorded_at"], "seconds": int(elapsed.total_seconds())})
+        output.append({**segment, "points": simplified, "original_point_count": len(points), "gaps": gaps, "simplified": simplified_by_tolerance, "truncated": truncated})
+    return {
+        "segments": output,
+        "total_points": total_points,
+        "returned_points": returned,
+        "truncated": any(segment["truncated"] for segment in output),
+        "bounds": {"south": min(bounds[::2]), "west": min(bounds[1::2]), "north": max(bounds[::2]), "east": max(bounds[1::2])} if bounds else None,
+        "simplify_tolerance_m": tolerance_m,
+    }
+
+
 if websocket_api is not None:
     def _base(command: str) -> dict:
         """Build a command schema with an exact websocket command name."""
@@ -107,6 +174,24 @@ if websocket_api is not None:
                 result["expense_summary"] = await _call(hass, msg, "expense_summary", trip_id)
             connection.send_result(msg["id"], result)
         except Exception as err:  # API boundary must not expose tracebacks
+            _send_error(connection, msg, err)
+
+    @websocket_api.websocket_command({**_base("camper_travel_journal/route"), vol.Optional("trip_id"): str, vol.Optional("drive_ids"): [str], vol.Optional("max_points", default=5000): vol.Coerce(int), vol.Optional("simplify_tolerance_m", default=0.0): vol.Coerce(float)})
+    @websocket_api.async_response
+    async def ws_route(hass: HomeAssistant, connection, msg: dict) -> None:
+        """Return authenticated, read-only route geometry for one vehicle."""
+        try:
+            max_points = msg.get("max_points", 5000)
+            tolerance_m = msg.get("simplify_tolerance_m", 0.0)
+            if not 1 <= max_points <= 100_000:
+                raise ValueError("route_max_points_invalid")
+            if not 0 <= tolerance_m <= 10_000:
+                raise ValueError("route_simplify_tolerance_invalid")
+            segments = await _call(hass, msg, "route_segments", msg["vehicle_id"], msg.get("trip_id"), msg.get("drive_ids"))
+            result = _route_response(segments, max_points, tolerance_m)
+            result.update({"vehicle_id": msg["vehicle_id"], "trip_id": msg.get("trip_id"), "association_semantics": "explicit_only"})
+            connection.send_result(msg["id"], result)
+        except Exception as err:
             _send_error(connection, msg, err)
 
     @websocket_api.websocket_command(_base("camper_travel_journal/diagnostics"))
@@ -298,7 +383,7 @@ if websocket_api is not None:
             connection.send_result(msg["id"], result)
         except Exception as err: _send_error(connection, msg, err)
 
-    COMMANDS = (ws_list_vehicles, ws_list, ws_diagnostics, ws_create_trip, ws_update_trip, ws_delete_trip, ws_transition_trip, ws_link_drives, ws_unlink_drive, ws_create_manual_drive, ws_update_manual_drive, ws_delete_manual_drive, ws_create_stop, ws_update_stop, ws_delete_stop, ws_create_expense, ws_update_expense, ws_delete_expense, ws_analyze_gpx, ws_import_gpx)
+    COMMANDS = (ws_list_vehicles, ws_list, ws_route, ws_diagnostics, ws_create_trip, ws_update_trip, ws_delete_trip, ws_transition_trip, ws_link_drives, ws_unlink_drive, ws_create_manual_drive, ws_update_manual_drive, ws_delete_manual_drive, ws_create_stop, ws_update_stop, ws_delete_stop, ws_create_expense, ws_update_expense, ws_delete_expense, ws_analyze_gpx, ws_import_gpx)
 else:
     COMMANDS = ()
 
