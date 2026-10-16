@@ -26,6 +26,42 @@ class RoutePersistenceTests(unittest.TestCase):
             self.assertEqual(segments[0]["association_sources"], ["gpx_exact"])
             store.close()
 
+    def test_live_interval_association_and_route_filters(self):
+        with TemporaryDirectory() as directory:
+            store = SQLiteStore(f"{directory}/journal.db")
+            store.open()
+            now = datetime(2026, 1, 1, tzinfo=timezone.utc)
+            store.insert_vehicle("v1", "Camper", "device_tracker.v1", now)
+            for offset in (0, 30, 60):
+                store.connection.execute("INSERT INTO gps_points(vehicle_id,recorded_at,latitude,longitude) VALUES(?,?,?,?)", ("v1", (now + timedelta(seconds=offset)).isoformat(), 49.0, 7.0 + offset / 10000))
+            store.connection.execute("INSERT INTO drives(id,vehicle_id,started_at,ended_at,distance_m,end_reason,created_at) VALUES(?,?,?,?,?,?,?)", ("d1", "v1", now.isoformat(), (now + timedelta(seconds=60)).isoformat(), 100, "stop", now.isoformat()))
+            store.connection.commit()
+            self.assertEqual(store.associate_drive_points("d1", "v1", now, now + timedelta(seconds=60), "live_detector"), 3)
+            self.assertEqual(len(store.route_segments("v1", drive_ids=["d1"])[0]["points"]), 3)
+            self.assertEqual(store.route_segments("v1", drive_ids=[]), [])
+            with self.assertRaisesRegex(ValueError, "association_source_invalid"):
+                store.associate_drive_points("d1", "v1", now, now, "unknown")
+            store.close()
+
+    def test_schema_v7_reconstructs_non_overlapping_legacy_drive_once(self):
+        with TemporaryDirectory() as directory:
+            path = f"{directory}/journal.db"
+            store = SQLiteStore(path)
+            store.open()
+            now = datetime(2026, 1, 1, tzinfo=timezone.utc)
+            store.insert_vehicle("v1", "Camper", "device_tracker.v1", now)
+            store.connection.execute("INSERT INTO gps_points(vehicle_id,recorded_at,latitude,longitude) VALUES(?,?,?,?)", ("v1", now.isoformat(), 49.0, 7.0))
+            store.connection.execute("INSERT INTO drives(id,vehicle_id,started_at,ended_at,distance_m,end_reason,created_at) VALUES(?,?,?,?,?,?,?)", ("legacy", "v1", now.isoformat(), (now + timedelta(seconds=30)).isoformat(), 100, "stop", now.isoformat()))
+            store.connection.execute("DROP TABLE drive_gps_points")
+            store.connection.execute("UPDATE schema_meta SET value='6' WHERE key='version'")
+            store.connection.commit()
+            store.close()
+            store = SQLiteStore(path)
+            store.open()
+            row = store.connection.execute("SELECT association_source FROM drive_gps_points WHERE drive_id='legacy'").fetchone()
+            self.assertEqual(row[0], "interval_reconstructed")
+            store.close()
+
     def test_reconstruction_marks_overlapping_intervals_ambiguous(self):
         with TemporaryDirectory() as directory:
             store = SQLiteStore(f"{directory}/journal.db")

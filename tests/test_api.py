@@ -124,6 +124,17 @@ def test_route_response_caps_large_synthetic_fixture_without_mutating_points():
     assert len(points) == 100_000
 
 
+def test_route_response_simplifies_and_marks_gaps_without_truncation():
+    start = datetime(2026, 1, 1, tzinfo=timezone.utc)
+    points = []
+    for index, offset in enumerate((0, 60, 120, 900)):
+        points.append({"recorded_at": (start + timedelta(seconds=offset)).isoformat(), "latitude": 49.0 + (0.01 if index == 1 else 0), "longitude": 7.0 + index * 0.001, "accuracy_m": 5, "association_source": "interval_reconstructed"})
+    result = api._route_response([{"drive_id": "d", "started_at": points[0]["recorded_at"], "ended_at": points[-1]["recorded_at"], "source": "gps", "association_sources": ["interval_reconstructed"], "points": points}], 100, 100)
+    assert result["truncated"] is False
+    assert result["segments"][0]["simplified"] is True
+    assert result["segments"][0]["gaps"][0]["seconds"] == 780
+
+
 @pytest.mark.asyncio
 async def test_gpx_preview_is_read_only_and_import_requires_matching_hash():
     data = b'<gpx version="1.1" xmlns="http://www.topografix.com/GPX/1/1"><trk><trkseg><trkpt lat="49" lon="7"><time>2026-10-13T08:00:00Z</time></trkpt></trkseg></trk></gpx>'
