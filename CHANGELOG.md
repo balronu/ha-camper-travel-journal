@@ -2,6 +2,15 @@
 
 🇩🇪 Deutsch | 🇬🇧 [English](README.en.md)
 
+## 0.2.0 – Stable
+
+- Stable release of the four-card Lovelace experience: Summary, Manager, Map
+  and optional Diagnostics.
+- CARTO Basemaps options, authenticated in-memory PDF travel reports, local
+  Home Assistant timezone formatting and localized expense categories.
+- Documentation, release metadata and frontend cache version updated for the
+  stable release. Historical beta entries remain below.
+
 ## 0.2.0-beta.6 – PDF-Reiseberichte
 
 - Authentifizierter PDF-Export der aktuell gespeicherten Reise mit Fahrten, Kosten, Ausgaben, Zwischenstopps und Notizen.

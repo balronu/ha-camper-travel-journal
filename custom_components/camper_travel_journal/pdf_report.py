@@ -6,6 +6,7 @@ from datetime import datetime
 from io import BytesIO
 import re
 from typing import Any
+from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 from xml.sax.saxutils import escape
 
 from reportlab.lib import colors
@@ -35,8 +36,27 @@ def _dt(value: str | None) -> datetime | None:
         return None
 
 
-def _date(value: str | None, language: str) -> str:
+def _local_zone(name: str | None) -> ZoneInfo:
+    try:
+        return ZoneInfo(name or "UTC")
+    except ZoneInfoNotFoundError:
+        return ZoneInfo("UTC")
+
+
+def _localized_datetime(value: str | None, time_zone: str | None) -> datetime | None:
     parsed = _dt(value)
+    if parsed is None:
+        return None
+    if parsed.tzinfo is None:
+        return parsed
+    return parsed.astimezone(_local_zone(time_zone))
+
+
+def _date(value: str | None, language: str, time_zone: str = "UTC") -> str:
+    if value and re.fullmatch(r"\d{4}-\d{2}-\d{2}", value):
+        parsed = _dt(value)
+    else:
+        parsed = _localized_datetime(value, time_zone)
     if parsed is None and value:
         return value[:10]
     if parsed is None:
@@ -46,18 +66,18 @@ def _date(value: str | None, language: str) -> str:
     return parsed.strftime("%m/%d/%Y")
 
 
-def _time(value: str | None, language: str) -> str:
-    parsed = _dt(value)
+def _time(value: str | None, language: str, time_zone: str = "UTC") -> str:
+    parsed = _localized_datetime(value, time_zone)
     if parsed is None:
         return ""
     return parsed.strftime("%H:%M" if language == "de" else "%I:%M %p")
 
 
-def _period(trip: dict[str, Any], language: str) -> str:
+def _period(trip: dict[str, Any], language: str, time_zone: str = "UTC") -> str:
     start = trip.get("start_date") or trip.get("started_at")
     end = trip.get("end_date") or trip.get("ended_at")
-    first = _date(start, language)
-    second = _date(end, language)
+    first = _date(start, language, time_zone)
+    second = _date(end, language, time_zone)
     if first and second and first != second:
         return f"{first} – {second}"
     return first or second
@@ -90,6 +110,15 @@ def _text(value: Any) -> str:
 
 def _markup(value: Any) -> str:
     return escape(_text(value))
+
+
+def _category_label(category: Any, language: str) -> str:
+    labels = {
+        "de": {"camping": "Camping", "fuel": "Kraftstoff", "toll": "Maut", "parking": "Parkgebühren", "food": "Verpflegung", "activities": "Aktivitäten", "ferry": "Fähre", "other": "Sonstiges"},
+        "en": {"camping": "Camping", "fuel": "Fuel", "toll": "Toll", "parking": "Parking", "food": "Food", "activities": "Activities", "ferry": "Ferry", "other": "Other"},
+    }
+    value = _text(category)
+    return labels[language].get(value, value)
 
 
 def _safe_filename(title: str, period: str) -> str:
@@ -141,7 +170,7 @@ def _table(rows: list[list[Flowable | str]], widths: list[float], *, header: boo
     return table
 
 
-def render_trip_report(report: dict[str, Any], *, language: str = "de") -> tuple[bytes, str]:
+def render_trip_report(report: dict[str, Any], *, language: str = "de", time_zone: str = "UTC") -> tuple[bytes, str]:
     """Render one validated trip snapshot without writing it to disk."""
     language = "en" if language.lower().startswith("en") else "de"
     labels = {
@@ -155,8 +184,8 @@ def render_trip_report(report: dict[str, Any], *, language: str = "de") -> tuple
     small = ParagraphStyle("ReportSmall", parent=body, fontSize=8, leading=10)
     right = ParagraphStyle("ReportRight", parent=body, alignment=TA_RIGHT)
     trip = report["trip"]
-    period = _period(trip, language)
-    now = datetime.now().astimezone().strftime("%d.%m.%Y %H:%M" if language == "de" else "%m/%d/%Y %I:%M %p")
+    period = _period(trip, language, time_zone)
+    now = datetime.now(_local_zone(time_zone)).strftime("%d.%m.%Y %H:%M" if language == "de" else "%m/%d/%Y %I:%M %p")
     stream = BytesIO()
     doc = _ReportDocTemplate(stream, created=now, language=language)
     story: list[Flowable] = [Paragraph(labels["report"], title), Paragraph(f"<b>{_markup(trip.get('title'))}</b>", body)]
@@ -177,28 +206,28 @@ def render_trip_report(report: dict[str, Any], *, language: str = "de") -> tuple
         rows = [[labels["date"], labels["time"], labels["distance_short"], labels["duration"], labels["route"]]]
         for drive in sorted(drives, key=lambda item: (item.get("started_at", ""), item.get("id", ""))):
             route = " → ".join(part for part in (_text(drive.get("start_label")), _text(drive.get("end_label"))) if part) or "–"
-            rows.append([_date(drive.get("started_at"), language), _time(drive.get("started_at"), language), _km(drive.get("distance_m"), language), _duration(drive.get("duration_seconds"), language), Paragraph(_markup(route), small)])
+            rows.append([_date(drive.get("started_at"), language, time_zone), _time(drive.get("started_at"), language, time_zone), _km(drive.get("distance_m"), language), _duration(drive.get("duration_seconds"), language), Paragraph(_markup(route), small)])
         story.append(_table(rows, [25 * mm, 22 * mm, 25 * mm, 23 * mm, doc.width - 95 * mm]))
     by_category = summary.get("by_category") or {}
     if by_category:
         story.append(Paragraph(labels["cost_summary"], heading))
         rows = [[labels["category"], labels["amount"]]]
         for category, amount in sorted(by_category.items()):
-            rows.append([Paragraph(_markup(category), body), Paragraph(_money(amount, currency, language), right)])
+            rows.append([Paragraph(_markup(_category_label(category, language)), body), Paragraph(_money(amount, currency, language), right)])
         story.append(_table(rows, [doc.width * 0.65, doc.width * 0.35]))
     expenses = report.get("expenses", [])
     if expenses:
         story.append(Paragraph(labels["expenses"], heading))
         rows = [[labels["date"], labels["category"], labels["amount"], labels["description"]]]
         for expense in sorted(expenses, key=lambda item: (item.get("occurred_at", ""), item.get("id", ""))):
-            rows.append([_date(expense.get("occurred_at"), language), _markup(expense.get("category")), _money(expense.get("amount_minor"), expense.get("currency"), language), Paragraph(_markup(expense.get("note")) or "–", small)])
+            rows.append([_date(expense.get("occurred_at"), language, time_zone), _markup(_category_label(expense.get("category"), language)), _money(expense.get("amount_minor"), expense.get("currency"), language), Paragraph(_markup(expense.get("note")) or "–", small)])
         story.append(_table(rows, [25 * mm, 32 * mm, 29 * mm, doc.width - 86 * mm]))
     stops = report.get("stops", [])
     if stops:
         story.append(Paragraph(labels["stops"], heading))
         rows = [[labels["date"], labels["name"], labels["note"]]]
         for stop in sorted(stops, key=lambda item: (item.get("occurred_at", ""), item.get("id", ""))):
-            rows.append([_date(stop.get("occurred_at"), language), Paragraph(_markup(stop.get("name")) or "–", body), Paragraph(_markup(stop.get("description")) or "–", small)])
+            rows.append([_date(stop.get("occurred_at"), language, time_zone), Paragraph(_markup(stop.get("name")) or "–", body), Paragraph(_markup(stop.get("description")) or "–", small)])
         story.append(_table(rows, [25 * mm, 40 * mm, doc.width - 65 * mm]))
     doc.build(story)
     return stream.getvalue(), _safe_filename(_text(trip.get("title")), period)

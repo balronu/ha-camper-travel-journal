@@ -9,7 +9,7 @@ lokal in einer eigenen SQLite-Datenbank.
 
 [🇬🇧 English](README.en.md) · [🇩🇪 Deutsche Hauptdokumentation](README.md)
 
-**Aktuelle stabile Version: v0.1.0**
+**Aktuelle stabile Version: v0.2.0**
 
 Technische Hinweise zur versionierten Frontend-Auslieferung stehen in der
 [Frontend-Cache-Dokumentation](docs/frontend-cache.md).
