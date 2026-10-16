@@ -6,7 +6,7 @@
 
 <h1 align="center">Camper Travel Journal</h1>
 <p align="center">Your digital camper travel journal for Home Assistant</p>
-<p align="center"><strong>Current stable version: v0.1.0</strong></p>
+<p align="center"><strong>Current stable version: v0.2.0</strong></p>
 
 <p align="center">
   <a href="https://github.com/balronu/ha-camper-travel-journal/releases/latest"><img src="https://img.shields.io/github/v/release/balronu/ha-camper-travel-journal?label=Release" alt="Release"></a>
@@ -38,6 +38,9 @@ mobile browsers and Home Assistant setups is important.
 - Summary Card with active-trip priority and a compact selector for every trip
   of the configured vehicle. Metrics and actions always use the same trip.
 - Manager Card for trips, drive assignment, manual drives and expenses.
+- PDF travel reports with drives, expenses, stops and notes; reports are
+  authenticated and generated in memory only.
+- Map Card with CARTO Basemaps, GPS lines, drive sections and segment colors.
 - Safe atomic PAJ GPX 1.1 import with preview, duplicate protection, period
   warnings and explicit target-trip selection.
 - Expense management with stable categories, integer cents and currency checks.
@@ -48,7 +51,7 @@ mobile browsers and Home Assistant setups is important.
 1. Open **HACS → Integrations → Custom repositories**.
 2. Add `https://github.com/balronu/ha-camper-travel-journal` as an
    **Integration** repository.
-3. Install the stable `v0.1.0` release.
+3. Install the stable `v0.2.0` release.
 4. Restart Home Assistant manually.
 5. Add the integration under **Settings → Devices & services**.
 
@@ -79,8 +82,9 @@ type: custom:camper-travel-journal-manager-card
 vehicle_id: <config-entry-id>
 ```
 
-The read-only GPS map was first introduced in `v0.2.0-beta.3` and is included
-in the current `v0.2.0-beta.6` beta. It displays stored GPS
+The stable release provides exactly four Lovelace card types: Summary Card,
+Manager Card, Map Card and the optional Diagnostics Card. Normal use does not
+require the Diagnostics Card. The Map Card displays stored GPS
 lines and drive segments, does not calculate road routes, and uses no geocoding
 or routing service:
 
@@ -146,8 +150,8 @@ issues or tests.
 ## Known limitations
 
 - The scope is focused on the travel journal, drives, expenses and GPX import.
-- The map view is a beta feature in `v0.2.0-beta.6`; statistics and
-  exports are not implemented yet.
+- Historical beta changes remain documented in the changelog; the current map
+  and PDF features are part of the stable release.
 - Stops exist in the backend but are not fully manageable from Lovelace yet.
 - Retention calculates candidates but does not automatically delete in this
   version.

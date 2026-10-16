@@ -1,5 +1,5 @@
-const We = globalThis, Ki = We.ShadowRoot && (We.ShadyCSS === void 0 || We.ShadyCSS.nativeShadow) && "adoptedStyleSheets" in Document.prototype && "replace" in CSSStyleSheet.prototype, Yi = /* @__PURE__ */ Symbol(), gs = /* @__PURE__ */ new WeakMap();
-let Is = class {
+const We = globalThis, Ki = We.ShadowRoot && (We.ShadyCSS === void 0 || We.ShadyCSS.nativeShadow) && "adoptedStyleSheets" in Document.prototype && "replace" in CSSStyleSheet.prototype, Yi = /* @__PURE__ */ Symbol(), vs = /* @__PURE__ */ new WeakMap();
+let zs = class {
   constructor(s, o, h) {
     if (this._$cssResult$ = !0, h !== Yi) throw Error("CSSResult is not constructable. Use `unsafeCSS` or `css` instead.");
     this.cssText = s, this.t = o;
@@ -9,7 +9,7 @@ let Is = class {
     const o = this.t;
     if (Ki && s === void 0) {
       const h = o !== void 0 && o.length === 1;
-      h && (s = gs.get(o)), s === void 0 && ((this.o = s = new CSSStyleSheet()).replaceSync(this.cssText), h && gs.set(o, s));
+      h && (s = vs.get(o)), s === void 0 && ((this.o = s = new CSSStyleSheet()).replaceSync(this.cssText), h && vs.set(o, s));
     }
     return s;
   }
@@ -17,25 +17,25 @@ let Is = class {
     return this.cssText;
   }
 };
-const zs = (c) => new Is(typeof c == "string" ? c : c + "", void 0, Yi), Zt = (c, ...s) => {
+const Os = (c) => new zs(typeof c == "string" ? c : c + "", void 0, Yi), Zt = (c, ...s) => {
   const o = c.length === 1 ? c[0] : s.reduce((h, d, p) => h + ((_) => {
     if (_._$cssResult$ === !0) return _.cssText;
     if (typeof _ == "number") return _;
     throw Error("Value passed to 'css' function must be a 'css' function result: " + _ + ". Use 'unsafeCSS' to pass non-literal values, but take care to ensure page security.");
   })(d) + c[p + 1], c[0]);
-  return new Is(o, c, Yi);
+  return new zs(o, c, Yi);
 }, yo = (c, s) => {
   if (Ki) c.adoptedStyleSheets = s.map((o) => o instanceof CSSStyleSheet ? o : o.styleSheet);
   else for (const o of s) {
     const h = document.createElement("style"), d = We.litNonce;
     d !== void 0 && h.setAttribute("nonce", d), h.textContent = o.cssText, c.appendChild(h);
   }
-}, vs = Ki ? (c) => c : (c) => c instanceof CSSStyleSheet ? ((s) => {
+}, ys = Ki ? (c) => c : (c) => c instanceof CSSStyleSheet ? ((s) => {
   let o = "";
   for (const h of s.cssRules) o += h.cssText;
-  return zs(o);
+  return Os(o);
 })(c) : c;
-const { is: xo, defineProperty: bo, getOwnPropertyDescriptor: wo, getOwnPropertyNames: Po, getOwnPropertySymbols: To, getPrototypeOf: Eo } = Object, Ye = globalThis, ys = Ye.trustedTypes, Lo = ys ? ys.emptyScript : "", So = Ye.reactiveElementPolyfillSupport, _e = (c, s) => c, Gi = { toAttribute(c, s) {
+const { is: xo, defineProperty: bo, getOwnPropertyDescriptor: wo, getOwnPropertyNames: Po, getOwnPropertySymbols: To, getPrototypeOf: Eo } = Object, Ye = globalThis, xs = Ye.trustedTypes, Lo = xs ? xs.emptyScript : "", So = Ye.reactiveElementPolyfillSupport, _e = (c, s) => c, Gi = { toAttribute(c, s) {
   switch (s) {
     case Boolean:
       c = c ? Lo : null;
@@ -63,7 +63,7 @@ const { is: xo, defineProperty: bo, getOwnPropertyDescriptor: wo, getOwnProperty
       }
   }
   return o;
-} }, Os = (c, s) => !xo(c, s), xs = { attribute: !0, type: String, converter: Gi, reflect: !1, useDefault: !1, hasChanged: Os };
+} }, Zs = (c, s) => !xo(c, s), bs = { attribute: !0, type: String, converter: Gi, reflect: !1, useDefault: !1, hasChanged: Zs };
 Symbol.metadata ??= /* @__PURE__ */ Symbol("metadata"), Ye.litPropertyMetadata ??= /* @__PURE__ */ new WeakMap();
 let Vt = class extends HTMLElement {
   static addInitializer(s) {
@@ -72,7 +72,7 @@ let Vt = class extends HTMLElement {
   static get observedAttributes() {
     return this.finalize(), this._$Eh && [...this._$Eh.keys()];
   }
-  static createProperty(s, o = xs) {
+  static createProperty(s, o = bs) {
     if (o.state && (o.attribute = !1), this._$Ei(), this.prototype.hasOwnProperty(s) && ((o = Object.create(o)).wrapped = !0), this.elementProperties.set(s, o), !o.noAccessor) {
       const h = /* @__PURE__ */ Symbol(), d = this.getPropertyDescriptor(s, h, o);
       d !== void 0 && bo(this.prototype, s, d);
@@ -90,7 +90,7 @@ let Vt = class extends HTMLElement {
     }, configurable: !0, enumerable: !0 };
   }
   static getPropertyOptions(s) {
-    return this.elementProperties.get(s) ?? xs;
+    return this.elementProperties.get(s) ?? bs;
   }
   static _$Ei() {
     if (this.hasOwnProperty(_e("elementProperties"))) return;
@@ -119,8 +119,8 @@ let Vt = class extends HTMLElement {
     const o = [];
     if (Array.isArray(s)) {
       const h = new Set(s.flat(1 / 0).reverse());
-      for (const d of h) o.unshift(vs(d));
-    } else s !== void 0 && o.push(vs(s));
+      for (const d of h) o.unshift(ys(d));
+    } else s !== void 0 && o.push(ys(s));
     return o;
   }
   static _$Eu(s, o) {
@@ -178,7 +178,7 @@ let Vt = class extends HTMLElement {
   requestUpdate(s, o, h, d = !1, p) {
     if (s !== void 0) {
       const _ = this.constructor;
-      if (d === !1 && (p = this[s]), h ??= _.getPropertyOptions(s), !((h.hasChanged ?? Os)(p, o) || h.useDefault && h.reflect && p === this._$Ej?.get(s) && !this.hasAttribute(_._$Eu(s, h)))) return;
+      if (d === !1 && (p = this[s]), h ??= _.getPropertyOptions(s), !((h.hasChanged ?? Zs)(p, o) || h.useDefault && h.reflect && p === this._$Ej?.get(s) && !this.hasAttribute(_._$Eu(s, h)))) return;
       this.C(s, o, h);
     }
     this.isUpdatePending === !1 && (this._$ES = this._$EP());
@@ -247,12 +247,12 @@ let Vt = class extends HTMLElement {
   }
 };
 Vt.elementStyles = [], Vt.shadowRootOptions = { mode: "open" }, Vt[_e("elementProperties")] = /* @__PURE__ */ new Map(), Vt[_e("finalized")] = /* @__PURE__ */ new Map(), So?.({ ReactiveElement: Vt }), (Ye.reactiveElementVersions ??= []).push("2.1.2");
-const Xi = globalThis, bs = (c) => c, Ge = Xi.trustedTypes, ws = Ge ? Ge.createPolicy("lit-html", { createHTML: (c) => c }) : void 0, Zs = "$lit$", St = `lit$${Math.random().toFixed(9).slice(2)}$`, Bs = "?" + St, Co = `<${Bs}>`, Ot = document, ve = () => Ot.createComment(""), ye = (c) => c === null || typeof c != "object" && typeof c != "function", Ji = Array.isArray, ko = (c) => Ji(c) || typeof c?.[Symbol.iterator] == "function", zi = `[ \t
-\f\r]`, fe = /<(?:(!--|\/[^a-zA-Z])|(\/?[a-zA-Z][^>\s]*)|(\/?$))/g, Ps = /-->/g, Ts = />/g, Dt = RegExp(`>|${zi}(?:([^\\s"'>=/]+)(${zi}*=${zi}*(?:[^ \t
-\f\r"'\`<>=]|("|')|))|$)`, "g"), Es = /'/g, Ls = /"/g, Rs = /^(?:script|style|textarea|title)$/i, $o = (c) => (s, ...o) => ({ _$litType$: c, strings: s, values: o }), x = $o(1), Kt = /* @__PURE__ */ Symbol.for("lit-noChange"), j = /* @__PURE__ */ Symbol.for("lit-nothing"), Ss = /* @__PURE__ */ new WeakMap(), It = Ot.createTreeWalker(Ot, 129);
-function Ns(c, s) {
+const Xi = globalThis, ws = (c) => c, Ge = Xi.trustedTypes, Ps = Ge ? Ge.createPolicy("lit-html", { createHTML: (c) => c }) : void 0, Bs = "$lit$", St = `lit$${Math.random().toFixed(9).slice(2)}$`, Rs = "?" + St, Co = `<${Rs}>`, Ot = document, ve = () => Ot.createComment(""), ye = (c) => c === null || typeof c != "object" && typeof c != "function", Ji = Array.isArray, ko = (c) => Ji(c) || typeof c?.[Symbol.iterator] == "function", zi = `[ \t
+\f\r]`, fe = /<(?:(!--|\/[^a-zA-Z])|(\/?[a-zA-Z][^>\s]*)|(\/?$))/g, Ts = /-->/g, Es = />/g, Dt = RegExp(`>|${zi}(?:([^\\s"'>=/]+)(${zi}*=${zi}*(?:[^ \t
+\f\r"'\`<>=]|("|')|))|$)`, "g"), Ls = /'/g, Ss = /"/g, Ns = /^(?:script|style|textarea|title)$/i, $o = (c) => (s, ...o) => ({ _$litType$: c, strings: s, values: o }), x = $o(1), Kt = /* @__PURE__ */ Symbol.for("lit-noChange"), j = /* @__PURE__ */ Symbol.for("lit-nothing"), Cs = /* @__PURE__ */ new WeakMap(), It = Ot.createTreeWalker(Ot, 129);
+function Us(c, s) {
   if (!Ji(c) || !c.hasOwnProperty("raw")) throw Error("invalid template strings array");
-  return ws !== void 0 ? ws.createHTML(s) : s;
+  return Ps !== void 0 ? Ps.createHTML(s) : s;
 }
 const Ao = (c, s) => {
   const o = c.length - 1, h = [];
@@ -260,11 +260,11 @@ const Ao = (c, s) => {
   for (let y = 0; y < o; y++) {
     const f = c[y];
     let v, S, w = -1, Z = 0;
-    for (; Z < f.length && (_.lastIndex = Z, S = _.exec(f), S !== null); ) Z = _.lastIndex, _ === fe ? S[1] === "!--" ? _ = Ps : S[1] !== void 0 ? _ = Ts : S[2] !== void 0 ? (Rs.test(S[2]) && (d = RegExp("</" + S[2], "g")), _ = Dt) : S[3] !== void 0 && (_ = Dt) : _ === Dt ? S[0] === ">" ? (_ = d ?? fe, w = -1) : S[1] === void 0 ? w = -2 : (w = _.lastIndex - S[2].length, v = S[1], _ = S[3] === void 0 ? Dt : S[3] === '"' ? Ls : Es) : _ === Ls || _ === Es ? _ = Dt : _ === Ps || _ === Ts ? _ = fe : (_ = Dt, d = void 0);
+    for (; Z < f.length && (_.lastIndex = Z, S = _.exec(f), S !== null); ) Z = _.lastIndex, _ === fe ? S[1] === "!--" ? _ = Ts : S[1] !== void 0 ? _ = Es : S[2] !== void 0 ? (Ns.test(S[2]) && (d = RegExp("</" + S[2], "g")), _ = Dt) : S[3] !== void 0 && (_ = Dt) : _ === Dt ? S[0] === ">" ? (_ = d ?? fe, w = -1) : S[1] === void 0 ? w = -2 : (w = _.lastIndex - S[2].length, v = S[1], _ = S[3] === void 0 ? Dt : S[3] === '"' ? Ss : Ls) : _ === Ss || _ === Ls ? _ = Dt : _ === Ts || _ === Es ? _ = fe : (_ = Dt, d = void 0);
     const X = _ === Dt && c[y + 1].startsWith("/>") ? " " : "";
-    p += _ === fe ? f + Co : w >= 0 ? (h.push(v), f.slice(0, w) + Zs + f.slice(w) + St + X) : f + St + (w === -2 ? y : X);
+    p += _ === fe ? f + Co : w >= 0 ? (h.push(v), f.slice(0, w) + Bs + f.slice(w) + St + X) : f + St + (w === -2 ? y : X);
   }
-  return [Ns(c, p + (c[o] || "<?>") + (s === 2 ? "</svg>" : s === 3 ? "</math>" : "")), h];
+  return [Us(c, p + (c[o] || "<?>") + (s === 2 ? "</svg>" : s === 3 ? "</math>" : "")), h];
 };
 class xe {
   constructor({ strings: s, _$litType$: o }, h) {
@@ -278,11 +278,11 @@ class xe {
     }
     for (; (d = It.nextNode()) !== null && f.length < y; ) {
       if (d.nodeType === 1) {
-        if (d.hasAttributes()) for (const w of d.getAttributeNames()) if (w.endsWith(Zs)) {
+        if (d.hasAttributes()) for (const w of d.getAttributeNames()) if (w.endsWith(Bs)) {
           const Z = S[_++], X = d.getAttribute(w).split(St), Y = /([.?@])?(.*)/.exec(Z);
           f.push({ type: 1, index: p, name: Y[2], strings: X, ctor: Y[1] === "." ? Do : Y[1] === "?" ? Io : Y[1] === "@" ? zo : Xe }), d.removeAttribute(w);
         } else w.startsWith(St) && (f.push({ type: 6, index: p }), d.removeAttribute(w));
-        if (Rs.test(d.tagName)) {
+        if (Ns.test(d.tagName)) {
           const w = d.textContent.split(St), Z = w.length - 1;
           if (Z > 0) {
             d.textContent = Ge ? Ge.emptyScript : "";
@@ -290,7 +290,7 @@ class xe {
             d.append(w[Z], ve());
           }
         }
-      } else if (d.nodeType === 8) if (d.data === Bs) f.push({ type: 2, index: p });
+      } else if (d.nodeType === 8) if (d.data === Rs) f.push({ type: 2, index: p });
       else {
         let w = -1;
         for (; (w = d.data.indexOf(St, w + 1)) !== -1; ) f.push({ type: 7, index: p }), w += St.length - 1;
@@ -368,7 +368,7 @@ class Pe {
     this._$AH !== j && ye(this._$AH) ? this._$AA.nextSibling.data = s : this.T(Ot.createTextNode(s)), this._$AH = s;
   }
   $(s) {
-    const { values: o, _$litType$: h } = s, d = typeof h == "number" ? this._$AC(s) : (h.el === void 0 && (h.el = xe.createElement(Ns(h.h, h.h[0]), this.options)), h);
+    const { values: o, _$litType$: h } = s, d = typeof h == "number" ? this._$AC(s) : (h.el === void 0 && (h.el = xe.createElement(Us(h.h, h.h[0]), this.options)), h);
     if (this._$AH?._$AD === d) this._$AH.p(o);
     else {
       const p = new Mo(d, this), _ = p.u(this.options);
@@ -376,8 +376,8 @@ class Pe {
     }
   }
   _$AC(s) {
-    let o = Ss.get(s.strings);
-    return o === void 0 && Ss.set(s.strings, o = new xe(s)), o;
+    let o = Cs.get(s.strings);
+    return o === void 0 && Cs.set(s.strings, o = new xe(s)), o;
   }
   k(s) {
     Ji(this._$AH) || (this._$AH = [], this._$AR());
@@ -388,8 +388,8 @@ class Pe {
   }
   _$AR(s = this._$AA.nextSibling, o) {
     for (this._$AP?.(!1, !0, o); s !== this._$AB; ) {
-      const h = bs(s).nextSibling;
-      bs(s).remove(), s = h;
+      const h = ws(s).nextSibling;
+      ws(s).remove(), s = h;
     }
   }
   setConnected(s) {
@@ -541,7 +541,7 @@ function tn(c, s) {
 async function K(c, s, o, h = {}) {
   return c.connection.sendMessagePromise({ type: s, vehicle_id: o, ...h });
 }
-const be = (c, s, o) => K(c, "camper_travel_journal/list", s, o ? { trip_id: o } : {}), No = (c, s, o, h, d = 5e3) => K(c, "camper_travel_journal/route", s, { trip_id: o, drive_ids: h, max_points: d }), Us = (c, s, o, h) => K(c, "camper_travel_journal/transition_trip", s, { trip_id: o, status: h }), Uo = (c, s, o, h = "", d = "", p = "") => K(c, "camper_travel_journal/create_trip", s, { title: o, start_date: h || void 0, end_date: d || void 0, destination: p }), Fo = (c, s, o, h) => K(c, "camper_travel_journal/update_trip", s, { trip_id: o, ...h }), Ho = (c, s, o) => K(c, "camper_travel_journal/delete_trip", s, { trip_id: o }), Wo = (c, s, o, h) => K(c, "camper_travel_journal/unlink_drive", s, { trip_id: o, drive_id: h }), qo = (c, s, o, h) => K(c, "camper_travel_journal/link_drives", s, { trip_id: o, drive_ids: h }), Go = (c, s, o) => K(c, "camper_travel_journal/create_manual_drive", s, o), jo = (c, s, o, h) => K(c, "camper_travel_journal/update_manual_drive", s, { drive_id: o, ...h }), Vo = (c, s, o) => K(c, "camper_travel_journal/delete_manual_drive", s, { drive_id: o }), Ko = (c, s, o, h) => K(c, "camper_travel_journal/create_expense", s, { trip_id: o, ...h }), Yo = (c, s, o, h) => K(c, "camper_travel_journal/update_expense", s, { expense_id: o, ...h }), Xo = (c, s, o) => K(c, "camper_travel_journal/delete_expense", s, { expense_id: o }), Jo = (c, s, o) => K(c, "camper_travel_journal/export_pdf", s, { trip_id: o }), Fs = async (c) => (await c.connection.sendMessagePromise({ type: "camper_travel_journal/list_vehicles" })).vehicles ?? [], Qo = (c, s, o) => K(c, "camper_travel_journal/analyze_gpx", s, { content_base64: o }), ta = (c, s, o, h, d, p) => K(c, "camper_travel_journal/import_gpx", s, { content_base64: o, file_hash: h, drive_keys: d, trip_id: p }), Hs = ["camping", "fuel", "toll", "parking", "food", "activities", "other"], Oi = Hs, ea = {
+const be = (c, s, o) => K(c, "camper_travel_journal/list", s, o ? { trip_id: o } : {}), No = (c, s, o, h, d = 5e3) => K(c, "camper_travel_journal/route", s, { trip_id: o, drive_ids: h, max_points: d }), Fs = (c, s, o, h) => K(c, "camper_travel_journal/transition_trip", s, { trip_id: o, status: h }), Uo = (c, s, o, h = "", d = "", p = "") => K(c, "camper_travel_journal/create_trip", s, { title: o, start_date: h || void 0, end_date: d || void 0, destination: p }), Fo = (c, s, o, h) => K(c, "camper_travel_journal/update_trip", s, { trip_id: o, ...h }), Ho = (c, s, o) => K(c, "camper_travel_journal/delete_trip", s, { trip_id: o }), Wo = (c, s, o, h) => K(c, "camper_travel_journal/unlink_drive", s, { trip_id: o, drive_id: h }), qo = (c, s, o, h) => K(c, "camper_travel_journal/link_drives", s, { trip_id: o, drive_ids: h }), Go = (c, s, o) => K(c, "camper_travel_journal/create_manual_drive", s, o), jo = (c, s, o, h) => K(c, "camper_travel_journal/update_manual_drive", s, { drive_id: o, ...h }), Vo = (c, s, o) => K(c, "camper_travel_journal/delete_manual_drive", s, { drive_id: o }), Ko = (c, s, o, h) => K(c, "camper_travel_journal/create_expense", s, { trip_id: o, ...h }), Yo = (c, s, o, h) => K(c, "camper_travel_journal/update_expense", s, { expense_id: o, ...h }), Xo = (c, s, o) => K(c, "camper_travel_journal/delete_expense", s, { expense_id: o }), Jo = (c, s, o) => K(c, "camper_travel_journal/export_pdf", s, { trip_id: o }), en = async (c) => (await c.connection.sendMessagePromise({ type: "camper_travel_journal/list_vehicles" })).vehicles ?? [], Qo = (c, s, o) => K(c, "camper_travel_journal/analyze_gpx", s, { content_base64: o }), ta = (c, s, o, h, d, p) => K(c, "camper_travel_journal/import_gpx", s, { content_base64: o, file_hash: h, drive_keys: d, trip_id: p }), Hs = ["camping", "fuel", "toll", "parking", "food", "activities", "other"], Oi = Hs, ea = {
   title: "Reisetagebuch",
   noDestination: "Kein Reiseziel",
   loading: "Reisedaten werden geladen …",
@@ -765,7 +765,7 @@ const be = (c, s, o) => K(c, "camper_travel_journal/list", s, o ? { trip_id: o }
   mapNoPoints: "No associated GPS points for this trip.",
   mapRouteImageAlt: "GPS route map",
   mapAttribution: "© OpenStreetMap contributors · GPS track, no road routing"
-}, Cs = {
+}, ks = {
   de: {
     mapTitle: "Reisekarte",
     mapVehicle: "Fahrzeug",
@@ -793,7 +793,7 @@ const be = (c, s, o) => K(c, "camper_travel_journal/list", s, o ? { trip_id: o }
 };
 function M(c) {
   const s = c?.locale?.language?.toLowerCase() ?? "de";
-  return { ...s.startsWith("de") ? ea : ia, ...s.startsWith("de") ? Cs.de : Cs.en };
+  return { ...s.startsWith("de") ? ea : ia, ...s.startsWith("de") ? ks.de : ks.en };
 }
 function je(c) {
   return (c?.locale?.language ?? "").toLowerCase().startsWith("de") ? "de-DE" : "en-US";
@@ -847,7 +847,7 @@ function ge(c, s, o) {
   const h = (o?.locale?.language ?? "").toLowerCase().startsWith("de") ? "de-DE" : "en-US";
   return new Intl.NumberFormat(h, { style: "currency", currency: s, minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(c / 100);
 }
-function ks(c) {
+function $s(c) {
   const s = c.trim().replace(",", ".");
   if (!/^\d+(?:\.\d{1,2})?$/.test(s)) return null;
   const [o, h = ""] = s.split("."), d = Number(o) * 100 + Number((h + "00").slice(0, 2));
@@ -906,7 +906,7 @@ class Ws extends Xt {
     const o = this.snapshot?.trips[0];
     if (!(!this.hass || !o))
       try {
-        await Us(this.hass, this.vehicleId, o.id, s), this.actionError = "", await this.refresh();
+        await Fs(this.hass, this.vehicleId, o.id, s), this.actionError = "", await this.refresh();
       } catch {
         this.actionError = M(this.hass).statusError, this.requestUpdate();
       }
@@ -968,6 +968,7 @@ class Ke extends Xt {
   gpxError = "";
   pdfBusyTripId = "";
   pdfSelectedTripId = "";
+  vehicleName = "";
   connectedCallback() {
     super.connectedCallback(), this.refresh();
   }
@@ -980,7 +981,15 @@ class Ke extends Xt {
   async refresh() {
     if (!this.hass || !this.vehicleId) return !1;
     try {
-      return this.snapshot = await be(this.hass, this.vehicleId, this.selected || void 0), this.loadError = "", this.requestUpdate(), !0;
+      const s = await be(this.hass, this.vehicleId, this.selected || void 0);
+      this.snapshot = s;
+      try {
+        const o = await en(this.hass);
+        this.vehicleName = o.find((h) => h.vehicle_id === this.vehicleId)?.name || "";
+      } catch {
+        this.vehicleName = "";
+      }
+      return this.loadError = "", this.requestUpdate(), !0;
     } catch {
       return this.loadError = M(this.hass).loadError, this.requestUpdate(), !1;
     }
@@ -1086,7 +1095,7 @@ class Ke extends Xt {
   async changeStatus(s, o) {
     if (this.hass)
       try {
-        await Us(this.hass, this.vehicleId, s, o), this.actionError = "", await this.refresh(), mt({ vehicleId: this.vehicleId, tripId: s });
+        await Fs(this.hass, this.vehicleId, s, o), this.actionError = "", await this.refresh(), mt({ vehicleId: this.vehicleId, tripId: s });
       } catch {
         this.fail(M(this.hass).statusError);
       }
@@ -1164,7 +1173,7 @@ class Ke extends Xt {
   }
   async addExpense(s) {
     if (!this.hass) return;
-    const o = M(this.hass), h = ks(this.amount);
+    const o = M(this.hass), h = $s(this.amount);
     if (h === null) return this.fail(o.amountInvalid);
     try {
       await Ko(this.hass, this.vehicleId, s, { occurred_at: (/* @__PURE__ */ new Date()).toISOString(), category: this.category, amount_minor: h, currency: "EUR" }), this.actionError = "", await this.refresh() && (this.amount = "", Ni({ vehicleId: this.vehicleId, tripId: s }));
@@ -1180,7 +1189,7 @@ class Ke extends Xt {
   }
   async saveExpense(s) {
     if (!this.hass || this.expenseSavingId) return;
-    const o = M(this.hass), h = ks(this.editingAmount);
+    const o = M(this.hass), h = $s(this.editingAmount);
     if (h === null) return this.fail(o.amountInvalid);
     if (!Ri(this.editingCategory)) return this.fail(o.categoryInvalid);
     this.expenseSavingId = s.id;
@@ -1241,7 +1250,7 @@ class Ke extends Xt {
   }
   renderGpx(s, o, h) {
     const d = o.find((y) => y.id === this.gpxTripId), p = this.gpxPeriod(), _ = this.gpxTripPeriodWarning(d);
-    return x`<ha-card><section class="gpx-import gpx-explicit"><h2>${s.gpxImport}</h2><p class="muted"><strong>${s.gpxVehicle}:</strong> ${this.vehicleId} (${s.gpxVehicleFixed})</p><label>${s.gpxTargetTrip}<select aria-label=${s.gpxTargetTrip} .value=${this.gpxTripId} @change=${(y) => {
+    return x`<ha-card><section class="gpx-import gpx-explicit"><h2>${s.gpxImport}</h2><p class="muted"><strong>${s.gpxVehicle}:</strong> ${this.vehicleName || s.editorVehicle}</p><label>${s.gpxTargetTrip}<select aria-label=${s.gpxTargetTrip} .value=${this.gpxTripId} @change=${(y) => {
       this.gpxTripId = y.currentTarget.value, this.requestUpdate();
     }}><option value="">${s.gpxNoTrip}</option>${o.map((y) => x`<option value=${y.id}>${y.title} · ${Ve(y.status, this.hass)} · ${we(y, this.hass) || s.period}</option>`)}</select></label><input type="file" accept=".gpx,application/gpx+xml,application/xml" @change=${(y) => this.readGPX(y)} ?disabled=${this.gpxBusy}><p class="muted">${this.gpxName || s.gpxPrivacy}</p>${this.gpxError ? x`<p class="error" role="alert">${this.gpxError}</p>` : ""}${h ? x`<div class="gpx-preview"><strong>${h.drives.length} ${s.gpxSections}, ${h.points.length} ${s.gpxPoints}</strong>${p ? x`<p class="muted">${s.gpxPeriod}: ${Et(p.start, this.hass)} – ${Et(p.end, this.hass)}</p>` : ""}${_ ? x`<p class="warning" role="alert">${s.gpxPeriodWarning}</p>` : ""}<h3>${s.gpxSummary}</h3><p class="muted">${h.points.length} ${s.gpxPoints}, ${this.gpxSelected.size} ${s.gpxSelectedDrives}, ${this.gpxSelectedDistanceKm().toFixed(1)} ${s.gpxDistance}, ${d?.title || s.gpxNoTrip}</p><div class="gpx-drive-list">${h.drives.map((y) => x`<label><input type="checkbox" .checked=${this.gpxSelected.has(y.key)} @change=${(f) => {
       f.currentTarget.checked ? this.gpxSelected.add(y.key) : this.gpxSelected.delete(y.key), this.requestUpdate();
@@ -1279,7 +1288,7 @@ function Ui() {
 function Fi(c) {
   return c.length <= 8 ? "••••" : `${c.slice(0, 4)}…${c.slice(-4)}`;
 }
-function $s(c) {
+function As(c) {
   return c?.connection ? c.connection.connected === !0 ? "available" : c.connection.connected === !1 ? "unavailable" : "unknown" : "unavailable";
 }
 function oa(c) {
@@ -1318,12 +1327,12 @@ function ca(c) {
 }
 async function da(c, s, o = ra) {
   const h = { state: "not_run", durationMs: null };
-  if (!c?.connection) return { version: "0.2.0-beta.5", connectionBefore: "unavailable", connectionAfter: "unavailable", authentication: h, vehicles: h, trips: h, vehicleId: Fi(s) };
-  const d = $s(c), p = await Hi(c, { type: "auth/current_user" }, ha, o), _ = await Hi(c, { type: "camper_travel_journal/list_vehicles" }, la, o), y = _.value?.vehicles?.filter((Jt) => typeof Jt.vehicle_id == "string") ?? [], f = y.length === 1 ? y[0].vehicle_id : void 0, S = await Hi(c, { type: "camper_travel_journal/list", vehicle_id: f ?? s }, ca, o), { value: w, ...Z } = p, { value: X, ...Y } = _, { value: D, ...Bt } = S;
+  if (!c?.connection) return { version: "0.2.0", connectionBefore: "unavailable", connectionAfter: "unavailable", authentication: h, vehicles: h, trips: h, vehicleId: Fi(s) };
+  const d = As(c), p = await Hi(c, { type: "auth/current_user" }, ha, o), _ = await Hi(c, { type: "camper_travel_journal/list_vehicles" }, la, o), y = _.value?.vehicles?.filter((Jt) => typeof Jt.vehicle_id == "string") ?? [], f = y.length === 1 ? y[0].vehicle_id : void 0, S = await Hi(c, { type: "camper_travel_journal/list", vehicle_id: f ?? s }, ca, o), { value: w, ...Z } = p, { value: X, ...Y } = _, { value: D, ...Bt } = S;
   return {
-    version: "0.2.0-beta.5",
+    version: "0.2.0",
     connectionBefore: d,
-    connectionAfter: $s(c),
+    connectionAfter: As(c),
     authentication: Z,
     vehicles: Y,
     trips: Bt,
@@ -1337,7 +1346,7 @@ function Wi(c) {
 function qi(c) {
   return c.state === "success" ? "erfolgreich" : c.state === "failed" ? "fehlgeschlagen" : "nicht geprüft";
 }
-const As = "01M4XW0KD3GQ0KASAYHQ29840P";
+const Ms = "01M4XW0KD3GQ0KASAYHQ29840P";
 class ua extends zt {
   static styles = Zt`
     :host { display: block; color: var(--primary-text-color); }
@@ -1356,7 +1365,7 @@ class ua extends zt {
   running = !1;
   error = "";
   manualCopy = !1;
-  config = { vehicle_id: As };
+  config = { vehicle_id: Ms };
   set hass(s) {
     this._hass = s, this.requestUpdate();
   }
@@ -1364,7 +1373,7 @@ class ua extends zt {
     return this._hass;
   }
   setConfig(s) {
-    this.config = { vehicle_id: s.vehicle_id || As };
+    this.config = { vehicle_id: s.vehicle_id || Ms };
   }
   async start() {
     if (!this._hass || this.running) {
@@ -1417,9 +1426,9 @@ class ua extends zt {
 }
 typeof customElements < "u" && !customElements.get("camper-travel-journal-diagnostics-card") && customElements.define("camper-travel-journal-diagnostics-card", ua);
 var me = { exports: {} };
-var pa = me.exports, Ms;
+var pa = me.exports, Ds;
 function fa() {
-  return Ms || (Ms = 1, (function(c, s) {
+  return Ds || (Ds = 1, (function(c, s) {
     (function(o, h) {
       h(s);
     })(pa, (function(o) {
@@ -1493,7 +1502,7 @@ function fa() {
         return (!e || e.indexOf("?") === -1 ? "?" : "&") + n.join("&");
       }
       var Jt = /\{ *([\w_ -]+) *\}/g;
-      function en(t, e) {
+      function nn(t, e) {
         return t.replace(Jt, function(i, n) {
           var r = e[n];
           if (r === void 0)
@@ -1514,22 +1523,22 @@ function fa() {
       function Qe(t) {
         return window["webkit" + t] || window["moz" + t] || window["ms" + t];
       }
-      var nn = 0;
-      function sn(t) {
-        var e = +/* @__PURE__ */ new Date(), i = Math.max(0, 16 - (e - nn));
-        return nn = e + i, window.setTimeout(t, i);
+      var sn = 0;
+      function rn(t) {
+        var e = +/* @__PURE__ */ new Date(), i = Math.max(0, 16 - (e - sn));
+        return sn = e + i, window.setTimeout(t, i);
       }
-      var ti = window.requestAnimationFrame || Qe("RequestAnimationFrame") || sn, rn = window.cancelAnimationFrame || Qe("CancelAnimationFrame") || Qe("CancelRequestAnimationFrame") || function(t) {
+      var ti = window.requestAnimationFrame || Qe("RequestAnimationFrame") || rn, on = window.cancelAnimationFrame || Qe("CancelAnimationFrame") || Qe("CancelRequestAnimationFrame") || function(t) {
         window.clearTimeout(t);
       };
       function Q(t, e, i) {
-        if (i && ti === sn)
+        if (i && ti === rn)
           t.call(e);
         else
           return ti.call(window, _(t, e));
       }
       function st(t) {
-        t && rn.call(window, t);
+        t && on.call(window, t);
       }
       var Gs = {
         __proto__: null,
@@ -1548,12 +1557,12 @@ function fa() {
         splitWords: Y,
         setOptions: D,
         getParamString: Bt,
-        template: en,
+        template: nn,
         isArray: ht,
         indexOf: Je,
         emptyImageUrl: Te,
         requestFn: ti,
-        cancelFn: rn,
+        cancelFn: on,
         requestAnimFrame: Q,
         cancelAnimFrame: st
       };
@@ -1759,7 +1768,7 @@ function fa() {
       function C(t, e, i) {
         this.x = i ? Math.round(t) : t, this.y = i ? Math.round(e) : e;
       }
-      var on = Math.trunc || function(t) {
+      var an = Math.trunc || function(t) {
         return t > 0 ? Math.floor(t) : Math.ceil(t);
       };
       C.prototype = {
@@ -1844,7 +1853,7 @@ function fa() {
           return this.clone()._trunc();
         },
         _trunc: function() {
-          return this.x = on(this.x), this.y = on(this.y), this;
+          return this.x = an(this.x), this.y = an(this.y), this;
         },
         // @method distanceTo(otherPoint: Point): Number
         // Returns the cartesian distance between the current and the given points.
@@ -2243,8 +2252,8 @@ function fa() {
           var i = Math.PI / 180, n = t.lat * i, r = e.lat * i, a = Math.sin((e.lat - t.lat) * i / 2), l = Math.sin((e.lng - t.lng) * i / 2), u = a * a + Math.cos(n) * Math.cos(r) * l * l, m = 2 * Math.atan2(Math.sqrt(u), Math.sqrt(1 - u));
           return this.R * m;
         }
-      }), an = 6378137, ei = {
-        R: an,
+      }), hn = 6378137, ei = {
+        R: hn,
         MAX_LATITUDE: 85.0511287798,
         project: function(t) {
           var e = Math.PI / 180, i = this.MAX_LATITUDE, n = Math.max(Math.min(i, t.lat), -i), r = Math.sin(n * e);
@@ -2261,7 +2270,7 @@ function fa() {
           );
         },
         bounds: (function() {
-          var t = an * Math.PI;
+          var t = hn * Math.PI;
           return new N([-t, -t], [t, t]);
         })()
       };
@@ -2306,10 +2315,10 @@ function fa() {
       }), Vs = d({}, ni, {
         code: "EPSG:900913"
       });
-      function hn(t) {
+      function ln(t) {
         return document.createElementNS("http://www.w3.org/2000/svg", t);
       }
-      function ln(t, e) {
+      function cn(t, e) {
         var i = "", n, r, a, l, u, m;
         for (n = 0, a = t.length; n < a; n++) {
           for (u = t[n], r = 0, l = u.length; r < l; r++)
@@ -2318,7 +2327,7 @@ function fa() {
         }
         return i || "M0 0";
       }
-      var si = document.documentElement.style, Ee = "ActiveXObject" in window, Ks = Ee && !document.addEventListener, cn = "msLaunchUri" in navigator && !("documentMode" in document), ri = dt("webkit"), dn = dt("android"), un = dt("android 2") || dt("android 3"), Ys = parseInt(/WebKit\/([0-9]+)|$/.exec(navigator.userAgent)[1], 10), Xs = dn && dt("Google") && Ys < 537 && !("AudioNode" in window), oi = !!window.opera, pn = !cn && dt("chrome"), fn = dt("gecko") && !ri && !oi && !Ee, Js = !pn && dt("safari"), mn = dt("phantom"), _n = "OTransition" in si, Qs = navigator.platform.indexOf("Win") === 0, gn = Ee && "transition" in si, ai = "WebKitCSSMatrix" in window && "m11" in new window.WebKitCSSMatrix() && !un, vn = "MozPerspective" in si, tr = !window.L_DISABLE_3D && (gn || ai || vn) && !_n && !mn, ee = typeof orientation < "u" || dt("mobile"), er = ee && ri, ir = ee && ai, yn = !window.PointerEvent && window.MSPointerEvent, xn = !!(window.PointerEvent || yn), bn = "ontouchstart" in window || !!window.TouchEvent, nr = !window.L_NO_TOUCH && (bn || xn), sr = ee && oi, rr = ee && fn, or = (window.devicePixelRatio || window.screen.deviceXDPI / window.screen.logicalXDPI) > 1, ar = (function() {
+      var si = document.documentElement.style, Ee = "ActiveXObject" in window, Ks = Ee && !document.addEventListener, dn = "msLaunchUri" in navigator && !("documentMode" in document), ri = dt("webkit"), un = dt("android"), pn = dt("android 2") || dt("android 3"), Ys = parseInt(/WebKit\/([0-9]+)|$/.exec(navigator.userAgent)[1], 10), Xs = un && dt("Google") && Ys < 537 && !("AudioNode" in window), oi = !!window.opera, fn = !dn && dt("chrome"), mn = dt("gecko") && !ri && !oi && !Ee, Js = !fn && dt("safari"), _n = dt("phantom"), gn = "OTransition" in si, Qs = navigator.platform.indexOf("Win") === 0, vn = Ee && "transition" in si, ai = "WebKitCSSMatrix" in window && "m11" in new window.WebKitCSSMatrix() && !pn, yn = "MozPerspective" in si, tr = !window.L_DISABLE_3D && (vn || ai || yn) && !gn && !_n, ee = typeof orientation < "u" || dt("mobile"), er = ee && ri, ir = ee && ai, xn = !window.PointerEvent && window.MSPointerEvent, bn = !!(window.PointerEvent || xn), wn = "ontouchstart" in window || !!window.TouchEvent, nr = !window.L_NO_TOUCH && (wn || bn), sr = ee && oi, rr = ee && mn, or = (window.devicePixelRatio || window.screen.deviceXDPI / window.screen.logicalXDPI) > 1, ar = (function() {
         var t = !1;
         try {
           var e = Object.defineProperty({}, "passive", {
@@ -2332,7 +2341,7 @@ function fa() {
         return t;
       })(), hr = (function() {
         return !!document.createElement("canvas").getContext;
-      })(), hi = !!(document.createElementNS && hn("svg").createSVGRect), lr = !!hi && (function() {
+      })(), hi = !!(document.createElementNS && ln("svg").createSVGRect), lr = !!hi && (function() {
         var t = document.createElement("div");
         return t.innerHTML = "<svg/>", (t.firstChild && t.firstChild.namespaceURI) === "http://www.w3.org/2000/svg";
       })(), cr = !hi && (function() {
@@ -2351,29 +2360,29 @@ function fa() {
       var P = {
         ie: Ee,
         ielt9: Ks,
-        edge: cn,
+        edge: dn,
         webkit: ri,
-        android: dn,
-        android23: un,
+        android: un,
+        android23: pn,
         androidStock: Xs,
         opera: oi,
-        chrome: pn,
-        gecko: fn,
+        chrome: fn,
+        gecko: mn,
         safari: Js,
-        phantom: mn,
-        opera12: _n,
+        phantom: _n,
+        opera12: gn,
         win: Qs,
-        ie3d: gn,
+        ie3d: vn,
         webkit3d: ai,
-        gecko3d: vn,
+        gecko3d: yn,
         any3d: tr,
         mobile: ee,
         mobileWebkit: er,
         mobileWebkit3d: ir,
-        msPointer: yn,
-        pointer: xn,
+        msPointer: xn,
+        pointer: bn,
         touch: nr,
-        touchNative: bn,
+        touchNative: wn,
         mobileOpera: sr,
         mobileGecko: rr,
         retina: or,
@@ -2384,19 +2393,19 @@ function fa() {
         inlineSvg: lr,
         mac: dr,
         linux: ur
-      }, wn = P.msPointer ? "MSPointerDown" : "pointerdown", Pn = P.msPointer ? "MSPointerMove" : "pointermove", Tn = P.msPointer ? "MSPointerUp" : "pointerup", En = P.msPointer ? "MSPointerCancel" : "pointercancel", li = {
-        touchstart: wn,
-        touchmove: Pn,
-        touchend: Tn,
-        touchcancel: En
-      }, Ln = {
+      }, Pn = P.msPointer ? "MSPointerDown" : "pointerdown", Tn = P.msPointer ? "MSPointerMove" : "pointermove", En = P.msPointer ? "MSPointerUp" : "pointerup", Ln = P.msPointer ? "MSPointerCancel" : "pointercancel", li = {
+        touchstart: Pn,
+        touchmove: Tn,
+        touchend: En,
+        touchcancel: Ln
+      }, Sn = {
         touchstart: vr,
         touchmove: Le,
         touchend: Le,
         touchcancel: Le
-      }, Rt = {}, Sn = !1;
+      }, Rt = {}, Cn = !1;
       function pr(t, e, i) {
-        return e === "touchstart" && gr(), Ln[e] ? (i = Ln[e].bind(this, i), t.addEventListener(li[e], i, !1), i) : (console.warn("wrong event specified:", e), w);
+        return e === "touchstart" && gr(), Sn[e] ? (i = Sn[e].bind(this, i), t.addEventListener(li[e], i, !1), i) : (console.warn("wrong event specified:", e), w);
       }
       function fr(t, e, i) {
         if (!li[e]) {
@@ -2411,11 +2420,11 @@ function fa() {
       function _r(t) {
         Rt[t.pointerId] && (Rt[t.pointerId] = t);
       }
-      function Cn(t) {
+      function kn(t) {
         delete Rt[t.pointerId];
       }
       function gr() {
-        Sn || (document.addEventListener(wn, mr, !0), document.addEventListener(Pn, _r, !0), document.addEventListener(Tn, Cn, !0), document.addEventListener(En, Cn, !0), Sn = !0);
+        Cn || (document.addEventListener(Pn, mr, !0), document.addEventListener(Tn, _r, !0), document.addEventListener(En, kn, !0), document.addEventListener(Ln, kn, !0), Cn = !0);
       }
       function Le(t, e) {
         if (e.pointerType !== (e.MSPOINTER_TYPE_MOUSE || "mouse")) {
@@ -2444,7 +2453,7 @@ function fa() {
             return;
           }
           if (!(a.pointerType === "mouse" || a.sourceCapabilities && !a.sourceCapabilities.firesTouchEvents)) {
-            var l = Dn(a);
+            var l = In(a);
             if (!(l.some(function(m) {
               return m instanceof HTMLLabelElement && m.attributes.for;
             }) && !l.some(function(m) {
@@ -2467,8 +2476,8 @@ function fa() {
         ["transform", "webkitTransform", "OTransform", "MozTransform", "msTransform"]
       ), ie = ke(
         ["webkitTransition", "transition", "OTransition", "MozTransition", "msTransition"]
-      ), kn = ie === "webkitTransition" || ie === "OTransition" ? ie + "End" : "transitionend";
-      function $n(t) {
+      ), $n = ie === "webkitTransition" || ie === "OTransition" ? ie + "End" : "transitionend";
+      function An(t) {
         return typeof t == "string" ? document.getElementById(t) : t;
       }
       function ne(t, e) {
@@ -2587,7 +2596,7 @@ function fa() {
       function Ae() {
         $e && ($e.style.outlineStyle = _i, $e = void 0, _i = void 0, R(window, "keydown", Ae));
       }
-      function An(t) {
+      function Mn(t) {
         do
           t = t.parentNode;
         while ((!t.offsetWidth || !t.offsetHeight) && t !== document.body);
@@ -2605,8 +2614,8 @@ function fa() {
         __proto__: null,
         TRANSFORM: ci,
         TRANSITION: ie,
-        TRANSITION_END: kn,
-        get: $n,
+        TRANSITION_END: $n,
+        get: An,
         getStyle: ne,
         create: O,
         remove: U,
@@ -2633,7 +2642,7 @@ function fa() {
         enableImageDrag: mi,
         preventOutline: gi,
         restoreOutline: Ae,
-        getSizedParentNode: An,
+        getSizedParentNode: Mn,
         getScale: vi
       };
       function k(t, e, i, n) {
@@ -2650,12 +2659,12 @@ function fa() {
       var ut = "_leaflet_events";
       function R(t, e, i, n) {
         if (arguments.length === 1)
-          Mn(t), delete t[ut];
+          Dn(t), delete t[ut];
         else if (e && typeof e == "object")
           for (var r in e)
             bi(t, r, e[r], i);
         else if (e = Y(e), arguments.length === 2)
-          Mn(t, function(u) {
+          Dn(t, function(u) {
             return Je(e, u) !== -1;
           });
         else
@@ -2663,7 +2672,7 @@ function fa() {
             bi(t, e[a], i, n);
         return this;
       }
-      function Mn(t, e) {
+      function Dn(t, e) {
         for (var i in t[ut]) {
           var n = i.split(/\d/)[0];
           (!e || e(n)) && bi(t, n, null, null, i);
@@ -2707,14 +2716,14 @@ function fa() {
       function At(t) {
         return V(t), $t(t), this;
       }
-      function Dn(t) {
+      function In(t) {
         if (t.composedPath)
           return t.composedPath();
         for (var e = [], i = t.target; i; )
           e.push(i), i = i.parentNode;
         return e;
       }
-      function In(t, e) {
+      function zn(t, e) {
         if (!e)
           return new C(t.clientX, t.clientY);
         var i = vi(e), n = i.boundingClientRect;
@@ -2726,7 +2735,7 @@ function fa() {
         );
       }
       var Er = P.linux && P.chrome ? window.devicePixelRatio : P.mac ? window.devicePixelRatio * 3 : window.devicePixelRatio > 0 ? 2 * window.devicePixelRatio : 1;
-      function zn(t) {
+      function On(t) {
         return P.edge ? t.wheelDeltaY / 2 : (
           // Don't trust window-geometry-based delta
           t.deltaY && t.deltaMode === 0 ? -t.deltaY / Er : (
@@ -2774,13 +2783,13 @@ function fa() {
         disableClickPropagation: ae,
         preventDefault: V,
         stop: At,
-        getPropagationPath: Dn,
-        getMousePosition: In,
-        getWheelDelta: zn,
+        getPropagationPath: In,
+        getMousePosition: zn,
+        getWheelDelta: On,
         isExternalTarget: Pi,
         addListener: k,
         removeListener: R
-      }, On = Qt.extend({
+      }, Zn = Qt.extend({
         // @method run(el: HTMLElement, newPos: Point, duration?: Number, easeLinearity?: Number)
         // Run an animation of a given element to a new position, optionally setting
         // duration in seconds (`0.25` by default) and easing linearity factor (3rd
@@ -2889,7 +2898,7 @@ function fa() {
           trackResize: !0
         },
         initialize: function(t, e) {
-          e = D(this, e), this._handlers = [], this._layers = {}, this._zoomBoundLayers = {}, this._sizeChanged = !0, this._initContainer(t), this._initLayout(), this._onResize = _(this._onResize, this), this._initEvents(), e.maxBounds && this.setMaxBounds(e.maxBounds), e.zoom !== void 0 && (this._zoom = this._limitZoom(e.zoom)), e.center && e.zoom !== void 0 && this.setView(I(e.center), e.zoom, { reset: !0 }), this.callInitHooks(), this._zoomAnimated = ie && P.any3d && !P.mobileOpera && this.options.zoomAnimation, this._zoomAnimated && (this._createAnimProxy(), k(this._proxy, kn, this._catchTransitionEnd, this)), this._addLayers(this.options.layers);
+          e = D(this, e), this._handlers = [], this._layers = {}, this._zoomBoundLayers = {}, this._sizeChanged = !0, this._initContainer(t), this._initLayout(), this._onResize = _(this._onResize, this), this._initEvents(), e.maxBounds && this.setMaxBounds(e.maxBounds), e.zoom !== void 0 && (this._zoom = this._limitZoom(e.zoom)), e.center && e.zoom !== void 0 && this.setView(I(e.center), e.zoom, { reset: !0 }), this.callInitHooks(), this._zoomAnimated = ie && P.any3d && !P.mobileOpera && this.options.zoomAnimation, this._zoomAnimated && (this._createAnimProxy(), k(this._proxy, $n, this._catchTransitionEnd, this)), this._addLayers(this.options.layers);
         },
         // @section Methods for modifying map state
         // @method setView(center: LatLng, zoom: Number, options?: Zoom/pan options): this
@@ -2970,7 +2979,7 @@ function fa() {
             return this.fire("moveend");
           if (e.animate !== !0 && !this.getSize().contains(t))
             return this._resetView(this.unproject(this.project(this.getCenter()).add(t)), this.getZoom()), this;
-          if (this._panAnim || (this._panAnim = new On(), this._panAnim.on({
+          if (this._panAnim || (this._panAnim = new Zn(), this._panAnim.on({
             step: this._onPanTransitionStep,
             end: this._onPanTransitionEnd
           }, this)), e.noMoveStart || this.fire("movestart"), e.animate !== !1) {
@@ -2992,7 +3001,7 @@ function fa() {
           t = I(t), e = e === void 0 ? l : e;
           var u = Math.max(a.x, a.y), m = u * this.getZoomScale(l, e), g = r.distanceTo(n) || 1, b = 1.42, T = b * b;
           function A(q) {
-            var He = q ? -1 : 1, mo = q ? m : u, _o = m * m - u * u + He * T * T * g * g, go = 2 * mo * T * g, Ii = _o / go, _s = Math.sqrt(Ii * Ii + 1) - Ii, vo = _s < 1e-9 ? -18 : Math.log(_s);
+            var He = q ? -1 : 1, mo = q ? m : u, _o = m * m - u * u + He * T * T * g * g, go = 2 * mo * T * g, Ii = _o / go, gs = Math.sqrt(Ii * Ii + 1) - Ii, vo = gs < 1e-9 ? -18 : Math.log(gs);
             return vo;
           }
           function J(q) {
@@ -3014,16 +3023,16 @@ function fa() {
           function uo(q) {
             return 1 - Math.pow(1 - q, 1.5);
           }
-          var po = Date.now(), fs = (A(1) - it) / b, fo = i.duration ? 1e3 * i.duration : 1e3 * fs * 0.8;
-          function ms() {
-            var q = (Date.now() - po) / fo, He = uo(q) * fs;
-            q <= 1 ? (this._flyToFrame = Q(ms, this), this._move(
+          var po = Date.now(), ms = (A(1) - it) / b, fo = i.duration ? 1e3 * i.duration : 1e3 * ms * 0.8;
+          function _s() {
+            var q = (Date.now() - po) / fo, He = uo(q) * ms;
+            q <= 1 ? (this._flyToFrame = Q(_s, this), this._move(
               this.unproject(n.add(r.subtract(n).multiplyBy(co(He) / g)), l),
               this.getScaleZoom(u / jt(He), l),
               { flyTo: !0 }
             )) : this._move(t, e)._moveEnd(!0);
           }
-          return this._moveStart(!0, i.noMoveStart), ms.call(this), this;
+          return this._moveStart(!0, i.noMoveStart), _s.call(this), this;
         },
         // @method flyToBounds(bounds: LatLngBounds, options?: fitBounds options): this
         // Sets the view of the map with a smooth animation like [`flyTo`](#map-flyto),
@@ -3381,7 +3390,7 @@ function fa() {
         // Given a MouseEvent object, returns the pixel coordinate relative to the
         // map container where the event took place.
         mouseEventToContainerPoint: function(t) {
-          return In(t, this._container);
+          return zn(t, this._container);
         },
         // @method mouseEventToLayerPoint(ev: MouseEvent): Point
         // Given a MouseEvent object, returns the pixel coordinate relative to
@@ -3397,7 +3406,7 @@ function fa() {
         },
         // map initialization methods
         _initContainer: function(t) {
-          var e = this._container = $n(t);
+          var e = this._container = An(t);
           if (e) {
             if (e._leaflet_id)
               throw new Error("Map container is already initialized.");
@@ -3734,7 +3743,7 @@ function fa() {
           U(this._controlContainer), delete this._controlCorners, delete this._controlContainer;
         }
       });
-      var Zn = lt.extend({
+      var Bn = lt.extend({
         // @section
         // @aka Control.Layers options
         options: {
@@ -3903,7 +3912,7 @@ function fa() {
           });
         }
       }), Cr = function(t, e, i) {
-        return new Zn(t, e, i);
+        return new Bn(t, e, i);
       }, Ti = lt.extend({
         // @section
         // @aka Control.Zoom options
@@ -3969,7 +3978,7 @@ function fa() {
       });
       var kr = function(t) {
         return new Ti(t);
-      }, Bn = lt.extend({
+      }, Rn = lt.extend({
         // @section
         // @aka Control.Scale options
         options: {
@@ -4022,7 +4031,7 @@ function fa() {
           return i = i >= 10 ? 10 : i >= 5 ? 5 : i >= 3 ? 3 : i >= 2 ? 2 : 1, e * i;
         }
       }), $r = function(t) {
-        return new Bn(t);
+        return new Rn(t);
       }, Ar = '<svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="12" height="8" viewBox="0 0 12 8" class="leaflet-attribution-flag"><path fill="#4C7BE1" d="M0 0h12v4H0z"/><path fill="#FFD500" d="M0 4h12v3H0z"/><path fill="#E0BC00" d="M0 7h12v1H0z"/></svg>', Ei = lt.extend({
         // @section
         // @aka Control.Attribution options
@@ -4082,7 +4091,7 @@ function fa() {
       var Mr = function(t) {
         return new Ei(t);
       };
-      lt.Layers = Zn, lt.Zoom = Ti, lt.Scale = Bn, lt.Attribution = Ei, he.layers = Cr, he.zoom = kr, he.scale = $r, he.attribution = Mr;
+      lt.Layers = Bn, lt.Zoom = Ti, lt.Scale = Rn, lt.Attribution = Ei, he.layers = Cr, he.zoom = kr, he.scale = $r, he.attribution = Mr;
       var pt = _t.extend({
         initialize: function(t) {
           this._map = t;
@@ -4112,7 +4121,7 @@ function fa() {
       pt.addTo = function(t, e) {
         return t.addHandler(e, this), this;
       };
-      var Dr = { Events: nt }, Rn = P.touch ? "touchstart mousedown" : "mousedown", Pt = Qt.extend({
+      var Dr = { Events: nt }, Nn = P.touch ? "touchstart mousedown" : "mousedown", Pt = Qt.extend({
         options: {
           // @section
           // @aka Draggable options
@@ -4129,12 +4138,12 @@ function fa() {
         // @method enable()
         // Enables the dragging ability
         enable: function() {
-          this._enabled || (k(this._dragStartTarget, Rn, this._onDown, this), this._enabled = !0);
+          this._enabled || (k(this._dragStartTarget, Nn, this._onDown, this), this._enabled = !0);
         },
         // @method disable()
         // Disables the dragging ability
         disable: function() {
-          this._enabled && (Pt._dragging === this && this.finishDrag(!0), R(this._dragStartTarget, Rn, this._onDown, this), this._enabled = !1, this._moved = !1);
+          this._enabled && (Pt._dragging === this && this.finishDrag(!0), R(this._dragStartTarget, Nn, this._onDown, this), this._enabled = !1, this._moved = !1);
         },
         _onDown: function(t) {
           if (this._enabled && (this._moved = !1, !di(this._element, "leaflet-zoom-anim"))) {
@@ -4144,7 +4153,7 @@ function fa() {
             }
             if (!(Pt._dragging || t.shiftKey || t.which !== 1 && t.button !== 1 && !t.touches) && (Pt._dragging = this, this._preventOutline && gi(this._element), fi(), se(), !this._moving)) {
               this.fire("down");
-              var e = t.touches ? t.touches[0] : t, i = An(this._element);
+              var e = t.touches ? t.touches[0] : t, i = Mn(this._element);
               this._startPoint = new C(e.clientX, e.clientY), this._startPos = kt(this._element), this._parentScale = vi(i);
               var n = t.type === "mousedown";
               k(document, n ? "mousemove" : "touchmove", this._onMove, this), k(document, n ? "mouseup" : "touchend touchcancel", this._onUp, this);
@@ -4177,7 +4186,7 @@ function fa() {
           });
         }
       });
-      function Nn(t, e, i) {
+      function Un(t, e, i) {
         var n, r = [1, 4, 2, 8], a, l, u, m, g, b, T, A;
         for (a = 0, b = t.length; a < b; a++)
           t[a]._code = Mt(t[a], e);
@@ -4188,7 +4197,7 @@ function fa() {
         }
         return t;
       }
-      function Un(t, e) {
+      function Fn(t, e) {
         var i, n, r, a, l, u, m, g, b;
         if (!t || t.length === 0)
           throw new Error("latlngs not passed");
@@ -4215,17 +4224,17 @@ function fa() {
       }
       var Ir = {
         __proto__: null,
-        clipPolygon: Nn,
-        polygonCenter: Un,
+        clipPolygon: Un,
+        polygonCenter: Fn,
         centroid: Li
       };
-      function Fn(t, e) {
+      function Hn(t, e) {
         if (!e || !t.length)
           return t.slice();
         var i = e * e;
         return t = Zr(t, i), t = Or(t, i), t;
       }
-      function Hn(t, e, i) {
+      function Wn(t, e, i) {
         return Math.sqrt(le(t, e, i, !0));
       }
       function zr(t, e, i) {
@@ -4250,10 +4259,10 @@ function fa() {
           Br(t[n], t[r]) > e && (i.push(t[n]), r = n);
         return r < a - 1 && i.push(t[a - 1]), i;
       }
-      var Wn;
-      function qn(t, e, i, n, r) {
-        var a = n ? Wn : Mt(t, i), l = Mt(e, i), u, m, g;
-        for (Wn = l; ; ) {
+      var qn;
+      function Gn(t, e, i, n, r) {
+        var a = n ? qn : Mt(t, i), l = Mt(e, i), u, m, g;
+        for (qn = l; ; ) {
           if (!(a | l))
             return [t, e];
           if (a & l)
@@ -4280,10 +4289,10 @@ function fa() {
       function ot(t) {
         return !ht(t[0]) || typeof t[0][0] != "object" && typeof t[0][0] < "u";
       }
-      function Gn(t) {
+      function jn(t) {
         return console.warn("Deprecated use of _flat, please use L.LineUtil.isFlat instead."), ot(t);
       }
-      function jn(t, e) {
+      function Vn(t, e) {
         var i, n, r, a, l, u, m, g;
         if (!t || t.length === 0)
           throw new Error("latlngs not passed");
@@ -4313,16 +4322,16 @@ function fa() {
       }
       var Rr = {
         __proto__: null,
-        simplify: Fn,
-        pointToSegmentDistance: Hn,
+        simplify: Hn,
+        pointToSegmentDistance: Wn,
         closestPointOnSegment: zr,
-        clipSegment: qn,
+        clipSegment: Gn,
         _getEdgeIntersection: Me,
         _getBitCode: Mt,
         _sqClosestPointOnSegment: le,
         isFlat: ot,
-        _flat: Gn,
-        polylineCenter: jn
+        _flat: jn,
+        polylineCenter: Vn
       }, Ci = {
         project: function(t) {
           return new C(t.lng, t.lat);
@@ -4356,7 +4365,7 @@ function fa() {
           var t = 0.5 / (Math.PI * ki.R);
           return te(t, 0.5, -t, 0.5);
         })()
-      }), Vn = d({}, wt, {
+      }), Kn = d({}, wt, {
         code: "EPSG:4326",
         projection: Ci,
         transformation: te(1 / 180, 1, -1 / 180, 0.5)
@@ -4375,7 +4384,7 @@ function fa() {
         },
         infinite: !0
       });
-      gt.Earth = wt, gt.EPSG3395 = Ur, gt.EPSG3857 = ni, gt.EPSG900913 = Vs, gt.EPSG4326 = Vn, gt.Simple = Fr;
+      gt.Earth = wt, gt.EPSG3395 = Ur, gt.EPSG3857 = ni, gt.EPSG900913 = Vs, gt.EPSG4326 = Kn, gt.Simple = Fr;
       var ct = Qt.extend({
         // Classes extending `L.Layer` will inherit the following options:
         options: {
@@ -4732,7 +4741,7 @@ function fa() {
           var i = document.querySelector('link[href$="leaflet.css"]');
           return i ? i.href.substring(0, i.href.length - 11 - 1) : "";
         }
-      }), Kn = pt.extend({
+      }), Yn = pt.extend({
         initialize: function(t) {
           this._marker = t;
         },
@@ -4930,9 +4939,9 @@ function fa() {
           this._setPos(e);
         },
         _initInteraction: function() {
-          if (this.options.interactive && ($(this._icon, "leaflet-interactive"), this.addInteractiveTarget(this._icon), Kn)) {
+          if (this.options.interactive && ($(this._icon, "leaflet-interactive"), this.addInteractiveTarget(this._icon), Yn)) {
             var t = this.options.draggable;
-            this.dragging && (t = this.dragging.enabled(), this.dragging.disable()), this.dragging = new Kn(this), t && this.dragging.enable();
+            this.dragging && (t = this.dragging.enabled(), this.dragging.disable()), this.dragging = new Yn(this), t && this.dragging.enable();
           }
         },
         // @method setOpacity(opacity: Number): this
@@ -5204,7 +5213,7 @@ function fa() {
         getCenter: function() {
           if (!this._map)
             throw new Error("Must add layer to map before using getCenter()");
-          return jn(this._defaultShape(), this._map.options.crs);
+          return Vn(this._defaultShape(), this._map.options.crs);
         },
         // @method getBounds(): LatLngBounds
         // Returns the `LatLngBounds` of the path.
@@ -5263,13 +5272,13 @@ function fa() {
             var e = this._parts, i, n, r, a, l, u, m;
             for (i = 0, r = 0, a = this._rings.length; i < a; i++)
               for (m = this._rings[i], n = 0, l = m.length; n < l - 1; n++)
-                u = qn(m[n], m[n + 1], t, n, !0), u && (e[r] = e[r] || [], e[r].push(u[0]), (u[1] !== m[n + 1] || n === l - 2) && (e[r].push(u[1]), r++));
+                u = Gn(m[n], m[n + 1], t, n, !0), u && (e[r] = e[r] || [], e[r].push(u[0]), (u[1] !== m[n + 1] || n === l - 2) && (e[r].push(u[1]), r++));
           }
         },
         // simplify each clipped part of the polyline for performance
         _simplifyPoints: function() {
           for (var t = this._parts, e = this.options.smoothFactor, i = 0, n = t.length; i < n; i++)
-            t[i] = Fn(t[i], e);
+            t[i] = Hn(t[i], e);
         },
         _update: function() {
           this._map && (this._clipPoints(), this._simplifyPoints(), this._updatePath());
@@ -5284,7 +5293,7 @@ function fa() {
             return !1;
           for (i = 0, a = this._parts.length; i < a; i++)
             for (u = this._parts[i], n = 0, l = u.length, r = l - 1; n < l; r = n++)
-              if (!(!e && n === 0) && Hn(t, u[r], u[n]) <= m)
+              if (!(!e && n === 0) && Wn(t, u[r], u[n]) <= m)
                 return !0;
           return !1;
         }
@@ -5292,7 +5301,7 @@ function fa() {
       function Kr(t, e) {
         return new yt(t, e);
       }
-      yt._flat = Gn;
+      yt._flat = jn;
       var Wt = yt.extend({
         options: {
           fill: !0
@@ -5305,7 +5314,7 @@ function fa() {
         getCenter: function() {
           if (!this._map)
             throw new Error("Must add layer to map before using getCenter()");
-          return Un(this._defaultShape(), this._map.options.crs);
+          return Fn(this._defaultShape(), this._map.options.crs);
         },
         _convertLatLngs: function(t) {
           var e = yt.prototype._convertLatLngs.call(this, t), i = e.length;
@@ -5325,7 +5334,7 @@ function fa() {
               return;
             }
             for (var n = 0, r = this._rings.length, a; n < r; n++)
-              a = Nn(this._rings[n], t, !0), a.length && this._parts.push(a);
+              a = Un(this._rings[n], t, !0), a.length && this._parts.push(a);
           }
         },
         _updatePath: function() {
@@ -5436,10 +5445,10 @@ function fa() {
           return null;
         switch (i.type) {
           case "Point":
-            return u = l(n), Yn(a, t, u, e);
+            return u = l(n), Xn(a, t, u, e);
           case "MultiPoint":
             for (g = 0, b = n.length; g < b; g++)
-              u = l(n[g]), r.push(Yn(a, t, u, e));
+              u = l(n[g]), r.push(Xn(a, t, u, e));
             return new vt(r);
           case "LineString":
           case "MultiLineString":
@@ -5467,7 +5476,7 @@ function fa() {
             throw new Error("Invalid GeoJSON object.");
         }
       }
-      function Yn(t, e, i, n) {
+      function Xn(t, e, i, n) {
         return t ? t(e, i) : new De(i, n && n.markersInheritOptions && n);
       }
       function Ai(t) {
@@ -5557,10 +5566,10 @@ function fa() {
           };
         }
       });
-      function Xn(t, e) {
+      function Jn(t, e) {
         return new xt(t, e);
       }
-      var Xr = Xn, Re = ct.extend({
+      var Xr = Jn, Re = ct.extend({
         // @section
         // @aka ImageOverlay options
         options: {
@@ -5685,7 +5694,7 @@ function fa() {
         }
       }), Jr = function(t, e, i) {
         return new Re(t, e, i);
-      }, Jn = Re.extend({
+      }, Qn = Re.extend({
         // @section
         // @aka VideoOverlay options
         options: {
@@ -5726,9 +5735,9 @@ function fa() {
         // used by this overlay.
       });
       function Qr(t, e, i) {
-        return new Jn(t, e, i);
+        return new Qn(t, e, i);
       }
-      var Qn = Re.extend({
+      var ts = Re.extend({
         _initImage: function() {
           var t = this._image = this._url;
           $(t, "leaflet-image-layer"), this._zoomAnimated && $(t, "leaflet-zoom-animated"), this.options.className && $(t, this.options.className), t.onselectstart = w, t.onmousemove = w;
@@ -5738,7 +5747,7 @@ function fa() {
         // used by this overlay.
       });
       function to(t, e, i) {
-        return new Qn(t, e, i);
+        return new ts(t, e, i);
       }
       var ft = ct.extend({
         // @section
@@ -6276,7 +6285,7 @@ function fa() {
           this._tooltip.options.sticky && t.originalEvent && (i = this._map.mouseEventToContainerPoint(t.originalEvent), n = this._map.containerPointToLayerPoint(i), e = this._map.layerPointToLatLng(n)), this._tooltip.setLatLng(e);
         }
       });
-      var ts = Ht.extend({
+      var es = Ht.extend({
         options: {
           // @section
           // @aka DivIcon options
@@ -6306,7 +6315,7 @@ function fa() {
         }
       });
       function no(t) {
-        return new ts(t);
+        return new es(t);
       }
       Ht.Default = ce;
       var de = ct.extend({
@@ -6789,7 +6798,7 @@ function fa() {
             var i = this._globalTileRange.max.y - t.y;
             this.options.tms && (e.y = i), e["-y"] = i;
           }
-          return en(this._url, d(e, this.options));
+          return nn(this._url, d(e, this.options));
         },
         _tileOnLoad: function(t, e) {
           P.ielt9 ? setTimeout(_(t, this, null, e), 0) : t(null, e);
@@ -6832,10 +6841,10 @@ function fa() {
             return de.prototype._tileReady.call(this, t, e, i);
         }
       });
-      function es(t, e) {
+      function is(t, e) {
         return new Gt(t, e);
       }
-      var is = Gt.extend({
+      var ns = Gt.extend({
         // @section
         // @aka TileLayer.WMS options
         // If any custom options not documented here are used, they will be sent to the
@@ -6884,7 +6893,7 @@ function fa() {
           this.wmsParams[e] = this._crs.code, Gt.prototype.onAdd.call(this, t);
         },
         getTileUrl: function(t) {
-          var e = this._tileCoordsToNwSe(t), i = this._crs, n = tt(i.project(e[0]), i.project(e[1])), r = n.min, a = n.max, l = (this._wmsVersion >= 1.3 && this._crs === Vn ? [r.y, r.x, a.y, a.x] : [r.x, r.y, a.x, a.y]).join(","), u = Gt.prototype.getTileUrl.call(this, t);
+          var e = this._tileCoordsToNwSe(t), i = this._crs, n = tt(i.project(e[0]), i.project(e[1])), r = n.min, a = n.max, l = (this._wmsVersion >= 1.3 && this._crs === Kn ? [r.y, r.x, a.y, a.x] : [r.x, r.y, a.x, a.y]).join(","), u = Gt.prototype.getTileUrl.call(this, t);
           return u + Bt(this.wmsParams, u, this.options.uppercase) + (this.options.uppercase ? "&BBOX=" : "&bbox=") + l;
         },
         // @method setParams(params: Object, noRedraw?: Boolean): this
@@ -6894,9 +6903,9 @@ function fa() {
         }
       });
       function ro(t, e) {
-        return new is(t, e);
+        return new ns(t, e);
       }
-      Gt.WMS = is, es.wms = ro;
+      Gt.WMS = ns, is.wms = ro;
       var bt = ct.extend({
         // @section
         // @aka Renderer options
@@ -6951,7 +6960,7 @@ function fa() {
           var t = this.options.padding, e = this._map.getSize(), i = this._map.containerPointToLayerPoint(e.multiplyBy(-t)).round();
           this._bounds = new N(i, i.add(e.multiplyBy(1 + t * 2)).round()), this._center = this._map.getCenter(), this._zoom = this._map.getZoom();
         }
-      }), ns = bt.extend({
+      }), ss = bt.extend({
         // @section
         // @aka Canvas options
         options: {
@@ -7135,8 +7144,8 @@ function fa() {
           }
         }
       });
-      function ss(t) {
-        return P.canvas ? new ns(t) : null;
+      function rs(t) {
+        return P.canvas ? new ss(t) : null;
       }
       var ue = (function() {
         try {
@@ -7184,7 +7193,7 @@ function fa() {
         _bringToBack: function(t) {
           Ut(t._container);
         }
-      }, Fe = P.vml ? ue : hn, pe = bt.extend({
+      }, Fe = P.vml ? ue : ln, pe = bt.extend({
         _initContainer: function() {
           this._container = Fe("svg"), this._container.setAttribute("pointer-events", "none"), this._rootGroup = Fe("g"), this._container.appendChild(this._rootGroup);
         },
@@ -7217,7 +7226,7 @@ function fa() {
           e && (i.stroke ? (e.setAttribute("stroke", i.color), e.setAttribute("stroke-opacity", i.opacity), e.setAttribute("stroke-width", i.weight), e.setAttribute("stroke-linecap", i.lineCap), e.setAttribute("stroke-linejoin", i.lineJoin), i.dashArray ? e.setAttribute("stroke-dasharray", i.dashArray) : e.removeAttribute("stroke-dasharray"), i.dashOffset ? e.setAttribute("stroke-dashoffset", i.dashOffset) : e.removeAttribute("stroke-dashoffset")) : e.setAttribute("stroke", "none"), i.fill ? (e.setAttribute("fill", i.fillColor || i.color), e.setAttribute("fill-opacity", i.fillOpacity), e.setAttribute("fill-rule", i.fillRule || "evenodd")) : e.setAttribute("fill", "none"));
         },
         _updatePoly: function(t, e) {
-          this._setPath(t, ln(t._parts, e));
+          this._setPath(t, cn(t._parts, e));
         },
         _updateCircle: function(t) {
           var e = t._point, i = Math.max(Math.round(t._radius), 1), n = Math.max(Math.round(t._radiusY), 1) || i, r = "a" + i + "," + n + " 0 1,0 ", a = t._empty() ? "M0 0" : "M" + (e.x - i) + "," + e.y + r + i * 2 + ",0 " + r + -i * 2 + ",0 ";
@@ -7235,7 +7244,7 @@ function fa() {
         }
       });
       P.vml && pe.include(oo);
-      function rs(t) {
+      function os(t) {
         return P.svg || P.vml ? new pe(t) : null;
       }
       z.include({
@@ -7254,10 +7263,10 @@ function fa() {
           return e === void 0 && (e = this._createRenderer({ pane: t }), this._paneRenderers[t] = e), e;
         },
         _createRenderer: function(t) {
-          return this.options.preferCanvas && ss(t) || rs(t);
+          return this.options.preferCanvas && rs(t) || os(t);
         }
       });
-      var os = Wt.extend({
+      var as = Wt.extend({
         initialize: function(t, e) {
           Wt.prototype.initialize.call(this, this._boundsToLatLngs(t), e);
         },
@@ -7276,15 +7285,15 @@ function fa() {
         }
       });
       function ao(t, e) {
-        return new os(t, e);
+        return new as(t, e);
       }
-      pe.create = Fe, pe.pointsToPath = ln, xt.geometryToLayer = ze, xt.coordsToLatLng = Ai, xt.coordsToLatLngs = Oe, xt.latLngToCoords = Mi, xt.latLngsToCoords = Ze, xt.getFeature = qt, xt.asFeature = Be, z.mergeOptions({
+      pe.create = Fe, pe.pointsToPath = cn, xt.geometryToLayer = ze, xt.coordsToLatLng = Ai, xt.coordsToLatLngs = Oe, xt.latLngToCoords = Mi, xt.latLngsToCoords = Ze, xt.getFeature = qt, xt.asFeature = Be, z.mergeOptions({
         // @option boxZoom: Boolean = true
         // Whether the map can be zoomed to a rectangular area specified by
         // dragging the mouse while pressing the shift key.
         boxZoom: !0
       });
-      var as = pt.extend({
+      var hs = pt.extend({
         initialize: function(t) {
           this._map = t, this._container = t._container, this._pane = t._panes.overlayPane, this._resetStateTimeout = 0, t.on("unload", this._destroy, this);
         },
@@ -7343,7 +7352,7 @@ function fa() {
           t.keyCode === 27 && (this._finish(), this._clearDeferredResetState(), this._resetState());
         }
       });
-      z.addInitHook("addHandler", "boxZoom", as), z.mergeOptions({
+      z.addInitHook("addHandler", "boxZoom", hs), z.mergeOptions({
         // @option doubleClickZoom: Boolean|String = true
         // Whether the map can be zoomed in by double clicking on it and
         // zoomed out by double clicking while holding shift. If passed
@@ -7351,7 +7360,7 @@ function fa() {
         //  view regardless of where the mouse was.
         doubleClickZoom: !0
       });
-      var hs = pt.extend({
+      var ls = pt.extend({
         addHooks: function() {
           this._map.on("dblclick", this._onDoubleClick, this);
         },
@@ -7363,7 +7372,7 @@ function fa() {
           e.options.doubleClickZoom === "center" ? e.setZoom(r) : e.setZoomAround(t.containerPoint, r);
         }
       });
-      z.addInitHook("addHandler", "doubleClickZoom", hs), z.mergeOptions({
+      z.addInitHook("addHandler", "doubleClickZoom", ls), z.mergeOptions({
         // @option dragging: Boolean = true
         // Whether the map is draggable with mouse/touch or not.
         dragging: !0,
@@ -7398,7 +7407,7 @@ function fa() {
         // solid, preventing the user from dragging outside the bounds.
         maxBoundsViscosity: 0
       });
-      var ls = pt.extend({
+      var cs = pt.extend({
         addHooks: function() {
           if (!this._draggable) {
             var t = this._map;
@@ -7477,7 +7486,7 @@ function fa() {
           }
         }
       });
-      z.addInitHook("addHandler", "dragging", ls), z.mergeOptions({
+      z.addInitHook("addHandler", "dragging", cs), z.mergeOptions({
         // @option keyboard: Boolean = true
         // Makes the map focusable and allows users to navigate the map with keyboard
         // arrows and `+`/`-` keys.
@@ -7486,7 +7495,7 @@ function fa() {
         // Amount of pixels to pan when pressing an arrow key.
         keyboardPanDelta: 80
       });
-      var cs = pt.extend({
+      var ds = pt.extend({
         keyCodes: {
           left: [37],
           right: [39],
@@ -7575,7 +7584,7 @@ function fa() {
           }
         }
       });
-      z.addInitHook("addHandler", "keyboard", cs), z.mergeOptions({
+      z.addInitHook("addHandler", "keyboard", ds), z.mergeOptions({
         // @section Mouse wheel options
         // @option scrollWheelZoom: Boolean|String = true
         // Whether the map can be zoomed by using the mouse wheel. If passed `'center'`,
@@ -7591,7 +7600,7 @@ function fa() {
         // faster (and vice versa).
         wheelPxPerZoomLevel: 60
       });
-      var ds = pt.extend({
+      var us = pt.extend({
         addHooks: function() {
           k(this._map._container, "wheel", this._onWheelScroll, this), this._delta = 0;
         },
@@ -7599,7 +7608,7 @@ function fa() {
           R(this._map._container, "wheel", this._onWheelScroll, this);
         },
         _onWheelScroll: function(t) {
-          var e = zn(t), i = this._map.options.wheelDebounceTime;
+          var e = On(t), i = this._map.options.wheelDebounceTime;
           this._delta += e, this._lastMousePos = this._map.mouseEventToContainerPoint(t), this._startTime || (this._startTime = +/* @__PURE__ */ new Date());
           var n = Math.max(i - (+/* @__PURE__ */ new Date() - this._startTime), 0);
           clearTimeout(this._timer), this._timer = setTimeout(_(this._performZoom, this), n), At(t);
@@ -7611,7 +7620,7 @@ function fa() {
           this._delta = 0, this._startTime = null, l && (t.options.scrollWheelZoom === "center" ? t.setZoom(e + l) : t.setZoomAround(this._lastMousePos, e + l));
         }
       });
-      z.addInitHook("addHandler", "scrollWheelZoom", ds);
+      z.addInitHook("addHandler", "scrollWheelZoom", us);
       var ho = 600;
       z.mergeOptions({
         // @section Touch interaction options
@@ -7623,7 +7632,7 @@ function fa() {
         // for it to be considered a valid tap.
         tapTolerance: 15
       });
-      var us = pt.extend({
+      var ps = pt.extend({
         addHooks: function() {
           k(this._map._container, "touchstart", this._onDown, this);
         },
@@ -7667,7 +7676,7 @@ function fa() {
           i._simulated = !0, e.target.dispatchEvent(i);
         }
       });
-      z.addInitHook("addHandler", "tapHold", us), z.mergeOptions({
+      z.addInitHook("addHandler", "tapHold", ps), z.mergeOptions({
         // @section Touch interaction options
         // @option touchZoom: Boolean|String = *
         // Whether the map can be zoomed by touch-dragging with two fingers. If
@@ -7680,7 +7689,7 @@ function fa() {
         // and then bounce back when pinch-zooming.
         bounceAtZoomLimits: !0
       });
-      var ps = pt.extend({
+      var fs = pt.extend({
         addHooks: function() {
           $(this._map._container, "leaflet-touch-zoom"), k(this._map._container, "touchstart", this._onTouchStart, this);
         },
@@ -7719,7 +7728,7 @@ function fa() {
           this._zooming = !1, st(this._animRequest), R(document, "touchmove", this._onTouchMove, this), R(document, "touchend touchcancel", this._onTouchEnd, this), this._map.options.zoomAnimation ? this._map._animateZoom(this._center, this._map._limitZoom(this._zoom), !0, this._map.options.zoomSnap) : this._map._resetView(this._center, this._map._limitZoom(this._zoom));
         }
       });
-      z.addInitHook("addHandler", "touchZoom", ps), z.BoxZoom = as, z.DoubleClickZoom = hs, z.Drag = ls, z.Keyboard = cs, z.ScrollWheelZoom = ds, z.TapHold = us, z.TouchZoom = ps, o.Bounds = N, o.Browser = P, o.CRS = gt, o.Canvas = ns, o.Circle = $i, o.CircleMarker = Ie, o.Class = _t, o.Control = lt, o.DivIcon = ts, o.DivOverlay = ft, o.DomEvent = Lr, o.DomUtil = Tr, o.Draggable = Pt, o.Evented = Qt, o.FeatureGroup = vt, o.GeoJSON = xt, o.GridLayer = de, o.Handler = pt, o.Icon = Ht, o.ImageOverlay = Re, o.LatLng = B, o.LatLngBounds = et, o.Layer = ct, o.LayerGroup = Ft, o.LineUtil = Rr, o.Map = z, o.Marker = De, o.Mixin = Dr, o.Path = Tt, o.Point = C, o.PolyUtil = Ir, o.Polygon = Wt, o.Polyline = yt, o.Popup = Ne, o.PosAnimation = On, o.Projection = Nr, o.Rectangle = os, o.Renderer = bt, o.SVG = pe, o.SVGOverlay = Qn, o.TileLayer = Gt, o.Tooltip = Ue, o.Transformation = ii, o.Util = Gs, o.VideoOverlay = Jn, o.bind = _, o.bounds = tt, o.canvas = ss, o.circle = Vr, o.circleMarker = jr, o.control = he, o.divIcon = no, o.extend = d, o.featureGroup = Wr, o.geoJSON = Xn, o.geoJson = Xr, o.gridLayer = so, o.icon = qr, o.imageOverlay = Jr, o.latLng = I, o.latLngBounds = H, o.layerGroup = Hr, o.map = Sr, o.marker = Gr, o.point = E, o.polygon = Yr, o.polyline = Kr, o.popup = eo, o.rectangle = ao, o.setOptions = D, o.stamp = f, o.svg = rs, o.svgOverlay = to, o.tileLayer = es, o.tooltip = io, o.transformation = te, o.version = h, o.videoOverlay = Qr;
+      z.addInitHook("addHandler", "touchZoom", fs), z.BoxZoom = hs, z.DoubleClickZoom = ls, z.Drag = cs, z.Keyboard = ds, z.ScrollWheelZoom = us, z.TapHold = ps, z.TouchZoom = fs, o.Bounds = N, o.Browser = P, o.CRS = gt, o.Canvas = ss, o.Circle = $i, o.CircleMarker = Ie, o.Class = _t, o.Control = lt, o.DivIcon = es, o.DivOverlay = ft, o.DomEvent = Lr, o.DomUtil = Tr, o.Draggable = Pt, o.Evented = Qt, o.FeatureGroup = vt, o.GeoJSON = xt, o.GridLayer = de, o.Handler = pt, o.Icon = Ht, o.ImageOverlay = Re, o.LatLng = B, o.LatLngBounds = et, o.Layer = ct, o.LayerGroup = Ft, o.LineUtil = Rr, o.Map = z, o.Marker = De, o.Mixin = Dr, o.Path = Tt, o.Point = C, o.PolyUtil = Ir, o.Polygon = Wt, o.Polyline = yt, o.Popup = Ne, o.PosAnimation = Zn, o.Projection = Nr, o.Rectangle = as, o.Renderer = bt, o.SVG = pe, o.SVGOverlay = ts, o.TileLayer = Gt, o.Tooltip = Ue, o.Transformation = ii, o.Util = Gs, o.VideoOverlay = Qn, o.bind = _, o.bounds = tt, o.canvas = rs, o.circle = Vr, o.circleMarker = jr, o.control = he, o.divIcon = no, o.extend = d, o.featureGroup = Wr, o.geoJSON = Jn, o.geoJson = Xr, o.gridLayer = so, o.icon = qr, o.imageOverlay = Jr, o.latLng = I, o.latLngBounds = H, o.layerGroup = Hr, o.map = Sr, o.marker = Gr, o.point = E, o.polygon = Yr, o.polyline = Kr, o.popup = eo, o.rectangle = ao, o.setOptions = D, o.stamp = f, o.svg = os, o.svgOverlay = to, o.tileLayer = is, o.tooltip = io, o.transformation = te, o.version = h, o.videoOverlay = Qr;
       var lo = window.L;
       o.noConflict = function() {
         return window.L = lo, this;
@@ -7735,7 +7744,7 @@ function _a(c) {
     return h !== d ? h - d : s.id.localeCompare(o.id);
   });
 }
-const Ds = ["#1976d2", "#d32f2f", "#388e3c", "#7b1fa2", "#f57c00", "#00796b"], ga = ma.replace(/\s+/g, " ").trim();
+const Is = ["#1976d2", "#d32f2f", "#388e3c", "#7b1fa2", "#f57c00", "#00796b"], ga = ma.replace(/\s+/g, " ").trim();
 class qs extends Xt {
   trips = [];
   selectedTripId = "";
@@ -7770,7 +7779,7 @@ class qs extends Xt {
     if (!(!this.hass || !this.vehicleId)) {
       this.fitMapPending ||= s, this.loading = !0, this.error = "", this.requestUpdate();
       try {
-        const o = await Fs(this.hass);
+        const o = await en(this.hass);
         this.vehicleName = o.find((_) => _.vehicle_id === this.vehicleId)?.name ?? "";
         const h = await be(this.hass, this.vehicleId);
         this.mapConfig = h.map_config, this.trips = h.trips, (!this.selectedTripId || !this.trips.some((_) => _.id === this.selectedTripId)) && (this.selectedTripId = this.trips.find((_) => _.status === "active")?.id ?? this.trips[0]?.id ?? "");
@@ -7819,7 +7828,7 @@ class qs extends Xt {
     this.fitMapPending && p.isValid() && (this.map.fitBounds(p.pad(0.08)), this.fitMapPending = !1), setTimeout(() => this.map?.invalidateSize(), 0);
   }
   driveColor(s) {
-    return Ds[s % Ds.length];
+    return Is[s % Is.length];
   }
   selectedTrip() {
     return this.trips.find((s) => s.id === this.selectedTripId);
@@ -7885,7 +7894,7 @@ class qs extends Xt {
     </ha-card>`;
   }
 }
-qs.styles = [Xt.styles, zs(ga), Zt`
+qs.styles = [Xt.styles, Os(ga), Zt`
   :host { min-width: 0; }
   ha-card { overflow: hidden; }
   .map-header { display: flex; align-items: end; justify-content: space-between; gap: 12px; margin-bottom: 12px; }
@@ -7961,7 +7970,7 @@ class xa extends zt {
     const s = this._hass;
     return this.loadingPromise = (async () => {
       try {
-        this.vehicles = await Fs(s), this.loadedConnection = s.connection;
+        this.vehicles = await en(s), this.loadedConnection = s.connection;
         const o = va(this._config, this.vehicles);
         o.vehicle_id !== this._config.vehicle_id && (this._config = o, this.fireConfigChanged());
       } catch {

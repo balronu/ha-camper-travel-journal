@@ -1,5 +1,10 @@
 # PDF-Reiseberichte
 
+Berichtzeitstempel werden in der konfigurierten Home-Assistant-Zeitzone
+angezeigt. Gespeicherte UTC-Zeitstempel bleiben unverändert; nur die Anzeige
+wird lokalisiert, einschließlich Sommer- und Winterzeit. Kostenkategorien
+werden in die Sprache des Berichts übersetzt.
+
 ## Technische Entscheidung
 
 Beta 6 verwendet ReportLab 5.0.1 serverseitig über den authentifizierten Home-Assistant-WebSocket.

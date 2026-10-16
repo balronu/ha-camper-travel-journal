@@ -197,7 +197,8 @@ if websocket_api is not None:
             }
             from .pdf_report import render_trip_report
             language = getattr(getattr(hass, "config", None), "language", "de")
-            pdf, filename = render_trip_report(report, language=language)
+            time_zone = getattr(getattr(hass, "config", None), "time_zone", "UTC")
+            pdf, filename = render_trip_report(report, language=language, time_zone=time_zone)
             connection.send_result(msg["id"], {
                 "content_type": "application/pdf",
                 "filename": filename,

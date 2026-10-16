@@ -6,7 +6,7 @@
 
 <h1 align="center">Camper Travel Journal</h1>
 <p align="center">Dein digitales Wohnmobil-Reisetagebuch für Home Assistant</p>
-<p align="center"><strong>Aktuelle stabile Version: v0.1.0</strong></p>
+<p align="center"><strong>Aktuelle stabile Version: v0.2.0</strong></p>
 
 <p align="center">
   <a href="https://github.com/balronu/ha-camper-travel-journal/releases/latest"><img src="https://img.shields.io/github/v/release/balronu/ha-camper-travel-journal?label=Release" alt="Release"></a>
@@ -41,6 +41,9 @@ Installationen bleibt wichtig.
 - Summary Card mit aktiver Reise als Standard und kompakter Auswahl aller
   Reisen des Fahrzeugs. Kennzahlen und Aktionen gehören immer zur Auswahl.
 - Manager Card für Reisen, Fahrtzuordnung, manuelle Fahrten und Kosten.
+- PDF-Reiseberichte mit Fahrten, Kosten, Zwischenstopps und Notizen; Berichte
+  werden authentifiziert und nur im Speicher erzeugt.
+- Map Card mit CARTO Basemaps, GPS-Linien, Fahrtabschnitten und Segmentfarben.
 - Sicherer, atomarer GPX-Import für PAJ-GPX-1.1-Dateien mit Vorschau,
   Duplikatschutz, Zeitraumwarnungen und expliziter Zielreise.
 - Kostenverwaltung mit stabilen Kategorien, Cent-Beträgen und
@@ -52,7 +55,7 @@ Installationen bleibt wichtig.
 1. Öffne **HACS → Integrationen → Benutzerdefinierte Repositories**.
 2. Füge `https://github.com/balronu/ha-camper-travel-journal` als Repository
    vom Typ **Integration** hinzu.
-3. Installiere die stabile Version `v0.1.0`.
+3. Installiere die stabile Version `v0.2.0`.
 4. Starte Home Assistant manuell neu.
 5. Füge die Integration unter **Einstellungen → Geräte & Dienste** hinzu.
 
@@ -83,8 +86,9 @@ type: custom:camper-travel-journal-manager-card
 vehicle_id: <config-entry-id>
 ```
 
-Die Kartenansicht wurde erstmals in `v0.2.0-beta.3` eingeführt und ist in der
-aktuellen Beta `v0.2.0-beta.6` enthalten. Sie zeigt
+Die Stable-Version bietet genau vier verfügbare Lovelace-Kartentypen: Summary
+Card, Manager Card, Map Card und die optionale Diagnostics Card. Die normale
+Nutzung benötigt die Diagnostics Card nicht. Die Map Card zeigt
 gespeicherte GPS-Linien und Fahrtsegmente, berechnet keine Straßenroute und
 verwendet keine Geocoding- oder Routing-Dienste:
 
@@ -155,8 +159,8 @@ privaten Koordinaten, Tokens oder unredigierten Logs.
 
 - Der Funktionsumfang ist auf Reisetagebuch, Fahrten, Kosten und den GPX-Import
   konzentriert.
-- Die Kartenansicht befindet sich in `v0.2.0-beta.6` weiterhin in der Beta-Phase;
-  Statistiken und Exporte sind noch nicht implementiert.
+- Historische Beta-Änderungen bleiben im Changelog dokumentiert; die aktuelle
+  Karten- und PDF-Funktion gehört zur Stable-Version.
 - Zwischenstopps sind im Backend vorhanden, aber noch nicht vollständig über
   Lovelace bedienbar.
 - Die Retention-Funktion berechnet Kandidaten, löscht in dieser Version aber

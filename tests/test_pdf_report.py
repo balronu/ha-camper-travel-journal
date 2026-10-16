@@ -1,7 +1,7 @@
 import unittest
 
 try:
-    from custom_components.camper_travel_journal.pdf_report import render_trip_report
+    from custom_components.camper_travel_journal.pdf_report import _category_label, _date, _time, render_trip_report
 except ModuleNotFoundError as error:  # pragma: no cover - CI installs manifest dependency
     if error.name != "reportlab":
         raise
@@ -53,3 +53,11 @@ def test_empty_report_is_valid_and_multi_page_report_grows():
     assert empty.startswith(b"%PDF-")
     assert many.startswith(b"%PDF-")
     assert many.count(b"/Type /Page") > empty.count(b"/Type /Page")
+
+
+def test_report_uses_home_assistant_timezone_and_localized_categories():
+    assert _date("2026-07-01T22:30:00+00:00", "de", "Europe/Berlin") == "02.07.2026"
+    assert _time("2026-07-01T22:30:00+00:00", "de", "Europe/Berlin") == "00:30"
+    assert _time("2026-01-01T23:30:00+00:00", "de", "Europe/Berlin") == "00:30"
+    assert _category_label("fuel", "de") == "Kraftstoff"
+    assert _category_label("other", "en") == "Other"
