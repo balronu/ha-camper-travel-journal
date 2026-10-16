@@ -18,6 +18,9 @@ const connection = {
       listCalls += 1;
       return { trips, drives: [], stops: [], available_drives: [], expenses: [], expense_summary: { total_minor: 0, currency: "EUR", mixed_currency: false } };
     }
+    if (message.type === "camper_travel_journal/list_vehicles") {
+      return { vehicles: [{ vehicle_id: "entry-wohnmobil", name: "Wohnmobil", title: "Camper Travel Journal" }] };
+    }
     if (message.type === "camper_travel_journal/analyze_gpx") {
       return { file_hash: `hash-${message.content_base64.length}`, warnings: ["gpx_gap_possible_drive_boundary"], duplicate_point_keys: [], conflicts: { duplicate_file: false, duplicate_points: 0, overlapping_drives: 0 }, points: [{ key: "p1", recorded_at: "2026-10-13T08:00:00+00:00", latitude: 49, longitude: 7 }, { key: "p2", recorded_at: "2026-10-14T08:00:00+00:00", latitude: 49.1, longitude: 7.1 }], drives: [{ key: "d1", started_at: "2026-10-13T08:00:00+00:00", ended_at: "2026-10-13T10:00:00+00:00", distance_m: 1118.7 * 1000, duration_seconds: 7200, reason: "stop" }] };
     }
@@ -79,7 +82,7 @@ await manager.updateComplete;
 manager.shadowRoot.querySelector('.gpx-explicit button')?.click();
 await waitFor(() => importMessages.length === 2 && !manager.gpxPreview && !manager.gpxBusy);
 result.textContent = JSON.stringify({
-  vehicleVisible: summaryText.includes("entry-wohnmobil"),
+  vehicleVisible: summaryText.includes("Wohnmobil") && !summaryText.includes("entry-wohnmobil"),
   targetVisible: summaryText.includes("Zielreise"),
   summaryVisible: summaryText.includes("2 GPS-Punkte") && summaryText.includes("1 ausgewählte Fahrten"),
   periodWarning: warningText,
