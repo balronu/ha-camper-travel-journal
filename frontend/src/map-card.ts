@@ -1,6 +1,6 @@
 import { css, html, unsafeCSS } from "lit";
 import { TravelCard, defineOnce } from "./base-card";
-import { list, route, type RouteResponse, type Snapshot } from "./api";
+import { list, route, type MapConfig, type RouteResponse, type Snapshot } from "./api";
 import { formatDateTime, messages } from "./i18n";
 import * as L from "leaflet";
 import leafletCss from "leaflet/dist/leaflet.css?inline";
@@ -26,6 +26,7 @@ export class MapCard extends TravelCard {
   private tileError = false;
   private tileLayer?: L.TileLayer;
   private renderQueued = false;
+  private mapConfig?: MapConfig;
 
   connectedCallback() {
     super.connectedCallback();
@@ -51,11 +52,13 @@ export class MapCard extends TravelCard {
     this.requestUpdate();
     try {
       const overview = await list(this.hass, this.vehicleId);
+      this.mapConfig = overview.map_config;
       this.trips = overview.trips;
       if (!this.selectedTripId || !this.trips.some((trip) => trip.id === this.selectedTripId)) {
         this.selectedTripId = this.trips.find((trip) => trip.status === "active")?.id ?? this.trips[0]?.id ?? "";
       }
       const details = this.selectedTripId ? await list(this.hass, this.vehicleId, this.selectedTripId) : overview;
+      this.mapConfig = details.map_config ?? this.mapConfig;
       this.drives = sortDrivesChronologically(details.drives);
       const available = new Set(this.drives.map((drive) => drive.id));
       this.selectedDriveIds = this.selectedDriveIds.filter((id) => available.has(id));
@@ -90,10 +93,12 @@ export class MapCard extends TravelCard {
       this.map = L.map(host, { zoomControl: true, attributionControl: true });
       this.map.setView([51.0, 10.0], 5);
     }
-    const config = this.config as MapCardConfig;
-    if (config.tile_url && !this.tileError && !this.tileLayer) {
-      const attribution = config.tile_attribution || (config.tile_url.includes("openstreetmap.org") ? "© OpenStreetMap contributors" : "");
-      this.tileLayer = L.tileLayer(config.tile_url, { maxZoom: 19, attribution }).on("tileerror", () => {
+    const manualConfig = this.config as MapCardConfig;
+    const tileUrl = manualConfig.tile_url ?? this.mapConfig?.tile_url ?? undefined;
+    const tileAttribution = manualConfig.tile_attribution ?? this.mapConfig?.tile_attribution ?? undefined;
+    if (tileUrl && !this.tileError && !this.tileLayer) {
+      const attribution = tileAttribution || (tileUrl.includes("openstreetmap.org") ? "© OpenStreetMap contributors" : "");
+      this.tileLayer = L.tileLayer(tileUrl, { maxZoom: 19, attribution }).on("tileerror", () => {
         this.tileError = true;
         this.tileLayer?.remove();
         this.tileLayer = undefined;
@@ -139,15 +144,17 @@ export class MapCard extends TravelCard {
 
   render() {
     const lang = messages(this.hass);
+    const manualConfig = this.config as MapCardConfig;
+    const tileAttribution = manualConfig.tile_attribution ?? this.mapConfig?.tile_attribution ?? undefined;
     return html`<ha-card><h2>${lang.mapTitle}</h2>
       ${this.trips.length ? html`<label class="selector">${lang.summaryChooseTrip}<select @change=${(event: Event) => void this.selectTrip(event)} .value=${this.selectedTripId}>${this.trips.map((trip) => html`<option value=${trip.id}>${trip.title} · ${trip.status}</option>`)}</select></label>` : ""}
       ${this.drives.length ? html`<fieldset class="drives"><legend>${lang.mapDriveSegments}</legend>${this.drives.map((drive) => html`<label><input type="checkbox" value=${drive.id} .checked=${this.selectedDriveIds.includes(drive.id)} @change=${(event: Event) => void this.toggleDrive(event)}> ${formatDateTime(drive.started_at, this.hass)} · ${(drive.distance_m / 1000).toFixed(1)} km</label>`)}</fieldset>` : ""}
       ${this.error ? html`<p class="error" role="alert">${this.error}</p>` : ""}
-      ${this.tileError ? html`<p class="error" role="alert">${messages(this.hass).mapTilesUnavailable ?? (this.hass?.locale?.language?.toLowerCase().startsWith("de") ? "Die Hintergrundkarte konnte nicht geladen werden. Die GPS-Route bleibt sichtbar." : "The background map could not be loaded. The GPS route remains visible.")}</p>` : !(this.config as MapCardConfig).tile_url ? html`<p class="muted" role="status">${messages(this.hass).mapTilesNotConfigured ?? (this.hass?.locale?.language?.toLowerCase().startsWith("de") ? "Keine Hintergrundkarte konfiguriert. Die GPS-Route bleibt sichtbar." : "No background map is configured. The GPS route remains visible.")}</p>` : ""}
+      ${this.tileError ? html`<p class="error" role="alert">${messages(this.hass).mapTilesUnavailable ?? (this.hass?.locale?.language?.toLowerCase().startsWith("de") ? "Die Hintergrundkarte konnte nicht geladen werden. Die GPS-Route bleibt sichtbar." : "The background map could not be loaded. The GPS route remains visible.")}</p>` : !(this.config as MapCardConfig).tile_url && !this.mapConfig?.tile_url ? html`<p class="muted" role="status">${messages(this.hass).mapTilesNotConfigured ?? (this.hass?.locale?.language?.toLowerCase().startsWith("de") ? "Keine Hintergrundkarte konfiguriert. Die GPS-Route bleibt sichtbar." : "No background map is configured. The GPS route remains visible.")}</p>` : ""}
       ${this.data?.truncated ? html`<p class="muted">${lang.mapTruncated}: ${this.data.returned_points} / ${this.data.total_points}</p>` : ""}
       ${!this.loading && !this.data?.segments.length ? html`<p class="muted">${lang.mapNoPoints}</p>` : ""}
       <div class="map" role="img" aria-label=${lang.mapRouteImageAlt}></div>
-      ${(this.config as MapCardConfig | undefined)?.tile_attribution ? html`<p class="attribution">${(this.config as MapCardConfig).tile_attribution}</p>` : ""}
+      ${tileAttribution ? html`<p class="attribution">${tileAttribution}</p>` : ""}
       ${this.loading ? html`<p class="muted">${lang.loading}</p>` : ""}
     </ha-card>`;
   }

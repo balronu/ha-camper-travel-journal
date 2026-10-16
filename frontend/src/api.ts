@@ -1,10 +1,11 @@
 export type Hass = { connection: { sendMessagePromise<T>(message: Record<string, unknown>): Promise<T> }; locale?: { language?: string } };
-export type Vehicle = { vehicle_id: string; name: string; title: string };
+export type MapConfig = { provider: string; tile_url?: string | null; tile_attribution?: string | null };
+export type Vehicle = { vehicle_id: string; name: string; title: string; map_config?: MapConfig };
 export type Trip = { id: string; title: string; description: string; destination: string; status: "planned" | "active" | "paused" | "completed"; started_at: string; ended_at?: string; start_date?: string | null; end_date?: string | null };
 export type Drive = { id: string; started_at: string; ended_at: string; duration_seconds?: number; distance_m: number; trip_id?: string | null; assignment_status?: "assigned" | "unassigned"; source?: "gps" | "manual"; start_label?: string | null; end_label?: string | null };
 export type Stop = { id: string; trip_id?: string; name: string; description: string; occurred_at: string; stop_type: string };
 export type Expense = { id: string; trip_id?: string; category: string; amount_minor: number; currency: string; occurred_at: string; note?: string };
-export type Snapshot = { trips: Trip[]; drives: Drive[]; available_drives?: Drive[]; stops: Stop[]; expenses?: Expense[]; expense_summary?: { total_minor?: number; by_category?: Record<string, number>; currency?: string | null; mixed_currency?: boolean } };
+export type Snapshot = { trips: Trip[]; drives: Drive[]; available_drives?: Drive[]; stops: Stop[]; expenses?: Expense[]; expense_summary?: { total_minor?: number; by_category?: Record<string, number>; currency?: string | null; mixed_currency?: boolean }; map_config?: MapConfig };
 export type GPXPreview = { file_hash: string; warnings: string[]; duplicate_point_keys: string[]; conflicts: { duplicate_file: boolean; duplicate_points: number; overlapping_drives: number }; points: Array<{ key: string; recorded_at: string; latitude: number; longitude: number }>; drives: Array<{ key: string; started_at: string; ended_at: string; distance_m: number; duration_seconds: number; reason: string }> };
 export type RoutePoint = { recorded_at: string; latitude: number; longitude: number; accuracy_m?: number | null; association_source: string };
 export type RouteSegment = { drive_id: string; started_at: string; ended_at: string; source: string; points: RoutePoint[]; original_point_count: number; gaps: Array<{ from: string; to: string; seconds: number }>; association_sources: string[]; simplified: boolean; truncated: boolean };

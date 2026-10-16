@@ -79,8 +79,10 @@ remain outside the repository and CI artifacts.
 
 ## Next development phase
 
-- `v0.2.0-beta.2` provides the map/route detail view with explicit GPS
+- `v0.2.0-beta.3` provides the map/route detail view with explicit GPS
   point-to-drive membership and neutral handling of ambiguous historical data.
+- `v0.2.0-beta.3` adds optional CARTO Basemaps configuration through the
+  integration Options Flow with secret-safe editing.
 - Continue map hardening with richer drive filtering, point pagination and
   mobile acceptance before a stable map release.
 - Add richer drive filtering and date-range selection without mixing vehicles.

@@ -2,6 +2,14 @@
 
 🇩🇪 Deutsch | 🇬🇧 [English](README.en.md)
 
+## 0.2.0-beta.3 – CARTO Basemaps
+
+- Ergänzt CARTO Basemaps als optionalen Anbieter im Integrations-Optionsflow.
+- Speichert, ändert und entfernt den API-Schlüssel über ein Passwortfeld; bestehende Schlüssel werden beim Bearbeiten nicht vorbefüllt.
+- Verwendet die offizielle CARTO-Voyager-Raster-URL und die Attribution `© OpenStreetMap contributors, © CARTO`.
+- Dokumentiert, dass browserbasierte Tile-Anfragen den Schlüssel in der Netzwerkansicht sichtbar machen.
+- Bewahrt manuelle `tile_url`/`tile_attribution`-Overrides und lässt GPS-Routen ohne Hintergrundkarte sichtbar.
+
 ## 0.2.0-beta.2 – regelkonforme Kartenprovider
 
 - OSM-Kacheln werden nicht mehr ungefragt als Standardprovider verwendet.

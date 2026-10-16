@@ -3,7 +3,7 @@
 from datetime import timedelta
 
 DOMAIN = "camper_travel_journal"
-FRONTEND_VERSION = "0.2.0-beta.2"
+FRONTEND_VERSION = "0.2.0-beta.3"
 FRONTEND_URL = f"/{DOMAIN}/camper-travel-journal.js?v={FRONTEND_VERSION}"
 # HA keeps extra module URLs in memory until they are explicitly removed.  A
 # HACS update/reload can therefore leave any previous beta bundle registered
@@ -29,6 +29,14 @@ CONF_RETENTION_DAYS = "retention_days"
 CONF_STOP_AFTER = "stop_after"
 CONF_MAX_GAP = "max_gap"
 CONF_MAX_SPEED = "max_speed"
+CONF_MAP_PROVIDER = "map_provider"
+CONF_CARTO_API_KEY = "carto_api_key"
+CONF_REMOVE_CARTO_API_KEY = "remove_carto_api_key"
+
+MAP_PROVIDER_NONE = "none"
+MAP_PROVIDER_CARTO = "carto"
+CARTO_TILE_URL = "https://basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}.png?key={key}"
+CARTO_TILE_ATTRIBUTION = "© OpenStreetMap contributors, © CARTO"
 
 DEFAULT_RECORDING_ENABLED = False
 DEFAULT_MIN_INTERVAL_SECONDS = 30

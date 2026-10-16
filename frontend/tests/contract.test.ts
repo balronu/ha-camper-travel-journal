@@ -13,7 +13,7 @@ const bundle = resolve(root, "../custom_components/camper_travel_journal/fronten
 
 describe("frontend release contract", () => {
   it("keeps backend, npm metadata and beta bundle aligned", () => {
-    expect(manifest.version).toBe("0.2.0-beta.2");
+    expect(manifest.version).toBe("0.2.0-beta.3");
     expect(pkg.version).toBe(manifest.version);
     expect(existsSync(bundle)).toBe(true);
   });
@@ -123,6 +123,8 @@ describe("frontend release contract", () => {
     expect(map).toContain("tile_attribution");
     expect(map).toContain("tileerror");
     expect(map).toContain("mapTilesUnavailable");
+    expect(map).toContain("map_config");
+    expect(readFileSync(resolve(root, "../custom_components/camper_travel_journal/const.py"), "utf8")).toContain("basemaps.cartocdn.com");
     expect(map).not.toContain("tile.openstreetmap.org/{z}/{x}/{y}.png");
     expect(map).not.toContain("routing");
   });

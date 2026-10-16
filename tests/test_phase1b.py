@@ -7,7 +7,7 @@ from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 from custom_components.camper_travel_journal.collector import GPSCollector
-from custom_components.camper_travel_journal.config_flow import defaults, validate_submission
+from custom_components.camper_travel_journal.config_flow import defaults, normalize_options, validate_submission
 from custom_components.camper_travel_journal.retention import dry_run_report
 from custom_components.camper_travel_journal.storage import AsyncSQLiteWorker, SCHEMA_VERSION, SQLiteStore
 from custom_components.camper_travel_journal.validation import validate_point
@@ -42,6 +42,15 @@ class Phase1BTests(unittest.TestCase):
         self.assertEqual(values["stop_after"], 10)
         self.assertEqual(validate_submission(FakeHass(), {"tracker_entity": "missing"})["tracker_entity"], "tracker_not_found")
         self.assertEqual(validate_submission(FakeHass(), {"tracker_entity": "device_tracker.camper"}), {})
+
+    def test_carto_secret_is_not_prefilled_and_can_be_changed_or_removed(self):
+        current = {"tracker_entity": "device_tracker.camper", "carto_api_key": "old-secret", "map_provider": "carto"}
+        kept = normalize_options(current, {"tracker_entity": "device_tracker.camper", "map_provider": "carto", "carto_api_key": ""})
+        self.assertEqual(kept["carto_api_key"], "old-secret")
+        changed = normalize_options(current, {"tracker_entity": "device_tracker.camper", "map_provider": "carto", "carto_api_key": "new-secret"})
+        self.assertEqual(changed["carto_api_key"], "new-secret")
+        removed = normalize_options(current, {"tracker_entity": "device_tracker.camper", "map_provider": "none", "carto_api_key": "", "remove_carto_api_key": True})
+        self.assertNotIn("carto_api_key", removed)
 
     def test_translations_are_json_and_aligned(self):
         root = Path(__file__).parents[1]
