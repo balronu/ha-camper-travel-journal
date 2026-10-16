@@ -174,6 +174,20 @@ async def test_list_command_returns_separate_domains():
 
 
 @pytest.mark.asyncio
+async def test_export_pdf_is_authenticated_and_returns_in_memory_document():
+    hass = FakeHass()
+    connection = FakeConnection()
+    await api.ws_export_pdf.__wrapped__(hass, connection, {"id": 22, "vehicle_id": "v1", "trip_id": "t1"})
+    assert connection.errors == []
+    result = connection.results[0][1]
+    assert result["content_type"] == "application/pdf"
+    assert result["filename"].endswith(".pdf")
+    assert base64.b64decode(result["pdf_base64"]).startswith(b"%PDF-")
+    assert "pdf_base64" not in result["filename"]
+    assert [method for method, _, _ in hass.worker.calls if method in {"list_trips", "list_drives", "list_stops", "list_expenses", "expense_summary"}] == ["list_trips", "list_drives", "list_stops", "list_expenses", "expense_summary"]
+
+
+@pytest.mark.asyncio
 async def test_diagnostics_command_is_read_only_and_returns_health_payload():
     hass = FakeHass()
     connection = FakeConnection()

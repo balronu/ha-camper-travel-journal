@@ -1,7 +1,7 @@
 import { css, html, unsafeCSS } from "lit";
 import { TravelCard, defineOnce } from "./base-card";
 import { list, listVehicles, route, type Drive, type MapConfig, type RouteResponse, type Snapshot } from "./api";
-import { formatDate, formatTime, formatTripPeriod, messages } from "./i18n";
+import { formatCompactTripPeriod, formatDate, formatTime, messages } from "./i18n";
 import * as L from "leaflet";
 import leafletCss from "leaflet/dist/leaflet.css?inline";
 import { sortDrivesChronologically } from "./map-utils";
@@ -200,7 +200,7 @@ export class MapCard extends TravelCard {
       ${selectedTrip ? html`<div class="metrics" aria-label=${lang.mapTrip}>
         <div class="metric"><span>${lang.mapTotalDistance}</span><strong>${totalDistance.toFixed(1)} km</strong></div>
         <div class="metric"><span>${lang.mapSelectedDrives}</span><strong>${selectedDrives.length} / ${this.drives.length}</strong></div>
-        <div class="metric"><span>${lang.mapTripPeriod}</span><strong>${formatTripPeriod(selectedTrip, this.hass) || "–"}</strong></div>
+        <div class="metric"><span>${lang.mapTripPeriod}</span><strong>${formatCompactTripPeriod(selectedTrip, this.hass) || "–"}</strong></div>
       </div>` : ""}
       ${this.drives.length ? html`<details class="drive-details" .open=${this.driveSectionsOpen} @toggle=${(event: Event) => this.onDriveSectionsToggle(event)}>
         <summary><span>${lang.mapDriveSegments}</span><span class="summary-count">${selectedDrives.length} / ${this.drives.length}</span></summary>

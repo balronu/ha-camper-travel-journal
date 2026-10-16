@@ -2,6 +2,13 @@
 
 🇩🇪 Deutsch | 🇬🇧 [English](README.en.md)
 
+## 0.2.0-beta.6 – PDF-Reiseberichte
+
+- Authentifizierter PDF-Export der aktuell gespeicherten Reise mit Fahrten, Kosten, Ausgaben, Zwischenstopps und Notizen.
+- A4-Layout mit Seitenzahlen, Erstellungsdatum, deutschen/englischen Beschriftungen und sprachabhängiger Formatierung.
+- PDF-Dateien werden nur im Speicher erzeugt und nicht dauerhaft oder öffentlich abgelegt.
+- Kompakte Reisezeiträume in der Map Card vermeiden abgeschnittene Datumsangaben auf schmalen Displays.
+
 ## 0.2.0-beta.5 – kompakte responsive Reisekarte
 
 - Kompakter Kartenkopf mit Reiseauswahl und Fahrzeugkontext.
