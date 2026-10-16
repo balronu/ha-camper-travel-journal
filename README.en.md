@@ -167,7 +167,7 @@ version is shown by the release badges above.
 See the status-separated [docs/ROADMAP.md](docs/ROADMAP.md). Planned work
 includes expanded statistics, exports and complete Lovelace stop management.
 The read-only map view and authenticated PDF travel reports are already
-available in the current beta line.
+available in the current stable release.
 
 ## Support and contributing
 

@@ -21,7 +21,7 @@ without a corresponding UI and test path.
 - Expense CRUD, integer-cent totals, mixed-currency protection, inline editing
   and canonical category IDs, including the `camping` round-trip.
 
-## Current stable baseline: `v0.1.0`
+## Current stable baseline: `v0.2.0`
 
 The stable baseline includes deterministic active-trip selection, persistent
 Summary Card trip selection and the documented GPX import workflow. CI covers the
