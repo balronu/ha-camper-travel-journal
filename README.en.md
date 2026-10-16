@@ -79,7 +79,8 @@ type: custom:camper-travel-journal-manager-card
 vehicle_id: <config-entry-id>
 ```
 
-The `v0.2.0-beta.6` card adds a read-only GPS map. It displays stored GPS
+The read-only GPS map was first introduced in `v0.2.0-beta.3` and is included
+in the current `v0.2.0-beta.6` beta. It displays stored GPS
 lines and drive segments, does not calculate road routes, and uses no geocoding
 or routing service:
 

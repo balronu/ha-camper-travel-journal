@@ -83,7 +83,8 @@ type: custom:camper-travel-journal-manager-card
 vehicle_id: <config-entry-id>
 ```
 
-Die `v0.2.0-beta.6`-Karte ergänzt eine read-only GPS-Ansicht. Sie zeigt
+Die Kartenansicht wurde erstmals in `v0.2.0-beta.3` eingeführt und ist in der
+aktuellen Beta `v0.2.0-beta.6` enthalten. Sie zeigt
 gespeicherte GPS-Linien und Fahrtsegmente, berechnet keine Straßenroute und
 verwendet keine Geocoding- oder Routing-Dienste:
 
