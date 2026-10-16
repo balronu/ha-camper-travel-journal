@@ -6,6 +6,7 @@ export type Drive = { id: string; started_at: string; ended_at: string; duration
 export type Stop = { id: string; trip_id?: string; name: string; description: string; occurred_at: string; stop_type: string };
 export type Expense = { id: string; trip_id?: string; category: string; amount_minor: number; currency: string; occurred_at: string; note?: string };
 export type Snapshot = { trips: Trip[]; drives: Drive[]; available_drives?: Drive[]; stops: Stop[]; expenses?: Expense[]; expense_summary?: { total_minor?: number; by_category?: Record<string, number>; currency?: string | null; mixed_currency?: boolean }; map_config?: MapConfig };
+export type PdfReport = { content_type: "application/pdf"; filename: string; pdf_base64: string };
 export type GPXPreview = { file_hash: string; warnings: string[]; duplicate_point_keys: string[]; conflicts: { duplicate_file: boolean; duplicate_points: number; overlapping_drives: number }; points: Array<{ key: string; recorded_at: string; latitude: number; longitude: number }>; drives: Array<{ key: string; started_at: string; ended_at: string; distance_m: number; duration_seconds: number; reason: string }> };
 export type RoutePoint = { recorded_at: string; latitude: number; longitude: number; accuracy_m?: number | null; association_source: string };
 export type RouteSegment = { drive_id: string; started_at: string; ended_at: string; source: string; points: RoutePoint[]; original_point_count: number; gaps: Array<{ from: string; to: string; seconds: number }>; association_sources: string[]; simplified: boolean; truncated: boolean };
@@ -25,6 +26,7 @@ export const deleteManualDrive = (hass: Hass, vehicleId: string, driveId: string
 export const createExpense = (hass: Hass, vehicleId: string, tripId: string, data: { occurred_at: string; category: string; amount_minor: number; currency: string; note?: string }) => command(hass, "camper_travel_journal/create_expense", vehicleId, { trip_id: tripId, ...data });
 export const updateExpense = (hass: Hass, vehicleId: string, expenseId: string, data: Record<string, unknown>) => command(hass, "camper_travel_journal/update_expense", vehicleId, { expense_id: expenseId, ...data });
 export const deleteExpense = (hass: Hass, vehicleId: string, expenseId: string) => command(hass, "camper_travel_journal/delete_expense", vehicleId, { expense_id: expenseId });
+export const exportPdf = (hass: Hass, vehicleId: string, tripId: string) => command<PdfReport>(hass, "camper_travel_journal/export_pdf", vehicleId, { trip_id: tripId });
 export const listVehicles = async (hass: Hass): Promise<Vehicle[]> => {
   const result = await hass.connection.sendMessagePromise<{ vehicles?: Vehicle[] }>({ type: "camper_travel_journal/list_vehicles" });
   return result.vehicles ?? [];

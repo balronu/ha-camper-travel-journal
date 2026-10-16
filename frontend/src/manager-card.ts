@@ -1,6 +1,6 @@
 import { css, html } from "lit";
 import { TravelCard, defineOnce } from "./base-card";
-import { analyzeGPX, createExpense, createManualDrive, createTrip, deleteExpense, deleteManualDrive, deleteTrip, importGPX, linkDrives, list, transition, unlinkDrive, updateExpense, updateManualDrive, updateTrip, type Drive, type Expense, type GPXPreview, type Snapshot } from "./api";
+import { analyzeGPX, createExpense, createManualDrive, createTrip, deleteExpense, deleteManualDrive, deleteTrip, exportPdf, importGPX, linkDrives, list, transition, unlinkDrive, updateExpense, updateManualDrive, updateTrip, type Drive, type Expense, type GPXPreview, type Snapshot } from "./api";
 import { notifyExpensesChanged, notifyTravelChanged } from "./expense-events";
 import { categoryLabel, EXPENSE_CATEGORIES, formatDateTime, formatDuration, formatMoneyMinor, formatTripPeriod, isExpenseCategory, messages, parseAmountMinor, statusLabel, type ExpenseCategory } from "./i18n";
 
@@ -13,6 +13,8 @@ export class ManagerCard extends TravelCard {
   private manualOccurredAt = ""; private manualStartLocation = ""; private manualEndLocation = ""; private manualDistanceKm = ""; private manualDurationMinutes = ""; private manualSaving = false;
   private editingDriveId = ""; private editingDriveOccurredAt = ""; private editingDriveStartLocation = ""; private editingDriveEndLocation = ""; private editingDriveDistanceKm = ""; private editingDriveDurationMinutes = ""; private driveSavingId = ""; private confirmingDriveId = "";
   private gpxContent = ""; private gpxName = ""; private gpxPreview?: GPXPreview; private gpxSelected = new Set<string>(); private gpxTripId = ""; private gpxBusy = false; private gpxError = "";
+  private pdfBusyTripId = "";
+  private pdfSelectedTripId = "";
 
   connectedCallback() { super.connectedCallback(); void this.refresh(); }
   protected onHassConnectionChanged() { void this.refresh(); }
@@ -127,6 +129,21 @@ export class ManagerCard extends TravelCard {
   }
   private categoryOptions(current?: string) { const categories = [...EXPENSE_CATEGORIES] as string[]; if (current && !categories.includes(current)) categories.unshift(current); return categories; }
 
+  private async downloadPdf(trip: Snapshot["trips"][number]) {
+    if (!this.hass || this.pdfBusyTripId) return;
+    this.pdfBusyTripId = trip.id; this.actionError = ""; this.requestUpdate();
+    try {
+      const report = await exportPdf(this.hass, this.vehicleId, trip.id);
+      const binary = atob(report.pdf_base64);
+      const bytes = Uint8Array.from(binary, (character) => character.charCodeAt(0));
+      const url = URL.createObjectURL(new Blob([bytes], { type: report.content_type }));
+      const anchor = document.createElement("a");
+      anchor.href = url; anchor.download = report.filename; anchor.click();
+      window.setTimeout(() => URL.revokeObjectURL(url), 1000);
+    } catch { this.fail(messages(this.hass).pdfExportError); }
+    finally { this.pdfBusyTripId = ""; this.requestUpdate(); }
+  }
+
   private renderExpense(expense: Expense, lang: ReturnType<typeof messages>) {
     const editing = this.editingExpenseId === expense.id; const saving = this.expenseSavingId === expense.id;
     return html`<div class="expense-row">${editing ? html`<form class="expense-form" @submit=${(event: SubmitEvent) => { event.preventDefault(); void this.saveExpense(expense); }}><select aria-label=${lang.category} .value=${this.editingCategory} @change=${(event: Event) => this.setEditingExpenseCategory((event.currentTarget as HTMLSelectElement).value)}>${this.categoryOptions(this.editingCategory).map((item) => html`<option value=${item}>${categoryLabel(item, this.hass)}</option>`)}</select><input aria-label=${lang.amount} type="number" min="0" step="0.01" inputmode="decimal" .value=${this.editingAmount} @input=${(event: InputEvent) => this.setEditingExpenseAmount((event.currentTarget as HTMLInputElement).value)}><div class="actions"><button type="submit" ?disabled=${saving}>${saving ? lang.saving : lang.save}</button><button type="button" class="secondary" @click=${() => this.cancelExpenseEdit()} ?disabled=${saving}>${lang.cancel}</button></div></form>` : html`<span>${categoryLabel(expense.category, this.hass)}: ${formatMoneyMinor(expense.amount_minor, expense.currency, this.hass)}</span><span class="actions"><button type="button" class="link" @click=${() => this.startExpenseEdit(expense)} ?disabled=${Boolean(this.expenseSavingId)}>${lang.edit}</button><button type="button" class="link" @click=${() => this.removeExpense(expense.id)}>${this.confirmingExpenseId === expense.id ? lang.confirmDelete : lang.remove}</button></span>`}</div>`;
@@ -145,7 +162,13 @@ export class ManagerCard extends TravelCard {
     const periodWarning = this.gpxTripPeriodWarning(selectedTrip);
     return html`<ha-card><section class="gpx-import gpx-explicit"><h2>${lang.gpxImport}</h2><p class="muted"><strong>${lang.gpxVehicle}:</strong> ${this.vehicleId} (${lang.gpxVehicleFixed})</p><label>${lang.gpxTargetTrip}<select aria-label=${lang.gpxTargetTrip} .value=${this.gpxTripId} @change=${(event: Event) => { this.gpxTripId = (event.currentTarget as HTMLSelectElement).value; this.requestUpdate(); }}><option value="">${lang.gpxNoTrip}</option>${trips.map((trip) => html`<option value=${trip.id}>${trip.title} · ${statusLabel(trip.status, this.hass)} · ${formatTripPeriod(trip, this.hass) || lang.period}</option>`)}</select></label><input type="file" accept=".gpx,application/gpx+xml,application/xml" @change=${(event: Event) => this.readGPX(event)} ?disabled=${this.gpxBusy}><p class="muted">${this.gpxName || lang.gpxPrivacy}</p>${this.gpxError ? html`<p class="error" role="alert">${this.gpxError}</p>` : ""}${gpx ? html`<div class="gpx-preview"><strong>${gpx.drives.length} ${lang.gpxSections}, ${gpx.points.length} ${lang.gpxPoints}</strong>${period ? html`<p class="muted">${lang.gpxPeriod}: ${formatDateTime(period.start, this.hass)} – ${formatDateTime(period.end, this.hass)}</p>` : ""}${periodWarning ? html`<p class="warning" role="alert">${lang.gpxPeriodWarning}</p>` : ""}<h3>${lang.gpxSummary}</h3><p class="muted">${gpx.points.length} ${lang.gpxPoints}, ${this.gpxSelected.size} ${lang.gpxSelectedDrives}, ${this.gpxSelectedDistanceKm().toFixed(1)} ${lang.gpxDistance}, ${selectedTrip?.title || lang.gpxNoTrip}</p><div class="gpx-drive-list">${gpx.drives.map((drive) => html`<label><input type="checkbox" .checked=${this.gpxSelected.has(drive.key)} @change=${(event: Event) => { const checked = (event.currentTarget as HTMLInputElement).checked; checked ? this.gpxSelected.add(drive.key) : this.gpxSelected.delete(drive.key); this.requestUpdate(); }}> ${formatDateTime(drive.started_at, this.hass)} – ${formatDateTime(drive.ended_at, this.hass)} · ${(drive.distance_m / 1000).toFixed(1)} km · ${formatDuration(drive.duration_seconds, this.hass)}</label>`)}</div>${gpx.warnings.length ? html`<p class="muted">${lang.gpxWarnings}: ${gpx.warnings.map((warning) => warning === "gpx_gap_possible_drive_boundary" ? lang.gpxGapBoundary : warning).join(", ")}</p>` : ""}${gpx.conflicts.duplicate_file ? html`<p class="error" role="alert">${lang.gpxDuplicate}</p>` : html`<button type="button" @click=${() => this.confirmGPX()} ?disabled=${this.gpxBusy || this.gpxSelected.size === 0}>${this.gpxBusy ? lang.saving : lang.gpxConfirm}</button>`}</div>` : ""}</section></ha-card>`;
   }
-  render() { const lang = messages(this.hass); const trips = this.snapshot?.trips ?? []; return html`${this.renderGpx(lang, trips, this.gpxPreview)}${this.renderLegacy()}`; }
+  private renderPdfExport(lang: ReturnType<typeof messages>, trips: Snapshot["trips"]) {
+    if (!trips.length) return "";
+    const tripId = trips.some((trip) => trip.id === this.pdfSelectedTripId) ? this.pdfSelectedTripId : (this.selected || trips[0].id);
+    const trip = trips.find((item) => item.id === tripId) ?? trips[0];
+    return html`<section class="pdf-export"><h3>${lang.pdfExportTitle}</h3><div class="pdf-export-row"><select aria-label=${lang.pdfExportTrip} .value=${trip.id} @change=${(event: Event) => { this.pdfSelectedTripId = (event.currentTarget as HTMLSelectElement).value; this.requestUpdate(); }}>${trips.map((item) => html`<option value=${item.id}>${item.title}</option>`)}</select><button type="button" @click=${() => void this.downloadPdf(trip)} ?disabled=${Boolean(this.pdfBusyTripId)}>${this.pdfBusyTripId ? lang.pdfExporting : lang.pdfExport}</button></div></section>`;
+  }
+  render() { const lang = messages(this.hass); const trips = this.snapshot?.trips ?? []; return html`${this.renderGpx(lang, trips, this.gpxPreview)}${this.renderPdfExport(lang, trips)}${this.renderLegacy()}`; }
   private renderLegacy() {
     const lang = messages(this.hass); const trips = this.snapshot?.trips ?? []; const expenses = this.snapshot?.expenses ?? []; const summary = this.snapshot?.expense_summary;
     const total = summary?.mixed_currency ? lang.mixedCurrency : summary?.total_minor !== undefined && summary.currency ? formatMoneyMinor(summary.total_minor, summary.currency, this.hass) : formatMoneyMinor(0, "EUR", this.hass); const error = this.loadError || this.actionError;
@@ -155,5 +178,5 @@ export class ManagerCard extends TravelCard {
 }
 
 ManagerCard.styles = [TravelCard.styles, css`section{margin-top:16px}.gpx-preview{padding:8px;background:var(--secondary-background-color)}.trip{display:grid;gap:8px;padding:12px 0;border-bottom:1px solid var(--divider-color)}.row,.expense-row,.drive-row{display:flex;justify-content:space-between;gap:8px;align-items:center;flex-wrap:wrap}.details{padding:8px;background:var(--secondary-background-color)}h4{margin:12px 0 4px}.link{min-height:30px;padding:4px 8px;font-size:.9em}.form-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(9rem,1fr));gap:8px;align-items:end}.form-grid input,.form-grid select{min-width:0;width:100%;box-sizing:border-box}.form-grid label{display:grid;gap:4px;font-size:.9em}.expense-form{display:grid;grid-template-columns:minmax(0,1fr) minmax(7rem,10rem) auto;gap:8px;align-items:center;width:100%}.expense-form input,.expense-form select{min-width:0;width:100%;box-sizing:border-box}.create-form{grid-template-columns:minmax(7rem,10rem) minmax(0,1fr) auto}.total{margin:12px 0 0;text-align:right}@media(max-width:500px){.expense-form,.create-form,.drive-edit-form{grid-template-columns:1fr}.expense-form .actions{margin-top:0}.total{text-align:left}}`] as any;
-ManagerCard.styles = [...(ManagerCard.styles as any), css`.gpx-import:not(.gpx-explicit){display:none}.gpx-import.gpx-explicit label{display:grid;gap:4px}.gpx-import.gpx-explicit select{min-width:0;max-width:100%;padding:6px}.gpx-drive-list{display:grid;gap:6px;margin:8px 0}.warning{padding:8px;background:var(--warning-color,#ff9800);color:var(--primary-text-color)}`] as any;
+ManagerCard.styles = [...(ManagerCard.styles as any), css`.gpx-import:not(.gpx-explicit){display:none}.gpx-import.gpx-explicit label{display:grid;gap:4px}.gpx-import.gpx-explicit select{min-width:0;max-width:100%;padding:6px}.gpx-drive-list{display:grid;gap:6px;margin:8px 0}.pdf-export{margin-top:16px;padding-top:12px;border-top:1px solid var(--divider-color)}.pdf-export-row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}.pdf-export-row select{min-width:0;flex:1 1 14rem;padding:8px;border:1px solid var(--divider-color);border-radius:6px;background:var(--card-background-color);color:var(--primary-text-color)}.warning{padding:8px;background:var(--warning-color,#ff9800);color:var(--primary-text-color)}`] as any;
 defineOnce("camper-travel-journal-manager-card", ManagerCard);

@@ -175,6 +175,37 @@ if websocket_api is not None:
             })
         connection.send_result(msg["id"], {"vehicles": sorted(vehicles, key=lambda item: item["name"].lower())})
 
+    @websocket_api.websocket_command({**_base("camper_travel_journal/export_pdf"), vol.Required("trip_id"): str})
+    @websocket_api.async_response
+    async def ws_export_pdf(hass: HomeAssistant, connection, msg: dict) -> None:
+        """Create one authenticated, in-memory PDF report for a trip."""
+        try:
+            vehicle_id = msg["vehicle_id"]
+            trip_id = msg["trip_id"]
+            trips = await _call(hass, msg, "list_trips", vehicle_id)
+            trip = next((item for item in trips if item.get("id") == trip_id), None)
+            if trip is None:
+                raise ValueError("trip_not_found")
+            vehicle_name = _runtime(hass, vehicle_id).values.get("vehicle_name", "Wohnmobil")
+            report = {
+                "vehicle_name": vehicle_name,
+                "trip": trip,
+                "drives": await _call(hass, msg, "list_drives", vehicle_id, trip_id=trip_id),
+                "stops": await _call(hass, msg, "list_stops", vehicle_id, trip_id=trip_id),
+                "expenses": await _call(hass, msg, "list_expenses", trip_id),
+                "expense_summary": await _call(hass, msg, "expense_summary", trip_id),
+            }
+            from .pdf_report import render_trip_report
+            language = getattr(getattr(hass, "config", None), "language", "de")
+            pdf, filename = render_trip_report(report, language=language)
+            connection.send_result(msg["id"], {
+                "content_type": "application/pdf",
+                "filename": filename,
+                "pdf_base64": base64.b64encode(pdf).decode("ascii"),
+            })
+        except Exception as err:
+            _send_error(connection, msg, err)
+
     @websocket_api.websocket_command({**_base("camper_travel_journal/list"), vol.Optional("trip_id"): str})
     @websocket_api.async_response
     async def ws_list(hass: HomeAssistant, connection, msg: dict) -> None:
@@ -401,7 +432,7 @@ if websocket_api is not None:
             connection.send_result(msg["id"], result)
         except Exception as err: _send_error(connection, msg, err)
 
-    COMMANDS = (ws_list_vehicles, ws_list, ws_route, ws_diagnostics, ws_create_trip, ws_update_trip, ws_delete_trip, ws_transition_trip, ws_link_drives, ws_unlink_drive, ws_create_manual_drive, ws_update_manual_drive, ws_delete_manual_drive, ws_create_stop, ws_update_stop, ws_delete_stop, ws_create_expense, ws_update_expense, ws_delete_expense, ws_analyze_gpx, ws_import_gpx)
+    COMMANDS = (ws_list_vehicles, ws_export_pdf, ws_list, ws_route, ws_diagnostics, ws_create_trip, ws_update_trip, ws_delete_trip, ws_transition_trip, ws_link_drives, ws_unlink_drive, ws_create_manual_drive, ws_update_manual_drive, ws_delete_manual_drive, ws_create_stop, ws_update_stop, ws_delete_stop, ws_create_expense, ws_update_expense, ws_delete_expense, ws_analyze_gpx, ws_import_gpx)
 else:
     COMMANDS = ()
 
