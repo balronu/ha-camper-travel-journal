@@ -83,7 +83,7 @@ type: custom:camper-travel-journal-manager-card
 vehicle_id: <config-entry-id>
 ```
 
-Die `v0.2.0-beta.3`-Karte ergänzt eine read-only GPS-Ansicht. Sie zeigt
+Die `v0.2.0-beta.6`-Karte ergänzt eine read-only GPS-Ansicht. Sie zeigt
 gespeicherte GPS-Linien und Fahrtsegmente, berechnet keine Straßenroute und
 verwendet keine Geocoding- oder Routing-Dienste:
 
@@ -154,7 +154,7 @@ privaten Koordinaten, Tokens oder unredigierten Logs.
 
 - Der Funktionsumfang ist auf Reisetagebuch, Fahrten, Kosten und den GPX-Import
   konzentriert.
-- Die Kartenansicht befindet sich in `v0.2.0-beta.3` weiterhin in der Beta-Phase;
+- Die Kartenansicht befindet sich in `v0.2.0-beta.6` weiterhin in der Beta-Phase;
   Statistiken und Exporte sind noch nicht implementiert.
 - Zwischenstopps sind im Backend vorhanden, aber noch nicht vollständig über
   Lovelace bedienbar.
@@ -170,9 +170,10 @@ Projektversion steht oben bei den Release-Badges.
 ## Roadmap
 
 Die statusgetrennte Roadmap steht in [docs/ROADMAP.md](docs/ROADMAP.md).
-Geplant sind unter anderem eine Routen-/Kartenansicht, Reiseverlauf,
-Statistiken, Exporte und eine vollständige Lovelace-Verwaltung der
-Zwischenstopps.
+Weiter geplant sind unter anderem erweiterte Statistiken, Exporte und
+vollständige Lovelace-Verwaltung von Zwischenstopps. Die read-only-
+Kartenansicht und der authentifizierte PDF-Reisebericht sind im aktuellen
+Beta-Zweig bereits vorhanden.
 
 ## Support und Mitwirkung
 

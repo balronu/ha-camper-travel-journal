@@ -79,7 +79,7 @@ type: custom:camper-travel-journal-manager-card
 vehicle_id: <config-entry-id>
 ```
 
-The `v0.2.0-beta.3` card adds a read-only GPS map. It displays stored GPS
+The `v0.2.0-beta.6` card adds a read-only GPS map. It displays stored GPS
 lines and drive segments, does not calculate road routes, and uses no geocoding
 or routing service:
 
@@ -145,7 +145,7 @@ issues or tests.
 ## Known limitations
 
 - The scope is focused on the travel journal, drives, expenses and GPX import.
-- The map view is a beta feature in `v0.2.0-beta.3`; statistics and
+- The map view is a beta feature in `v0.2.0-beta.6`; statistics and
   exports are not implemented yet.
 - Stops exist in the backend but are not fully manageable from Lovelace yet.
 - Retention calculates candidates but does not automatically delete in this
@@ -160,8 +160,9 @@ version is shown by the release badges above.
 ## Roadmap
 
 See the status-separated [docs/ROADMAP.md](docs/ROADMAP.md). Planned work
-includes a route/map view, trip history, statistics, exports and complete
-Lovelace stop management.
+includes expanded statistics, exports and complete Lovelace stop management.
+The read-only map view and authenticated PDF travel reports are already
+available in the current beta line.
 
 ## Support and contributing
 
