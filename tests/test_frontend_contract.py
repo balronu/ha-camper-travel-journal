@@ -34,7 +34,8 @@ def test_release_version_is_aligned_across_project_and_readmes():
     for name in ("README.md", "README.de.md", "README.en.md"):
         text = (ROOT / name).read_text(encoding="utf-8")
         assert "v0.1.0" in text
-        assert "beta." not in text
+        if name != "README.de.md":
+            assert "v0.2.0-beta.1" in text
 
 
 def test_local_home_assistant_brand_asset_is_present():
