@@ -76,7 +76,7 @@ result.textContent = JSON.stringify({
   listCalls,
   categoryLabel: managerCategoryLabel,
   total: managerTotal,
-  summaryTotal: summary.shadowRoot.textContent.includes("23,00"),
+  summaryReflectsActiveTrip: summary.shadowRoot.textContent.includes("Zweite Reise") && summary.shadowRoot.textContent.includes("0,00"),
   summaryListCalls,
   closedAfterSave,
   reopened,

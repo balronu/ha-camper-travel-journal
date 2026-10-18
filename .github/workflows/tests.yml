@@ -73,7 +73,7 @@ jobs:
           if (result.createdCategory !== 'camping') throw new Error(`expected camping payload, got ${result.createdCategory}`);
           if (!result.categoryLabel) throw new Error('camping label did not render');
           if (!result.total) throw new Error('camping expense total did not render');
-          if (!result.summaryTotal) throw new Error('summary card did not refresh after expense creation');
+          if (!result.summaryReflectsActiveTrip) throw new Error('summary card did not follow the shared active trip context');
           if (result.summaryListCalls < 2) throw new Error(`summary card did not perform its initial and synchronized trip loads: ${result.summaryListCalls}`);
           if (!result.closedAfterSave || !result.reopened || !result.switchedTrip || !result.closedSecond) throw new Error(`details toggle regression: ${JSON.stringify(result)}`);
           if (result.visibleTemplateLeak) throw new Error('frontend template source leaked into visible DOM');

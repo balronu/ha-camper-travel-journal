@@ -218,6 +218,8 @@ if websocket_api is not None:
                 "stops": await _call(hass, msg, "list_stops", msg["vehicle_id"], trip_id=trip_id),
                 "stop_suggestions": await _call(hass, msg, "list_stop_suggestions", msg["vehicle_id"], trip_id=trip_id) if trip_id else await _call(hass, msg, "list_stop_suggestions", msg["vehicle_id"]),
             }
+            if trip_id:
+                result["interruptions"] = await _call(hass, msg, "list_trip_interruptions", msg["vehicle_id"], trip_id)
             result["map_config"] = _map_config(_runtime(hass, msg["vehicle_id"]).values)
             if trip_id:
                 result["available_drives"] = await _call(hass, msg, "list_available_drives", msg["vehicle_id"])

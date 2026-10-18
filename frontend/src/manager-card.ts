@@ -1,47 +1,84 @@
 import { css, html } from "lit";
 import { TravelCard, defineOnce } from "./base-card";
-import { acceptStopSuggestion, analyzeGPX, createExpense, createManualDrive, createStop, createTrip, deleteExpense, deleteManualDrive, deleteRating, deleteStop, deleteTrip, dismissStopSuggestion, exportPdf, generateStopSuggestions, importGPX, linkDrives, list, listVehicles, transition, unlinkDrive, updateExpense, updateManualDrive, updateOvernight, updateRating, updateStop, updateTrip, type Drive, type Expense, type GPXPreview, type Snapshot, type StopSuggestion } from "./api";
+import { acceptStopSuggestion, analyzeGPX, createExpense, createManualDrive, createStop, createTrip, deleteExpense, deleteManualDrive, deleteRating, deleteStop, deleteTrip, dismissStopSuggestion, exportPdf, generateStopSuggestions, importGPX, linkDrives, list, listVehicles, transition, unlinkDrive, updateExpense, updateManualDrive, updateOvernight, updateRating, updateStop, updateTrip, type Drive, type Expense, type GPXPreview, type Snapshot, type StopSuggestion, type TripInterruption } from "./api";
 import { notifyExpensesChanged, notifyTravelChanged } from "./expense-events";
 import { categoryLabel, EXPENSE_CATEGORIES, formatDateTime, formatDuration, formatMoneyMinor, formatTripPeriod, isExpenseCategory, messages, parseAmountMinor, statusLabel, type ExpenseCategory } from "./i18n";
+import { ACTIVE_TRIP_CHANGED_EVENT, publishActiveTrip, readActiveTrip, type TripContextDetail } from "./trip-context";
 
 export class ManagerCard extends TravelCard {
   private snapshot?: Snapshot; private loadError = ""; private actionError = "";
   private tripTitle = ""; private destination = ""; private tripStartDate = ""; private tripEndDate = "";
   private editingTripId = ""; private editingTripTitle = ""; private editingDestination = ""; private editingStartDate = ""; private editingEndDate = "";
   private confirmingTripId = ""; private confirmingExpenseId = ""; private amount = ""; private category: ExpenseCategory = EXPENSE_CATEGORIES[0];
-  private selected = ""; private editingExpenseId = ""; private editingAmount = ""; private editingCategory = "other"; private expenseSavingId = "";
+  private activeTripId = ""; private selected = ""; private editingExpenseId = ""; private editingAmount = ""; private editingCategory = "other"; private expenseSavingId = "";
   private manualOccurredAt = ""; private manualStartLocation = ""; private manualEndLocation = ""; private manualDistanceKm = ""; private manualDurationMinutes = ""; private manualSaving = false;
   private editingDriveId = ""; private editingDriveOccurredAt = ""; private editingDriveStartLocation = ""; private editingDriveEndLocation = ""; private editingDriveDistanceKm = ""; private editingDriveDurationMinutes = ""; private driveSavingId = ""; private confirmingDriveId = "";
   private gpxContent = ""; private gpxName = ""; private gpxPreview?: GPXPreview; private gpxSelected = new Set<string>(); private gpxTripId = ""; private gpxBusy = false; private gpxError = "";
   private pdfBusyTripId = "";
-  private pdfSelectedTripId = "";
   private vehicleName = "";
   private placeName = ""; private placeType = "other"; private placeArrived = ""; private placeDeparted = ""; private placeLatitude = ""; private placeLongitude = ""; private placeDescription = ""; private placeAddress = ""; private placeSaving = false;
   private editingPlaceId = ""; private confirmingPlaceId = ""; private ratingPlaceId = ""; private ratingOverall = ""; private ratingAccess = ""; private ratingSpace = ""; private ratingFacilities = ""; private ratingSurroundings = ""; private ratingText = "";
+  private interruptionDriveId = "";
   private suggestionEditingId = ""; private suggestionName = "GPS-Stopp"; private suggestionType = "other";
+  private readonly onActiveTripChanged = (event: Event) => {
+    const detail = (event as CustomEvent<TripContextDetail>).detail;
+    if (detail?.vehicleId !== this.vehicleId || detail.tripId === this.activeTripId) return;
+    this.activeTripId = detail.tripId;
+    this.selected = "";
+    void this.refresh();
+  };
   private async refreshSuggestions(tripId: string) { if (!this.hass) return; try { await generateStopSuggestions(this.hass, this.vehicleId, tripId); await this.refresh(); } catch { this.fail(messages(this.hass).loadError); } }
   private async acceptSuggestion(suggestion: StopSuggestion, tripId: string) { if (!this.hass) return; if (this.suggestionEditingId !== suggestion.id) { this.suggestionEditingId = suggestion.id; this.suggestionName = "GPS-Stopp"; this.suggestionType = "other"; this.requestUpdate(); return; } try { await acceptStopSuggestion(this.hass, this.vehicleId, suggestion.id, tripId, this.suggestionName, this.suggestionType); this.suggestionEditingId = ""; await this.refresh(); notifyTravelChanged({ vehicleId: this.vehicleId, tripId }); } catch { this.fail(messages(this.hass).loadError); } }
   private async dismissSuggestion(suggestion: StopSuggestion, tripId: string) { if (!this.hass) return; try { await dismissStopSuggestion(this.hass, this.vehicleId, suggestion.id); await this.refresh(); notifyTravelChanged({ vehicleId: this.vehicleId, tripId }); } catch { this.fail(messages(this.hass).loadError); } }
-  private resetPlaceForm() { this.placeName = ""; this.placeType = "other"; this.placeArrived = ""; this.placeDeparted = ""; this.placeLatitude = ""; this.placeLongitude = ""; this.placeDescription = ""; this.placeAddress = ""; this.editingPlaceId = ""; }
-  private placePayload() { const parse = (value: string) => value.trim() ? Number(value.replace(",", ".")) : undefined; return { name: this.placeName.trim(), place_type: this.placeType, category: this.placeType, occurred_at: new Date(this.placeArrived).toISOString(), arrived_at: new Date(this.placeArrived).toISOString(), departed_at: this.placeDeparted ? new Date(this.placeDeparted).toISOString() : undefined, latitude: parse(this.placeLatitude), longitude: parse(this.placeLongitude), address: this.placeAddress, description: this.placeDescription }; }
+  private resetPlaceForm() { this.placeName = ""; this.placeType = "other"; this.placeArrived = ""; this.placeDeparted = ""; this.placeLatitude = ""; this.placeLongitude = ""; this.placeDescription = ""; this.placeAddress = ""; this.editingPlaceId = ""; this.interruptionDriveId = ""; }
+  private placePayload() { const parse = (value: string) => value.trim() ? Number(value.replace(",", ".")) : undefined; return { name: this.placeName.trim(), place_type: this.placeType, category: this.placeType, drive_id: this.interruptionDriveId || undefined, occurred_at: new Date(this.placeArrived).toISOString(), arrived_at: new Date(this.placeArrived).toISOString(), departed_at: this.placeDeparted ? new Date(this.placeDeparted).toISOString() : undefined, latitude: parse(this.placeLatitude), longitude: parse(this.placeLongitude), address: this.placeAddress, description: this.placeDescription }; }
   private editPlace(place: Snapshot["stops"][number]) { this.editingPlaceId = place.id; this.placeName = place.name; this.placeType = place.place_type || place.stop_type; this.placeArrived = place.arrived_at ? this.placeLocalDateTime(place.arrived_at) : this.placeLocalDateTime(place.occurred_at); this.placeDeparted = place.departed_at ? this.placeLocalDateTime(place.departed_at) : ""; this.placeLatitude = place.latitude == null ? "" : String(place.latitude); this.placeLongitude = place.longitude == null ? "" : String(place.longitude); this.placeDescription = place.description || ""; this.placeAddress = place.address || ""; this.requestUpdate(); }
   private placeLocalDateTime(value: string) { const date = new Date(value); const pad = (n: number) => String(n).padStart(2, "0"); return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`; }
+  private startInterruption(interruption: TripInterruption) {
+    if (interruption.existing_place_id) { const existing = (this.snapshot?.stops ?? []).find((place) => place.id === interruption.existing_place_id); if (existing) this.editPlace(existing); return; }
+    this.editingPlaceId = ""; this.interruptionDriveId = interruption.previous_drive_id;
+    this.placeName = ""; this.placeType = "other"; this.placeArrived = this.placeLocalDateTime(interruption.started_at); this.placeDeparted = this.placeLocalDateTime(interruption.ended_at);
+    const point = interruption.previous_end_point;
+    this.placeLatitude = point ? String(point.latitude) : ""; this.placeLongitude = point ? String(point.longitude) : "";
+    this.placeDescription = ""; this.placeAddress = ""; this.selected = this.activeTripId; this.requestUpdate();
+  }
   private async savePlace(tripId: string) { if (!this.hass || this.placeSaving || !this.placeName.trim() || !this.placeArrived) return; this.placeSaving = true; try { const payload = this.placePayload(); if (this.editingPlaceId) await updateStop(this.hass, this.vehicleId, this.editingPlaceId, payload); else { const result = await createStop(this.hass, this.vehicleId, tripId, payload); if (["campsite", "rv_site", "wild_camp", "overnight"].includes(this.placeType)) await updateOvernight(this.hass, this.vehicleId, result.stop_id, { place_kind: this.placeType }); } this.resetPlaceForm(); await this.refresh(); notifyTravelChanged({ vehicleId: this.vehicleId, tripId }); } catch { this.fail(messages(this.hass).placeSaveError ?? messages(this.hass).loadError); } finally { this.placeSaving = false; this.requestUpdate(); } }
   private async removePlace(place: Snapshot["stops"][number], tripId: string) { if (!this.hass) return; if (this.confirmingPlaceId !== place.id) { this.confirmingPlaceId = place.id; this.requestUpdate(); return; } try { await deleteStop(this.hass, this.vehicleId, place.id); this.confirmingPlaceId = ""; await this.refresh(); notifyTravelChanged({ vehicleId: this.vehicleId, tripId }); } catch { this.fail(messages(this.hass).placeDeleteError ?? messages(this.hass).loadError); } }
   private async saveRating(placeId: string, tripId: string) { if (!this.hass) return; const values = [this.ratingOverall, this.ratingAccess, this.ratingSpace, this.ratingFacilities, this.ratingSurroundings]; if (!this.ratingOverall || values.slice(1).some((value) => value && (!/^\d$/.test(value) || Number(value) < 1 || Number(value) > 5))) return this.fail(messages(this.hass).ratingInvalid ?? messages(this.hass).dateInvalid); try { await updateRating(this.hass, this.vehicleId, placeId, { overall: Number(this.ratingOverall), large_rv_access: this.ratingAccess ? Number(this.ratingAccess) : undefined, space_maneuvering: this.ratingSpace ? Number(this.ratingSpace) : undefined, facilities: this.ratingFacilities ? Number(this.ratingFacilities) : undefined, surroundings: this.ratingSurroundings ? Number(this.ratingSurroundings) : undefined, review_text: this.ratingText }); this.ratingPlaceId = ""; await this.refresh(); notifyTravelChanged({ vehicleId: this.vehicleId, tripId }); } catch { this.fail(messages(this.hass).ratingSaveError ?? messages(this.hass).loadError); } }
   private async removeRating(placeId: string, tripId: string) { if (!this.hass) return; try { await deleteRating(this.hass, this.vehicleId, placeId); this.ratingPlaceId = ""; await this.refresh(); notifyTravelChanged({ vehicleId: this.vehicleId, tripId }); } catch { this.fail(messages(this.hass).ratingSaveError ?? messages(this.hass).loadError); } }
   private startRating(place: Snapshot["stops"][number]) { this.ratingPlaceId = place.id; this.ratingOverall = place.rating_overall ? String(place.rating_overall) : ""; this.ratingAccess = place.large_rv_access ? String(place.large_rv_access) : ""; this.ratingSpace = place.space_maneuvering ? String(place.space_maneuvering) : ""; this.ratingFacilities = place.facilities ? String(place.facilities) : ""; this.ratingSurroundings = place.surroundings ? String(place.surroundings) : ""; this.ratingText = place.review_text || ""; this.requestUpdate(); }
 
-  connectedCallback() { super.connectedCallback(); void this.refresh(); }
+  connectedCallback() { super.connectedCallback(); window.addEventListener(ACTIVE_TRIP_CHANGED_EVENT, this.onActiveTripChanged); void this.refresh(); }
+  disconnectedCallback() { window.removeEventListener(ACTIVE_TRIP_CHANGED_EVENT, this.onActiveTripChanged); super.disconnectedCallback(); }
   protected onHassConnectionChanged() { void this.refresh(); }
   protected onConfigChanged() { void this.refresh(); }
-  private async refresh(): Promise<boolean> { if (!this.hass || !this.vehicleId) return false; try { const snapshot = await list(this.hass, this.vehicleId, this.selected || undefined); this.snapshot = snapshot; try { const vehicles = await listVehicles(this.hass); this.vehicleName = vehicles.find((vehicle) => vehicle.vehicle_id === this.vehicleId)?.name || ""; } catch { this.vehicleName = ""; } this.loadError = ""; this.requestUpdate(); return true; } catch { this.loadError = messages(this.hass).loadError; this.requestUpdate(); return false; } }
+  private async refresh(): Promise<boolean> {
+    if (!this.hass || !this.vehicleId) return false;
+    try {
+      const contextTripId = readActiveTrip(this.vehicleId);
+      if (!this.activeTripId) this.activeTripId = contextTripId;
+      let snapshot = await list(this.hass, this.vehicleId, this.activeTripId || undefined);
+      const selectedTrip = snapshot.trips.find((trip) => trip.id === this.activeTripId)
+        ?? snapshot.trips.find((trip) => trip.status === "active")
+        ?? snapshot.trips[0];
+      if (selectedTrip && this.activeTripId !== selectedTrip.id) {
+        this.activeTripId = selectedTrip.id;
+        publishActiveTrip({ vehicleId: this.vehicleId, tripId: this.activeTripId, source: "manager" });
+        snapshot = await list(this.hass, this.vehicleId, this.activeTripId);
+      } else if (selectedTrip) {
+        publishActiveTrip({ vehicleId: this.vehicleId, tripId: selectedTrip.id, source: "manager" });
+      }
+      this.snapshot = snapshot;
+      try { const vehicles = await listVehicles(this.hass); this.vehicleName = vehicles.find((vehicle) => vehicle.vehicle_id === this.vehicleId)?.name || ""; } catch { this.vehicleName = ""; }
+      this.loadError = ""; this.requestUpdate(); return true;
+    } catch { this.loadError = messages(this.hass).loadError; this.requestUpdate(); return false; }
+  }
   private fail(message: string) { this.actionError = message; this.requestUpdate(); }
   private async readGPX(event: Event) {
     const file = (event.currentTarget as HTMLInputElement).files?.[0];
     if (!file || !this.hass) return;
     this.gpxBusy = true; this.gpxError = ""; this.gpxPreview = undefined; this.gpxName = file.name;
-    try { const bytes = new Uint8Array(await file.arrayBuffer()); let binary = ""; bytes.forEach((byte) => { binary += String.fromCharCode(byte); }); this.gpxContent = btoa(binary); this.gpxPreview = await analyzeGPX(this.hass, this.vehicleId, this.gpxContent); this.gpxSelected = new Set(this.gpxPreview.drives.map((drive) => drive.key)); this.gpxTripId = this.selected; }
+    try { const bytes = new Uint8Array(await file.arrayBuffer()); let binary = ""; bytes.forEach((byte) => { binary += String.fromCharCode(byte); }); this.gpxContent = btoa(binary); this.gpxPreview = await analyzeGPX(this.hass, this.vehicleId, this.gpxContent); this.gpxSelected = new Set(this.gpxPreview.drives.map((drive) => drive.key)); this.gpxTripId = this.activeTripId; }
     catch { this.gpxError = messages(this.hass).gpxAnalyzeError; }
     finally { this.gpxBusy = false; this.requestUpdate(); }
   }
@@ -71,7 +108,7 @@ export class ManagerCard extends TravelCard {
   private async addTrip() {
     if (!this.hass || !this.tripTitle.trim()) return;
     if (this.tripStartDate && this.tripEndDate && this.tripEndDate < this.tripStartDate) return this.fail(messages(this.hass).dateInvalid);
-    try { await createTrip(this.hass, this.vehicleId, this.tripTitle, this.tripStartDate, this.tripEndDate, this.destination); this.actionError = ""; this.tripTitle = ""; this.destination = ""; this.tripStartDate = ""; this.tripEndDate = ""; await this.refresh(); notifyTravelChanged({ vehicleId: this.vehicleId, tripId: this.selected }); }
+    try { await createTrip(this.hass, this.vehicleId, this.tripTitle, this.tripStartDate, this.tripEndDate, this.destination); this.actionError = ""; this.tripTitle = ""; this.destination = ""; this.tripStartDate = ""; this.tripEndDate = ""; await this.refresh(); notifyTravelChanged({ vehicleId: this.vehicleId, tripId: this.activeTripId }); }
     catch { this.fail(messages(this.hass).tripCreateError); }
   }
   private startTripEdit(trip: Snapshot["trips"][number]) { this.actionError = ""; this.editingTripId = trip.id; this.editingTripTitle = trip.title; this.editingDestination = trip.destination || ""; this.editingStartDate = trip.start_date || ""; this.editingEndDate = trip.end_date || ""; this.requestUpdate(); }
@@ -85,13 +122,13 @@ export class ManagerCard extends TravelCard {
   private async removeTrip(id: string) {
     if (!this.hass) return;
     if (this.confirmingTripId !== id) { this.confirmingTripId = id; this.requestUpdate(); return; }
-    try { await deleteTrip(this.hass, this.vehicleId, id); this.confirmingTripId = ""; if (this.selected === id) this.selected = ""; await this.refresh(); notifyTravelChanged({ vehicleId: this.vehicleId, tripId: id }); }
+    try { await deleteTrip(this.hass, this.vehicleId, id); this.confirmingTripId = ""; if (this.selected === id) this.selected = ""; if (this.activeTripId === id) this.activeTripId = ""; await this.refresh(); notifyTravelChanged({ vehicleId: this.vehicleId, tripId: id }); }
     catch { this.fail(messages(this.hass).tripDeleteError); }
   }
   private async changeStatus(id: string, status: "active" | "paused" | "completed") { if (!this.hass) return; try { await transition(this.hass, this.vehicleId, id, status); this.actionError = ""; await this.refresh(); notifyTravelChanged({ vehicleId: this.vehicleId, tripId: id }); } catch { this.fail(messages(this.hass).statusError); } }
   private async assignDrive(tripId: string, driveId: string) { if (!this.hass) return; try { await linkDrives(this.hass, this.vehicleId, tripId, [driveId]); this.actionError = ""; await this.refresh(); notifyTravelChanged({ vehicleId: this.vehicleId, tripId }); } catch { this.fail(messages(this.hass).driveAssignError); } }
   private async unassignDrive(tripId: string, driveId: string) { if (!this.hass) return; try { await unlinkDrive(this.hass, this.vehicleId, tripId, driveId); this.actionError = ""; await this.refresh(); notifyTravelChanged({ vehicleId: this.vehicleId, tripId }); } catch { this.fail(messages(this.hass).driveAssignError); } }
-  private toggleTripDetails(tripId: string) { this.selected = this.selected === tripId ? "" : tripId; if (this.selected) void this.refresh(); else this.requestUpdate(); }
+  private toggleTripDetails(tripId: string) { this.selected = this.selected === tripId ? "" : tripId; if (this.selected) { this.activeTripId = tripId; publishActiveTrip({ vehicleId: this.vehicleId, tripId, source: "manager" }); void this.refresh(); } else this.requestUpdate(); }
 
   private async addManualDrive(tripId: string) {
     if (!this.hass || this.manualSaving) return;
@@ -132,14 +169,14 @@ export class ManagerCard extends TravelCard {
   private async saveExpense(expense: Expense) {
     if (!this.hass || this.expenseSavingId) return; const lang = messages(this.hass); const amountMinor = parseAmountMinor(this.editingAmount); if (amountMinor === null) return this.fail(lang.amountInvalid); if (!isExpenseCategory(this.editingCategory)) return this.fail(lang.categoryInvalid);
     this.expenseSavingId = expense.id;
-    try { await updateExpense(this.hass, this.vehicleId, expense.id, { amount_minor: amountMinor, category: this.editingCategory }); this.actionError = ""; if (await this.refresh()) { this.cancelExpenseEdit(); notifyExpensesChanged({ vehicleId: this.vehicleId, tripId: expense.trip_id ?? this.selected }); } }
+    try { await updateExpense(this.hass, this.vehicleId, expense.id, { amount_minor: amountMinor, category: this.editingCategory }); this.actionError = ""; if (await this.refresh()) { this.cancelExpenseEdit(); notifyExpensesChanged({ vehicleId: this.vehicleId, tripId: expense.trip_id ?? this.activeTripId }); } }
     catch { this.fail(lang.expenseEditError); }
     finally { this.expenseSavingId = ""; this.requestUpdate(); }
   }
   private async removeExpense(id: string) {
     if (!this.hass || this.expenseSavingId) return; if (this.confirmingExpenseId !== id) { this.confirmingExpenseId = id; this.requestUpdate(); return; }
     this.expenseSavingId = id;
-    try { await deleteExpense(this.hass, this.vehicleId, id); this.confirmingExpenseId = ""; this.actionError = ""; if (await this.refresh()) notifyExpensesChanged({ vehicleId: this.vehicleId, tripId: this.selected }); }
+    try { await deleteExpense(this.hass, this.vehicleId, id); this.confirmingExpenseId = ""; this.actionError = ""; if (await this.refresh()) notifyExpensesChanged({ vehicleId: this.vehicleId, tripId: this.activeTripId }); }
     catch { this.fail(messages(this.hass).expenseDeleteError); }
     finally { this.expenseSavingId = ""; this.requestUpdate(); }
   }
@@ -165,12 +202,16 @@ export class ManagerCard extends TravelCard {
     return html`<div class="expense-row">${editing ? html`<form class="expense-form" @submit=${(event: SubmitEvent) => { event.preventDefault(); void this.saveExpense(expense); }}><select aria-label=${lang.category} .value=${this.editingCategory} @change=${(event: Event) => this.setEditingExpenseCategory((event.currentTarget as HTMLSelectElement).value)}>${this.categoryOptions(this.editingCategory).map((item) => html`<option value=${item}>${categoryLabel(item, this.hass)}</option>`)}</select><input aria-label=${lang.amount} type="number" min="0" step="0.01" inputmode="decimal" .value=${this.editingAmount} @input=${(event: InputEvent) => this.setEditingExpenseAmount((event.currentTarget as HTMLInputElement).value)}><div class="actions"><button type="submit" ?disabled=${saving}>${saving ? lang.saving : lang.save}</button><button type="button" class="secondary" @click=${() => this.cancelExpenseEdit()} ?disabled=${saving}>${lang.cancel}</button></div></form>` : html`<span>${categoryLabel(expense.category, this.hass)}: ${formatMoneyMinor(expense.amount_minor, expense.currency, this.hass)}</span><span class="actions"><button type="button" class="link" @click=${() => this.startExpenseEdit(expense)} ?disabled=${Boolean(this.expenseSavingId)}>${lang.edit}</button><button type="button" class="link" @click=${() => this.removeExpense(expense.id)}>${this.confirmingExpenseId === expense.id ? lang.confirmDelete : lang.remove}</button></span>`}</div>`;
   }
   private renderDrive(drive: Drive, tripId: string, lang: ReturnType<typeof messages>) {
-    const source = drive.source === "manual" ? lang.sourceManual : lang.sourceGps;
-    const locations = drive.source === "manual" ? `${drive.start_label || "—"} → ${drive.end_label || "—"}` : `${lang.driveStart}: ${formatDateTime(drive.started_at, this.hass)} · ${lang.driveEnd}: ${formatDateTime(drive.ended_at, this.hass)}`;
+    const source = drive.source === "manual" ? lang.sourceManual : drive.source === "gpx" ? (lang.sourceGpx ?? lang.sourceGps) : lang.sourceGps;
+    const locations = `${lang.driveStart}: ${formatDateTime(drive.started_at, this.hass)} · ${lang.driveEnd}: ${drive.ended_at ? formatDateTime(drive.ended_at, this.hass) : "–"}`;
     if (this.editingDriveId === drive.id) return html`<form class="form-grid drive-edit-form" @submit=${(event: SubmitEvent) => { event.preventDefault(); void this.saveManualDrive(drive, tripId); }}><label>${lang.driveStart}<input type="datetime-local" .value=${this.editingDriveOccurredAt} @input=${(event: InputEvent) => this.editingDriveOccurredAt = (event.currentTarget as HTMLInputElement).value}></label><input aria-label=${lang.startLocation} .value=${this.editingDriveStartLocation} @input=${(event: InputEvent) => this.editingDriveStartLocation = (event.currentTarget as HTMLInputElement).value}><input aria-label=${lang.endLocation} .value=${this.editingDriveEndLocation} @input=${(event: InputEvent) => this.editingDriveEndLocation = (event.currentTarget as HTMLInputElement).value}><input aria-label=${lang.distanceKm} type="number" min="0" step="0.1" inputmode="decimal" .value=${this.editingDriveDistanceKm} @input=${(event: InputEvent) => this.editingDriveDistanceKm = (event.currentTarget as HTMLInputElement).value}><input aria-label=${lang.durationMinutes} type="number" min="0" step="1" .value=${this.editingDriveDurationMinutes} @input=${(event: InputEvent) => this.editingDriveDurationMinutes = (event.currentTarget as HTMLInputElement).value}><button type="submit" ?disabled=${this.driveSavingId === drive.id}>${this.driveSavingId === drive.id ? lang.saving : lang.save}</button><button type="button" class="secondary" @click=${() => this.cancelManualDriveEdit()} ?disabled=${Boolean(this.driveSavingId)}>${lang.cancel}</button></form>`;
     const assignment = drive.trip_id === tripId ? html`<button type="button" class="link" @click=${() => this.unassignDrive(tripId, drive.id)}>${lang.unassign}</button>` : html`<button type="button" class="link" @click=${() => this.assignDrive(tripId, drive.id)}>${lang.assign}</button>`;
     const manualActions = drive.source === "manual" ? html`<button type="button" class="link" @click=${() => this.startManualDriveEdit(drive)} ?disabled=${Boolean(this.driveSavingId)}>${lang.edit}</button><button type="button" class="link" @click=${() => this.removeManualDrive(tripId, drive.id)} ?disabled=${Boolean(this.driveSavingId)}>${this.confirmingDriveId === drive.id ? lang.confirmDelete : lang.remove}</button>` : "";
-    return html`<div class="drive-row"><div><strong>${source}</strong> · ${locations}<br><span class="muted">${(drive.distance_m / 1000).toFixed(1)} km · ${formatDuration(drive.duration_seconds, this.hass)} · ${drive.assignment_status === "assigned" ? lang.assignedDrives : lang.freeDrives}</span></div><span class="actions">${manualActions}${assignment}</span></div>`;
+    return html`<div class="drive-row"><div><strong>${source}</strong> · ${locations}${drive.start_label || drive.end_label ? html`<br><span class="muted">${drive.start_label || "–"} → ${drive.end_label || "–"}</span>` : ""}<br><span class="muted">${(drive.distance_m / 1000).toFixed(1)} km · ${drive.duration_seconds ? formatDuration(drive.duration_seconds, this.hass) : "–"} · ${drive.assignment_status === "assigned" ? lang.assignedDrives : lang.freeDrives}</span></div><span class="actions">${manualActions}${assignment}</span></div>`;
+  }
+  private renderInterruptions(lang: ReturnType<typeof messages>, tripId: string) {
+    const interruptions = this.snapshot?.interruptions ?? [];
+    return html`<section class="place-section"><details open><summary><strong>${lang.interruption ?? "Unterbrechungen zwischen Fahrten"}</strong><span>${interruptions.length}</span></summary>${interruptions.length ? interruptions.map((item) => html`<article class="interruption-row"><div><strong>${formatDateTime(item.started_at, this.hass)} → ${formatDateTime(item.ended_at, this.hass)}</strong><span class="muted">${formatDuration(item.duration_seconds, this.hass)} · ${lang.interruptionUnconfirmed ?? "Nicht als Aufenthalt nachgewiesen"}</span></div>${item.existing_place_id ? html`<button type="button" class="link" @click=${() => this.startInterruption(item)}>${lang.edit}</button>` : html`<button type="button" @click=${() => this.startInterruption(item)}>${lang.recordInterruption ?? "Als Aufenthalt erfassen"}</button>`}</article>`) : html`<p class="muted">${lang.noPlaces ?? "Keine Unterbrechungen zwischen Fahrten."}</p>`}</details></section>`;
   }
   private renderGpx(lang: ReturnType<typeof messages>, trips: Snapshot["trips"], gpx: GPXPreview | undefined) {
     const selectedTrip = trips.find((trip) => trip.id === this.gpxTripId);
@@ -180,9 +221,9 @@ export class ManagerCard extends TravelCard {
   }
   private renderPdfExport(lang: ReturnType<typeof messages>, trips: Snapshot["trips"]) {
     if (!trips.length) return "";
-    const tripId = trips.some((trip) => trip.id === this.pdfSelectedTripId) ? this.pdfSelectedTripId : (this.selected || trips[0].id);
+    const tripId = trips.some((trip) => trip.id === this.activeTripId) ? this.activeTripId : trips[0].id;
     const trip = trips.find((item) => item.id === tripId) ?? trips[0];
-    return html`<section class="pdf-export"><h3>${lang.pdfExportTitle}</h3><div class="pdf-export-row"><select aria-label=${lang.pdfExportTrip} .value=${trip.id} @change=${(event: Event) => { this.pdfSelectedTripId = (event.currentTarget as HTMLSelectElement).value; this.requestUpdate(); }}>${trips.map((item) => html`<option value=${item.id}>${item.title}</option>`)}</select><button type="button" @click=${() => void this.downloadPdf(trip)} ?disabled=${Boolean(this.pdfBusyTripId)}>${this.pdfBusyTripId ? lang.pdfExporting : lang.pdfExport}</button></div></section>`;
+    return html`<section class="pdf-export"><h3>${lang.pdfExportTitle}</h3><p class="muted">${trip.title} · ${formatTripPeriod(trip, this.hass)}</p><div class="pdf-export-row"><button type="button" @click=${() => void this.downloadPdf(trip)} ?disabled=${Boolean(this.pdfBusyTripId)}>${this.pdfBusyTripId ? lang.pdfExporting : lang.pdfExport}</button></div></section>`;
   }
   private renderSuggestions(lang: ReturnType<typeof messages>, tripId: string) {
     const suggestions = this.snapshot?.stop_suggestions ?? [];
@@ -197,7 +238,7 @@ export class ManagerCard extends TravelCard {
     const rated = (this.snapshot?.stops ?? []).filter((place) => place.rating_overall);
     return rated.length ? html`<section class="place-section"><details><summary><strong>${lang.ratingEdit ?? "Bewertungen"}</strong><span>${rated.length}</span></summary>${rated.map((place) => html`<div class="row"><span>${place.name} · ${place.rating_overall}/5</span><button type="button" class="link" @click=${() => void this.removeRating(place.id, tripId)}>${lang.ratingRemove ?? "Bewertung löschen"}</button></div>`)}</details></section>` : "";
   }
-  render() { const lang = messages(this.hass); const trips = this.snapshot?.trips ?? []; return html`${this.renderGpx(lang, trips, this.gpxPreview)}${this.renderPdfExport(lang, trips)}${this.selected ? this.renderSuggestions(lang, this.selected) : ""}${this.selected ? this.renderPlaces(lang, this.selected) : ""}${this.selected ? this.renderRatingActions(lang, this.selected) : ""}${this.renderLegacy()}`; }
+  render() { const lang = messages(this.hass); const trips = this.snapshot?.trips ?? []; return html`${this.renderGpx(lang, trips, this.gpxPreview)}${this.renderPdfExport(lang, trips)}${this.activeTripId ? this.renderInterruptions(lang, this.activeTripId) : ""}${this.activeTripId ? this.renderSuggestions(lang, this.activeTripId) : ""}${this.activeTripId ? this.renderPlaces(lang, this.activeTripId) : ""}${this.activeTripId ? this.renderRatingActions(lang, this.activeTripId) : ""}${this.renderLegacy()}`; }
   private renderLegacy() {
     const lang = messages(this.hass); const trips = this.snapshot?.trips ?? []; const expenses = this.snapshot?.expenses ?? []; const summary = this.snapshot?.expense_summary;
     const total = summary?.mixed_currency ? lang.mixedCurrency : summary?.total_minor !== undefined && summary.currency ? formatMoneyMinor(summary.total_minor, summary.currency, this.hass) : formatMoneyMinor(0, "EUR", this.hass); const error = this.loadError || this.actionError;
@@ -207,5 +248,5 @@ export class ManagerCard extends TravelCard {
 }
 
 ManagerCard.styles = [TravelCard.styles, css`section{margin-top:16px}.gpx-preview{padding:8px;background:var(--secondary-background-color)}.trip{display:grid;gap:8px;padding:12px 0;border-bottom:1px solid var(--divider-color)}.row,.expense-row,.drive-row{display:flex;justify-content:space-between;gap:8px;align-items:center;flex-wrap:wrap}.details{padding:8px;background:var(--secondary-background-color)}h4{margin:12px 0 4px}.link{min-height:30px;padding:4px 8px;font-size:.9em}.form-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(9rem,1fr));gap:8px;align-items:end}.form-grid input,.form-grid select{min-width:0;width:100%;box-sizing:border-box}.form-grid label{display:grid;gap:4px;font-size:.9em}.expense-form{display:grid;grid-template-columns:minmax(0,1fr) minmax(7rem,10rem) auto;gap:8px;align-items:center;width:100%}.expense-form input,.expense-form select{min-width:0;width:100%;box-sizing:border-box}.create-form{grid-template-columns:minmax(7rem,10rem) minmax(0,1fr) auto}.total{margin:12px 0 0;text-align:right}@media(max-width:500px){.expense-form,.create-form,.drive-edit-form{grid-template-columns:1fr}.expense-form .actions{margin-top:0}.total{text-align:left}}`] as any;
-ManagerCard.styles = [...(ManagerCard.styles as any), css`.gpx-import:not(.gpx-explicit){display:none}.gpx-import.gpx-explicit label{display:grid;gap:4px}.gpx-import.gpx-explicit select{min-width:0;max-width:100%;padding:6px}.gpx-drive-list{display:grid;gap:6px;margin:8px 0}.pdf-export{margin-top:16px;padding-top:12px;border-top:1px solid var(--divider-color)}.pdf-export-row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}.pdf-export-row select{min-width:0;flex:1 1 14rem;padding:8px;border:1px solid var(--divider-color);border-radius:6px;background:var(--card-background-color);color:var(--primary-text-color)}.warning{padding:8px;background:var(--warning-color,#ff9800);color:var(--primary-text-color)}`] as any;
+ManagerCard.styles = [...(ManagerCard.styles as any), css`.gpx-import:not(.gpx-explicit){display:none}.gpx-import.gpx-explicit label{display:grid;gap:4px}.gpx-import.gpx-explicit select{min-width:0;max-width:100%;padding:6px}.gpx-drive-list{display:grid;gap:6px;margin:8px 0}.pdf-export{margin-top:16px;padding-top:12px;border-top:1px solid var(--divider-color)}.pdf-export-row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}.interruption-row{display:flex;justify-content:space-between;gap:8px;align-items:center;padding:9px 0;border-bottom:1px solid var(--divider-color)}.interruption-row>div{display:grid;gap:3px;min-width:0}.warning{padding:8px;background:var(--warning-color,#ff9800);color:var(--primary-text-color)}@media(max-width:500px){.form-grid{grid-template-columns:1fr}.form-grid textarea{min-height:5rem}.place-section .form-grid{gap:10px}.place-section .actions{display:grid;grid-template-columns:1fr}.place-section .actions button{width:100%}.interruption-row{align-items:stretch;flex-direction:column}.interruption-row button{width:100%}.pdf-export-row button{width:100%}}`] as any;
 defineOnce("camper-travel-journal-manager-card", ManagerCard);

@@ -63,6 +63,96 @@ class V03PlaceTests(unittest.TestCase):
         self.assertEqual(self.store.list_stops("v1", self.trip)[0]["id"], stop_id)
         self.assertEqual(self.store.list_stop_suggestions("v1", status="all")[0]["status"], "accepted")
 
+    def test_trip_scoped_suggestions_use_assigned_gps_points_only(self):
+        drive_id = "drive-retroactive"
+        self.store.connection.execute(
+            "INSERT INTO drives(id,vehicle_id,started_at,ended_at,distance_m,end_reason,source,created_at) VALUES(?,?,?,?,?,?,?,?)",
+            (drive_id, "v1", "2026-10-18T12:00:00+00:00", "2026-10-18T12:20:00+00:00", 0, "test", "gpx", self.now.isoformat()),
+        )
+        self.store.connection.execute(
+            "INSERT INTO trip_drives(trip_id,drive_id,linked_at) VALUES(?,?,?)",
+            (self.trip, drive_id, self.now.isoformat()),
+        )
+        for ordinal, minute in enumerate((0, 5, 10, 15)):
+            cursor = self.store.connection.execute(
+                "INSERT INTO gps_points(vehicle_id,recorded_at,latitude,longitude) VALUES(?,?,?,?)",
+                ("v1", f"2026-10-18T12:{minute:02d}:00+00:00", 50.0, 8.0),
+            )
+            self.store.connection.execute(
+                "INSERT INTO drive_gps_points(drive_id,gps_point_id,ordinal,association_source) VALUES(?,?,?,?)",
+                (drive_id, cursor.lastrowid, ordinal, "test"),
+            )
+        # This stationary window belongs to the same vehicle but not to the trip.
+        for minute in (30, 35, 40):
+            self.store.connection.execute(
+                "INSERT INTO gps_points(vehicle_id,recorded_at,latitude,longitude) VALUES(?,?,?,?)",
+                ("v1", f"2026-10-18T12:{minute:02d}:00+00:00", 51.0, 9.0),
+            )
+        self.store.connection.commit()
+
+        suggestions = self.store.generate_stop_suggestions("v1", self.now, trip_id=self.trip)
+        self.assertEqual(len(suggestions), 1)
+        self.assertEqual(suggestions[0]["trip_id"], self.trip)
+        self.assertEqual(suggestions[0]["drive_id"], drive_id)
+        self.assertEqual(self.store.generate_stop_suggestions("v1", self.now, trip_id=self.trip), [])
+
+    def test_trip_scoped_suggestions_reject_unknown_or_foreign_trip(self):
+        self.store.insert_vehicle("v2", "Other", "device_tracker.other", self.now)
+        other_trip = self.store.create_trip("v2", "Other", self.now, self.now)
+        with self.assertRaisesRegex(ValueError, "trip_not_found"):
+            self.store.generate_stop_suggestions("v1", self.now, trip_id="missing")
+        with self.assertRaisesRegex(ValueError, "trip_vehicle_mismatch"):
+            self.store.generate_stop_suggestions("v1", self.now, trip_id=other_trip)
+
+    def test_derived_trip_interruptions_use_drive_endpoints_without_persisting(self):
+        drives = [
+            ("b1", "2026-10-13T04:06:00+00:00", "2026-10-13T11:46:00+00:00"),
+            ("b2", "2026-10-14T06:43:00+00:00", "2026-10-14T11:00:00+00:00"),
+            ("b3", "2026-10-14T11:11:00+00:00", "2026-10-14T14:19:00+00:00"),
+        ]
+        for drive_id, started, ended in drives:
+            self.store.connection.execute(
+                "INSERT INTO drives(id,vehicle_id,started_at,ended_at,distance_m,end_reason,source,created_at) VALUES(?,?,?,?,?,?,?,?)",
+                (drive_id, "v1", started, ended, 1000, "test", "gps", self.now.isoformat()),
+            )
+            self.store.connection.execute(
+                "INSERT INTO trip_drives(trip_id,drive_id,linked_at) VALUES(?,?,?)",
+                (self.trip, drive_id, self.now.isoformat()),
+            )
+        for drive_id, recorded, latitude in (
+            ("b1", "2026-10-13T11:45:00+00:00", 53.08),
+            ("b2", "2026-10-14T06:44:00+00:00", 53.09),
+            ("b2", "2026-10-14T10:59:00+00:00", 53.10),
+            ("b3", "2026-10-14T11:12:00+00:00", 53.11),
+        ):
+            point = self.store.connection.execute(
+                "INSERT INTO gps_points(vehicle_id,recorded_at,latitude,longitude) VALUES(?,?,?,?)",
+                ("v1", recorded, latitude, 8.8),
+            )
+            ordinal = self.store.connection.execute(
+                "SELECT count(*) FROM drive_gps_points WHERE drive_id=?", (drive_id,)
+            ).fetchone()[0]
+            self.store.connection.execute(
+                "INSERT INTO drive_gps_points(drive_id,gps_point_id,ordinal,association_source) VALUES(?,?,?,?)",
+                (drive_id, point.lastrowid, ordinal, "test"),
+            )
+        self.store.connection.commit()
+
+        gaps = self.store.list_trip_interruptions("v1", self.trip)
+        self.assertEqual([gap["duration_seconds"] for gap in gaps], [18 * 3600 + 57 * 60, 11 * 60])
+        self.assertEqual(gaps[0]["status"], "unconfirmed")
+        self.assertEqual(gaps[0]["previous_end_point"]["latitude"], 53.08)
+        self.assertEqual(gaps[1]["next_start_point"]["latitude"], 53.11)
+        self.assertEqual(self.store.list_stops("v1", self.trip), [])
+
+    def test_derived_interruptions_report_existing_confirmed_place(self):
+        first = self.store.create_manual_drive("v1", datetime(2026, 10, 13, 10, tzinfo=UTC), "A", "B", 1, 60, self.now, self.trip)
+        second = self.store.create_manual_drive("v1", datetime(2026, 10, 13, 13, tzinfo=UTC), "C", "D", 1, 60, self.now, self.trip)
+        stop = self.store.create_stop(Stop("", "v1", "Bereits erfasst", datetime(2026, 10, 13, 11, tzinfo=UTC), arrived_at=datetime(2026, 10, 13, 11, tzinfo=UTC), departed_at=datetime(2026, 10, 13, 12, tzinfo=UTC), trip_id=self.trip, automatic=False), self.now)
+        gap = self.store.list_trip_interruptions("v1", self.trip)[0]
+        self.assertEqual((gap["previous_drive_id"], gap["next_drive_id"], gap["existing_place_id"]), (first, second, stop))
+        self.assertEqual(gap["status"], "confirmed_place")
+
     def test_public_export_defaults_to_private_fields(self):
         stop = {"id": "p1", "name": "Geheimer Ort", "place_type": "restaurant", "latitude": 50.0, "longitude": 8.0, "description": "privat", "review_text": "privat", "rating_overall": 4}
         payload = build_public_trip_export({"id": self.trip, "title": "Reise", "destination": "Ziel"}, [stop])
