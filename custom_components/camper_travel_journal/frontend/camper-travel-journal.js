@@ -18,11 +18,11 @@ let Ur = class {
   }
 };
 const Wr = (c) => new Ur(typeof c == "string" ? c : c + "", void 0, nn), zt = (c, ...i) => {
-  const s = c.length === 1 ? c[0] : i.reduce((o, h, u) => o + ((f) => {
+  const s = c.length === 1 ? c[0] : i.reduce((o, h, d) => o + ((f) => {
     if (f._$cssResult$ === !0) return f.cssText;
     if (typeof f == "number") return f;
     throw Error("Value passed to 'css' function must be a 'css' function result: " + f + ". Use 'unsafeCSS' to pass non-literal values, but take care to ensure page security.");
-  })(h) + c[u + 1], c[0]);
+  })(h) + c[d + 1], c[0]);
   return new Ur(s, c, nn);
 }, ka = (c, i) => {
   if (en) c.adoptedStyleSheets = i.map((s) => s instanceof CSSStyleSheet ? s : s.styleSheet);
@@ -35,7 +35,7 @@ const Wr = (c) => new Ur(typeof c == "string" ? c : c + "", void 0, nn), zt = (c
   for (const o of i.cssRules) s += o.cssText;
   return Wr(s);
 })(c) : c;
-const { is: La, defineProperty: Ia, getOwnPropertyDescriptor: Ca, getOwnPropertyNames: Aa, getOwnPropertySymbols: Da, getPrototypeOf: Ma } = Object, ti = globalThis, Pr = ti.trustedTypes, za = Pr ? Pr.emptyScript : "", Oa = ti.reactiveElementPolyfillSupport, $e = (c, i) => c, Xi = { toAttribute(c, i) {
+const { is: La, defineProperty: Ca, getOwnPropertyDescriptor: Ia, getOwnPropertyNames: Aa, getOwnPropertySymbols: Da, getPrototypeOf: Ma } = Object, ti = globalThis, Pr = ti.trustedTypes, za = Pr ? Pr.emptyScript : "", Oa = ti.reactiveElementPolyfillSupport, $e = (c, i) => c, Xi = { toAttribute(c, i) {
   switch (i) {
     case Boolean:
       c = c ? za : null;
@@ -75,18 +75,18 @@ let ie = class extends HTMLElement {
   static createProperty(i, s = Er) {
     if (s.state && (s.attribute = !1), this._$Ei(), this.prototype.hasOwnProperty(i) && ((s = Object.create(s)).wrapped = !0), this.elementProperties.set(i, s), !s.noAccessor) {
       const o = /* @__PURE__ */ Symbol(), h = this.getPropertyDescriptor(i, o, s);
-      h !== void 0 && Ia(this.prototype, i, h);
+      h !== void 0 && Ca(this.prototype, i, h);
     }
   }
   static getPropertyDescriptor(i, s, o) {
-    const { get: h, set: u } = Ca(this.prototype, i) ?? { get() {
+    const { get: h, set: d } = Ia(this.prototype, i) ?? { get() {
       return this[s];
     }, set(f) {
       this[s] = f;
     } };
     return { get: h, set(f) {
       const x = h?.call(this);
-      u?.call(this, f), this.requestUpdate(i, x, o);
+      d?.call(this, f), this.requestUpdate(i, x, o);
     }, configurable: !0, enumerable: !0 };
   }
   static getPropertyOptions(i) {
@@ -162,29 +162,29 @@ let ie = class extends HTMLElement {
   _$ET(i, s) {
     const o = this.constructor.elementProperties.get(i), h = this.constructor._$Eu(i, o);
     if (h !== void 0 && o.reflect === !0) {
-      const u = (o.converter?.toAttribute !== void 0 ? o.converter : Xi).toAttribute(s, o.type);
-      this._$Em = i, u == null ? this.removeAttribute(h) : this.setAttribute(h, u), this._$Em = null;
+      const d = (o.converter?.toAttribute !== void 0 ? o.converter : Xi).toAttribute(s, o.type);
+      this._$Em = i, d == null ? this.removeAttribute(h) : this.setAttribute(h, d), this._$Em = null;
     }
   }
   _$AK(i, s) {
     const o = this.constructor, h = o._$Eh.get(i);
     if (h !== void 0 && this._$Em !== h) {
-      const u = o.getPropertyOptions(h), f = typeof u.converter == "function" ? { fromAttribute: u.converter } : u.converter?.fromAttribute !== void 0 ? u.converter : Xi;
+      const d = o.getPropertyOptions(h), f = typeof d.converter == "function" ? { fromAttribute: d.converter } : d.converter?.fromAttribute !== void 0 ? d.converter : Xi;
       this._$Em = h;
-      const x = f.fromAttribute(s, u.type);
+      const x = f.fromAttribute(s, d.type);
       this[h] = x ?? this._$Ej?.get(h) ?? x, this._$Em = null;
     }
   }
-  requestUpdate(i, s, o, h = !1, u) {
+  requestUpdate(i, s, o, h = !1, d) {
     if (i !== void 0) {
       const f = this.constructor;
-      if (h === !1 && (u = this[i]), o ??= f.getPropertyOptions(i), !((o.hasChanged ?? Hr)(u, s) || o.useDefault && o.reflect && u === this._$Ej?.get(i) && !this.hasAttribute(f._$Eu(i, o)))) return;
+      if (h === !1 && (d = this[i]), o ??= f.getPropertyOptions(i), !((o.hasChanged ?? Hr)(d, s) || o.useDefault && o.reflect && d === this._$Ej?.get(i) && !this.hasAttribute(f._$Eu(i, o)))) return;
       this.C(i, s, o);
     }
     this.isUpdatePending === !1 && (this._$ES = this._$EP());
   }
-  C(i, s, { useDefault: o, reflect: h, wrapped: u }, f) {
-    o && !(this._$Ej ??= /* @__PURE__ */ new Map()).has(i) && (this._$Ej.set(i, f ?? s ?? this[i]), u !== !0 || f !== void 0) || (this._$AL.has(i) || (this.hasUpdated || o || (s = void 0), this._$AL.set(i, s)), h === !0 && this._$Em !== i && (this._$Eq ??= /* @__PURE__ */ new Set()).add(i));
+  C(i, s, { useDefault: o, reflect: h, wrapped: d }, f) {
+    o && !(this._$Ej ??= /* @__PURE__ */ new Map()).has(i) && (this._$Ej.set(i, f ?? s ?? this[i]), d !== !0 || f !== void 0) || (this._$AL.has(i) || (this.hasUpdated || o || (s = void 0), this._$AL.set(i, s)), h === !0 && this._$Em !== i && (this._$Eq ??= /* @__PURE__ */ new Set()).add(i));
   }
   async _$EP() {
     this.isUpdatePending = !0;
@@ -203,13 +203,13 @@ let ie = class extends HTMLElement {
     if (!this.isUpdatePending) return;
     if (!this.hasUpdated) {
       if (this.renderRoot ??= this.createRenderRoot(), this._$Ep) {
-        for (const [h, u] of this._$Ep) this[h] = u;
+        for (const [h, d] of this._$Ep) this[h] = d;
         this._$Ep = void 0;
       }
       const o = this.constructor.elementProperties;
-      if (o.size > 0) for (const [h, u] of o) {
-        const { wrapped: f } = u, x = this[h];
-        f !== !0 || this._$AL.has(h) || x === void 0 || this.C(h, void 0, u, x);
+      if (o.size > 0) for (const [h, d] of o) {
+        const { wrapped: f } = d, x = this[h];
+        f !== !0 || this._$AL.has(h) || x === void 0 || this.C(h, void 0, d, x);
       }
     }
     let i = !1;
@@ -247,30 +247,30 @@ let ie = class extends HTMLElement {
   }
 };
 ie.elementStyles = [], ie.shadowRootOptions = { mode: "open" }, ie[$e("elementProperties")] = /* @__PURE__ */ new Map(), ie[$e("finalized")] = /* @__PURE__ */ new Map(), Oa?.({ ReactiveElement: ie }), (ti.reactiveElementVersions ??= []).push("2.1.2");
-const rn = globalThis, Sr = (c) => c, Xe = rn.trustedTypes, kr = Xe ? Xe.createPolicy("lit-html", { createHTML: (c) => c }) : void 0, qr = "$lit$", At = `lit$${Math.random().toFixed(9).slice(2)}$`, jr = "?" + At, Ra = `<${jr}>`, jt = document, Pe = () => jt.createComment(""), Ee = (c) => c === null || typeof c != "object" && typeof c != "function", sn = Array.isArray, Na = (c) => sn(c) || typeof c?.[Symbol.iterator] == "function", Ui = `[ \t
-\f\r]`, xe = /<(?:(!--|\/[^a-zA-Z])|(\/?[a-zA-Z][^>\s]*)|(\/?$))/g, Lr = /-->/g, Ir = />/g, Ut = RegExp(`>|${Ui}(?:([^\\s"'>=/]+)(${Ui}*=${Ui}*(?:[^ \t
-\f\r"'\`<>=]|("|')|))|$)`, "g"), Cr = /'/g, Ar = /"/g, Gr = /^(?:script|style|textarea|title)$/i, Ba = (c) => (i, ...s) => ({ _$litType$: c, strings: i, values: s }), g = Ba(1), ne = /* @__PURE__ */ Symbol.for("lit-noChange"), X = /* @__PURE__ */ Symbol.for("lit-nothing"), Dr = /* @__PURE__ */ new WeakMap(), Wt = jt.createTreeWalker(jt, 129);
+const rn = globalThis, Sr = (c) => c, Xe = rn.trustedTypes, kr = Xe ? Xe.createPolicy("lit-html", { createHTML: (c) => c }) : void 0, jr = "$lit$", At = `lit$${Math.random().toFixed(9).slice(2)}$`, qr = "?" + At, Ra = `<${qr}>`, qt = document, Pe = () => qt.createComment(""), Ee = (c) => c === null || typeof c != "object" && typeof c != "function", sn = Array.isArray, Na = (c) => sn(c) || typeof c?.[Symbol.iterator] == "function", Ui = `[ \t
+\f\r]`, xe = /<(?:(!--|\/[^a-zA-Z])|(\/?[a-zA-Z][^>\s]*)|(\/?$))/g, Lr = /-->/g, Cr = />/g, Ut = RegExp(`>|${Ui}(?:([^\\s"'>=/]+)(${Ui}*=${Ui}*(?:[^ \t
+\f\r"'\`<>=]|("|')|))|$)`, "g"), Ir = /'/g, Ar = /"/g, Gr = /^(?:script|style|textarea|title)$/i, Ba = (c) => (i, ...s) => ({ _$litType$: c, strings: i, values: s }), g = Ba(1), ne = /* @__PURE__ */ Symbol.for("lit-noChange"), X = /* @__PURE__ */ Symbol.for("lit-nothing"), Dr = /* @__PURE__ */ new WeakMap(), Wt = qt.createTreeWalker(qt, 129);
 function Kr(c, i) {
   if (!sn(c) || !c.hasOwnProperty("raw")) throw Error("invalid template strings array");
   return kr !== void 0 ? kr.createHTML(i) : i;
 }
 const Za = (c, i) => {
   const s = c.length - 1, o = [];
-  let h, u = i === 2 ? "<svg>" : i === 3 ? "<math>" : "", f = xe;
+  let h, d = i === 2 ? "<svg>" : i === 3 ? "<math>" : "", f = xe;
   for (let x = 0; x < s; x++) {
     const p = c[x];
-    let v, $, b = -1, I = 0;
-    for (; I < p.length && (f.lastIndex = I, $ = f.exec(p), $ !== null); ) I = f.lastIndex, f === xe ? $[1] === "!--" ? f = Lr : $[1] !== void 0 ? f = Ir : $[2] !== void 0 ? (Gr.test($[2]) && (h = RegExp("</" + $[2], "g")), f = Ut) : $[3] !== void 0 && (f = Ut) : f === Ut ? $[0] === ">" ? (f = h ?? xe, b = -1) : $[1] === void 0 ? b = -2 : (b = f.lastIndex - $[2].length, v = $[1], f = $[3] === void 0 ? Ut : $[3] === '"' ? Ar : Cr) : f === Ar || f === Cr ? f = Ut : f === Lr || f === Ir ? f = xe : (f = Ut, h = void 0);
+    let v, $, b = -1, C = 0;
+    for (; C < p.length && (f.lastIndex = C, $ = f.exec(p), $ !== null); ) C = f.lastIndex, f === xe ? $[1] === "!--" ? f = Lr : $[1] !== void 0 ? f = Cr : $[2] !== void 0 ? (Gr.test($[2]) && (h = RegExp("</" + $[2], "g")), f = Ut) : $[3] !== void 0 && (f = Ut) : f === Ut ? $[0] === ">" ? (f = h ?? xe, b = -1) : $[1] === void 0 ? b = -2 : (b = f.lastIndex - $[2].length, v = $[1], f = $[3] === void 0 ? Ut : $[3] === '"' ? Ar : Ir) : f === Ar || f === Ir ? f = Ut : f === Lr || f === Cr ? f = xe : (f = Ut, h = void 0);
     const T = f === Ut && c[x + 1].startsWith("/>") ? " " : "";
-    u += f === xe ? p + Ra : b >= 0 ? (o.push(v), p.slice(0, b) + qr + p.slice(b) + At + T) : p + At + (b === -2 ? x : T);
+    d += f === xe ? p + Ra : b >= 0 ? (o.push(v), p.slice(0, b) + jr + p.slice(b) + At + T) : p + At + (b === -2 ? x : T);
   }
-  return [Kr(c, u + (c[s] || "<?>") + (i === 2 ? "</svg>" : i === 3 ? "</math>" : "")), o];
+  return [Kr(c, d + (c[s] || "<?>") + (i === 2 ? "</svg>" : i === 3 ? "</math>" : "")), o];
 };
 class Se {
   constructor({ strings: i, _$litType$: s }, o) {
     let h;
     this.parts = [];
-    let u = 0, f = 0;
+    let d = 0, f = 0;
     const x = i.length - 1, p = this.parts, [v, $] = Za(i, s);
     if (this.el = Se.createElement(v, o), Wt.currentNode = this.el.content, s === 2 || s === 3) {
       const b = this.el.content.firstChild;
@@ -278,36 +278,36 @@ class Se {
     }
     for (; (h = Wt.nextNode()) !== null && p.length < x; ) {
       if (h.nodeType === 1) {
-        if (h.hasAttributes()) for (const b of h.getAttributeNames()) if (b.endsWith(qr)) {
-          const I = $[f++], T = h.getAttribute(b).split(At), B = /([.?@])?(.*)/.exec(I);
-          p.push({ type: 1, index: u, name: B[2], strings: T, ctor: B[1] === "." ? Ua : B[1] === "?" ? Wa : B[1] === "@" ? Ha : ei }), h.removeAttribute(b);
-        } else b.startsWith(At) && (p.push({ type: 6, index: u }), h.removeAttribute(b));
+        if (h.hasAttributes()) for (const b of h.getAttributeNames()) if (b.endsWith(jr)) {
+          const C = $[f++], T = h.getAttribute(b).split(At), B = /([.?@])?(.*)/.exec(C);
+          p.push({ type: 1, index: d, name: B[2], strings: T, ctor: B[1] === "." ? Ua : B[1] === "?" ? Wa : B[1] === "@" ? Ha : ei }), h.removeAttribute(b);
+        } else b.startsWith(At) && (p.push({ type: 6, index: d }), h.removeAttribute(b));
         if (Gr.test(h.tagName)) {
-          const b = h.textContent.split(At), I = b.length - 1;
-          if (I > 0) {
+          const b = h.textContent.split(At), C = b.length - 1;
+          if (C > 0) {
             h.textContent = Xe ? Xe.emptyScript : "";
-            for (let T = 0; T < I; T++) h.append(b[T], Pe()), Wt.nextNode(), p.push({ type: 2, index: ++u });
-            h.append(b[I], Pe());
+            for (let T = 0; T < C; T++) h.append(b[T], Pe()), Wt.nextNode(), p.push({ type: 2, index: ++d });
+            h.append(b[C], Pe());
           }
         }
-      } else if (h.nodeType === 8) if (h.data === jr) p.push({ type: 2, index: u });
+      } else if (h.nodeType === 8) if (h.data === qr) p.push({ type: 2, index: d });
       else {
         let b = -1;
-        for (; (b = h.data.indexOf(At, b + 1)) !== -1; ) p.push({ type: 7, index: u }), b += At.length - 1;
+        for (; (b = h.data.indexOf(At, b + 1)) !== -1; ) p.push({ type: 7, index: d }), b += At.length - 1;
       }
-      u++;
+      d++;
     }
   }
   static createElement(i, s) {
-    const o = jt.createElement("template");
+    const o = qt.createElement("template");
     return o.innerHTML = i, o;
   }
 }
 function re(c, i, s = c, o) {
   if (i === ne) return i;
   let h = o !== void 0 ? s._$Co?.[o] : s._$Cl;
-  const u = Ee(i) ? void 0 : i._$litDirective$;
-  return h?.constructor !== u && (h?._$AO?.(!1), u === void 0 ? h = void 0 : (h = new u(c), h._$AT(c, s, o)), o !== void 0 ? (s._$Co ??= [])[o] = h : s._$Cl = h), h !== void 0 && (i = re(c, h._$AS(c, i.values), h, o)), i;
+  const d = Ee(i) ? void 0 : i._$litDirective$;
+  return h?.constructor !== d && (h?._$AO?.(!1), d === void 0 ? h = void 0 : (h = new d(c), h._$AT(c, s, o)), o !== void 0 ? (s._$Co ??= [])[o] = h : s._$Cl = h), h !== void 0 && (i = re(c, h._$AS(c, i.values), h, o)), i;
 }
 class Fa {
   constructor(i, s) {
@@ -320,17 +320,17 @@ class Fa {
     return this._$AM._$AU;
   }
   u(i) {
-    const { el: { content: s }, parts: o } = this._$AD, h = (i?.creationScope ?? jt).importNode(s, !0);
+    const { el: { content: s }, parts: o } = this._$AD, h = (i?.creationScope ?? qt).importNode(s, !0);
     Wt.currentNode = h;
-    let u = Wt.nextNode(), f = 0, x = 0, p = o[0];
+    let d = Wt.nextNode(), f = 0, x = 0, p = o[0];
     for (; p !== void 0; ) {
       if (f === p.index) {
         let v;
-        p.type === 2 ? v = new ke(u, u.nextSibling, this, i) : p.type === 1 ? v = new p.ctor(u, p.name, p.strings, this, i) : p.type === 6 && (v = new qa(u, this, i)), this._$AV.push(v), p = o[++x];
+        p.type === 2 ? v = new ke(d, d.nextSibling, this, i) : p.type === 1 ? v = new p.ctor(d, p.name, p.strings, this, i) : p.type === 6 && (v = new ja(d, this, i)), this._$AV.push(v), p = o[++x];
       }
-      f !== p?.index && (u = Wt.nextNode(), f++);
+      f !== p?.index && (d = Wt.nextNode(), f++);
     }
-    return Wt.currentNode = jt, h;
+    return Wt.currentNode = qt, h;
   }
   p(i) {
     let s = 0;
@@ -365,14 +365,14 @@ class ke {
     this._$AH !== i && (this._$AR(), this._$AH = this.O(i));
   }
   _(i) {
-    this._$AH !== X && Ee(this._$AH) ? this._$AA.nextSibling.data = i : this.T(jt.createTextNode(i)), this._$AH = i;
+    this._$AH !== X && Ee(this._$AH) ? this._$AA.nextSibling.data = i : this.T(qt.createTextNode(i)), this._$AH = i;
   }
   $(i) {
     const { values: s, _$litType$: o } = i, h = typeof o == "number" ? this._$AC(i) : (o.el === void 0 && (o.el = Se.createElement(Kr(o.h, o.h[0]), this.options)), o);
     if (this._$AH?._$AD === h) this._$AH.p(s);
     else {
-      const u = new Fa(h, this), f = u.u(this.options);
-      u.p(s), this.T(f), this._$AH = u;
+      const d = new Fa(h, this), f = d.u(this.options);
+      d.p(s), this.T(f), this._$AH = d;
     }
   }
   _$AC(i) {
@@ -383,7 +383,7 @@ class ke {
     sn(this._$AH) || (this._$AH = [], this._$AR());
     const s = this._$AH;
     let o, h = 0;
-    for (const u of i) h === s.length ? s.push(o = new ke(this.O(Pe()), this.O(Pe()), this, this.options)) : o = s[h], o._$AI(u), h++;
+    for (const d of i) h === s.length ? s.push(o = new ke(this.O(Pe()), this.O(Pe()), this, this.options)) : o = s[h], o._$AI(d), h++;
     h < s.length && (this._$AR(o && o._$AB.nextSibling, h), s.length = h);
   }
   _$AR(i = this._$AA.nextSibling, s) {
@@ -403,17 +403,17 @@ class ei {
   get _$AU() {
     return this._$AM._$AU;
   }
-  constructor(i, s, o, h, u) {
-    this.type = 1, this._$AH = X, this._$AN = void 0, this.element = i, this.name = s, this._$AM = h, this.options = u, o.length > 2 || o[0] !== "" || o[1] !== "" ? (this._$AH = Array(o.length - 1).fill(new String()), this.strings = o) : this._$AH = X;
+  constructor(i, s, o, h, d) {
+    this.type = 1, this._$AH = X, this._$AN = void 0, this.element = i, this.name = s, this._$AM = h, this.options = d, o.length > 2 || o[0] !== "" || o[1] !== "" ? (this._$AH = Array(o.length - 1).fill(new String()), this.strings = o) : this._$AH = X;
   }
   _$AI(i, s = this, o, h) {
-    const u = this.strings;
+    const d = this.strings;
     let f = !1;
-    if (u === void 0) i = re(this, i, s, 0), f = !Ee(i) || i !== this._$AH && i !== ne, f && (this._$AH = i);
+    if (d === void 0) i = re(this, i, s, 0), f = !Ee(i) || i !== this._$AH && i !== ne, f && (this._$AH = i);
     else {
       const x = i;
       let p, v;
-      for (i = u[0], p = 0; p < u.length - 1; p++) v = re(this, x[o + p], s, p), v === ne && (v = this._$AH[p]), f ||= !Ee(v) || v !== this._$AH[p], v === X ? i = X : i !== X && (i += (v ?? "") + u[p + 1]), this._$AH[p] = v;
+      for (i = d[0], p = 0; p < d.length - 1; p++) v = re(this, x[o + p], s, p), v === ne && (v = this._$AH[p]), f ||= !Ee(v) || v !== this._$AH[p], v === X ? i = X : i !== X && (i += (v ?? "") + d[p + 1]), this._$AH[p] = v;
     }
     f && !h && this.j(i);
   }
@@ -438,19 +438,19 @@ let Wa = class extends ei {
   }
 };
 class Ha extends ei {
-  constructor(i, s, o, h, u) {
-    super(i, s, o, h, u), this.type = 5;
+  constructor(i, s, o, h, d) {
+    super(i, s, o, h, d), this.type = 5;
   }
   _$AI(i, s = this) {
     if ((i = re(this, i, s, 0) ?? X) === ne) return;
-    const o = this._$AH, h = i === X && o !== X || i.capture !== o.capture || i.once !== o.once || i.passive !== o.passive, u = i !== X && (o === X || h);
-    h && this.element.removeEventListener(this.name, this, o), u && this.element.addEventListener(this.name, this, i), this._$AH = i;
+    const o = this._$AH, h = i === X && o !== X || i.capture !== o.capture || i.once !== o.once || i.passive !== o.passive, d = i !== X && (o === X || h);
+    h && this.element.removeEventListener(this.name, this, o), d && this.element.addEventListener(this.name, this, i), this._$AH = i;
   }
   handleEvent(i) {
     typeof this._$AH == "function" ? this._$AH.call(this.options?.host ?? this.element, i) : this._$AH.handleEvent(i);
   }
 }
-class qa {
+class ja {
   constructor(i, s, o) {
     this.element = i, this.type = 6, this._$AN = void 0, this._$AM = s, this.options = o;
   }
@@ -461,14 +461,14 @@ class qa {
     re(this, i);
   }
 }
-const ja = rn.litHtmlPolyfillSupport;
-ja?.(Se, ke), (rn.litHtmlVersions ??= []).push("3.3.3");
+const qa = rn.litHtmlPolyfillSupport;
+qa?.(Se, ke), (rn.litHtmlVersions ??= []).push("3.3.3");
 const Ga = (c, i, s) => {
   const o = s?.renderBefore ?? i;
   let h = o._$litPart$;
   if (h === void 0) {
-    const u = s?.renderBefore ?? null;
-    o._$litPart$ = h = new ke(i.insertBefore(Pe(), u), u, void 0, s ?? {});
+    const d = s?.renderBefore ?? null;
+    o._$litPart$ = h = new ke(i.insertBefore(Pe(), d), d, void 0, s ?? {});
   }
   return h._$AI(c), h;
 };
@@ -887,12 +887,12 @@ function Je(c) {
 function Te(c, i) {
   const s = /^(\d{4})-(\d{2})-(\d{2})$/.exec(c);
   if (s) {
-    const [, o, h, u] = s;
-    return Je(i).startsWith("de") ? `${u}.${h}.${o}` : `${h}/${u}/${o}`;
+    const [, o, h, d] = s;
+    return Je(i).startsWith("de") ? `${d}.${h}.${o}` : `${h}/${d}/${o}`;
   }
   return new Date(c).toLocaleDateString(Je(i));
 }
-function j(c, i) {
+function q(c, i) {
   return new Date(c).toLocaleString(Je(i), { dateStyle: "short", timeStyle: "short" });
 }
 function zr(c, i) {
@@ -911,16 +911,16 @@ function Xa(c, i) {
   const h = (v) => {
     const $ = /^(\d{4})-(\d{2})-(\d{2})$/.exec(v);
     return $ ? new Date(Number($[1]), Number($[2]) - 1, Number($[3])) : new Date(v);
-  }, u = h(s || o || ""), f = h(o || s || "");
-  if (Number.isNaN(u.getTime()) || Number.isNaN(f.getTime())) return kt(c, i);
+  }, d = h(s || o || ""), f = h(o || s || "");
+  if (Number.isNaN(d.getTime()) || Number.isNaN(f.getTime())) return kt(c, i);
   if (!(i?.locale?.language ?? "").toLowerCase().startsWith("de")) {
-    const v = new Intl.DateTimeFormat("en-US", { month: "short" }), $ = (I) => I.getDate(), b = (I) => I.getFullYear();
-    return b(u) === b(f) && u.getMonth() === f.getMonth() ? `${v.format(u)} ${$(u)}–${$(f)}, ${b(u)}` : b(u) === b(f) ? `${v.format(u)} ${$(u)}–${v.format(f)} ${$(f)}, ${b(u)}` : `${v.format(u)} ${$(u)}, ${b(u)}–${v.format(f)} ${$(f)}, ${b(f)}`;
+    const v = new Intl.DateTimeFormat("en-US", { month: "short" }), $ = (C) => C.getDate(), b = (C) => C.getFullYear();
+    return b(d) === b(f) && d.getMonth() === f.getMonth() ? `${v.format(d)} ${$(d)}–${$(f)}, ${b(d)}` : b(d) === b(f) ? `${v.format(d)} ${$(d)}–${v.format(f)} ${$(f)}, ${b(d)}` : `${v.format(d)} ${$(d)}, ${b(d)}–${v.format(f)} ${$(f)}, ${b(f)}`;
   }
   const p = (v) => `${String(v.getDate()).padStart(2, "0")}.${String(v.getMonth() + 1).padStart(2, "0")}.${String(v.getFullYear()).slice(-2)}`;
-  return u.getFullYear() === f.getFullYear() && u.getMonth() === f.getMonth() ? `${String(u.getDate()).padStart(2, "0")}.–${p(f).slice(0, 2)}.${String(f.getMonth() + 1).padStart(2, "0")}.${String(f.getFullYear()).slice(-2)}` : `${p(u)}–${p(f)}`;
+  return d.getFullYear() === f.getFullYear() && d.getMonth() === f.getMonth() ? `${String(d.getDate()).padStart(2, "0")}.–${p(f).slice(0, 2)}.${String(f.getMonth() + 1).padStart(2, "0")}.${String(f.getFullYear()).slice(-2)}` : `${p(d)}–${p(f)}`;
 }
-function qt(c, i) {
+function jt(c, i) {
   return P(i).statuses[c] ?? c;
 }
 function Wi(c, i) {
@@ -991,10 +991,10 @@ class Ot extends Ht {
     o.className = "migration-notice", o.setAttribute("role", "note");
     const h = document.createElement("strong");
     h.textContent = s.migrationTitle ?? "IMPORTANT: THE LOVELACE CARDS HAVE CHANGED!";
-    const u = document.createElement("p");
-    u.textContent = s.migrationText ?? "Use the central journal card for new dashboards.";
+    const d = document.createElement("p");
+    d.textContent = s.migrationText ?? "Use the central journal card for new dashboards.";
     const f = document.createElement("a");
-    f.href = "https://github.com/balronu/ha-camper-travel-journal/blob/main/README.md#migration", f.target = "_blank", f.rel = "noreferrer", f.textContent = s.migrationLink ?? "Migration guide", o.append(h, u, f), i.prepend(o);
+    f.href = "https://github.com/balronu/ha-camper-travel-journal/blob/main/README.md#migration", f.target = "_blank", f.rel = "noreferrer", f.textContent = s.migrationLink ?? "Migration guide", o.append(h, d, f), i.prepend(o);
   }
   static getConfigElement() {
     return document.createElement("camper-travel-journal-card-editor");
@@ -1016,8 +1016,8 @@ function ii(c, i) {
 async function F(c, i, s, o = {}) {
   return c.connection.sendMessagePromise({ type: i, vehicle_id: s, ...o });
 }
-const Mt = (c, i, s) => F(c, "camper_travel_journal/list", i, s ? { trip_id: s } : {}), to = (c, i, s, o, h = 5e3) => F(c, "camper_travel_journal/route", i, { trip_id: s, drive_ids: o, max_points: h }), Yr = (c, i, s, o) => F(c, "camper_travel_journal/transition_trip", i, { trip_id: s, status: o }), eo = (c, i, s, o = "", h = "", u = "") => F(c, "camper_travel_journal/create_trip", i, { title: s, start_date: o || void 0, end_date: h || void 0, destination: u }), io = (c, i, s, o) => F(c, "camper_travel_journal/update_trip", i, { trip_id: s, ...o }), no = (c, i, s) => F(c, "camper_travel_journal/delete_trip", i, { trip_id: s }), ro = (c, i, s, o) => F(c, "camper_travel_journal/unlink_drive", i, { trip_id: s, drive_id: o }), so = (c, i, s, o) => F(c, "camper_travel_journal/link_drives", i, { trip_id: s, drive_ids: o }), ao = (c, i, s) => F(c, "camper_travel_journal/create_manual_drive", i, s), oo = (c, i, s, o) => F(c, "camper_travel_journal/update_manual_drive", i, { drive_id: s, ...o }), lo = (c, i, s) => F(c, "camper_travel_journal/delete_manual_drive", i, { drive_id: s }), ho = (c, i, s, o) => F(c, "camper_travel_journal/create_expense", i, { trip_id: s, ...o }), co = (c, i, s, o) => F(c, "camper_travel_journal/update_expense", i, { expense_id: s, ...o }), Xr = (c, i, s, o) => F(c, "camper_travel_journal/create_stop", i, { trip_id: s, ...o }), uo = (c, i, s, o) => F(c, "camper_travel_journal/update_stop", i, { stop_id: s, ...o }), po = (c, i, s) => F(c, "camper_travel_journal/delete_stop", i, { stop_id: s }), Ji = (c, i, s, o, h, u) => F(c, "camper_travel_journal/assign_interruption", i, { trip_id: s, interruption_id: o, status: h, stop_id: u }), Jr = (c, i, s, o, h) => F(c, "camper_travel_journal/create_stop_from_interruption", i, { trip_id: s, interruption_id: o, ...h }), fo = (c, i, s, o) => F(c, "camper_travel_journal/update_overnight", i, { place_id: s, ...o }), mo = (c, i, s, o) => F(c, "camper_travel_journal/update_rating", i, { place_id: s, ...o }), go = (c, i, s) => F(c, "camper_travel_journal/delete_rating", i, { place_id: s }), _o = (c, i, s) => F(c, "camper_travel_journal/generate_stop_suggestions", i, { trip_id: s }), vo = (c, i, s, o, h, u) => F(c, "camper_travel_journal/accept_stop_suggestion", i, { suggestion_id: s, trip_id: o, name: h, place_type: u }), yo = (c, i, s) => F(c, "camper_travel_journal/dismiss_stop_suggestion", i, { suggestion_id: s }), bo = (c, i, s) => F(c, "camper_travel_journal/delete_expense", i, { expense_id: s }), xo = (c, i, s) => F(c, "camper_travel_journal/export_pdf", i, { trip_id: s }), ni = async (c) => (await c.connection.sendMessagePromise({ type: "camper_travel_journal/list_vehicles" })).vehicles ?? [], wo = (c, i, s) => F(c, "camper_travel_journal/analyze_gpx", i, { content_base64: s }), $o = (c, i, s, o, h, u) => F(c, "camper_travel_journal/import_gpx", i, { content_base64: s, file_hash: o, drive_keys: h, trip_id: u }), Qi = "camper-travel-journal-expenses-changed", tn = "camper-travel-journal-data-changed";
-function qi(c) {
+const Mt = (c, i, s) => F(c, "camper_travel_journal/list", i, s ? { trip_id: s } : {}), to = (c, i, s, o, h = 5e3) => F(c, "camper_travel_journal/route", i, { trip_id: s, drive_ids: o, max_points: h }), Yr = (c, i, s, o) => F(c, "camper_travel_journal/transition_trip", i, { trip_id: s, status: o }), eo = (c, i, s, o = "", h = "", d = "") => F(c, "camper_travel_journal/create_trip", i, { title: s, start_date: o || void 0, end_date: h || void 0, destination: d }), io = (c, i, s, o) => F(c, "camper_travel_journal/update_trip", i, { trip_id: s, ...o }), no = (c, i, s) => F(c, "camper_travel_journal/delete_trip", i, { trip_id: s }), ro = (c, i, s, o) => F(c, "camper_travel_journal/unlink_drive", i, { trip_id: s, drive_id: o }), so = (c, i, s, o) => F(c, "camper_travel_journal/link_drives", i, { trip_id: s, drive_ids: o }), ao = (c, i, s) => F(c, "camper_travel_journal/create_manual_drive", i, s), oo = (c, i, s, o) => F(c, "camper_travel_journal/update_manual_drive", i, { drive_id: s, ...o }), lo = (c, i, s) => F(c, "camper_travel_journal/delete_manual_drive", i, { drive_id: s }), ho = (c, i, s, o) => F(c, "camper_travel_journal/create_expense", i, { trip_id: s, ...o }), co = (c, i, s, o) => F(c, "camper_travel_journal/update_expense", i, { expense_id: s, ...o }), Xr = (c, i, s, o) => F(c, "camper_travel_journal/create_stop", i, { trip_id: s, ...o }), uo = (c, i, s, o) => F(c, "camper_travel_journal/update_stop", i, { stop_id: s, ...o }), po = (c, i, s) => F(c, "camper_travel_journal/delete_stop", i, { stop_id: s }), Ji = (c, i, s, o, h, d) => F(c, "camper_travel_journal/assign_interruption", i, { trip_id: s, interruption_id: o, status: h, stop_id: d }), Jr = (c, i, s, o, h) => F(c, "camper_travel_journal/create_stop_from_interruption", i, { trip_id: s, interruption_id: o, ...h }), fo = (c, i, s, o) => F(c, "camper_travel_journal/update_overnight", i, { place_id: s, ...o }), mo = (c, i, s, o) => F(c, "camper_travel_journal/update_rating", i, { place_id: s, ...o }), go = (c, i, s) => F(c, "camper_travel_journal/delete_rating", i, { place_id: s }), _o = (c, i, s) => F(c, "camper_travel_journal/generate_stop_suggestions", i, { trip_id: s }), vo = (c, i, s, o, h, d) => F(c, "camper_travel_journal/accept_stop_suggestion", i, { suggestion_id: s, trip_id: o, name: h, place_type: d }), yo = (c, i, s) => F(c, "camper_travel_journal/dismiss_stop_suggestion", i, { suggestion_id: s }), bo = (c, i, s) => F(c, "camper_travel_journal/delete_expense", i, { expense_id: s }), xo = (c, i, s) => F(c, "camper_travel_journal/export_pdf", i, { trip_id: s }), ni = async (c) => (await c.connection.sendMessagePromise({ type: "camper_travel_journal/list_vehicles" })).vehicles ?? [], wo = (c, i, s) => F(c, "camper_travel_journal/analyze_gpx", i, { content_base64: s }), $o = (c, i, s, o, h, d) => F(c, "camper_travel_journal/import_gpx", i, { content_base64: s, file_hash: o, drive_keys: h, trip_id: d }), Qi = "camper-travel-journal-expenses-changed", tn = "camper-travel-journal-data-changed";
+function ji(c) {
   window.dispatchEvent(new CustomEvent(Qi, { detail: c }));
 }
 function Q(c) {
@@ -1091,8 +1091,8 @@ class Qr extends Ot {
       this.trips = i.trips;
       const s = ri(this.vehicleId), h = i.trips.find((f) => f.id === (s || this.selectedTripId)) ?? this.chooseDefaultTrip(i.trips);
       this.selectedTripId = h?.id ?? "", h && Dt({ vehicleId: this.vehicleId, tripId: h.id, source: "summary" });
-      const u = h ? await Mt(this.hass, this.vehicleId, h.id) : i;
-      return this.snapshot = h ? { ...u, trips: [h] } : u, this.loadError = "", !0;
+      const d = h ? await Mt(this.hass, this.vehicleId, h.id) : i;
+      return this.snapshot = h ? { ...d, trips: [h] } : d, this.loadError = "", !0;
     } catch {
       return this.loadError = P(this.hass).loadError, !1;
     } finally {
@@ -1117,7 +1117,7 @@ class Qr extends Ot {
     const f = this.snapshot?.expense_summary, x = f?.mixed_currency ? i.mixedCurrency : f?.total_minor !== void 0 && f.currency ? yt(f.total_minor, f.currency, this.hass) : yt(0, "EUR", this.hass), p = this.loadError || this.actionError, v = s ? kt(s, this.hass) : "";
     return g`<ha-card><h2>${s?.title ?? i.title}</h2>${o.length ? g`<label class="trip-selector">${i.summaryChooseTrip}<select aria-label=${i.summaryTrip} @change=${($) => {
       this.selectTrip($.currentTarget.value);
-    }} ?disabled=${this.loading}>${o.map(($) => g`<option value=${$.id} ?selected=${$.id === this.selectedTripId}>${$.title} · ${qt($.status, this.hass)} · ${kt($, this.hass)}</option>`)}</select></label>` : ""}${p ? g`<p class="error" role="alert">${p}</p>` : s ? g`<p class="muted">${s.destination || i.noDestination} · ${qt(s.status, this.hass)} · ${v}</p><div class="grid"><div class="metric"><span class="muted">${i.distance}</span><span class="value">${h.toFixed(1)} km</span></div><div class="metric"><span class="muted">${i.drives}</span><span class="value">${this.snapshot?.drives.length ?? 0}</span></div><div class="metric"><span class="muted">${i.stops}</span><span class="value">${this.snapshot?.stops.length ?? 0}</span></div><div class="metric"><span class="muted">${i.costs}</span><span class="value">${x}</span></div></div><div class="actions">${s.status === "planned" ? g`<button @click=${() => this.setStatus("active")}>${i.start}</button>` : s.status === "paused" ? g`<button @click=${() => this.setStatus("active")}>${i.resume}</button>` : ""}${s.status === "active" ? g`<button class="secondary" @click=${() => this.setStatus("paused")}>${i.pause}</button><button @click=${() => this.setStatus("completed")}>${i.complete}</button>` : ""}</div>` : g`<p class="muted">${i.noTrip}</p>`}${this.loading ? g`<p class="muted">${i.loading}</p>` : ""}</ha-card>`;
+    }} ?disabled=${this.loading}>${o.map(($) => g`<option value=${$.id} ?selected=${$.id === this.selectedTripId}>${$.title} · ${jt($.status, this.hass)} · ${kt($, this.hass)}</option>`)}</select></label>` : ""}${p ? g`<p class="error" role="alert">${p}</p>` : s ? g`<p class="muted">${s.destination || i.noDestination} · ${jt(s.status, this.hass)} · ${v}</p><div class="grid"><div class="metric"><span class="muted">${i.distance}</span><span class="value">${h.toFixed(1)} km</span></div><div class="metric"><span class="muted">${i.drives}</span><span class="value">${this.snapshot?.drives.length ?? 0}</span></div><div class="metric"><span class="muted">${i.stops}</span><span class="value">${this.snapshot?.stops.length ?? 0}</span></div><div class="metric"><span class="muted">${i.costs}</span><span class="value">${x}</span></div></div><div class="actions">${s.status === "planned" ? g`<button @click=${() => this.setStatus("active")}>${i.start}</button>` : s.status === "paused" ? g`<button @click=${() => this.setStatus("active")}>${i.resume}</button>` : ""}${s.status === "active" ? g`<button class="secondary" @click=${() => this.setStatus("paused")}>${i.pause}</button><button @click=${() => this.setStatus("completed")}>${i.complete}</button>` : ""}</div>` : g`<p class="muted">${i.noTrip}</p>`}${this.loading ? g`<p class="muted">${i.loading}</p>` : ""}</ha-card>`;
   }
 }
 Qr.styles = [Ot.styles, zt`.trip-selector{display:grid;gap:4px;margin:12px 0;font-size:.9em}.trip-selector select{min-width:0;width:100%;box-sizing:border-box;padding:6px}`];
@@ -1274,12 +1274,12 @@ class Qe extends Ot {
     const s = new Date(i), o = (h) => String(h).padStart(2, "0");
     return `${s.getFullYear()}-${o(s.getMonth() + 1)}-${o(s.getDate())}T${o(s.getHours())}:${o(s.getMinutes())}`;
   }
-  async assignExistingInterruption(i) {
-    if (!(!this.hass || !i.existing_place_id || this.placeSaving)) {
+  async assignExistingInterruption(i, s = i.existing_place_id || "") {
+    if (!(!this.hass || !s || this.placeSaving)) {
       this.placeSaving = !0;
       try {
-        const s = (this.snapshot?.stops ?? []).find((h) => h.id === i.existing_place_id), o = s?.place_kind || s?.place_type || s?.stop_type;
-        await Ji(this.hass, this.vehicleId, this.activeTripId, i.id, ["campsite", "rv_site", "wild_camp", "overnight"].includes(o || "") ? "overnight" : "stop", i.existing_place_id), await this.refresh(), Q({ vehicleId: this.vehicleId, tripId: this.activeTripId });
+        const o = (this.snapshot?.stops ?? []).find((x) => x.id === s), h = o?.place_kind || o?.place_type || o?.stop_type, d = i.existing_places?.find((x) => x.id === s), f = d?.place_kind || d?.place_type || d?.stop_type;
+        await Ji(this.hass, this.vehicleId, this.activeTripId, i.id, ["campsite", "rv_site", "wild_camp", "overnight"].includes(h || f || "") ? "overnight" : "stop", s), await this.refresh(), Q({ vehicleId: this.vehicleId, tripId: this.activeTripId });
       } catch {
         this.fail(P(this.hass).placeSaveError ?? P(this.hass).loadError);
       } finally {
@@ -1288,10 +1288,6 @@ class Qe extends Ot {
     }
   }
   startInterruption(i) {
-    if (i.existing_place_id) {
-      this.assignExistingInterruption(i);
-      return;
-    }
     this.editingPlaceId = "", this.interruptionId = i.id, this.interruptionDriveId = i.previous_drive_id, this.placeName = "", this.placeType = "other", this.placeArrived = this.placeLocalDateTime(i.started_at), this.placeDeparted = this.placeLocalDateTime(i.ended_at);
     const s = i.previous_end_point;
     this.placeLatitude = s ? String(s.latitude) : "", this.placeLongitude = s ? String(s.longitude) : "", this.placeDescription = "", this.placeAddress = "", this.placeWebsite = "", this.selected = this.activeTripId, this.openEditor("place-create", this.activeTripId);
@@ -1365,7 +1361,7 @@ class Qe extends Ot {
       o && this.activeTripId !== o.id ? (this.activeTripId = o.id, this.embeddedTripId() || Dt({ vehicleId: this.vehicleId, tripId: this.activeTripId, source: "manager" }), s = await Mt(this.hass, this.vehicleId, this.activeTripId)) : o && !this.embeddedTripId() && Dt({ vehicleId: this.vehicleId, tripId: o.id, source: "manager" }), this.snapshot = s;
       try {
         const h = await ni(this.hass);
-        this.vehicleName = h.find((u) => u.vehicle_id === this.vehicleId)?.name || "";
+        this.vehicleName = h.find((d) => d.vehicle_id === this.vehicleId)?.name || "";
       } catch {
         this.vehicleName = "";
       }
@@ -1384,9 +1380,9 @@ class Qe extends Ot {
       try {
         const o = new Uint8Array(await s.arrayBuffer());
         let h = "";
-        o.forEach((u) => {
-          h += String.fromCharCode(u);
-        }), this.gpxContent = btoa(h), this.gpxPreview = await wo(this.hass, this.vehicleId, this.gpxContent), this.gpxSelected = new Set(this.gpxPreview.drives.map((u) => u.key)), this.gpxTripId = this.activeTripId;
+        o.forEach((d) => {
+          h += String.fromCharCode(d);
+        }), this.gpxContent = btoa(h), this.gpxPreview = await wo(this.hass, this.vehicleId, this.gpxContent), this.gpxSelected = new Set(this.gpxPreview.drives.map((d) => d.key)), this.gpxTripId = this.activeTripId;
       } catch {
         this.gpxError = P(this.hass).gpxAnalyzeError;
       } finally {
@@ -1572,7 +1568,7 @@ class Qe extends Ot {
     const s = P(this.hass), o = Or(this.amount);
     if (o === null) return this.fail(s.amountInvalid);
     try {
-      await ho(this.hass, this.vehicleId, i, { occurred_at: (/* @__PURE__ */ new Date()).toISOString(), category: this.category, amount_minor: o, currency: "EUR" }), this.actionError = "", await this.refresh() && (this.amount = "", this.closeEditor(!0), qi({ vehicleId: this.vehicleId, tripId: i }));
+      await ho(this.hass, this.vehicleId, i, { occurred_at: (/* @__PURE__ */ new Date()).toISOString(), category: this.category, amount_minor: o, currency: "EUR" }), this.actionError = "", await this.refresh() && (this.amount = "", this.closeEditor(!0), ji({ vehicleId: this.vehicleId, tripId: i }));
     } catch {
       this.fail(s.expenseCreateError);
     }
@@ -1593,7 +1589,7 @@ class Qe extends Ot {
     if (!Hi(this.editingCategory)) return this.fail(s.categoryInvalid);
     this.expenseSavingId = i.id;
     try {
-      await co(this.hass, this.vehicleId, i.id, { amount_minor: o, category: this.editingCategory }), this.actionError = "", await this.refresh() && (this.editingExpenseId = "", this.closeEditor(!0), qi({ vehicleId: this.vehicleId, tripId: i.trip_id ?? this.activeTripId }));
+      await co(this.hass, this.vehicleId, i.id, { amount_minor: o, category: this.editingCategory }), this.actionError = "", await this.refresh() && (this.editingExpenseId = "", this.closeEditor(!0), ji({ vehicleId: this.vehicleId, tripId: i.trip_id ?? this.activeTripId }));
     } catch {
       this.fail(s.expenseEditError);
     } finally {
@@ -1608,7 +1604,7 @@ class Qe extends Ot {
       }
       this.expenseSavingId = i;
       try {
-        await bo(this.hass, this.vehicleId, i), this.confirmingExpenseId = "", this.actionError = "", await this.refresh() && qi({ vehicleId: this.vehicleId, tripId: this.activeTripId });
+        await bo(this.hass, this.vehicleId, i), this.confirmingExpenseId = "", this.actionError = "", await this.refresh() && ji({ vehicleId: this.vehicleId, tripId: this.activeTripId });
       } catch {
         this.fail(P(this.hass).expenseDeleteError);
       } finally {
@@ -1624,8 +1620,8 @@ class Qe extends Ot {
     if (!(!this.hass || this.pdfBusyTripId)) {
       this.pdfBusyTripId = i.id, this.actionError = "", this.requestUpdate();
       try {
-        const s = await xo(this.hass, this.vehicleId, i.id), o = atob(s.pdf_base64), h = Uint8Array.from(o, (x) => x.charCodeAt(0)), u = URL.createObjectURL(new Blob([h], { type: s.content_type })), f = document.createElement("a");
-        f.href = u, f.download = s.filename, f.click(), window.setTimeout(() => URL.revokeObjectURL(u), 1e3);
+        const s = await xo(this.hass, this.vehicleId, i.id), o = atob(s.pdf_base64), h = Uint8Array.from(o, (x) => x.charCodeAt(0)), d = URL.createObjectURL(new Blob([h], { type: s.content_type })), f = document.createElement("a");
+        f.href = d, f.download = s.filename, f.click(), window.setTimeout(() => URL.revokeObjectURL(d), 1e3);
       } catch {
         this.fail(P(this.hass).pdfExportError);
       } finally {
@@ -1637,24 +1633,26 @@ class Qe extends Ot {
     return g`<div class="expense-row"><span>${Wi(i.category, this.hass)}: ${yt(i.amount_minor, i.currency, this.hass)}</span><span class="actions"><button type="button" class="link" @click=${() => this.startExpenseEdit(i)} ?disabled=${!!this.expenseSavingId}>${s.edit}</button><button type="button" class="link" @click=${() => this.removeExpense(i.id)}>${this.confirmingExpenseId === i.id ? s.confirmDelete : s.remove}</button></span></div>`;
   }
   renderDrive(i, s, o) {
-    const h = i.source === "manual" ? o.sourceManual : i.source === "gpx" ? o.sourceGpx ?? o.sourceGps : o.sourceGps, u = `${o.driveStart}: ${j(i.started_at, this.hass)} · ${o.driveEnd}: ${i.ended_at ? j(i.ended_at, this.hass) : "–"}`, f = i.trip_id === s ? g`<button type="button" class="link" @click=${() => this.unassignDrive(s, i.id)}>${o.unassign}</button>` : g`<button type="button" class="link" @click=${() => this.assignDrive(s, i.id)}>${o.assign}</button>`, x = i.source === "manual" ? g`<button type="button" class="link" @click=${() => this.startManualDriveEdit(i)} ?disabled=${!!this.driveSavingId}>${o.edit}</button><button type="button" class="link" @click=${() => this.removeManualDrive(s, i.id)} ?disabled=${!!this.driveSavingId}>${this.confirmingDriveId === i.id ? o.confirmDelete : o.remove}</button>` : "";
-    return g`<div class="drive-row"><div><strong>${h}</strong> · ${u}${i.start_label || i.end_label ? g`<br><span class="muted">${i.start_label || "–"} → ${i.end_label || "–"}</span>` : ""}<br><span class="muted">${(i.distance_m / 1e3).toFixed(1)} km · ${i.duration_seconds ? St(i.duration_seconds, this.hass) : "–"} · ${i.assignment_status === "assigned" ? o.assignedDrives : o.freeDrives}</span></div><span class="actions">${x}${f}</span></div>`;
+    const h = i.source === "manual" ? o.sourceManual : i.source === "gpx" ? o.sourceGpx ?? o.sourceGps : o.sourceGps, d = `${o.driveStart}: ${q(i.started_at, this.hass)} · ${o.driveEnd}: ${i.ended_at ? q(i.ended_at, this.hass) : "–"}`, f = i.trip_id === s ? g`<button type="button" class="link" @click=${() => this.unassignDrive(s, i.id)}>${o.unassign}</button>` : g`<button type="button" class="link" @click=${() => this.assignDrive(s, i.id)}>${o.assign}</button>`, x = i.source === "manual" ? g`<button type="button" class="link" @click=${() => this.startManualDriveEdit(i)} ?disabled=${!!this.driveSavingId}>${o.edit}</button><button type="button" class="link" @click=${() => this.removeManualDrive(s, i.id)} ?disabled=${!!this.driveSavingId}>${this.confirmingDriveId === i.id ? o.confirmDelete : o.remove}</button>` : "";
+    return g`<div class="drive-row"><div><strong>${h}</strong> · ${d}${i.start_label || i.end_label ? g`<br><span class="muted">${i.start_label || "–"} → ${i.end_label || "–"}</span>` : ""}<br><span class="muted">${(i.distance_m / 1e3).toFixed(1)} km · ${i.duration_seconds ? St(i.duration_seconds, this.hass) : "–"} · ${i.assignment_status === "assigned" ? o.assignedDrives : o.freeDrives}</span></div><span class="actions">${x}${f}</span></div>`;
   }
   renderInterruptions(i, s) {
     const o = (this.snapshot?.interruptions ?? []).filter((h) => h.status === "unassigned");
-    return g`<section class="place-section"><details open><summary><strong>${i.unassignedInterruptions ?? "Nicht zugeordnete Fahrtunterbrechungen"}</strong><span>${o.length}</span></summary>${o.length ? o.map((h) => g`<article class="interruption-row"><div><strong>${j(h.started_at, this.hass)} → ${j(h.ended_at, this.hass)}</strong><span class="muted">${St(h.duration_seconds, this.hass)} · ${i.interruptionUnconfirmed ?? "Nicht als Aufenthalt nachgewiesen"}</span></div><button type="button" @click=${() => this.startInterruption(h)}>${i.recordInterruption ?? "Als Aufenthalt erfassen"}</button></article>`) : g`<p class="muted">${i.noPlaces ?? "Keine Unterbrechungen zwischen Fahrten."}</p>`}</details></section>`;
+    return g`<section class="place-section"><details open><summary><strong>${i.unassignedInterruptions ?? "Nicht zugeordnete Fahrtunterbrechungen"}</strong><span>${o.length}</span></summary>${o.length ? o.map((h) => g`<article class="interruption-row"><div class="interruption-copy"><strong>${q(h.started_at, this.hass)} → ${q(h.ended_at, this.hass)}</strong><span class="muted">${St(h.duration_seconds, this.hass)} · ${i.interruptionUnconfirmed ?? "Nicht als Aufenthalt nachgewiesen"}</span>${h.existing_places?.length ? g`<span class="candidate-label">Vorhandener Aufenthalt: ${h.existing_places.map((d) => d.name).join(", ")}</span>` : ""}</div><div class="actions compact-actions">${h.existing_places?.map((d) => g`<button type="button" class="link" @click=${() => {
+      this.assignExistingInterruption(h, d.id);
+    }} ?disabled=${this.placeSaving}>${i.assign ?? "Zuordnen"}: ${d.name}</button>`)}<button type="button" @click=${() => this.startInterruption(h)}>${i.recordInterruption ?? "Neuen Aufenthalt erfassen"}</button></div></article>`) : g`<p class="muted">${i.noPlaces ?? "Keine Unterbrechungen zwischen Fahrten."}</p>`}</details></section>`;
   }
   renderGpx(i, s, o) {
-    const h = !!this.embeddedTripId(), u = s.find((p) => p.id === this.gpxTripId), f = this.gpxPeriod(), x = this.gpxTripPeriodWarning(u);
-    return g`<section class="gpx-import gpx-explicit"><h3>${i.gpxImport}</h3><p class="muted"><strong>${h ? i.gpxTargetTrip ?? "Reise" : i.gpxVehicle}:</strong> ${h ? u?.title || "" : this.vehicleName || i.editorVehicle}</p>${h ? "" : g`<label>${i.gpxTargetTrip}<select aria-label=${i.gpxTargetTrip} .value=${this.gpxTripId} @change=${(p) => {
+    const h = !!this.embeddedTripId(), d = s.find((p) => p.id === this.gpxTripId), f = this.gpxPeriod(), x = this.gpxTripPeriodWarning(d);
+    return g`<section class="gpx-import gpx-explicit"><h3>${i.gpxImport}</h3><p class="muted"><strong>${h ? i.gpxTargetTrip ?? "Reise" : i.gpxVehicle}:</strong> ${h ? d?.title || "" : this.vehicleName || i.editorVehicle}</p>${h ? "" : g`<label>${i.gpxTargetTrip}<select aria-label=${i.gpxTargetTrip} .value=${this.gpxTripId} @change=${(p) => {
       this.gpxTripId = p.currentTarget.value, this.requestUpdate();
-    }}><option value="">${i.gpxNoTrip}</option>${s.map((p) => g`<option value=${p.id}>${p.title} · ${qt(p.status, this.hass)} · ${kt(p, this.hass) || i.period}</option>`)}</select></label>`}<input type="file" accept=".gpx,application/gpx+xml,application/xml" @change=${(p) => this.readGPX(p)} ?disabled=${this.gpxBusy}><p class="muted">${this.gpxName || i.gpxPrivacy}</p>${this.gpxError ? g`<p class="error" role="alert">${this.gpxError}</p>` : ""}${o ? g`<div class="gpx-preview"><strong>${o.drives.length} ${i.gpxSections}, ${o.points.length} ${i.gpxPoints}</strong>${f ? g`<p class="muted">${i.gpxPeriod}: ${j(f.start, this.hass)} – ${j(f.end, this.hass)}</p>` : ""}${x ? g`<p class="warning" role="alert">${i.gpxPeriodWarning}</p>` : ""}<h3>${i.gpxSummary}</h3><p class="muted">${o.points.length} ${i.gpxPoints}, ${this.gpxSelected.size} ${i.gpxSelectedDrives}, ${this.gpxSelectedDistanceKm().toFixed(1)} ${i.gpxDistance}, ${u?.title || i.gpxNoTrip}</p><div class="gpx-drive-list">${o.drives.map((p) => g`<label><input type="checkbox" .checked=${this.gpxSelected.has(p.key)} @change=${(v) => {
+    }}><option value="">${i.gpxNoTrip}</option>${s.map((p) => g`<option value=${p.id}>${p.title} · ${jt(p.status, this.hass)} · ${kt(p, this.hass) || i.period}</option>`)}</select></label>`}<input type="file" accept=".gpx,application/gpx+xml,application/xml" @change=${(p) => this.readGPX(p)} ?disabled=${this.gpxBusy}><p class="muted">${this.gpxName || i.gpxPrivacy}</p>${this.gpxError ? g`<p class="error" role="alert">${this.gpxError}</p>` : ""}${o ? g`<div class="gpx-preview"><strong>${o.drives.length} ${i.gpxSections}, ${o.points.length} ${i.gpxPoints}</strong>${f ? g`<p class="muted">${i.gpxPeriod}: ${q(f.start, this.hass)} – ${q(f.end, this.hass)}</p>` : ""}${x ? g`<p class="warning" role="alert">${i.gpxPeriodWarning}</p>` : ""}<h3>${i.gpxSummary}</h3><p class="muted">${o.points.length} ${i.gpxPoints}, ${this.gpxSelected.size} ${i.gpxSelectedDrives}, ${this.gpxSelectedDistanceKm().toFixed(1)} ${i.gpxDistance}, ${d?.title || i.gpxNoTrip}</p><div class="gpx-drive-list">${o.drives.map((p) => g`<label><input type="checkbox" .checked=${this.gpxSelected.has(p.key)} @change=${(v) => {
       v.currentTarget.checked ? this.gpxSelected.add(p.key) : this.gpxSelected.delete(p.key), this.requestUpdate();
-    }}> ${j(p.started_at, this.hass)} – ${j(p.ended_at, this.hass)} · ${(p.distance_m / 1e3).toFixed(1)} km · ${St(p.duration_seconds, this.hass)}</label>`)}</div>${o.warnings.length ? g`<p class="muted">${i.gpxWarnings}: ${o.warnings.map((p) => p === "gpx_gap_possible_drive_boundary" ? i.gpxGapBoundary : p).join(", ")}</p>` : ""}${o.conflicts.duplicate_file ? g`<p class="error" role="alert">${i.gpxDuplicate}</p>` : g`<button type="button" @click=${() => this.confirmGPX()} ?disabled=${this.gpxBusy || this.gpxSelected.size === 0}>${this.gpxBusy ? i.saving : i.gpxConfirm}</button>`}</div>` : ""}</section>`;
+    }}> ${q(p.started_at, this.hass)} – ${q(p.ended_at, this.hass)} · ${(p.distance_m / 1e3).toFixed(1)} km · ${St(p.duration_seconds, this.hass)}</label>`)}</div>${o.warnings.length ? g`<p class="muted">${i.gpxWarnings}: ${o.warnings.map((p) => p === "gpx_gap_possible_drive_boundary" ? i.gpxGapBoundary : p).join(", ")}</p>` : ""}${o.conflicts.duplicate_file ? g`<p class="error" role="alert">${i.gpxDuplicate}</p>` : g`<button type="button" @click=${() => this.confirmGPX()} ?disabled=${this.gpxBusy || this.gpxSelected.size === 0}>${this.gpxBusy ? i.saving : i.gpxConfirm}</button>`}</div>` : ""}</section>`;
   }
   renderPdfExport(i, s) {
     if (!s.length) return "";
-    const o = s.some((u) => u.id === this.activeTripId) ? this.activeTripId : s[0].id, h = s.find((u) => u.id === o) ?? s[0];
+    const o = s.some((d) => d.id === this.activeTripId) ? this.activeTripId : s[0].id, h = s.find((d) => d.id === o) ?? s[0];
     return g`<section class="pdf-export"><h3>${i.pdfExportTitle}</h3><p class="muted">${h.title} · ${kt(h, this.hass)}</p><div class="pdf-export-row"><button type="button" @click=${() => {
       this.downloadPdf(h);
     }} ?disabled=${!!this.pdfBusyTripId}>${this.pdfBusyTripId ? i.pdfExporting : i.pdfExport}</button></div></section>`;
@@ -1663,7 +1661,7 @@ class Qe extends Ot {
     const o = this.snapshot?.stop_suggestions ?? [];
     return g`<section class="place-section"><h3>${i.gpsSuggestions ?? "GPS-Stoppvorschläge"}</h3><button type="button" @click=${() => {
       this.refreshSuggestions(s);
-    }}>${i.generateSuggestions ?? "Vorschläge aktualisieren"}</button>${o.length ? g`<ul>${o.map((h) => g`<li>${j(h.arrived_at, this.hass)} – ${j(h.departed_at || h.arrived_at, this.hass)}${this.suggestionEditingId === h.id ? g`<div class="form-grid"><input aria-label=${i.placeName ?? "Name"} .value=${this.suggestionName} @input=${(u) => this.suggestionName = u.currentTarget.value}><select aria-label=${i.placeCategory ?? "Kategorie"} .value=${this.suggestionType} @change=${(u) => this.suggestionType = u.currentTarget.value}><option value="other">${i.placeOther ?? "Sonstiger Ort"}</option><option value="restaurant">${i.placeRestaurant ?? "Restaurant"}</option><option value="fuel_stop">${i.placeFuel ?? "Tankpause"}</option><option value="campsite">${i.placeCampsite ?? "Campingplatz"}</option><option value="rv_site">${i.placeRvSite ?? "Wohnmobilstellplatz"}</option></select></div>` : ""} <button type="button" @click=${() => {
+    }}>${i.generateSuggestions ?? "Vorschläge aktualisieren"}</button>${o.length ? g`<ul>${o.map((h) => g`<li>${q(h.arrived_at, this.hass)} – ${q(h.departed_at || h.arrived_at, this.hass)}${this.suggestionEditingId === h.id ? g`<div class="form-grid"><input aria-label=${i.placeName ?? "Name"} .value=${this.suggestionName} @input=${(d) => this.suggestionName = d.currentTarget.value}><select aria-label=${i.placeCategory ?? "Kategorie"} .value=${this.suggestionType} @change=${(d) => this.suggestionType = d.currentTarget.value}><option value="other">${i.placeOther ?? "Sonstiger Ort"}</option><option value="restaurant">${i.placeRestaurant ?? "Restaurant"}</option><option value="fuel_stop">${i.placeFuel ?? "Tankpause"}</option><option value="campsite">${i.placeCampsite ?? "Campingplatz"}</option><option value="rv_site">${i.placeRvSite ?? "Wohnmobilstellplatz"}</option></select></div>` : ""} <button type="button" @click=${() => {
       this.acceptSuggestion(h, s);
     }}>${this.suggestionEditingId === h.id ? i.save ?? "Speichern" : i.accept ?? "Übernehmen"}</button><button type="button" class="secondary" @click=${() => {
       this.dismissSuggestion(h, s);
@@ -1672,27 +1670,27 @@ class Qe extends Ot {
   starPicker(i, s, o) {
     return g`<fieldset class="star-picker"><legend>${i}</legend><div role="radiogroup" aria-label=${i}>${[1, 2, 3, 4, 5].map((h) => g`<button type="button" class="star-button" role="radio" aria-label=${`${h}/5`} aria-checked=${s === String(h)} ?data-selected=${s === String(h)} @click=${() => {
       o(String(h)), this.requestUpdate();
-    }} @keydown=${(u) => {
-      (u.key === "ArrowRight" || u.key === "ArrowUp") && (u.preventDefault(), o(String(Math.min(5, h + 1))), this.requestUpdate()), (u.key === "ArrowLeft" || u.key === "ArrowDown") && (u.preventDefault(), o(String(Math.max(1, h - 1))), this.requestUpdate());
+    }} @keydown=${(d) => {
+      (d.key === "ArrowRight" || d.key === "ArrowUp") && (d.preventDefault(), o(String(Math.min(5, h + 1))), this.requestUpdate()), (d.key === "ArrowLeft" || d.key === "ArrowDown") && (d.preventDefault(), o(String(Math.max(1, h - 1))), this.requestUpdate());
     }}>${s && Number(s) >= h ? "★" : "☆"}</button>`)}</div></fieldset>`;
   }
   renderPlacesLegacy(i, s) {
     const o = this.snapshot?.stops ?? [], h = g`<option value="other">${i.placeOther ?? "Sonstiger Ort"}</option><option value="restaurant">${i.placeRestaurant ?? "Restaurant"}</option><option value="fuel_stop">${i.placeFuel ?? "Tankpause"}</option><option value="attraction">${i.placeAttraction ?? "Sehenswürdigkeit"}</option><option value="ferry">${i.placeFerry ?? "Fähre"}</option><option value="campsite">${i.placeCampsite ?? "Campingplatz"}</option><option value="rv_site">${i.placeRvSite ?? "Wohnmobilstellplatz"}</option><option value="wild_camp">${i.placeWildCamp ?? "Freistehplatz"}</option>`;
-    return g`<section class="place-section"><details open><summary><strong>${i.places ?? "Orte und Zwischenstopps"}</strong><span>${o.length}</span></summary><form class="form-grid" @submit=${(u) => {
-      u.preventDefault(), this.savePlace(s);
-    }}><input aria-label=${i.placeName ?? "Name"} placeholder=${i.placeName ?? "Name"} .value=${this.placeName} @input=${(u) => this.placeName = u.currentTarget.value} required><select aria-label=${i.placeCategory ?? "Kategorie"} .value=${this.placeType} @change=${(u) => this.placeType = u.currentTarget.value}>${h}</select><label>${i.placeArrived ?? "Ankunft"}<input type="datetime-local" .value=${this.placeArrived} @input=${(u) => this.placeArrived = u.currentTarget.value} required></label><label>${i.placeDeparted ?? "Abfahrt"}<input type="datetime-local" .value=${this.placeDeparted} @input=${(u) => this.placeDeparted = u.currentTarget.value}></label><input aria-label=${i.placeAddress ?? "Adresse"} placeholder=${i.placeAddress ?? "Adresse"} .value=${this.placeAddress} @input=${(u) => this.placeAddress = u.currentTarget.value}><input aria-label=${i.placeWebsite ?? "Webseite"} type="url" placeholder=${i.placeWebsite ?? "Webseite (optional)"} .value=${this.placeWebsite} @input=${(u) => this.placeWebsite = u.currentTarget.value}><input aria-label="Latitude" inputmode="decimal" placeholder="Latitude" .value=${this.placeLatitude} @input=${(u) => this.placeLatitude = u.currentTarget.value}><input aria-label="Longitude" inputmode="decimal" placeholder="Longitude" .value=${this.placeLongitude} @input=${(u) => this.placeLongitude = u.currentTarget.value}><textarea aria-label=${i.placeDescription ?? "Notizen"} placeholder=${i.placeDescription ?? "Beschreibung und Notizen"} .value=${this.placeDescription} @input=${(u) => this.placeDescription = u.currentTarget.value}></textarea><div class="actions"><button type="submit" ?disabled=${this.placeSaving}>${this.placeSaving ? i.saving : this.editingPlaceId ? i.save : i.create ?? "Anlegen"}</button>${this.editingPlaceId ? g`<button type="button" class="secondary" @click=${() => this.resetPlaceForm()}>${i.cancel}</button>` : ""}</div></form>${o.length ? g`<div class="place-list">${o.map((u) => g`<article class="place-row"><div><strong>${u.name}</strong><span class="muted">${u.place_type || u.stop_type} · ${j(u.arrived_at || u.occurred_at, this.hass)}${u.duration_seconds ? ` · ${St(u.duration_seconds, this.hass)}` : ""}${u.rating_overall ? ` · ${u.rating_overall}/5` : ""}</span><span>${u.description || ""}</span>${u.website_url ? g`<a href=${u.website_url} target="_blank" rel="noopener noreferrer">${i.placeWebsiteOpen ?? "Webseite öffnen"}</a>` : ""}</div><div class="actions"><button type="button" class="link" @click=${() => this.editPlace(u)}>${i.edit}</button><button type="button" class="link" @click=${() => {
-      this.removePlace(u, s);
-    }}>${this.confirmingPlaceId === u.id ? i.confirmDelete : i.remove}</button><button type="button" class="link" @click=${() => this.startRating(u)}>${u.rating_overall ? i.ratingEdit ?? "Bewertung" : i.ratingAdd ?? "Bewerten"}</button></div>${this.ratingPlaceId === u.id ? g`<div class="rating-form form-grid">${this.starPicker(i.ratingOverall ?? "Gesamt", this.ratingOverall, (f) => this.ratingOverall = f)}${this.starPicker(i.ratingAccess ?? "Anfahrt", this.ratingAccess, (f) => this.ratingAccess = f)}${this.starPicker(i.ratingSpace ?? "Platzgröße", this.ratingSpace, (f) => this.ratingSpace = f)}${this.starPicker(i.ratingFacilities ?? "Ausstattung", this.ratingFacilities, (f) => this.ratingFacilities = f)}${this.starPicker(i.ratingSurroundings ?? "Umgebung", this.ratingSurroundings, (f) => this.ratingSurroundings = f)}<textarea aria-label=${i.ratingComment ?? "Kommentar"} .value=${this.ratingText} @input=${(f) => this.ratingText = f.currentTarget.value}></textarea><button type="button" @click=${() => {
-      this.saveRating(u.id, s);
+    return g`<section class="place-section"><details open><summary><strong>${i.places ?? "Orte und Zwischenstopps"}</strong><span>${o.length}</span></summary><form class="form-grid" @submit=${(d) => {
+      d.preventDefault(), this.savePlace(s);
+    }}><input aria-label=${i.placeName ?? "Name"} placeholder=${i.placeName ?? "Name"} .value=${this.placeName} @input=${(d) => this.placeName = d.currentTarget.value} required><select aria-label=${i.placeCategory ?? "Kategorie"} .value=${this.placeType} @change=${(d) => this.placeType = d.currentTarget.value}>${h}</select><label>${i.placeArrived ?? "Ankunft"}<input type="datetime-local" .value=${this.placeArrived} @input=${(d) => this.placeArrived = d.currentTarget.value} required></label><label>${i.placeDeparted ?? "Abfahrt"}<input type="datetime-local" .value=${this.placeDeparted} @input=${(d) => this.placeDeparted = d.currentTarget.value}></label><input aria-label=${i.placeAddress ?? "Adresse"} placeholder=${i.placeAddress ?? "Adresse"} .value=${this.placeAddress} @input=${(d) => this.placeAddress = d.currentTarget.value}><input aria-label=${i.placeWebsite ?? "Webseite"} type="url" placeholder=${i.placeWebsite ?? "Webseite (optional)"} .value=${this.placeWebsite} @input=${(d) => this.placeWebsite = d.currentTarget.value}><input aria-label="Latitude" inputmode="decimal" placeholder="Latitude" .value=${this.placeLatitude} @input=${(d) => this.placeLatitude = d.currentTarget.value}><input aria-label="Longitude" inputmode="decimal" placeholder="Longitude" .value=${this.placeLongitude} @input=${(d) => this.placeLongitude = d.currentTarget.value}><textarea aria-label=${i.placeDescription ?? "Notizen"} placeholder=${i.placeDescription ?? "Beschreibung und Notizen"} .value=${this.placeDescription} @input=${(d) => this.placeDescription = d.currentTarget.value}></textarea><div class="actions"><button type="submit" ?disabled=${this.placeSaving}>${this.placeSaving ? i.saving : this.editingPlaceId ? i.save : i.create ?? "Anlegen"}</button>${this.editingPlaceId ? g`<button type="button" class="secondary" @click=${() => this.resetPlaceForm()}>${i.cancel}</button>` : ""}</div></form>${o.length ? g`<div class="place-list">${o.map((d) => g`<article class="place-row"><div><strong>${d.name}</strong><span class="muted">${d.place_type || d.stop_type} · ${q(d.arrived_at || d.occurred_at, this.hass)}${d.duration_seconds ? ` · ${St(d.duration_seconds, this.hass)}` : ""}${d.rating_overall ? ` · ${d.rating_overall}/5` : ""}</span><span>${d.description || ""}</span>${d.website_url ? g`<a href=${d.website_url} target="_blank" rel="noopener noreferrer">${i.placeWebsiteOpen ?? "Webseite öffnen"}</a>` : ""}</div><div class="actions"><button type="button" class="link" @click=${() => this.editPlace(d)}>${i.edit}</button><button type="button" class="link" @click=${() => {
+      this.removePlace(d, s);
+    }}>${this.confirmingPlaceId === d.id ? i.confirmDelete : i.remove}</button><button type="button" class="link" @click=${() => this.startRating(d)}>${d.rating_overall ? i.ratingEdit ?? "Bewertung" : i.ratingAdd ?? "Bewerten"}</button></div>${this.ratingPlaceId === d.id ? g`<div class="rating-form form-grid">${this.starPicker(i.ratingOverall ?? "Gesamt", this.ratingOverall, (f) => this.ratingOverall = f)}${this.starPicker(i.ratingAccess ?? "Anfahrt", this.ratingAccess, (f) => this.ratingAccess = f)}${this.starPicker(i.ratingSpace ?? "Platzgröße", this.ratingSpace, (f) => this.ratingSpace = f)}${this.starPicker(i.ratingFacilities ?? "Ausstattung", this.ratingFacilities, (f) => this.ratingFacilities = f)}${this.starPicker(i.ratingSurroundings ?? "Umgebung", this.ratingSurroundings, (f) => this.ratingSurroundings = f)}<textarea aria-label=${i.ratingComment ?? "Kommentar"} .value=${this.ratingText} @input=${(f) => this.ratingText = f.currentTarget.value}></textarea><button type="button" @click=${() => {
+      this.saveRating(d.id, s);
     }}>${i.save}</button></div>` : ""}</article>`)}</div>` : g`<p class="muted">${i.noPlaces ?? "Keine Orte gespeichert."}</p>`}</details></section>`;
   }
   renderPlaces(i, s) {
-    const o = this.snapshot?.stops ?? [], h = /* @__PURE__ */ new Set(["campsite", "rv_site", "wild_camp", "overnight"]), u = o.filter((v) => h.has(v.place_kind || v.place_type || v.stop_type)), f = o.filter((v) => !h.has(v.place_kind || v.place_type || v.stop_type)), x = (v) => g`<article class="place-row"><div><strong>${v.name}</strong><span class="muted">${Ja(v.place_kind || v.place_type || v.stop_type, this.hass)} · ${j(v.arrived_at || v.occurred_at, this.hass)}${v.duration_seconds ? ` · ${St(v.duration_seconds, this.hass)}` : ""}${v.rating_overall ? ` · ${v.rating_overall}/5` : ""}</span>${v.address ? g`<span class="muted">${v.address}</span>` : ""}${v.description ? g`<span>${v.description}</span>` : ""}${v.website_url ? g`<a href=${v.website_url} target="_blank" rel="noopener noreferrer">${i.placeWebsiteOpen ?? "Webseite öffnen"}</a>` : ""}</div><div class="actions compact-actions"><button type="button" class="link" @click=${() => this.editPlace(v)}>${i.edit}</button><button type="button" class="link" @click=${() => {
+    const o = this.snapshot?.stops ?? [], h = /* @__PURE__ */ new Set(["campsite", "rv_site", "wild_camp", "overnight"]), d = o.filter((v) => h.has(v.place_kind || v.place_type || v.stop_type)), f = o.filter((v) => !h.has(v.place_kind || v.place_type || v.stop_type)), x = (v) => g`<article class="place-row"><div><strong>${v.name}</strong><span class="muted">${Ja(v.place_kind || v.place_type || v.stop_type, this.hass)} · ${q(v.arrived_at || v.occurred_at, this.hass)}${v.duration_seconds ? ` · ${St(v.duration_seconds, this.hass)}` : ""}${v.rating_overall ? ` · ${v.rating_overall}/5` : ""}</span>${v.address ? g`<span class="muted">${v.address}</span>` : ""}${v.description ? g`<span>${v.description}</span>` : ""}${v.website_url ? g`<a href=${v.website_url} target="_blank" rel="noopener noreferrer">${i.placeWebsiteOpen ?? "Webseite öffnen"}</a>` : ""}</div><div class="actions compact-actions"><button type="button" class="link" @click=${() => this.editPlace(v)}>${i.edit}</button><button type="button" class="link" @click=${() => {
       this.removePlace(v, s);
     }}>${this.confirmingPlaceId === v.id ? i.confirmDelete : i.remove}</button><button type="button" class="link" @click=${() => this.startRating(v)}>${v.rating_overall ? i.ratingEdit ?? "Bewertung" : i.ratingAdd ?? "Bewerten"}</button></div></article>`, p = (v, $) => g`<details class="stay-group" open><summary><strong>${v}</strong><span>${$.length}</span></summary>${$.length ? g`<div class="place-list">${$.map(x)}</div>` : g`<p class="muted">${i.noPlaces ?? "Keine Orte gespeichert."}</p>`}</details>`;
     return g`<section class="place-section stay-management"><div class="actions compact-actions"><button type="button" @click=${() => {
       this.resetPlaceForm(), this.placeArrived = this.nowLocalDateTime(), this.openEditor("place-create", s);
-    }}>${i.create ?? "Hinzufügen"}</button></div>${p(i.overnights ?? "Übernachtungsplätze", u)}${p(i.places ?? "Zwischenstopps", f)}${this.renderInterruptions(i, s)}${this.renderSuggestions(i, s)}</section>`;
+    }}>${i.create ?? "Hinzufügen"}</button></div>${p(i.overnights ?? "Übernachtungsplätze", d)}${p(i.places ?? "Zwischenstopps", f)}${this.renderInterruptions(i, s)}${this.renderSuggestions(i, s)}</section>`;
   }
   renderRatingActions(i, s) {
     const o = (this.snapshot?.stops ?? []).filter((h) => h.rating_overall);
@@ -1702,24 +1700,24 @@ class Qe extends Ot {
   }
   renderEditorDialog(i, s) {
     if (!this.editorKind) return "";
-    const o = this.editorKind === "trip-edit", h = this.editorKind === "drive-edit", u = this.editorKind === "place-edit", f = this.editorKind === "expense-edit", x = this.editorKind === "rating-edit", p = o ? i.edit : this.editorKind === "trip-create" ? i.newTrip : h ? i.edit : this.editorKind === "drive-create" ? i.manualDrive : u ? i.edit : this.editorKind === "place-create" ? i.places ?? "Ort hinzufügen" : f ? i.edit : this.editorKind === "expense-create" ? i.expenses : i.ratingEdit ?? "Bewertung", v = this.actionError || this.loadError, $ = () => this.closeEditor();
+    const o = this.editorKind === "trip-edit", h = this.editorKind === "drive-edit", d = this.editorKind === "place-edit", f = this.editorKind === "expense-edit", x = this.editorKind === "rating-edit", p = o ? i.edit : this.editorKind === "trip-create" ? i.newTrip : h ? i.edit : this.editorKind === "drive-create" ? i.manualDrive : d ? i.edit : this.editorKind === "place-create" ? i.places ?? "Ort hinzufügen" : f ? i.edit : this.editorKind === "expense-create" ? i.expenses : i.ratingEdit ?? "Bewertung", v = this.actionError || this.loadError, $ = () => this.closeEditor();
     return g`<dialog class="editor-dialog" aria-labelledby="editor-dialog-title" @cancel=${(b) => {
       b.preventDefault(), $();
     }}>
       <form @submit=${(b) => {
       if (b.preventDefault(), this.editorKind === "trip-create") this.addTrip();
       else if (o) {
-        const I = this.snapshot?.trips.find((T) => T.id === this.editingTripId);
-        I && this.saveTrip(I);
+        const C = this.snapshot?.trips.find((T) => T.id === this.editingTripId);
+        C && this.saveTrip(C);
       } else if (this.editorKind === "drive-create") this.addManualDrive(s);
       else if (h) {
-        const I = [...this.snapshot?.drives ?? [], ...this.snapshot?.available_drives ?? []].find((T) => T.id === this.editingDriveId);
-        I && this.saveManualDrive(I, s);
-      } else if (this.editorKind === "place-create" || u) this.savePlace(s);
+        const C = [...this.snapshot?.drives ?? [], ...this.snapshot?.available_drives ?? []].find((T) => T.id === this.editingDriveId);
+        C && this.saveManualDrive(C, s);
+      } else if (this.editorKind === "place-create" || d) this.savePlace(s);
       else if (this.editorKind === "expense-create") this.addExpense(s);
       else if (f) {
-        const I = (this.snapshot?.expenses ?? []).find((T) => T.id === this.editingExpenseId);
-        I && this.saveExpense(I);
+        const C = (this.snapshot?.expenses ?? []).find((T) => T.id === this.editingExpenseId);
+        C && this.saveExpense(C);
       } else x && this.ratingPlaceId && this.saveRating(this.ratingPlaceId, s);
     }}>
         <h3 id="editor-dialog-title">${p}</h3>
@@ -1748,7 +1746,7 @@ class Qe extends Ot {
       this.editingEndDate = b.currentTarget.value, this.markEditorDirty();
     }}></label>` : ""}
           ${this.editorKind === "drive-create" ? this.renderDriveEditorFields(i, !1) : h ? this.renderDriveEditorFields(i, !0) : ""}
-          ${this.editorKind === "place-create" || u ? this.renderPlaceEditorFields(i) : ""}
+          ${this.editorKind === "place-create" || d ? this.renderPlaceEditorFields(i) : ""}
           ${this.editorKind === "expense-create" ? this.renderExpenseEditorFields(i, !1) : f ? this.renderExpenseEditorFields(i, !0) : ""}
           ${x ? g`${this.starPicker(i.ratingOverall ?? "Gesamt", this.ratingOverall, (b) => {
       this.ratingOverall = b, this.markEditorDirty();
@@ -1824,16 +1822,16 @@ class Qe extends Ot {
     return g`<section class="place-section"><details><summary><strong>${i.expenses}</strong><span>${s.length}</span></summary><div class="actions compact-actions"><button type="button" @click=${() => this.startExpenseCreate(this.embeddedTripId())}>${i.create ?? "Hinzufügen"}</button></div>${s.map((h) => this.renderExpense(h, i))}<p class="total"><strong>${i.total}: ${o}</strong></p></details></section>`;
   }
   renderLegacySource() {
-    const i = P(this.hass), s = this.snapshot?.trips ?? [], o = this.snapshot?.expenses ?? [], h = this.snapshot?.expense_summary, u = h?.mixed_currency ? i.mixedCurrency : h?.total_minor !== void 0 && h.currency ? yt(h.total_minor, h.currency, this.hass) : yt(0, "EUR", this.hass), f = this.loadError || this.actionError, x = this.gpxPreview;
+    const i = P(this.hass), s = this.snapshot?.trips ?? [], o = this.snapshot?.expenses ?? [], h = this.snapshot?.expense_summary, d = h?.mixed_currency ? i.mixedCurrency : h?.total_minor !== void 0 && h.currency ? yt(h.total_minor, h.currency, this.hass) : yt(0, "EUR", this.hass), f = this.loadError || this.actionError, x = this.gpxPreview;
     return g`<ha-card><h2>${i.manager}</h2>${f ? g`<p class="error" role="alert">${f}</p>` : ""}<section class="gpx-import"><h3>${i.gpxImport}</h3><input type="file" accept=".gpx,application/gpx+xml,application/xml" @change=${(p) => this.readGPX(p)} ?disabled=${this.gpxBusy}><p class="muted">${this.gpxName || i.gpxPrivacy}</p>${this.gpxError ? g`<p class="error" role="alert">${this.gpxError}</p>` : ""}${x ? g`<div class="gpx-preview"><strong>${x.drives.length} ${i.gpxSections}, ${x.points.length} ${i.gpxPoints}</strong><ul>${x.drives.map((p) => g`<li><label><input type="checkbox" .checked=${this.gpxSelected.has(p.key)} @change=${(v) => {
       v.currentTarget.checked ? this.gpxSelected.add(p.key) : this.gpxSelected.delete(p.key), this.requestUpdate();
-    }}> ${j(p.started_at, this.hass)} – ${j(p.ended_at, this.hass)} · ${(p.distance_m / 1e3).toFixed(1)} km · ${St(p.duration_seconds, this.hass)}</label></li>`)}</ul>${x.warnings.length ? g`<p class="muted">${i.gpxWarnings}: ${x.warnings.join(", ")}</p>` : ""}${x.conflicts.duplicate_file ? g`<p class="error" role="alert">${i.gpxDuplicate}</p>` : g`<button type="button" @click=${() => this.confirmGPX()} ?disabled=${this.gpxBusy || this.gpxSelected.size === 0}>${this.gpxBusy ? i.saving : i.gpxConfirm}</button>`}</div>` : ""}</section><section><h3>${i.newTrip}</h3><div class="form-grid"><input aria-label=${i.tripName} placeholder=${i.tripName} .value=${this.tripTitle} @input=${(p) => this.tripTitle = p.target.value}><input aria-label=${i.destination} placeholder=${i.destination} .value=${this.destination} @input=${(p) => this.destination = p.target.value}><label>${i.startDate}<input type="date" .value=${this.tripStartDate} @input=${(p) => this.tripStartDate = p.currentTarget.value}></label><label>${i.endDate}<input type="date" .value=${this.tripEndDate} @input=${(p) => this.tripEndDate = p.currentTarget.value}></label><button type="button" @click=${() => this.addTrip()}>${i.create}</button></div></section><section><h3>${i.trips}</h3>${s.length ? s.map((p) => g`<article class="trip"><div class="row"><strong>${p.title}</strong><span class="muted">${p.destination || ""} · ${qt(p.status, this.hass)} · ${kt(p, this.hass) || i.period}</span></div>${this.editingTripId === p.id ? g`<form class="form-grid" @submit=${(v) => {
+    }}> ${q(p.started_at, this.hass)} – ${q(p.ended_at, this.hass)} · ${(p.distance_m / 1e3).toFixed(1)} km · ${St(p.duration_seconds, this.hass)}</label></li>`)}</ul>${x.warnings.length ? g`<p class="muted">${i.gpxWarnings}: ${x.warnings.join(", ")}</p>` : ""}${x.conflicts.duplicate_file ? g`<p class="error" role="alert">${i.gpxDuplicate}</p>` : g`<button type="button" @click=${() => this.confirmGPX()} ?disabled=${this.gpxBusy || this.gpxSelected.size === 0}>${this.gpxBusy ? i.saving : i.gpxConfirm}</button>`}</div>` : ""}</section><section><h3>${i.newTrip}</h3><div class="form-grid"><input aria-label=${i.tripName} placeholder=${i.tripName} .value=${this.tripTitle} @input=${(p) => this.tripTitle = p.target.value}><input aria-label=${i.destination} placeholder=${i.destination} .value=${this.destination} @input=${(p) => this.destination = p.target.value}><label>${i.startDate}<input type="date" .value=${this.tripStartDate} @input=${(p) => this.tripStartDate = p.currentTarget.value}></label><label>${i.endDate}<input type="date" .value=${this.tripEndDate} @input=${(p) => this.tripEndDate = p.currentTarget.value}></label><button type="button" @click=${() => this.addTrip()}>${i.create}</button></div></section><section><h3>${i.trips}</h3>${s.length ? s.map((p) => g`<article class="trip"><div class="row"><strong>${p.title}</strong><span class="muted">${p.destination || ""} · ${jt(p.status, this.hass)} · ${kt(p, this.hass) || i.period}</span></div>${this.editingTripId === p.id ? g`<form class="form-grid" @submit=${(v) => {
       v.preventDefault(), this.saveTrip(p);
-    }}><input aria-label=${i.tripName} .value=${this.editingTripTitle} @input=${(v) => this.editingTripTitle = v.currentTarget.value}><input aria-label=${i.destination} .value=${this.editingDestination} @input=${(v) => this.editingDestination = v.currentTarget.value}><label>${i.startDate}<input type="date" .value=${this.editingStartDate} @input=${(v) => this.editingStartDate = v.currentTarget.value}></label><label>${i.endDate}<input type="date" .value=${this.editingEndDate} @input=${(v) => this.editingEndDate = v.currentTarget.value}></label><button type="submit">${i.save}</button><button type="button" class="secondary" @click=${() => this.cancelTripEdit()}>${i.cancel}</button></form>` : g`<div class="actions"><button type="button" class="secondary" @click=${() => this.startTripEdit(p)}>${i.edit}</button><button type="button" class="secondary" @click=${() => this.removeTrip(p.id)}>${this.confirmingTripId === p.id ? i.confirmDelete : i.remove}</button>${p.status === "planned" || p.status === "paused" ? g`<button type="button" @click=${() => this.changeStatus(p.id, "active")}>${i.resume}</button>` : ""}${p.status === "active" ? g`<button type="button" class="secondary" @click=${() => this.changeStatus(p.id, "paused")}>${i.pause}</button><button type="button" @click=${() => this.changeStatus(p.id, "completed")}>${i.complete}</button>` : ""}<button type="button" class="secondary" @click=${() => this.toggleTripDetails(p.id)}>${this.selected === p.id ? i.close : i.details}</button></div>`}${this.selected === p.id ? g`<div class="details"><h4>${i.assignedDrives}</h4>${(this.snapshot?.drives ?? []).length ? (this.snapshot?.drives ?? []).map((v) => this.renderDrive(v, p.id, i)) : g`<p class="muted">${i.noDrives}</p>`}<h4>${i.freeDrives}</h4>${(this.snapshot?.available_drives ?? []).length ? (this.snapshot?.available_drives ?? []).map((v) => this.renderDrive(v, p.id, i)) : g`<p class="muted">${i.noDrives}</p>`}<h4>${i.manualDrive}</h4><div class="form-grid"><label>${i.driveStart}<input type="datetime-local" .value=${this.manualOccurredAt} @input=${(v) => this.manualOccurredAt = v.currentTarget.value}></label><input aria-label=${i.startLocation} placeholder=${i.startLocation} .value=${this.manualStartLocation} @input=${(v) => this.manualStartLocation = v.currentTarget.value}><input aria-label=${i.endLocation} placeholder=${i.endLocation} .value=${this.manualEndLocation} @input=${(v) => this.manualEndLocation = v.currentTarget.value}><input aria-label=${i.distanceKm} type="number" min="0" step="0.1" inputmode="decimal" placeholder=${i.distanceKm} .value=${this.manualDistanceKm} @input=${(v) => this.manualDistanceKm = v.currentTarget.value}><input aria-label=${i.durationMinutes} type="number" min="0" step="1" placeholder=${i.durationMinutes} .value=${this.manualDurationMinutes} @input=${(v) => this.manualDurationMinutes = v.currentTarget.value}><button type="button" @click=${() => this.addManualDrive(p.id)} ?disabled=${this.manualSaving}>${this.manualSaving ? i.saving : i.createDrive}</button></div><h4>${i.expenses}</h4><div class="expense-form create-form"><input aria-label=${i.amount} type="number" min="0" step="0.01" inputmode="decimal" placeholder="EUR" .value=${this.amount} @input=${(v) => this.setExpenseAmount(v.currentTarget.value)}><select aria-label=${i.category} .value=${this.category} @change=${(v) => this.setExpenseCategory(v.currentTarget.value)}>${Ve.map((v) => g`<option value=${v}>${Wi(v, this.hass)}</option>`)}</select><button type="button" @click=${() => this.addExpense(p.id)}>${i.save}</button></div>${o.map((v) => this.renderExpense(v, i))}<p class="total"><strong>${i.total}: ${u}</strong></p></div>` : ""}</article>`) : g`<p class="muted">${i.noTrip}</p>`}</section></ha-card>`;
+    }}><input aria-label=${i.tripName} .value=${this.editingTripTitle} @input=${(v) => this.editingTripTitle = v.currentTarget.value}><input aria-label=${i.destination} .value=${this.editingDestination} @input=${(v) => this.editingDestination = v.currentTarget.value}><label>${i.startDate}<input type="date" .value=${this.editingStartDate} @input=${(v) => this.editingStartDate = v.currentTarget.value}></label><label>${i.endDate}<input type="date" .value=${this.editingEndDate} @input=${(v) => this.editingEndDate = v.currentTarget.value}></label><button type="submit">${i.save}</button><button type="button" class="secondary" @click=${() => this.cancelTripEdit()}>${i.cancel}</button></form>` : g`<div class="actions"><button type="button" class="secondary" @click=${() => this.startTripEdit(p)}>${i.edit}</button><button type="button" class="secondary" @click=${() => this.removeTrip(p.id)}>${this.confirmingTripId === p.id ? i.confirmDelete : i.remove}</button>${p.status === "planned" || p.status === "paused" ? g`<button type="button" @click=${() => this.changeStatus(p.id, "active")}>${i.resume}</button>` : ""}${p.status === "active" ? g`<button type="button" class="secondary" @click=${() => this.changeStatus(p.id, "paused")}>${i.pause}</button><button type="button" @click=${() => this.changeStatus(p.id, "completed")}>${i.complete}</button>` : ""}<button type="button" class="secondary" @click=${() => this.toggleTripDetails(p.id)}>${this.selected === p.id ? i.close : i.details}</button></div>`}${this.selected === p.id ? g`<div class="details"><h4>${i.assignedDrives}</h4>${(this.snapshot?.drives ?? []).length ? (this.snapshot?.drives ?? []).map((v) => this.renderDrive(v, p.id, i)) : g`<p class="muted">${i.noDrives}</p>`}<h4>${i.freeDrives}</h4>${(this.snapshot?.available_drives ?? []).length ? (this.snapshot?.available_drives ?? []).map((v) => this.renderDrive(v, p.id, i)) : g`<p class="muted">${i.noDrives}</p>`}<h4>${i.manualDrive}</h4><div class="form-grid"><label>${i.driveStart}<input type="datetime-local" .value=${this.manualOccurredAt} @input=${(v) => this.manualOccurredAt = v.currentTarget.value}></label><input aria-label=${i.startLocation} placeholder=${i.startLocation} .value=${this.manualStartLocation} @input=${(v) => this.manualStartLocation = v.currentTarget.value}><input aria-label=${i.endLocation} placeholder=${i.endLocation} .value=${this.manualEndLocation} @input=${(v) => this.manualEndLocation = v.currentTarget.value}><input aria-label=${i.distanceKm} type="number" min="0" step="0.1" inputmode="decimal" placeholder=${i.distanceKm} .value=${this.manualDistanceKm} @input=${(v) => this.manualDistanceKm = v.currentTarget.value}><input aria-label=${i.durationMinutes} type="number" min="0" step="1" placeholder=${i.durationMinutes} .value=${this.manualDurationMinutes} @input=${(v) => this.manualDurationMinutes = v.currentTarget.value}><button type="button" @click=${() => this.addManualDrive(p.id)} ?disabled=${this.manualSaving}>${this.manualSaving ? i.saving : i.createDrive}</button></div><h4>${i.expenses}</h4><div class="expense-form create-form"><input aria-label=${i.amount} type="number" min="0" step="0.01" inputmode="decimal" placeholder="EUR" .value=${this.amount} @input=${(v) => this.setExpenseAmount(v.currentTarget.value)}><select aria-label=${i.category} .value=${this.category} @change=${(v) => this.setExpenseCategory(v.currentTarget.value)}>${Ve.map((v) => g`<option value=${v}>${Wi(v, this.hass)}</option>`)}</select><button type="button" @click=${() => this.addExpense(p.id)}>${i.save}</button></div>${o.map((v) => this.renderExpense(v, i))}<p class="total"><strong>${i.total}: ${d}</strong></p></div>` : ""}</article>`) : g`<p class="muted">${i.noTrip}</p>`}</section></ha-card>`;
   }
   renderLegacyOld() {
     const i = P(this.hass), s = this.snapshot?.trips ?? [];
-    return g`<ha-card><h2>${i.manager}</h2>${this.loadError || this.actionError ? g`<p class="error" role="alert">${this.loadError || this.actionError}</p>` : ""}<section><h3>${i.trips}</h3>${s.length ? s.map((o) => g`<article class="trip"><div class="row"><strong>${o.title}</strong><span class="muted">${o.destination || ""} · ${qt(o.status, this.hass)} · ${kt(o, this.hass) || i.period}</span></div><div class="actions compact-actions"><button type="button" class="secondary" @click=${() => this.startTripEdit(o)}>${i.edit}</button><button type="button" class="secondary" @click=${() => this.removeTrip(o.id)}>${this.confirmingTripId === o.id ? i.confirmDelete : i.remove}</button><button type="button" class="secondary" @click=${() => this.toggleTripDetails(o.id)}>${this.selected === o.id ? i.close : i.details}</button></div>${this.selected === o.id ? g`<div class="details"><h4>${i.assignedDrives}</h4>${(this.snapshot?.drives ?? []).map((h) => this.renderDrive(h, o.id, i))}<h4>${i.expenses}</h4>${(this.snapshot?.expenses ?? []).map((h) => this.renderExpense(h, i))}<p class="total"><strong>${i.total}: ${yt(this.snapshot?.expense_summary?.total_minor ?? 0, this.snapshot?.expense_summary?.currency ?? "EUR", this.hass)}</strong></p></div>` : ""}</article>`) : g`<p class="muted">${i.noTrip}</p>`}</section></ha-card>`;
+    return g`<ha-card><h2>${i.manager}</h2>${this.loadError || this.actionError ? g`<p class="error" role="alert">${this.loadError || this.actionError}</p>` : ""}<section><h3>${i.trips}</h3>${s.length ? s.map((o) => g`<article class="trip"><div class="row"><strong>${o.title}</strong><span class="muted">${o.destination || ""} · ${jt(o.status, this.hass)} · ${kt(o, this.hass) || i.period}</span></div><div class="actions compact-actions"><button type="button" class="secondary" @click=${() => this.startTripEdit(o)}>${i.edit}</button><button type="button" class="secondary" @click=${() => this.removeTrip(o.id)}>${this.confirmingTripId === o.id ? i.confirmDelete : i.remove}</button><button type="button" class="secondary" @click=${() => this.toggleTripDetails(o.id)}>${this.selected === o.id ? i.close : i.details}</button></div>${this.selected === o.id ? g`<div class="details"><h4>${i.assignedDrives}</h4>${(this.snapshot?.drives ?? []).map((h) => this.renderDrive(h, o.id, i))}<h4>${i.expenses}</h4>${(this.snapshot?.expenses ?? []).map((h) => this.renderExpense(h, i))}<p class="total"><strong>${i.total}: ${yt(this.snapshot?.expense_summary?.total_minor ?? 0, this.snapshot?.expense_summary?.currency ?? "EUR", this.hass)}</strong></p></div>` : ""}</article>`) : g`<p class="muted">${i.noTrip}</p>`}</section></ha-card>`;
   }
   renderLegacy() {
     const i = P(this.hass);
@@ -1841,10 +1839,10 @@ class Qe extends Ot {
   }
 }
 Qe.styles = [Ot.styles, zt`section{margin-top:16px}.gpx-preview{padding:8px;background:var(--secondary-background-color)}.trip{display:grid;gap:8px;padding:12px 0;border-bottom:1px solid var(--divider-color)}.row,.expense-row,.drive-row{display:flex;justify-content:space-between;gap:8px;align-items:center;flex-wrap:wrap}.details{padding:8px;background:var(--secondary-background-color)}h4{margin:12px 0 4px}.link{min-height:30px;padding:4px 8px;font-size:.9em}.form-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(9rem,1fr));gap:8px;align-items:end}.form-grid input,.form-grid select{min-width:0;width:100%;box-sizing:border-box}.form-grid label{display:grid;gap:4px;font-size:.9em}.expense-form{display:grid;grid-template-columns:minmax(0,1fr) minmax(7rem,10rem) auto;gap:8px;align-items:center;width:100%}.expense-form input,.expense-form select{min-width:0;width:100%;box-sizing:border-box}.create-form{grid-template-columns:minmax(7rem,10rem) minmax(0,1fr) auto}.total{margin:12px 0 0;text-align:right}.editor-toolbar,.compact-actions{display:flex;flex-wrap:wrap;gap:8px}.editor-dialog{width:min(36rem,calc(100vw - 2rem));max-height:calc(100dvh - 2rem);padding:0;border:0;border-radius:12px;color:var(--primary-text-color);background:var(--card-background-color)}.editor-dialog::backdrop{background:rgb(0 0 0 / .5)}.editor-dialog form{display:grid;gap:12px;padding:18px;max-height:calc(100dvh - 2rem);overflow:auto}.editor-dialog label{display:grid;gap:5px}.editor-dialog input,.editor-dialog select,.editor-dialog textarea{box-sizing:border-box;width:100%;min-height:40px;padding:8px;color:var(--primary-text-color);background:var(--card-background-color);border:1px solid var(--divider-color);border-radius:7px;font:inherit}.editor-dialog textarea{min-height:5rem}.dialog-actions{display:flex;justify-content:flex-end;gap:8px;flex-wrap:wrap}.editor-dialog button:focus-visible{outline:2px solid var(--primary-color);outline-offset:2px}@media(max-width:500px){.editor-toolbar button,.dialog-actions button{flex:1 1 100%}.editor-dialog{width:calc(100vw - 1rem);max-height:calc(100dvh - 1rem)}.editor-dialog form{padding:14px;max-height:calc(100dvh - 1rem)}.total{text-align:left}}`];
-Qe.styles = [...Qe.styles, zt`.gpx-import:not(.gpx-explicit){display:none}.gpx-import.gpx-explicit label{display:grid;gap:4px}.gpx-import.gpx-explicit select{min-width:0;max-width:100%;padding:6px}.gpx-drive-list{display:grid;gap:6px;margin:8px 0}.pdf-export{margin-top:16px;padding-top:12px;border-top:1px solid var(--divider-color)}.pdf-export-row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}.interruption-row{display:flex;justify-content:space-between;gap:8px;align-items:center;padding:9px 0;border-bottom:1px solid var(--divider-color)}.interruption-row>div{display:grid;gap:3px;min-width:0}.stay-management{display:grid;gap:10px}.stay-group{border:1px solid var(--divider-color);border-radius:8px;padding:8px}.stay-group>summary{cursor:pointer;display:flex;justify-content:space-between;gap:8px}.warning{padding:8px;background:var(--warning-color,#ff9800);color:var(--primary-text-color)}.star-picker{border:0;padding:0;margin:0;min-width:0}.star-picker legend{font-size:.9em;color:var(--secondary-text-color)}.star-picker [role=radiogroup]{display:flex;gap:2px}.star-button{min-height:38px;min-width:38px;padding:2px;background:transparent;color:var(--secondary-text-color);font-size:1.6rem;line-height:1}.star-button[data-selected]{color:var(--primary-color)}.star-button:hover{color:var(--primary-color)}@media(max-width:500px){.form-grid{grid-template-columns:1fr}.form-grid textarea{min-height:5rem}.place-section .form-grid{gap:10px}.place-section .actions{display:grid;grid-template-columns:1fr}.place-section .actions button{width:100%}.stay-management>.compact-actions,.stay-management .place-row .compact-actions{display:flex;grid-template-columns:none}.stay-management>.compact-actions button,.stay-management .place-row .compact-actions button{width:auto;min-height:38px}.interruption-row{align-items:stretch;flex-direction:column}.interruption-row button{width:100%}.pdf-export-row button{width:100%}}`];
+Qe.styles = [...Qe.styles, zt`.gpx-import:not(.gpx-explicit){display:none}.gpx-import.gpx-explicit label{display:grid;gap:4px}.gpx-import.gpx-explicit select{min-width:0;max-width:100%;padding:6px}.gpx-drive-list{display:grid;gap:6px;margin:8px 0}.pdf-export{margin-top:16px;padding-top:12px;border-top:1px solid var(--divider-color)}.pdf-export-row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}.interruption-row{display:flex;justify-content:space-between;gap:12px;align-items:center;padding:10px 0;border-bottom:1px solid var(--divider-color)}.interruption-row>div{display:grid;gap:4px;min-width:0}.interruption-copy{overflow-wrap:anywhere}.interruption-row>.actions{margin-top:0;justify-content:flex-end}.candidate-label{font-size:.9em}.stay-management{display:grid;gap:10px}.stay-group{border:1px solid var(--divider-color);border-radius:8px;padding:8px}.stay-group>summary,.place-section details>summary{cursor:pointer;display:flex;justify-content:space-between;gap:10px;align-items:baseline}.place-list{display:grid;gap:8px}.place-row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;align-items:start;padding:10px 0;border-bottom:1px solid var(--divider-color);min-width:0}.place-row>div:first-child{display:grid;gap:4px;min-width:0;overflow-wrap:anywhere}.place-row strong,.place-row span,.place-row a{overflow-wrap:anywhere}.place-row .actions{margin-top:0;align-items:start;justify-content:flex-end}.warning{padding:8px;background:var(--warning-color,#ff9800);color:var(--primary-text-color)}.star-picker{border:0;padding:0;margin:0;min-width:0}.star-picker legend{font-size:.9em;color:var(--secondary-text-color)}.star-picker [role=radiogroup]{display:flex;gap:2px}.star-button{min-height:38px;min-width:38px;padding:2px;background:transparent;color:var(--secondary-text-color);font-size:1.6rem;line-height:1}.star-button[data-selected]{color:var(--primary-color)}.star-button:hover{color:var(--primary-color)}@media(max-width:500px){.form-grid{grid-template-columns:1fr}.form-grid textarea{min-height:5rem}.place-section .form-grid{gap:10px}.place-section .actions{display:grid;grid-template-columns:1fr}.place-section .actions button{width:100%}.stay-management>.compact-actions,.stay-management .place-row .compact-actions{display:flex;grid-template-columns:none}.stay-management>.compact-actions button,.stay-management .place-row .compact-actions button{width:auto;min-height:38px}.place-row{grid-template-columns:1fr;gap:8px}.place-row .actions{justify-content:flex-start;flex-wrap:wrap}.interruption-row{align-items:stretch;flex-direction:column}.interruption-row>.actions{justify-content:flex-start}.interruption-row button{width:auto;min-height:38px}.pdf-export-row button{width:100%}}`];
 ii("camper-travel-journal-manager-card", Qe);
 const Po = 1e4;
-function ji() {
+function qi() {
   return typeof performance < "u" ? performance.now() : Date.now();
 }
 function Gi(c) {
@@ -1860,20 +1858,20 @@ function Eo(c) {
 function So(c, i) {
   return new Promise((s, o) => {
     const h = setTimeout(() => o(Object.assign(new Error("Zeitüberschreitung"), { code: "timeout" })), i);
-    c.then((u) => {
-      clearTimeout(h), s(u);
-    }, (u) => {
-      clearTimeout(h), o(u);
+    c.then((d) => {
+      clearTimeout(h), s(d);
+    }, (d) => {
+      clearTimeout(h), o(d);
     });
   });
 }
 async function Ki(c, i, s, o) {
-  const h = ji();
+  const h = qi();
   try {
-    const u = await So(c.connection.sendMessagePromise(i), o);
-    return { ...s(u), durationMs: Math.round(ji() - h), value: u };
-  } catch (u) {
-    return { state: "failed", durationMs: Math.round(ji() - h), ...Eo(u) };
+    const d = await So(c.connection.sendMessagePromise(i), o);
+    return { ...s(d), durationMs: Math.round(qi() - h), value: d };
+  } catch (d) {
+    return { state: "failed", durationMs: Math.round(qi() - h), ...Eo(d) };
   }
 }
 function ko(c) {
@@ -1883,19 +1881,19 @@ function Lo(c) {
   const i = c?.vehicles;
   return Array.isArray(i) && i.every((s) => s && typeof s == "object" && typeof s.vehicle_id == "string") ? { state: "success", structure: "ok", count: i.length } : { state: "failed", structure: "invalid", errorCode: "invalid_response", errorMessage: "Fahrzeugantwort hat eine ungültige Struktur." };
 }
-function Io(c) {
+function Co(c) {
   const i = c;
   return Array.isArray(i?.trips) && Array.isArray(i?.drives) && Array.isArray(i?.stops) ? { state: "success", structure: "ok", count: i.trips.length, drivesCount: i.drives.length, stopsCount: i.stops.length } : { state: "failed", structure: "invalid", errorCode: "invalid_response", errorMessage: "Reisedatenantwort hat eine ungültige Struktur." };
 }
-async function Co(c, i, s = Po) {
+async function Io(c, i, s = Po) {
   const o = { state: "not_run", durationMs: null };
   if (!c?.connection) return { version: "0.3.0-beta.7", connectionBefore: "unavailable", connectionAfter: "unavailable", authentication: o, vehicles: o, trips: o, vehicleId: Gi(i) };
-  const h = Rr(c), u = await Ki(c, { type: "auth/current_user" }, ko, s), f = await Ki(c, { type: "camper_travel_journal/list_vehicles" }, Lo, s), x = f.value?.vehicles?.filter((se) => typeof se.vehicle_id == "string") ?? [], p = x.length === 1 ? x[0].vehicle_id : void 0, $ = await Ki(c, { type: "camper_travel_journal/list", vehicle_id: p ?? i }, Io, s), { value: b, ...I } = u, { value: T, ...B } = f, { value: z, ...pt } = $;
+  const h = Rr(c), d = await Ki(c, { type: "auth/current_user" }, ko, s), f = await Ki(c, { type: "camper_travel_journal/list_vehicles" }, Lo, s), x = f.value?.vehicles?.filter((se) => typeof se.vehicle_id == "string") ?? [], p = x.length === 1 ? x[0].vehicle_id : void 0, $ = await Ki(c, { type: "camper_travel_journal/list", vehicle_id: p ?? i }, Co, s), { value: b, ...C } = d, { value: T, ...B } = f, { value: z, ...pt } = $;
   return {
     version: "0.3.0-beta.7",
     connectionBefore: h,
     connectionAfter: Rr(c),
-    authentication: I,
+    authentication: C,
     vehicles: B,
     trips: pt,
     vehicleId: Gi(i),
@@ -1946,7 +1944,7 @@ class Ao extends Ht {
     }
     this.running = !0, this.error = "", this.manualCopy = !1, this.requestUpdate();
     try {
-      this.report = await Co(this._hass, this.config.vehicle_id);
+      this.report = await Io(this._hass, this.config.vehicle_id);
     } catch {
       this.error = "Diagnose konnte nicht gestartet werden.";
     } finally {
@@ -1980,8 +1978,8 @@ class Ao extends Ht {
     o.textContent = "IMPORTANT: THE LOVELACE CARDS HAVE CHANGED!";
     const h = document.createElement("p");
     h.textContent = "Use the central Camper Travel Journal card for new dashboards. This legacy card remains supported for compatibility.";
-    const u = document.createElement("a");
-    u.href = "https://github.com/balronu/ha-camper-travel-journal/blob/main/README.md#migration", u.target = "_blank", u.rel = "noreferrer", u.textContent = "Migration guide", s.append(o, h, u), i.prepend(s);
+    const d = document.createElement("a");
+    d.href = "https://github.com/balronu/ha-camper-travel-journal/blob/main/README.md#migration", d.target = "_blank", d.rel = "noreferrer", d.textContent = "Migration guide", s.append(o, h, d), i.prepend(s);
   }
   render() {
     const i = this.report;
@@ -2019,7 +2017,7 @@ function Mo() {
         }
         return t;
       }
-      var u = Object.create || /* @__PURE__ */ (function() {
+      var d = Object.create || /* @__PURE__ */ (function() {
         function t() {
         }
         return function(e) {
@@ -2040,11 +2038,11 @@ function Mo() {
         return "_leaflet_id" in t || (t._leaflet_id = ++x), t._leaflet_id;
       }
       function v(t, e, n) {
-        var r, a, l, d;
-        return d = function() {
+        var r, a, l, u;
+        return u = function() {
           r = !1, a && (l.apply(n, a), a = !1);
         }, l = function() {
-          r ? a = arguments : (t.apply(n, arguments), setTimeout(d, e), r = !0);
+          r ? a = arguments : (t.apply(n, arguments), setTimeout(u, e), r = !0);
         }, l;
       }
       function $(t, e, n) {
@@ -2054,7 +2052,7 @@ function Mo() {
       function b() {
         return !1;
       }
-      function I(t, e) {
+      function C(t, e) {
         if (e === !1)
           return t;
         var n = Math.pow(10, e === void 0 ? 6 : e);
@@ -2067,7 +2065,7 @@ function Mo() {
         return T(t).split(/\s+/);
       }
       function z(t, e) {
-        Object.prototype.hasOwnProperty.call(t, "options") || (t.options = t.options ? u(t.options) : {});
+        Object.prototype.hasOwnProperty.call(t, "options") || (t.options = t.options ? d(t.options) : {});
         for (var n in e)
           t.options[n] = e[n];
         return t.options;
@@ -2120,7 +2118,7 @@ function Mo() {
       var is = {
         __proto__: null,
         extend: h,
-        create: u,
+        create: d,
         bind: f,
         get lastId() {
           return x;
@@ -2129,7 +2127,7 @@ function Mo() {
         throttle: v,
         wrapNum: $,
         falseFn: b,
-        formatNum: I,
+        formatNum: C,
         trim: T,
         splitWords: B,
         setOptions: z,
@@ -2148,14 +2146,14 @@ function Mo() {
       xt.extend = function(t) {
         var e = function() {
           z(this), this.initialize && this.initialize.apply(this, arguments), this.callInitHooks();
-        }, n = e.__super__ = this.prototype, r = u(n);
+        }, n = e.__super__ = this.prototype, r = d(n);
         r.constructor = e, e.prototype = r;
         for (var a in this)
           Object.prototype.hasOwnProperty.call(this, a) && a !== "prototype" && a !== "__super__" && (e[a] = this[a]);
-        return t.statics && h(e, t.statics), t.includes && (ns(t.includes), h.apply(null, [r].concat(t.includes))), h(r, t), delete r.statics, delete r.includes, r.options && (r.options = n.options ? u(n.options) : {}, h(r.options, t.options)), r._initHooks = [], r.callInitHooks = function() {
+        return t.statics && h(e, t.statics), t.includes && (ns(t.includes), h.apply(null, [r].concat(t.includes))), h(r, t), delete r.statics, delete r.includes, r.options && (r.options = n.options ? d(n.options) : {}, h(r.options, t.options)), r._initHooks = [], r.callInitHooks = function() {
           if (!this._initHooksCalled) {
             n.callInitHooks && n.callInitHooks.call(this), this._initHooksCalled = !0;
-            for (var l = 0, d = r._initHooks.length; l < d; l++)
+            for (var l = 0, u = r._initHooks.length; l < u; l++)
               r._initHooks[l].call(this);
           }
         }, e;
@@ -2215,7 +2213,7 @@ function Mo() {
               this._off(r, t[r], e);
           else {
             t = B(t);
-            for (var a = arguments.length === 1, l = 0, d = t.length; l < d; l++)
+            for (var a = arguments.length === 1, l = 0, u = t.length; l < u; l++)
               a ? this._off(t[l]) : this._off(t[l], e, n);
           }
           return this;
@@ -2246,10 +2244,10 @@ function Mo() {
               console.warn("wrong listener type: " + typeof e);
               return;
             }
-            var d = this._listens(t, e, n);
-            if (d !== !1) {
-              var m = r[d];
-              this._firingCount && (m.fn = b, this._events[t] = r = r.slice()), r.splice(d, 1);
+            var u = this._listens(t, e, n);
+            if (u !== !1) {
+              var m = r[u];
+              this._firingCount && (m.fn = b, this._events[t] = r = r.slice()), r.splice(u, 1);
             }
           }
         },
@@ -2269,7 +2267,7 @@ function Mo() {
             var a = this._events[t];
             if (a) {
               this._firingCount = this._firingCount + 1 || 1;
-              for (var l = 0, d = a.length; l < d; l++) {
+              for (var l = 0, u = a.length; l < u; l++) {
                 var m = a[l], _ = m.fn;
                 m.once && this.off(t, _, m.ctx), _.call(m.ctx || this, r);
               }
@@ -2290,8 +2288,8 @@ function Mo() {
           if (l && l.length && this._listens(t, a, n) !== !1)
             return !0;
           if (r) {
-            for (var d in this._eventParents)
-              if (this._eventParents[d].listens(t, e, n, r))
+            for (var u in this._eventParents)
+              if (this._eventParents[u].listens(t, e, n, r))
                 return !0;
           }
           return !1;
@@ -2342,17 +2340,17 @@ function Mo() {
       };
       st.addEventListener = st.on, st.removeEventListener = st.clearAllEventListeners = st.off, st.addOneTimeEventListener = st.once, st.fireEvent = st.fire, st.hasEventListeners = st.listens;
       var ae = xt.extend(st);
-      function C(t, e, n) {
+      function I(t, e, n) {
         this.x = n ? Math.round(t) : t, this.y = n ? Math.round(e) : e;
       }
       var un = Math.trunc || function(t) {
         return t > 0 ? Math.floor(t) : Math.ceil(t);
       };
-      C.prototype = {
+      I.prototype = {
         // @method clone(): Point
         // Returns a copy of the current point.
         clone: function() {
-          return new C(this.x, this.y);
+          return new I(this.x, this.y);
         },
         // @method add(otherPoint: Point): Point
         // Returns the result of addition of the current and the given points.
@@ -2392,13 +2390,13 @@ function Mo() {
         // [scaling matrix](https://en.wikipedia.org/wiki/Scaling_%28geometry%29#Matrix_representation)
         // defined by `scale`.
         scaleBy: function(t) {
-          return new C(this.x * t.x, this.y * t.y);
+          return new I(this.x * t.x, this.y * t.y);
         },
         // @method unscaleBy(scale: Point): Point
         // Inverse of `scaleBy`. Divide each coordinate of the current point by
         // each coordinate of `scale`.
         unscaleBy: function(t) {
-          return new C(this.x / t.x, this.y / t.y);
+          return new I(this.x / t.x, this.y / t.y);
         },
         // @method round(): Point
         // Returns a copy of the current point with rounded coordinates.
@@ -2452,11 +2450,11 @@ function Mo() {
         // @method toString(): String
         // Returns a string representation of the point for debugging purposes.
         toString: function() {
-          return "Point(" + I(this.x) + ", " + I(this.y) + ")";
+          return "Point(" + C(this.x) + ", " + C(this.y) + ")";
         }
       };
       function k(t, e, n) {
-        return t instanceof C ? t : ct(t) ? new C(t[0], t[1]) : t == null ? t : typeof t == "object" && "x" in t && "y" in t ? new C(t.x, t.y) : new C(t, e, n);
+        return t instanceof I ? t : ct(t) ? new I(t[0], t[1]) : t == null ? t : typeof t == "object" && "x" in t && "y" in t ? new I(t.x, t.y) : new I(t, e, n);
       }
       function W(t, e) {
         if (t)
@@ -2473,7 +2471,7 @@ function Mo() {
           var e, n;
           if (!t)
             return this;
-          if (t instanceof C || typeof t[0] == "number" || "x" in t)
+          if (t instanceof I || typeof t[0] == "number" || "x" in t)
             e = n = k(t);
           else if (t = it(t), e = t.min, n = t.max, !e || !n)
             return this;
@@ -2520,23 +2518,23 @@ function Mo() {
         // Returns `true` if the rectangle contains the given point.
         contains: function(t) {
           var e, n;
-          return typeof t[0] == "number" || t instanceof C ? t = k(t) : t = it(t), t instanceof W ? (e = t.min, n = t.max) : e = n = t, e.x >= this.min.x && n.x <= this.max.x && e.y >= this.min.y && n.y <= this.max.y;
+          return typeof t[0] == "number" || t instanceof I ? t = k(t) : t = it(t), t instanceof W ? (e = t.min, n = t.max) : e = n = t, e.x >= this.min.x && n.x <= this.max.x && e.y >= this.min.y && n.y <= this.max.y;
         },
         // @method intersects(otherBounds: Bounds): Boolean
         // Returns `true` if the rectangle intersects the given bounds. Two bounds
         // intersect if they have at least one point in common.
         intersects: function(t) {
           t = it(t);
-          var e = this.min, n = this.max, r = t.min, a = t.max, l = a.x >= e.x && r.x <= n.x, d = a.y >= e.y && r.y <= n.y;
-          return l && d;
+          var e = this.min, n = this.max, r = t.min, a = t.max, l = a.x >= e.x && r.x <= n.x, u = a.y >= e.y && r.y <= n.y;
+          return l && u;
         },
         // @method overlaps(otherBounds: Bounds): Boolean
         // Returns `true` if the rectangle overlaps the given bounds. Two bounds
         // overlap if their intersection is an area.
         overlaps: function(t) {
           t = it(t);
-          var e = this.min, n = this.max, r = t.min, a = t.max, l = a.x > e.x && r.x < n.x, d = a.y > e.y && r.y < n.y;
-          return l && d;
+          var e = this.min, n = this.max, r = t.min, a = t.max, l = a.x > e.x && r.x < n.x, u = a.y > e.y && r.y < n.y;
+          return l && u;
         },
         // @method isValid(): Boolean
         // Returns `true` if the bounds are properly initialized.
@@ -2658,15 +2656,15 @@ function Mo() {
         // Returns `true` if the rectangle intersects the given bounds. Two bounds intersect if they have at least one point in common.
         intersects: function(t) {
           t = G(t);
-          var e = this._southWest, n = this._northEast, r = t.getSouthWest(), a = t.getNorthEast(), l = a.lat >= e.lat && r.lat <= n.lat, d = a.lng >= e.lng && r.lng <= n.lng;
-          return l && d;
+          var e = this._southWest, n = this._northEast, r = t.getSouthWest(), a = t.getNorthEast(), l = a.lat >= e.lat && r.lat <= n.lat, u = a.lng >= e.lng && r.lng <= n.lng;
+          return l && u;
         },
         // @method overlaps(otherBounds: LatLngBounds): Boolean
         // Returns `true` if the rectangle overlaps the given bounds. Two bounds overlap if their intersection is an area.
         overlaps: function(t) {
           t = G(t);
-          var e = this._southWest, n = this._northEast, r = t.getSouthWest(), a = t.getNorthEast(), l = a.lat > e.lat && r.lat < n.lat, d = a.lng > e.lng && r.lng < n.lng;
-          return l && d;
+          var e = this._southWest, n = this._northEast, r = t.getSouthWest(), a = t.getNorthEast(), l = a.lat > e.lat && r.lat < n.lat, u = a.lng > e.lng && r.lng < n.lng;
+          return l && u;
         },
         // @method toBBoxString(): String
         // Returns a string with bounding box coordinates in a 'southwest_lng,southwest_lat,northeast_lng,northeast_lat' format. Useful for sending requests to web services that return geo data.
@@ -2708,7 +2706,7 @@ function Mo() {
         // @method toString(): String
         // Returns a string representation of the point (for debugging purposes).
         toString: function(t) {
-          return "LatLng(" + I(this.lat, t) + ", " + I(this.lng, t) + ")";
+          return "LatLng(" + C(this.lat, t) + ", " + C(this.lng, t) + ")";
         },
         // @method distanceTo(otherLatLng: LatLng): Number
         // Returns the distance (in meters) to the given `LatLng` calculated using the [Spherical Law of Cosines](https://en.wikipedia.org/wiki/Spherical_law_of_cosines).
@@ -2815,7 +2813,7 @@ function Mo() {
           var e = t.getCenter(), n = this.wrapLatLng(e), r = e.lat - n.lat, a = e.lng - n.lng;
           if (r === 0 && a === 0)
             return t;
-          var l = t.getSouthWest(), d = t.getNorthEast(), m = new Z(l.lat - r, l.lng - a), _ = new Z(d.lat - r, d.lng - a);
+          var l = t.getSouthWest(), u = t.getNorthEast(), m = new Z(l.lat - r, l.lng - a), _ = new Z(u.lat - r, u.lng - a);
           return new nt(m, _);
         }
       }, Lt = h({}, wt, {
@@ -2826,7 +2824,7 @@ function Mo() {
         R: 6371e3,
         // distance between two geographical points using spherical law of cosines approximation
         distance: function(t, e) {
-          var n = Math.PI / 180, r = t.lat * n, a = e.lat * n, l = Math.sin((e.lat - t.lat) * n / 2), d = Math.sin((e.lng - t.lng) * n / 2), m = l * l + Math.cos(r) * Math.cos(a) * d * d, _ = 2 * Math.atan2(Math.sqrt(m), Math.sqrt(1 - m));
+          var n = Math.PI / 180, r = t.lat * n, a = e.lat * n, l = Math.sin((e.lat - t.lat) * n / 2), u = Math.sin((e.lng - t.lng) * n / 2), m = l * l + Math.cos(r) * Math.cos(a) * u * u, _ = 2 * Math.atan2(Math.sqrt(m), Math.sqrt(1 - m));
           return this.R * _;
         }
       }), pn = 6378137, li = {
@@ -2834,7 +2832,7 @@ function Mo() {
         MAX_LATITUDE: 85.0511287798,
         project: function(t) {
           var e = Math.PI / 180, n = this.MAX_LATITUDE, r = Math.max(Math.min(n, t.lat), -n), a = Math.sin(r * e);
-          return new C(
+          return new I(
             this.R * t.lng * e,
             this.R * Math.log((1 + a) / (1 - a)) / 2
           );
@@ -2873,7 +2871,7 @@ function Mo() {
         // Returns the reverse transformation of the given point, optionally divided
         // by the given scale. Only accepts actual `L.Point` instances, not arrays.
         untransform: function(t, e) {
-          return e = e || 1, new C(
+          return e = e || 1, new I(
             (t.x / e - this._b) / this._a,
             (t.y / e - this._d) / this._c
           );
@@ -2896,15 +2894,15 @@ function Mo() {
         return document.createElementNS("http://www.w3.org/2000/svg", t);
       }
       function mn(t, e) {
-        var n = "", r, a, l, d, m, _;
+        var n = "", r, a, l, u, m, _;
         for (r = 0, l = t.length; r < l; r++) {
-          for (m = t[r], a = 0, d = m.length; a < d; a++)
+          for (m = t[r], a = 0, u = m.length; a < u; a++)
             _ = m[a], n += (a ? "L" : "M") + _.x + " " + _.y;
           n += e ? E.svg ? "z" : "x" : "";
         }
         return n || "M0 0";
       }
-      var di = document.documentElement.style, Ie = "ActiveXObject" in window, ss = Ie && !document.addEventListener, gn = "msLaunchUri" in navigator && !("documentMode" in document), ui = ft("webkit"), _n = ft("android"), vn = ft("android 2") || ft("android 3"), as = parseInt(/WebKit\/([0-9]+)|$/.exec(navigator.userAgent)[1], 10), os = _n && ft("Google") && as < 537 && !("AudioNode" in window), pi = !!window.opera, yn = !gn && ft("chrome"), bn = ft("gecko") && !ui && !pi && !Ie, ls = !yn && ft("safari"), xn = ft("phantom"), wn = "OTransition" in di, hs = navigator.platform.indexOf("Win") === 0, $n = Ie && "transition" in di, fi = "WebKitCSSMatrix" in window && "m11" in new window.WebKitCSSMatrix() && !vn, Tn = "MozPerspective" in di, cs = !window.L_DISABLE_3D && ($n || fi || Tn) && !wn && !xn, le = typeof orientation < "u" || ft("mobile"), ds = le && ui, us = le && fi, Pn = !window.PointerEvent && window.MSPointerEvent, En = !!(window.PointerEvent || Pn), Sn = "ontouchstart" in window || !!window.TouchEvent, ps = !window.L_NO_TOUCH && (Sn || En), fs = le && pi, ms = le && bn, gs = (window.devicePixelRatio || window.screen.deviceXDPI / window.screen.logicalXDPI) > 1, _s = (function() {
+      var di = document.documentElement.style, Ce = "ActiveXObject" in window, ss = Ce && !document.addEventListener, gn = "msLaunchUri" in navigator && !("documentMode" in document), ui = ft("webkit"), _n = ft("android"), vn = ft("android 2") || ft("android 3"), as = parseInt(/WebKit\/([0-9]+)|$/.exec(navigator.userAgent)[1], 10), os = _n && ft("Google") && as < 537 && !("AudioNode" in window), pi = !!window.opera, yn = !gn && ft("chrome"), bn = ft("gecko") && !ui && !pi && !Ce, ls = !yn && ft("safari"), xn = ft("phantom"), wn = "OTransition" in di, hs = navigator.platform.indexOf("Win") === 0, $n = Ce && "transition" in di, fi = "WebKitCSSMatrix" in window && "m11" in new window.WebKitCSSMatrix() && !vn, Tn = "MozPerspective" in di, cs = !window.L_DISABLE_3D && ($n || fi || Tn) && !wn && !xn, le = typeof orientation < "u" || ft("mobile"), ds = le && ui, us = le && fi, Pn = !window.PointerEvent && window.MSPointerEvent, En = !!(window.PointerEvent || Pn), Sn = "ontouchstart" in window || !!window.TouchEvent, ps = !window.L_NO_TOUCH && (Sn || En), fs = le && pi, ms = le && bn, gs = (window.devicePixelRatio || window.screen.deviceXDPI / window.screen.logicalXDPI) > 1, _s = (function() {
         var t = !1;
         try {
           var e = Object.defineProperty({}, "passive", {
@@ -2935,7 +2933,7 @@ function Mo() {
         return navigator.userAgent.toLowerCase().indexOf(t) >= 0;
       }
       var E = {
-        ie: Ie,
+        ie: Ce,
         ielt9: ss,
         edge: gn,
         webkit: ui,
@@ -2970,16 +2968,16 @@ function Mo() {
         inlineSvg: ys,
         mac: xs,
         linux: ws
-      }, kn = E.msPointer ? "MSPointerDown" : "pointerdown", Ln = E.msPointer ? "MSPointerMove" : "pointermove", In = E.msPointer ? "MSPointerUp" : "pointerup", Cn = E.msPointer ? "MSPointerCancel" : "pointercancel", gi = {
+      }, kn = E.msPointer ? "MSPointerDown" : "pointerdown", Ln = E.msPointer ? "MSPointerMove" : "pointermove", Cn = E.msPointer ? "MSPointerUp" : "pointerup", In = E.msPointer ? "MSPointerCancel" : "pointercancel", gi = {
         touchstart: kn,
         touchmove: Ln,
-        touchend: In,
-        touchcancel: Cn
+        touchend: Cn,
+        touchcancel: In
       }, An = {
         touchstart: ks,
-        touchmove: Ce,
-        touchend: Ce,
-        touchcancel: Ce
+        touchmove: Ie,
+        touchend: Ie,
+        touchcancel: Ie
       }, Gt = {}, Dn = !1;
       function $s(t, e, n) {
         return e === "touchstart" && Ss(), An[e] ? (n = An[e].bind(this, n), t.addEventListener(gi[e], n, !1), n) : (console.warn("wrong event specified:", e), b);
@@ -3001,9 +2999,9 @@ function Mo() {
         delete Gt[t.pointerId];
       }
       function Ss() {
-        Dn || (document.addEventListener(kn, Ps, !0), document.addEventListener(Ln, Es, !0), document.addEventListener(In, Mn, !0), document.addEventListener(Cn, Mn, !0), Dn = !0);
+        Dn || (document.addEventListener(kn, Ps, !0), document.addEventListener(Ln, Es, !0), document.addEventListener(Cn, Mn, !0), document.addEventListener(In, Mn, !0), Dn = !0);
       }
-      function Ce(t, e) {
+      function Ie(t, e) {
         if (e.pointerType !== (e.MSPOINTER_TYPE_MOUSE || "mouse")) {
           e.touches = [];
           for (var n in Gt)
@@ -3012,7 +3010,7 @@ function Mo() {
         }
       }
       function ks(t, e) {
-        e.MSPOINTER_TYPE_TOUCH && e.pointerType === e.MSPOINTER_TYPE_TOUCH && J(e), Ce(t, e);
+        e.MSPOINTER_TYPE_TOUCH && e.pointerType === e.MSPOINTER_TYPE_TOUCH && J(e), Ie(t, e);
       }
       function Ls(t) {
         var e = {}, n, r;
@@ -3020,8 +3018,8 @@ function Mo() {
           n = t[r], e[r] = n && n.bind ? n.bind(t) : n;
         return t = e, e.type = "dblclick", e.detail = 2, e.isTrusted = !1, e._simulated = !0, e;
       }
-      var Is = 200;
-      function Cs(t, e) {
+      var Cs = 200;
+      function Is(t, e) {
         t.addEventListener("dblclick", e);
         var n = 0, r;
         function a(l) {
@@ -3030,14 +3028,14 @@ function Mo() {
             return;
           }
           if (!(l.pointerType === "mouse" || l.sourceCapabilities && !l.sourceCapabilities.firesTouchEvents)) {
-            var d = Bn(l);
-            if (!(d.some(function(_) {
+            var u = Bn(l);
+            if (!(u.some(function(_) {
               return _ instanceof HTMLLabelElement && _.attributes.for;
-            }) && !d.some(function(_) {
+            }) && !u.some(function(_) {
               return _ instanceof HTMLInputElement || _ instanceof HTMLSelectElement;
             }))) {
               var m = Date.now();
-              m - n <= Is ? (r++, r === 2 && e(Ls(l))) : r = 1, n = m;
+              m - n <= Cs ? (r++, r === 2 && e(Ls(l))) : r = 1, n = m;
             }
           }
         }
@@ -3100,7 +3098,7 @@ function Mo() {
           yi(t, (l ? l + " " : "") + e);
         }
       }
-      function q(t, e) {
+      function j(t, e) {
         t.classList !== void 0 ? t.classList.remove(e) : yi(t, T((" " + De(t) + " ").replace(" " + e + " ", " ")));
       }
       function yi(t, e) {
@@ -3129,14 +3127,14 @@ function Mo() {
         return !1;
       }
       function Rt(t, e, n) {
-        var r = e || new C(0, 0);
+        var r = e || new I(0, 0);
         t.style[_i] = (E.ie3d ? "translate(" + r.x + "px," + r.y + "px)" : "translate3d(" + r.x + "px," + r.y + "px,0)") + (n ? " scale(" + n + ")" : "");
       }
       function K(t, e) {
         t._leaflet_pos = e, E.any3d ? Rt(t, e) : (t.style.left = e.x + "px", t.style.top = e.y + "px");
       }
       function Nt(t) {
-        return t._leaflet_pos || new C(0, 0);
+        return t._leaflet_pos || new I(0, 0);
       }
       var de, ue, bi;
       if ("onselectstart" in document)
@@ -3201,7 +3199,7 @@ function Mo() {
         toBack: Vt,
         hasClass: vi,
         addClass: D,
-        removeClass: q,
+        removeClass: j,
         setClass: yi,
         getClass: De,
         setOpacity: ot,
@@ -3228,7 +3226,7 @@ function Mo() {
             Si(t, a, e[a], n);
         else {
           e = B(e);
-          for (var l = 0, d = e.length; l < d; l++)
+          for (var l = 0, u = e.length; l < u; l++)
             Si(t, e[l], n, r);
         }
         return this;
@@ -3245,7 +3243,7 @@ function Mo() {
             return si(e, m) !== -1;
           });
         else
-          for (var l = 0, d = e.length; l < d; l++)
+          for (var l = 0, u = e.length; l < u; l++)
             ki(t, e[l], n, r);
         return this;
       }
@@ -3266,10 +3264,10 @@ function Mo() {
           return this;
         var l = function(m) {
           return n.call(r || t, m || window.event);
-        }, d = l;
-        !E.touchNative && E.pointer && e.indexOf("touch") === 0 ? l = $s(t, e, l) : E.touch && e === "dblclick" ? l = Cs(t, l) : "addEventListener" in t ? e === "touchstart" || e === "touchmove" || e === "wheel" || e === "mousewheel" ? t.addEventListener(Ei[e] || e, l, E.passiveEvents ? { passive: !1 } : !1) : e === "mouseenter" || e === "mouseleave" ? (l = function(m) {
-          m = m || window.event, Ii(t, m) && d(m);
-        }, t.addEventListener(Ei[e], l, !1)) : t.addEventListener(e, d, !1) : t.attachEvent("on" + e, l), t[mt] = t[mt] || {}, t[mt][a] = l;
+        }, u = l;
+        !E.touchNative && E.pointer && e.indexOf("touch") === 0 ? l = $s(t, e, l) : E.touch && e === "dblclick" ? l = Is(t, l) : "addEventListener" in t ? e === "touchstart" || e === "touchmove" || e === "wheel" || e === "mousewheel" ? t.addEventListener(Ei[e] || e, l, E.passiveEvents ? { passive: !1 } : !1) : e === "mouseenter" || e === "mouseleave" ? (l = function(m) {
+          m = m || window.event, Ci(t, m) && u(m);
+        }, t.addEventListener(Ei[e], l, !1)) : t.addEventListener(e, u, !1) : t.attachEvent("on" + e, l), t[mt] = t[mt] || {}, t[mt][a] = l;
       }
       function ki(t, e, n, r, a) {
         a = a || e + p(n) + (r ? "_" + p(r) : "");
@@ -3302,9 +3300,9 @@ function Mo() {
       }
       function Zn(t, e) {
         if (!e)
-          return new C(t.clientX, t.clientY);
+          return new I(t.clientX, t.clientY);
         var n = Pi(e), r = n.boundingClientRect;
-        return new C(
+        return new I(
           // offset.left/top values are in page scale (like clientX/Y),
           // whereas clientLeft/Top (border width) values are the original values (before CSS scale applies).
           (t.clientX - r.left) / n.x - e.clientLeft,
@@ -3339,7 +3337,7 @@ function Mo() {
           )
         );
       }
-      function Ii(t, e) {
+      function Ci(t, e) {
         var n = e.relatedTarget;
         if (!n)
           return !0;
@@ -3363,7 +3361,7 @@ function Mo() {
         getPropagationPath: Bn,
         getMousePosition: Zn,
         getWheelDelta: Fn,
-        isExternalTarget: Ii,
+        isExternalTarget: Ci,
         addListener: A,
         removeListener: U
       }, Un = ae.extend({
@@ -3512,7 +3510,7 @@ function Mo() {
         // @method setZoomAround(offset: Point, zoom: Number, options: Zoom options): this
         // Zooms the map while keeping a specified pixel on the map (relative to the top-left corner) stationary.
         setZoomAround: function(t, e, n) {
-          var r = this.getZoomScale(e), a = this.getSize().divideBy(2), l = t instanceof C ? t : this.latLngToContainerPoint(t), d = l.subtract(a).multiplyBy(1 - 1 / r), m = this.containerPointToLatLng(a.add(d));
+          var r = this.getZoomScale(e), a = this.getSize().divideBy(2), l = t instanceof I ? t : this.latLngToContainerPoint(t), u = l.subtract(a).multiplyBy(1 - 1 / r), m = this.containerPointToLatLng(a.add(u));
           return this.setView(m, e, { zoom: n });
         },
         _getBoundsCenterZoom: function(t, e) {
@@ -3523,7 +3521,7 @@ function Mo() {
               center: t.getCenter(),
               zoom: a
             };
-          var l = r.subtract(n).divideBy(2), d = this.project(t.getSouthWest(), a), m = this.project(t.getNorthEast(), a), _ = this.unproject(d.add(m).divideBy(2).add(l), a);
+          var l = r.subtract(n).divideBy(2), u = this.project(t.getSouthWest(), a), m = this.project(t.getNorthEast(), a), _ = this.unproject(u.add(m).divideBy(2).add(l), a);
           return {
             center: _,
             zoom: a
@@ -3574,9 +3572,9 @@ function Mo() {
           if (n = n || {}, n.animate === !1 || !E.any3d)
             return this.setView(t, e, n);
           this._stop();
-          var r = this.project(this.getCenter()), a = this.project(t), l = this.getSize(), d = this._zoom;
-          t = O(t), e = e === void 0 ? d : e;
-          var m = Math.max(l.x, l.y), _ = m * this.getZoomScale(d, e), y = a.distanceTo(r) || 1, w = 1.42, S = w * w;
+          var r = this.project(this.getCenter()), a = this.project(t), l = this.getSize(), u = this._zoom;
+          t = O(t), e = e === void 0 ? u : e;
+          var m = Math.max(l.x, l.y), _ = m * this.getZoomScale(u, e), y = a.distanceTo(r) || 1, w = 1.42, S = w * w;
           function M(V) {
             var Ke = V ? -1 : 1, Ta = V ? _ : m, Pa = _ * _ - m * m + Ke * S * S * y * y, Ea = 2 * Ta * S * y, Fi = Pa / Ea, wr = Math.sqrt(Fi * Fi + 1) - Fi, Sa = wr < 1e-9 ? -18 : Math.log(wr);
             return Sa;
@@ -3604,8 +3602,8 @@ function Mo() {
           function xr() {
             var V = (Date.now() - wa) / $a, Ke = xa(V) * br;
             V <= 1 ? (this._flyToFrame = et(xr, this), this._move(
-              this.unproject(r.add(a.subtract(r).multiplyBy(ba(Ke) / y)), d),
-              this.getScaleZoom(m / ee(Ke), d),
+              this.unproject(r.add(a.subtract(r).multiplyBy(ba(Ke) / y)), u),
+              this.getScaleZoom(m / ee(Ke), u),
               { flyTo: !0 }
             )) : this._move(t, e)._moveEnd(!0);
           }
@@ -3649,7 +3647,7 @@ function Mo() {
         // the map will not be panned.
         panInside: function(t, e) {
           e = e || {};
-          var n = k(e.paddingTopLeft || e.padding || [0, 0]), r = k(e.paddingBottomRight || e.padding || [0, 0]), a = this.project(this.getCenter()), l = this.project(t), d = this.getPixelBounds(), m = it([d.min.add(n), d.max.subtract(r)]), _ = m.getSize();
+          var n = k(e.paddingTopLeft || e.padding || [0, 0]), r = k(e.paddingBottomRight || e.padding || [0, 0]), a = this.project(this.getCenter()), l = this.project(t), u = this.getPixelBounds(), m = it([u.min.add(n), u.max.subtract(r)]), _ = m.getSize();
           if (!m.contains(l)) {
             this._enforcingBounds = !0;
             var y = l.subtract(m.getCenter()), w = m.extend(l).getSize().subtract(_);
@@ -3735,8 +3733,8 @@ function Mo() {
           if (this._container._leaflet_id) {
             var e = t.coords.latitude, n = t.coords.longitude, r = new Z(e, n), a = r.toBounds(t.coords.accuracy * 2), l = this._locateOptions;
             if (l.setView) {
-              var d = this.getBoundsZoom(a);
-              this.setView(r, l.maxZoom ? Math.min(d, l.maxZoom) : d);
+              var u = this.getBoundsZoom(a);
+              this.setView(r, l.maxZoom ? Math.min(u, l.maxZoom) : u);
             }
             var m = {
               latlng: r,
@@ -3819,13 +3817,13 @@ function Mo() {
         // the given bounds in its entirety.
         getBoundsZoom: function(t, e, n) {
           t = G(t), n = k(n || [0, 0]);
-          var r = this.getZoom() || 0, a = this.getMinZoom(), l = this.getMaxZoom(), d = t.getNorthWest(), m = t.getSouthEast(), _ = this.getSize().subtract(n), y = it(this.project(m, r), this.project(d, r)).getSize(), w = E.any3d ? this.options.zoomSnap : 1, S = _.x / y.x, M = _.y / y.y, tt = e ? Math.max(S, M) : Math.min(S, M);
+          var r = this.getZoom() || 0, a = this.getMinZoom(), l = this.getMaxZoom(), u = t.getNorthWest(), m = t.getSouthEast(), _ = this.getSize().subtract(n), y = it(this.project(m, r), this.project(u, r)).getSize(), w = E.any3d ? this.options.zoomSnap : 1, S = _.x / y.x, M = _.y / y.y, tt = e ? Math.max(S, M) : Math.min(S, M);
           return r = this.getScaleZoom(tt, r), w && (r = Math.round(r / (w / 100)) * (w / 100), r = e ? Math.ceil(r / w) * w : Math.floor(r / w) * w), Math.max(a, Math.min(l, r));
         },
         // @method getSize(): Point
         // Returns the current size of the map container (in pixels).
         getSize: function() {
-          return (!this._size || this._sizeChanged) && (this._size = new C(
+          return (!this._size || this._sizeChanged) && (this._size = new I(
             this._container.clientWidth || 0,
             this._container.clientHeight || 0
           ), this._sizeChanged = !1), this._size.clone();
@@ -3998,12 +3996,12 @@ function Mo() {
         },
         _initPanes: function() {
           var t = this._panes = {};
-          this._paneRenderers = {}, this._mapPane = this.createPane("mapPane", this._container), K(this._mapPane, new C(0, 0)), this.createPane("tilePane"), this.createPane("overlayPane"), this.createPane("shadowPane"), this.createPane("markerPane"), this.createPane("tooltipPane"), this.createPane("popupPane"), this.options.markerZoomAnimation || (D(t.markerPane, "leaflet-zoom-hide"), D(t.shadowPane, "leaflet-zoom-hide"));
+          this._paneRenderers = {}, this._mapPane = this.createPane("mapPane", this._container), K(this._mapPane, new I(0, 0)), this.createPane("tilePane"), this.createPane("overlayPane"), this.createPane("shadowPane"), this.createPane("markerPane"), this.createPane("tooltipPane"), this.createPane("popupPane"), this.options.markerZoomAnimation || (D(t.markerPane, "leaflet-zoom-hide"), D(t.shadowPane, "leaflet-zoom-hide"));
         },
         // private methods that modify map state
         // @section Map state change events
         _resetView: function(t, e, n) {
-          K(this._mapPane, new C(0, 0));
+          K(this._mapPane, new I(0, 0));
           var r = !this._loaded;
           this._loaded = !0, e = this._limitZoom(e), this.fire("viewprereset");
           var a = this._zoom !== e;
@@ -4059,16 +4057,16 @@ function Mo() {
           Math.max(Math.abs(t.x), Math.abs(t.y)) >= this.options.transform3DLimit && this._resetView(this.getCenter(), this.getZoom());
         },
         _findEventTargets: function(t, e) {
-          for (var n = [], r, a = e === "mouseout" || e === "mouseover", l = t.target || t.srcElement, d = !1; l; ) {
+          for (var n = [], r, a = e === "mouseout" || e === "mouseover", l = t.target || t.srcElement, u = !1; l; ) {
             if (r = this._targets[p(l)], r && (e === "click" || e === "preclick") && this._draggableMoved(r)) {
-              d = !0;
+              u = !0;
               break;
             }
-            if (r && r.listens(e, !0) && (a && !Ii(l, t) || (n.push(r), a)) || l === this._container)
+            if (r && r.listens(e, !0) && (a && !Ci(l, t) || (n.push(r), a)) || l === this._container)
               break;
             l = l.parentNode;
           }
-          return !n.length && !d && !a && this.listens(e, !0) && (n = [this]), n;
+          return !n.length && !u && !a && this.listens(e, !0) && (n = [this]), n;
         },
         _isClickDisabled: function(t) {
           for (; t && t !== this._container; ) {
@@ -4092,8 +4090,8 @@ function Mo() {
           }
           var a = this._findEventTargets(t, e);
           if (n) {
-            for (var l = [], d = 0; d < n.length; d++)
-              n[d].listens(e, !0) && l.push(n[d]);
+            for (var l = [], u = 0; u < n.length; u++)
+              n[u].listens(e, !0) && l.push(n[u]);
             a = l.concat(a);
           }
           if (a.length) {
@@ -4105,8 +4103,8 @@ function Mo() {
               var y = m.getLatLng && (!m._radius || m._radius <= 10);
               _.containerPoint = y ? this.latLngToContainerPoint(m.getLatLng()) : this.mouseEventToContainerPoint(t), _.layerPoint = this.containerPointToLayerPoint(_.containerPoint), _.latlng = y ? m.getLatLng() : this.layerPointToLatLng(_.layerPoint);
             }
-            for (d = 0; d < a.length; d++)
-              if (a[d].fire(e, _, !0), _.originalEvent._stopped || a[d].options.bubblingMouseEvents === !1 && si(this._mouseEvents, e) !== -1)
+            for (u = 0; u < a.length; u++)
+              if (a[u].fire(e, _, !0), _.originalEvent._stopped || a[u].options.bubblingMouseEvents === !1 && si(this._mouseEvents, e) !== -1)
                 return;
           }
         },
@@ -4127,7 +4125,7 @@ function Mo() {
         },
         // private methods for getting map state
         _getMapPanePos: function() {
-          return Nt(this._mapPane) || new C(0, 0);
+          return Nt(this._mapPane) || new I(0, 0);
         },
         _moved: function() {
           var t = this._getMapPanePos();
@@ -4166,8 +4164,8 @@ function Mo() {
         _limitCenter: function(t, e, n) {
           if (!n)
             return t;
-          var r = this.project(t, e), a = this.getSize().divideBy(2), l = new W(r.subtract(a), r.add(a)), d = this._getBoundsOffset(l, n, e);
-          return Math.abs(d.x) <= 1 && Math.abs(d.y) <= 1 ? t : this.unproject(r.add(d), e);
+          var r = this.project(t, e), a = this.getSize().divideBy(2), l = new W(r.subtract(a), r.add(a)), u = this._getBoundsOffset(l, n, e);
+          return Math.abs(u.x) <= 1 && Math.abs(u.y) <= 1 ? t : this.unproject(r.add(u), e);
         },
         // adjust offset for view to get inside bounds
         _limitOffset: function(t, e) {
@@ -4181,8 +4179,8 @@ function Mo() {
           var r = it(
             this.project(e.getNorthEast(), n),
             this.project(e.getSouthWest(), n)
-          ), a = r.min.subtract(t.min), l = r.max.subtract(t.max), d = this._rebound(a.x, -l.x), m = this._rebound(a.y, -l.y);
-          return new C(d, m);
+          ), a = r.min.subtract(t.min), l = r.max.subtract(t.max), u = this._rebound(a.x, -l.x), m = this._rebound(a.y, -l.y);
+          return new I(u, m);
         },
         _rebound: function(t, e) {
           return t + e > 0 ? Math.round(t - e) / 2 : Math.max(0, Math.ceil(t)) - Math.max(0, Math.floor(e));
@@ -4195,7 +4193,7 @@ function Mo() {
           this.fire("move");
         },
         _onPanTransitionEnd: function() {
-          q(this._mapPane, "leaflet-pan-anim"), this.fire("moveend");
+          j(this._mapPane, "leaflet-pan-anim"), this.fire("moveend");
         },
         _tryAnimatedPan: function(t, e) {
           var n = this._getCenterOffset(t)._trunc();
@@ -4239,7 +4237,7 @@ function Mo() {
           }), this._tempFireZoomEvent || (this._tempFireZoomEvent = this._zoom !== this._animateToZoom), this._move(this._animateToCenter, this._animateToZoom, void 0, !0), setTimeout(f(this._onZoomTransitionEnd, this), 250));
         },
         _onZoomTransitionEnd: function() {
-          this._animatingZoom && (this._mapPane && q(this._mapPane, "leaflet-zoom-anim"), this._animatingZoom = !1, this._move(this._animateToCenter, this._animateToZoom, void 0, !0), this._tempFireZoomEvent && this.fire("zoom"), delete this._tempFireZoomEvent, this.fire("move"), this._moveEnd(!0));
+          this._animatingZoom && (this._mapPane && j(this._mapPane, "leaflet-zoom-anim"), this._animatingZoom = !1, this._move(this._animateToCenter, this._animateToZoom, void 0, !0), this._tempFireZoomEvent && this.fire("zoom"), delete this._tempFireZoomEvent, this.fire("move"), this._moveEnd(!0));
         }
       });
       function Rs(t, e) {
@@ -4309,8 +4307,8 @@ function Mo() {
         _initControlPos: function() {
           var t = this._controlCorners = {}, e = "leaflet-", n = this._controlContainer = N("div", e + "control-container", this._container);
           function r(a, l) {
-            var d = e + a + " " + e + l;
-            t[a + l] = N("div", d, n);
+            var u = e + a + " " + e + l;
+            t[a + l] = N("div", u, n);
           }
           r("top", "left"), r("top", "right"), r("bottom", "left"), r("bottom", "right");
         },
@@ -4391,12 +4389,12 @@ function Mo() {
         expand: function() {
           D(this._container, "leaflet-control-layers-expanded"), this._section.style.height = null;
           var t = this._map.getSize().y - (this._container.offsetTop + 50);
-          return t < this._section.clientHeight ? (D(this._section, "leaflet-control-layers-scrollbar"), this._section.style.height = t + "px") : q(this._section, "leaflet-control-layers-scrollbar"), this._checkDisabledLayers(), this;
+          return t < this._section.clientHeight ? (D(this._section, "leaflet-control-layers-scrollbar"), this._section.style.height = t + "px") : j(this._section, "leaflet-control-layers-scrollbar"), this._checkDisabledLayers(), this;
         },
         // @method collapse(): this
         // Collapse the control container if expanded.
         collapse: function() {
-          return q(this._container, "leaflet-control-layers-expanded"), this;
+          return j(this._container, "leaflet-control-layers-expanded"), this;
         },
         _initLayout: function() {
           var t = "leaflet-control-layers", e = this._container = N("div", t), n = this.options.collapsed;
@@ -4457,8 +4455,8 @@ function Mo() {
           a.innerHTML = " " + t.name;
           var l = document.createElement("span");
           e.appendChild(l), l.appendChild(r), l.appendChild(a);
-          var d = t.overlay ? this._overlaysList : this._baseLayersList;
-          return d.appendChild(e), this._checkDisabledLayers(), e;
+          var u = t.overlay ? this._overlaysList : this._baseLayersList;
+          return u.appendChild(e), this._checkDisabledLayers(), e;
         },
         _onInputClick: function() {
           if (!this._preventClick) {
@@ -4490,7 +4488,7 @@ function Mo() {
         }
       }), Ns = function(t, e, n) {
         return new Wn(t, e, n);
-      }, Ci = dt.extend({
+      }, Ii = dt.extend({
         // @section
         // @aka Control.Zoom options
         options: {
@@ -4545,16 +4543,16 @@ function Mo() {
         },
         _updateDisabled: function() {
           var t = this._map, e = "leaflet-disabled";
-          q(this._zoomInButton, e), q(this._zoomOutButton, e), this._zoomInButton.setAttribute("aria-disabled", "false"), this._zoomOutButton.setAttribute("aria-disabled", "false"), (this._disabled || t._zoom === t.getMinZoom()) && (D(this._zoomOutButton, e), this._zoomOutButton.setAttribute("aria-disabled", "true")), (this._disabled || t._zoom === t.getMaxZoom()) && (D(this._zoomInButton, e), this._zoomInButton.setAttribute("aria-disabled", "true"));
+          j(this._zoomInButton, e), j(this._zoomOutButton, e), this._zoomInButton.setAttribute("aria-disabled", "false"), this._zoomOutButton.setAttribute("aria-disabled", "false"), (this._disabled || t._zoom === t.getMinZoom()) && (D(this._zoomOutButton, e), this._zoomOutButton.setAttribute("aria-disabled", "true")), (this._disabled || t._zoom === t.getMaxZoom()) && (D(this._zoomInButton, e), this._zoomInButton.setAttribute("aria-disabled", "true"));
         }
       });
       R.mergeOptions({
         zoomControl: !0
       }), R.addInitHook(function() {
-        this.options.zoomControl && (this.zoomControl = new Ci(), this.addControl(this.zoomControl));
+        this.options.zoomControl && (this.zoomControl = new Ii(), this.addControl(this.zoomControl));
       });
       var Bs = function(t) {
-        return new Ci(t);
+        return new Ii(t);
       }, Hn = dt.extend({
         // @section
         // @aka Control.Scale options
@@ -4668,7 +4666,7 @@ function Mo() {
       var Us = function(t) {
         return new Ai(t);
       };
-      dt.Layers = Wn, dt.Zoom = Ci, dt.Scale = Hn, dt.Attribution = Ai, me.layers = Ns, me.zoom = Bs, me.scale = Zs, me.attribution = Us;
+      dt.Layers = Wn, dt.Zoom = Ii, dt.Scale = Hn, dt.Attribution = Ai, me.layers = Ns, me.zoom = Bs, me.scale = Zs, me.attribution = Us;
       var gt = xt.extend({
         initialize: function(t) {
           this._map = t;
@@ -4698,7 +4696,7 @@ function Mo() {
       gt.addTo = function(t, e) {
         return t.addHandler(e, this), this;
       };
-      var Ws = { Events: st }, qn = E.touch ? "touchstart mousedown" : "mousedown", It = ae.extend({
+      var Ws = { Events: st }, jn = E.touch ? "touchstart mousedown" : "mousedown", Ct = ae.extend({
         options: {
           // @section
           // @aka Draggable options
@@ -4715,23 +4713,23 @@ function Mo() {
         // @method enable()
         // Enables the dragging ability
         enable: function() {
-          this._enabled || (A(this._dragStartTarget, qn, this._onDown, this), this._enabled = !0);
+          this._enabled || (A(this._dragStartTarget, jn, this._onDown, this), this._enabled = !0);
         },
         // @method disable()
         // Disables the dragging ability
         disable: function() {
-          this._enabled && (It._dragging === this && this.finishDrag(!0), U(this._dragStartTarget, qn, this._onDown, this), this._enabled = !1, this._moved = !1);
+          this._enabled && (Ct._dragging === this && this.finishDrag(!0), U(this._dragStartTarget, jn, this._onDown, this), this._enabled = !1, this._moved = !1);
         },
         _onDown: function(t) {
           if (this._enabled && (this._moved = !1, !vi(this._element, "leaflet-zoom-anim"))) {
             if (t.touches && t.touches.length !== 1) {
-              It._dragging === this && this.finishDrag();
+              Ct._dragging === this && this.finishDrag();
               return;
             }
-            if (!(It._dragging || t.shiftKey || t.which !== 1 && t.button !== 1 && !t.touches) && (It._dragging = this, this._preventOutline && Ti(this._element), xi(), de(), !this._moving)) {
+            if (!(Ct._dragging || t.shiftKey || t.which !== 1 && t.button !== 1 && !t.touches) && (Ct._dragging = this, this._preventOutline && Ti(this._element), xi(), de(), !this._moving)) {
               this.fire("down");
               var e = t.touches ? t.touches[0] : t, n = Rn(this._element);
-              this._startPoint = new C(e.clientX, e.clientY), this._startPos = Nt(this._element), this._parentScale = Pi(n);
+              this._startPoint = new I(e.clientX, e.clientY), this._startPos = Nt(this._element), this._parentScale = Pi(n);
               var r = t.type === "mousedown";
               A(document, r ? "mousemove" : "touchmove", this._onMove, this), A(document, r ? "mouseup" : "touchend touchcancel", this._onUp, this);
             }
@@ -4743,7 +4741,7 @@ function Mo() {
               this._moved = !0;
               return;
             }
-            var e = t.touches && t.touches.length === 1 ? t.touches[0] : t, n = new C(e.clientX, e.clientY)._subtract(this._startPoint);
+            var e = t.touches && t.touches.length === 1 ? t.touches[0] : t, n = new I(e.clientX, e.clientY)._subtract(this._startPoint);
             !n.x && !n.y || Math.abs(n.x) + Math.abs(n.y) < this.options.clickTolerance || (n.x /= this._parentScale.x, n.y /= this._parentScale.y, J(t), this._moved || (this.fire("dragstart"), this._moved = !0, D(document.body, "leaflet-dragging"), this._lastTarget = t.target || t.srcElement, window.SVGElementInstance && this._lastTarget instanceof window.SVGElementInstance && (this._lastTarget = this._lastTarget.correspondingUseElement), D(this._lastTarget, "leaflet-drag-target")), this._newPos = this._startPos.add(n), this._moving = !0, this._lastEvent = t, this._updatePosition());
           }
         },
@@ -4755,27 +4753,27 @@ function Mo() {
           this._enabled && this.finishDrag();
         },
         finishDrag: function(t) {
-          q(document.body, "leaflet-dragging"), this._lastTarget && (q(this._lastTarget, "leaflet-drag-target"), this._lastTarget = null), U(document, "mousemove touchmove", this._onMove, this), U(document, "mouseup touchend touchcancel", this._onUp, this), wi(), ue();
+          j(document.body, "leaflet-dragging"), this._lastTarget && (j(this._lastTarget, "leaflet-drag-target"), this._lastTarget = null), U(document, "mousemove touchmove", this._onMove, this), U(document, "mouseup touchend touchcancel", this._onUp, this), wi(), ue();
           var e = this._moved && this._moving;
-          this._moving = !1, It._dragging = !1, e && this.fire("dragend", {
+          this._moving = !1, Ct._dragging = !1, e && this.fire("dragend", {
             noInertia: t,
             distance: this._newPos.distanceTo(this._startPos)
           });
         }
       });
-      function jn(t, e, n) {
-        var r, a = [1, 4, 2, 8], l, d, m, _, y, w, S, M;
+      function qn(t, e, n) {
+        var r, a = [1, 4, 2, 8], l, u, m, _, y, w, S, M;
         for (l = 0, w = t.length; l < w; l++)
           t[l]._code = Ft(t[l], e);
         for (m = 0; m < 4; m++) {
-          for (S = a[m], r = [], l = 0, w = t.length, d = w - 1; l < w; d = l++)
-            _ = t[l], y = t[d], _._code & S ? y._code & S || (M = Re(y, _, S, e, n), M._code = Ft(M, e), r.push(M)) : (y._code & S && (M = Re(y, _, S, e, n), M._code = Ft(M, e), r.push(M)), r.push(_));
+          for (S = a[m], r = [], l = 0, w = t.length, u = w - 1; l < w; u = l++)
+            _ = t[l], y = t[u], _._code & S ? y._code & S || (M = Re(y, _, S, e, n), M._code = Ft(M, e), r.push(M)) : (y._code & S && (M = Re(y, _, S, e, n), M._code = Ft(M, e), r.push(M)), r.push(_));
           t = r;
         }
         return t;
       }
       function Gn(t, e) {
-        var n, r, a, l, d, m, _, y, w;
+        var n, r, a, l, u, m, _, y, w;
         if (!t || t.length === 0)
           throw new Error("latlngs not passed");
         lt(t) || (console.warn("latlngs are not flat! Only the first ring will be used"), t = t[0]);
@@ -4787,7 +4785,7 @@ function Mo() {
           ht.push(e.project(O([rt.lat - S.lat, rt.lng - S.lng])));
         }
         for (m = _ = y = 0, n = 0, r = Y - 1; n < Y; r = n++)
-          a = ht[n], l = ht[r], d = a.y * l.x - l.y * a.x, _ += (a.x + l.x) * d, y += (a.y + l.y) * d, m += d * 3;
+          a = ht[n], l = ht[r], u = a.y * l.x - l.y * a.x, _ += (a.x + l.x) * u, y += (a.y + l.y) * u, m += u * 3;
         m === 0 ? w = ht[0] : w = [_ / m, y / m];
         var ee = e.unproject(k(w));
         return O([ee.lat + S.lat, ee.lng + S.lng]);
@@ -4801,7 +4799,7 @@ function Mo() {
       }
       var Hs = {
         __proto__: null,
-        clipPolygon: jn,
+        clipPolygon: qn,
         polygonCenter: Gn,
         centroid: Di
       };
@@ -4809,27 +4807,27 @@ function Mo() {
         if (!e || !t.length)
           return t.slice();
         var n = e * e;
-        return t = Gs(t, n), t = js(t, n), t;
+        return t = Gs(t, n), t = qs(t, n), t;
       }
       function Vn(t, e, n) {
         return Math.sqrt(ge(t, e, n, !0));
       }
-      function qs(t, e, n) {
+      function js(t, e, n) {
         return ge(t, e, n);
       }
-      function js(t, e) {
+      function qs(t, e) {
         var n = t.length, r = typeof Uint8Array < "u" ? Uint8Array : Array, a = new r(n);
         a[0] = a[n - 1] = 1, Mi(t, a, e, 0, n - 1);
-        var l, d = [];
+        var l, u = [];
         for (l = 0; l < n; l++)
-          a[l] && d.push(t[l]);
-        return d;
+          a[l] && u.push(t[l]);
+        return u;
       }
       function Mi(t, e, n, r, a) {
-        var l = 0, d, m, _;
+        var l = 0, u, m, _;
         for (m = r + 1; m <= a - 1; m++)
-          _ = ge(t[m], t[r], t[a], !0), _ > l && (d = m, l = _);
-        l > n && (e[d] = 1, Mi(t, e, n, r, d), Mi(t, e, n, d, a));
+          _ = ge(t[m], t[r], t[a], !0), _ > l && (u = m, l = _);
+        l > n && (e[u] = 1, Mi(t, e, n, r, u), Mi(t, e, n, u, a));
       }
       function Gs(t, e) {
         for (var n = [t[0]], r = 1, a = 0, l = t.length; r < l; r++)
@@ -4838,18 +4836,18 @@ function Mo() {
       }
       var Yn;
       function Xn(t, e, n, r, a) {
-        var l = r ? Yn : Ft(t, n), d = Ft(e, n), m, _, y;
-        for (Yn = d; ; ) {
-          if (!(l | d))
+        var l = r ? Yn : Ft(t, n), u = Ft(e, n), m, _, y;
+        for (Yn = u; ; ) {
+          if (!(l | u))
             return [t, e];
-          if (l & d)
+          if (l & u)
             return !1;
-          m = l || d, _ = Re(t, e, m, n, a), y = Ft(_, n), m === l ? (t = _, l = y) : (e = _, d = y);
+          m = l || u, _ = Re(t, e, m, n, a), y = Ft(_, n), m === l ? (t = _, l = y) : (e = _, u = y);
         }
       }
       function Re(t, e, n, r, a) {
-        var l = e.x - t.x, d = e.y - t.y, m = r.min, _ = r.max, y, w;
-        return n & 8 ? (y = t.x + l * (_.y - t.y) / d, w = _.y) : n & 4 ? (y = t.x + l * (m.y - t.y) / d, w = m.y) : n & 2 ? (y = _.x, w = t.y + d * (_.x - t.x) / l) : n & 1 && (y = m.x, w = t.y + d * (m.x - t.x) / l), new C(y, w, a);
+        var l = e.x - t.x, u = e.y - t.y, m = r.min, _ = r.max, y, w;
+        return n & 8 ? (y = t.x + l * (_.y - t.y) / u, w = _.y) : n & 4 ? (y = t.x + l * (m.y - t.y) / u, w = m.y) : n & 2 ? (y = _.x, w = t.y + u * (_.x - t.x) / l) : n & 1 && (y = m.x, w = t.y + u * (m.x - t.x) / l), new I(y, w, a);
       }
       function Ft(t, e) {
         var n = 0;
@@ -4860,8 +4858,8 @@ function Mo() {
         return n * n + r * r;
       }
       function ge(t, e, n, r) {
-        var a = e.x, l = e.y, d = n.x - a, m = n.y - l, _ = d * d + m * m, y;
-        return _ > 0 && (y = ((t.x - a) * d + (t.y - l) * m) / _, y > 1 ? (a = n.x, l = n.y) : y > 0 && (a += d * y, l += m * y)), d = t.x - a, m = t.y - l, r ? d * d + m * m : new C(a, l);
+        var a = e.x, l = e.y, u = n.x - a, m = n.y - l, _ = u * u + m * m, y;
+        return _ > 0 && (y = ((t.x - a) * u + (t.y - l) * m) / _, y > 1 ? (a = n.x, l = n.y) : y > 0 && (a += u * y, l += m * y)), u = t.x - a, m = t.y - l, r ? u * u + m * m : new I(a, l);
       }
       function lt(t) {
         return !ct(t[0]) || typeof t[0][0] != "object" && typeof t[0][0] < "u";
@@ -4870,7 +4868,7 @@ function Mo() {
         return console.warn("Deprecated use of _flat, please use L.LineUtil.isFlat instead."), lt(t);
       }
       function Qn(t, e) {
-        var n, r, a, l, d, m, _, y;
+        var n, r, a, l, u, m, _, y;
         if (!t || t.length === 0)
           throw new Error("latlngs not passed");
         lt(t) || (console.warn("latlngs are not flat! Only the first ring will be used"), t = t[0]);
@@ -4887,10 +4885,10 @@ function Mo() {
           y = Y[0];
         else
           for (n = 0, l = 0; n < tt - 1; n++)
-            if (d = Y[n], m = Y[n + 1], a = d.distanceTo(m), l += a, l > r) {
+            if (u = Y[n], m = Y[n + 1], a = u.distanceTo(m), l += a, l > r) {
               _ = (l - r) / a, y = [
-                m.x - _ * (m.x - d.x),
-                m.y - _ * (m.y - d.y)
+                m.x - _ * (m.x - u.x),
+                m.y - _ * (m.y - u.y)
               ];
               break;
             }
@@ -4901,7 +4899,7 @@ function Mo() {
         __proto__: null,
         simplify: Kn,
         pointToSegmentDistance: Vn,
-        closestPointOnSegment: qs,
+        closestPointOnSegment: js,
         clipSegment: Xn,
         _getEdgeIntersection: Re,
         _getBitCode: Ft,
@@ -4911,7 +4909,7 @@ function Mo() {
         polylineCenter: Qn
       }, zi = {
         project: function(t) {
-          return new C(t.lng, t.lat);
+          return new I(t.lng, t.lat);
         },
         unproject: function(t) {
           return new Z(t.y, t.x);
@@ -4922,13 +4920,13 @@ function Mo() {
         R_MINOR: 6356752314245179e-9,
         bounds: new W([-2003750834279e-5, -1549657073972e-5], [2003750834279e-5, 1876465623138e-5]),
         project: function(t) {
-          var e = Math.PI / 180, n = this.R, r = t.lat * e, a = this.R_MINOR / n, l = Math.sqrt(1 - a * a), d = l * Math.sin(r), m = Math.tan(Math.PI / 4 - r / 2) / Math.pow((1 - d) / (1 + d), l / 2);
-          return r = -n * Math.log(Math.max(m, 1e-10)), new C(t.lng * e * n, r);
+          var e = Math.PI / 180, n = this.R, r = t.lat * e, a = this.R_MINOR / n, l = Math.sqrt(1 - a * a), u = l * Math.sin(r), m = Math.tan(Math.PI / 4 - r / 2) / Math.pow((1 - u) / (1 + u), l / 2);
+          return r = -n * Math.log(Math.max(m, 1e-10)), new I(t.lng * e * n, r);
         },
         unproject: function(t) {
-          for (var e = 180 / Math.PI, n = this.R, r = this.R_MINOR / n, a = Math.sqrt(1 - r * r), l = Math.exp(-t.y / n), d = Math.PI / 2 - 2 * Math.atan(l), m = 0, _ = 0.1, y; m < 15 && Math.abs(_) > 1e-7; m++)
-            y = a * Math.sin(d), y = Math.pow((1 - y) / (1 + y), a / 2), _ = Math.PI / 2 - 2 * Math.atan(l * y) - d, d += _;
-          return new Z(d * e, t.x * e / n);
+          for (var e = 180 / Math.PI, n = this.R, r = this.R_MINOR / n, a = Math.sqrt(1 - r * r), l = Math.exp(-t.y / n), u = Math.PI / 2 - 2 * Math.atan(l), m = 0, _ = 0.1, y; m < 15 && Math.abs(_) > 1e-7; m++)
+            y = a * Math.sin(u), y = Math.pow((1 - y) / (1 + y), a / 2), _ = Math.PI / 2 - 2 * Math.atan(l * y) - u, u += _;
+          return new Z(u * e, t.x * e / n);
         }
       }, Ys = {
         __proto__: null,
@@ -5324,7 +5322,7 @@ function Mo() {
         },
         addHooks: function() {
           var t = this._marker._icon;
-          this._draggable || (this._draggable = new It(t, t, !0)), this._draggable.on({
+          this._draggable || (this._draggable = new Ct(t, t, !0)), this._draggable.on({
             dragstart: this._onDragStart,
             predrag: this._onPreDrag,
             drag: this._onDrag,
@@ -5337,20 +5335,20 @@ function Mo() {
             predrag: this._onPreDrag,
             drag: this._onDrag,
             dragend: this._onDragEnd
-          }, this).disable(), this._marker._icon && q(this._marker._icon, "leaflet-marker-draggable");
+          }, this).disable(), this._marker._icon && j(this._marker._icon, "leaflet-marker-draggable");
         },
         moved: function() {
           return this._draggable && this._draggable._moved;
         },
         _adjustPan: function(t) {
-          var e = this._marker, n = e._map, r = this._marker.options.autoPanSpeed, a = this._marker.options.autoPanPadding, l = Nt(e._icon), d = n.getPixelBounds(), m = n.getPixelOrigin(), _ = it(
-            d.min._subtract(m).add(a),
-            d.max._subtract(m).subtract(a)
+          var e = this._marker, n = e._map, r = this._marker.options.autoPanSpeed, a = this._marker.options.autoPanPadding, l = Nt(e._icon), u = n.getPixelBounds(), m = n.getPixelOrigin(), _ = it(
+            u.min._subtract(m).add(a),
+            u.max._subtract(m).subtract(a)
           );
           if (!_.contains(l)) {
             var y = k(
-              (Math.max(_.max.x, l.x) - _.max.x) / (d.max.x - _.max.x) - (Math.min(_.min.x, l.x) - _.min.x) / (d.min.x - _.min.x),
-              (Math.max(_.max.y, l.y) - _.max.y) / (d.max.y - _.max.y) - (Math.min(_.min.y, l.y) - _.min.y) / (d.min.y - _.min.y)
+              (Math.max(_.max.x, l.x) - _.max.x) / (u.max.x - _.max.x) - (Math.min(_.min.x, l.x) - _.min.x) / (u.min.x - _.min.x),
+              (Math.max(_.max.y, l.y) - _.max.y) / (u.max.y - _.max.y) - (Math.min(_.min.y, l.y) - _.min.y) / (u.min.y - _.min.y)
             ).multiplyBy(r);
             n.panBy(y, { animate: !1 }), this._draggable._newPos._add(y), this._draggable._startPos._add(y), K(e._icon, this._draggable._newPos), this._onDrag(t), this._panRequest = et(this._adjustPan.bind(this, t));
           }
@@ -5556,7 +5554,7 @@ function Mo() {
       function ia(t, e) {
         return new Ne(t, e);
       }
-      var Ct = ut.extend({
+      var It = ut.extend({
         // @section
         // @aka Path options
         options: {
@@ -5642,7 +5640,7 @@ function Mo() {
         _clickTolerance: function() {
           return (this.options.stroke ? this.options.weight / 2 : 0) + (this._renderer.options.tolerance || 0);
         }
-      }), Be = Ct.extend({
+      }), Be = It.extend({
         // @section
         // @aka CircleMarker options
         options: {
@@ -5677,7 +5675,7 @@ function Mo() {
         },
         setStyle: function(t) {
           var e = t && t.radius || this._radius;
-          return Ct.prototype.setStyle.call(this, t), this.setRadius(e), this;
+          return It.prototype.setStyle.call(this, t), this.setRadius(e), this;
         },
         _project: function() {
           this._point = this._map.latLngToLayerPoint(this._latlng), this._updateBounds();
@@ -5728,12 +5726,12 @@ function Mo() {
             this._map.layerPointToLatLng(this._point.add(t))
           );
         },
-        setStyle: Ct.prototype.setStyle,
+        setStyle: It.prototype.setStyle,
         _project: function() {
           var t = this._latlng.lng, e = this._latlng.lat, n = this._map, r = n.options.crs;
           if (r.distance === Lt.distance) {
-            var a = Math.PI / 180, l = this._mRadius / Lt.R / a, d = n.project([e + l, t]), m = n.project([e - l, t]), _ = d.add(m).divideBy(2), y = n.unproject(_).lat, w = Math.acos((Math.cos(l * a) - Math.sin(e * a) * Math.sin(y * a)) / (Math.cos(e * a) * Math.cos(y * a))) / a;
-            (isNaN(w) || w === 0) && (w = l / Math.cos(Math.PI / 180 * e)), this._point = _.subtract(n.getPixelOrigin()), this._radius = isNaN(w) ? 0 : _.x - n.project([y, t - w]).x, this._radiusY = _.y - d.y;
+            var a = Math.PI / 180, l = this._mRadius / Lt.R / a, u = n.project([e + l, t]), m = n.project([e - l, t]), _ = u.add(m).divideBy(2), y = n.unproject(_).lat, w = Math.acos((Math.cos(l * a) - Math.sin(e * a) * Math.sin(y * a)) / (Math.cos(e * a) * Math.cos(y * a))) / a;
+            (isNaN(w) || w === 0) && (w = l / Math.cos(Math.PI / 180 * e)), this._point = _.subtract(n.getPixelOrigin()), this._radius = isNaN(w) ? 0 : _.x - n.project([y, t - w]).x, this._radiusY = _.y - u.y;
           } else {
             var S = r.unproject(r.project(this._latlng).subtract([this._mRadius, 0]));
             this._point = n.latLngToLayerPoint(this._latlng), this._radius = this._point.x - n.latLngToLayerPoint(S).x;
@@ -5744,7 +5742,7 @@ function Mo() {
       function ra(t, e, n) {
         return new Ri(t, e, n);
       }
-      var Tt = Ct.extend({
+      var Tt = It.extend({
         // @section
         // @aka Polyline options
         options: {
@@ -5777,8 +5775,8 @@ function Mo() {
         // @method closestLayerPoint(p: Point): Point
         // Returns the point closest to `p` on the Polyline.
         closestLayerPoint: function(t) {
-          for (var e = 1 / 0, n = null, r = ge, a, l, d = 0, m = this._parts.length; d < m; d++)
-            for (var _ = this._parts[d], y = 1, w = _.length; y < w; y++) {
+          for (var e = 1 / 0, n = null, r = ge, a, l, u = 0, m = this._parts.length; u < m; u++)
+            for (var _ = this._parts[u], y = 1, w = _.length; y < w; y++) {
               a = _[y - 1], l = _[y];
               var S = r(t, a, l, !0);
               S < e && (e = S, n = r(t, a, l));
@@ -5821,7 +5819,7 @@ function Mo() {
           this._rings = [], this._projectLatlngs(this._latlngs, this._rings, t), this._bounds.isValid() && t.isValid() && (this._rawPxBounds = t, this._updateBounds());
         },
         _updateBounds: function() {
-          var t = this._clickTolerance(), e = new C(t, t);
+          var t = this._clickTolerance(), e = new I(t, t);
           this._rawPxBounds && (this._pxBounds = new W([
             this._rawPxBounds.min.subtract(e),
             this._rawPxBounds.max.add(e)
@@ -5829,11 +5827,11 @@ function Mo() {
         },
         // recursively turns latlngs into a set of rings with projected coordinates
         _projectLatlngs: function(t, e, n) {
-          var r = t[0] instanceof Z, a = t.length, l, d;
+          var r = t[0] instanceof Z, a = t.length, l, u;
           if (r) {
-            for (d = [], l = 0; l < a; l++)
-              d[l] = this._map.latLngToLayerPoint(t[l]), n.extend(d[l]);
-            e.push(d);
+            for (u = [], l = 0; l < a; l++)
+              u[l] = this._map.latLngToLayerPoint(t[l]), n.extend(u[l]);
+            e.push(u);
           } else
             for (l = 0; l < a; l++)
               this._projectLatlngs(t[l], e, n);
@@ -5846,10 +5844,10 @@ function Mo() {
               this._parts = this._rings;
               return;
             }
-            var e = this._parts, n, r, a, l, d, m, _;
+            var e = this._parts, n, r, a, l, u, m, _;
             for (n = 0, a = 0, l = this._rings.length; n < l; n++)
-              for (_ = this._rings[n], r = 0, d = _.length; r < d - 1; r++)
-                m = Xn(_[r], _[r + 1], t, r, !0), m && (e[a] = e[a] || [], e[a].push(m[0]), (m[1] !== _[r + 1] || r === d - 2) && (e[a].push(m[1]), a++));
+              for (_ = this._rings[n], r = 0, u = _.length; r < u - 1; r++)
+                m = Xn(_[r], _[r + 1], t, r, !0), m && (e[a] = e[a] || [], e[a].push(m[0]), (m[1] !== _[r + 1] || r === u - 2) && (e[a].push(m[1]), a++));
           }
         },
         // simplify each clipped part of the polyline for performance
@@ -5865,11 +5863,11 @@ function Mo() {
         },
         // Needed by the `Canvas` renderer for interactivity
         _containsPoint: function(t, e) {
-          var n, r, a, l, d, m, _ = this._clickTolerance();
+          var n, r, a, l, u, m, _ = this._clickTolerance();
           if (!this._pxBounds || !this._pxBounds.contains(t))
             return !1;
           for (n = 0, l = this._parts.length; n < l; n++)
-            for (m = this._parts[n], r = 0, d = m.length, a = d - 1; r < d; a = r++)
+            for (m = this._parts[n], r = 0, u = m.length, a = u - 1; r < u; a = r++)
               if (!(!e && r === 0) && Vn(t, m[a], m[r]) <= _)
                 return !0;
           return !1;
@@ -5904,14 +5902,14 @@ function Mo() {
           return lt(this._latlngs[0]) ? this._latlngs[0] : this._latlngs[0][0];
         },
         _clipPoints: function() {
-          var t = this._renderer._bounds, e = this.options.weight, n = new C(e, e);
+          var t = this._renderer._bounds, e = this.options.weight, n = new I(e, e);
           if (t = new W(t.min.subtract(n), t.max.add(n)), this._parts = [], !(!this._pxBounds || !this._pxBounds.intersects(t))) {
             if (this.options.noClip) {
               this._parts = this._rings;
               return;
             }
             for (var r = 0, a = this._rings.length, l; r < a; r++)
-              l = jn(this._rings[r], t, !0), l.length && this._parts.push(l);
+              l = qn(this._rings[r], t, !0), l.length && this._parts.push(l);
           }
         },
         _updatePath: function() {
@@ -5919,12 +5917,12 @@ function Mo() {
         },
         // Needed by the `Canvas` renderer for interactivity
         _containsPoint: function(t) {
-          var e = !1, n, r, a, l, d, m, _, y;
+          var e = !1, n, r, a, l, u, m, _, y;
           if (!this._pxBounds || !this._pxBounds.contains(t))
             return !1;
           for (l = 0, _ = this._parts.length; l < _; l++)
-            for (n = this._parts[l], d = 0, y = n.length, m = y - 1; d < y; m = d++)
-              r = n[d], a = n[m], r.y > t.y != a.y > t.y && t.x < (a.x - r.x) * (t.y - r.y) / (a.y - r.y) + r.x && (e = !e);
+            for (n = this._parts[l], u = 0, y = n.length, m = y - 1; u < y; m = u++)
+              r = n[u], a = n[m], r.y > t.y != a.y > t.y && t.x < (a.x - r.x) * (t.y - r.y) / (a.y - r.y) + r.x && (e = !e);
           return e || Tt.prototype._containsPoint.call(this, t, !0);
         }
       });
@@ -5996,8 +5994,8 @@ function Mo() {
           var l = this.options;
           if (l.filter && !l.filter(t))
             return this;
-          var d = Ze(t, l);
-          return d ? (d.feature = We(t), d.defaultOptions = d.options, this.resetStyle(d), l.onEachFeature && l.onEachFeature(t, d), this.addLayer(d)) : this;
+          var u = Ze(t, l);
+          return u ? (u.feature = We(t), u.defaultOptions = u.options, this.resetStyle(u), l.onEachFeature && l.onEachFeature(t, u), this.addLayer(u)) : this;
         },
         // @method resetStyle( <Path> layer? ): this
         // Resets the given vector layer's style to the original GeoJSON style, useful for resetting style after hover events.
@@ -6017,22 +6015,22 @@ function Mo() {
         }
       });
       function Ze(t, e) {
-        var n = t.type === "Feature" ? t.geometry : t, r = n ? n.coordinates : null, a = [], l = e && e.pointToLayer, d = e && e.coordsToLatLng || Ni, m, _, y, w;
+        var n = t.type === "Feature" ? t.geometry : t, r = n ? n.coordinates : null, a = [], l = e && e.pointToLayer, u = e && e.coordsToLatLng || Ni, m, _, y, w;
         if (!r && !n)
           return null;
         switch (n.type) {
           case "Point":
-            return m = d(r), ir(l, t, m, e);
+            return m = u(r), ir(l, t, m, e);
           case "MultiPoint":
             for (y = 0, w = r.length; y < w; y++)
-              m = d(r[y]), a.push(ir(l, t, m, e));
+              m = u(r[y]), a.push(ir(l, t, m, e));
             return new $t(a);
           case "LineString":
           case "MultiLineString":
-            return _ = Fe(r, n.type === "LineString" ? 0 : 1, d), new Tt(_, e);
+            return _ = Fe(r, n.type === "LineString" ? 0 : 1, u), new Tt(_, e);
           case "Polygon":
           case "MultiPolygon":
-            return _ = Fe(r, n.type === "Polygon" ? 1 : 2, d), new Jt(_, e);
+            return _ = Fe(r, n.type === "Polygon" ? 1 : 2, u), new Jt(_, e);
           case "GeometryCollection":
             for (y = 0, w = n.geometries.length; y < w; y++) {
               var S = Ze({
@@ -6060,15 +6058,15 @@ function Mo() {
         return new Z(t[1], t[0], t[2]);
       }
       function Fe(t, e, n) {
-        for (var r = [], a = 0, l = t.length, d; a < l; a++)
-          d = e ? Fe(t[a], e - 1, n) : (n || Ni)(t[a]), r.push(d);
+        for (var r = [], a = 0, l = t.length, u; a < l; a++)
+          u = e ? Fe(t[a], e - 1, n) : (n || Ni)(t[a]), r.push(u);
         return r;
       }
       function Bi(t, e) {
-        return t = O(t), t.alt !== void 0 ? [I(t.lng, e), I(t.lat, e), I(t.alt, e)] : [I(t.lng, e), I(t.lat, e)];
+        return t = O(t), t.alt !== void 0 ? [C(t.lng, e), C(t.lat, e), C(t.alt, e)] : [C(t.lng, e), C(t.lat, e)];
       }
       function Ue(t, e, n, r) {
-        for (var a = [], l = 0, d = t.length; l < d; l++)
+        for (var a = [], l = 0, u = t.length; l < u; l++)
           a.push(e ? Ue(t[l], lt(t[l]) ? 0 : e - 1, n, r) : Bi(t[l], r));
         return !e && n && a.length > 0 && a.push(a[0].slice()), a;
       }
@@ -6130,8 +6128,8 @@ function Mo() {
               if (n)
                 r.push(l.geometry);
               else {
-                var d = We(l);
-                d.type === "FeatureCollection" ? r.push.apply(r, d.features) : r.push(d);
+                var u = We(l);
+                u.type === "FeatureCollection" ? r.push.apply(r, u.features) : r.push(u);
               }
             }
           }), n ? Qt(this, {
@@ -6303,8 +6301,8 @@ function Mo() {
           }
           ct(this._url) || (this._url = [this._url]), !this.options.keepAspectRatio && Object.prototype.hasOwnProperty.call(e.style, "objectFit") && (e.style.objectFit = "fill"), e.autoplay = !!this.options.autoplay, e.loop = !!this.options.loop, e.muted = !!this.options.muted, e.playsInline = !!this.options.playsInline;
           for (var l = 0; l < this._url.length; l++) {
-            var d = N("source");
-            d.src = this._url[l], e.appendChild(d);
+            var u = N("source");
+            u.src = this._url[l], e.appendChild(u);
           }
         }
         // @method getElement(): HTMLVideoElement
@@ -6374,7 +6372,7 @@ function Mo() {
           this._zoomAnimated = t._zoomAnimated, this._container || this._initLayout(), t._fadeAnimated && ot(this._container, 0), clearTimeout(this._removeTimeout), this.getPane().appendChild(this._container), this.update(), t._fadeAnimated && ot(this._container, 1), this.bringToFront(), this.options.interactive && (D(this._container, "leaflet-interactive"), this.addInteractiveTarget(this._container));
         },
         onRemove: function(t) {
-          t._fadeAnimated ? (ot(this._container, 0), this._removeTimeout = setTimeout(f(H, void 0, this._container), 200)) : H(this._container), this.options.interactive && (q(this._container, "leaflet-interactive"), this.removeInteractiveTarget(this._container));
+          t._fadeAnimated ? (ot(this._container, 0), this._removeTimeout = setTimeout(f(H, void 0, this._container), 200)) : H(this._container), this.options.interactive && (j(this._container, "leaflet-interactive"), this.removeInteractiveTarget(this._container));
         },
         // @namespace DivOverlay
         // @method getLatLng: LatLng
@@ -6494,7 +6492,7 @@ function Mo() {
           return a instanceof t ? (z(a, r), a._source = this) : (a = e && !r ? e : new t(r, this), a.setContent(n)), a;
         }
       });
-      var qe = _t.extend({
+      var je = _t.extend({
         // @section
         // @aka Popup options
         options: {
@@ -6561,10 +6559,10 @@ function Mo() {
           return t = arguments.length ? t : this._source._map, !t.hasLayer(this) && t._popup && t._popup.options.autoClose && t.removeLayer(t._popup), t._popup = this, _t.prototype.openOn.call(this, t);
         },
         onAdd: function(t) {
-          _t.prototype.onAdd.call(this, t), t.fire("popupopen", { popup: this }), this._source && (this._source.fire("popupopen", { popup: this }, !0), this._source instanceof Ct || this._source.on("preclick", Bt));
+          _t.prototype.onAdd.call(this, t), t.fire("popupopen", { popup: this }), this._source && (this._source.fire("popupopen", { popup: this }, !0), this._source instanceof It || this._source.on("preclick", Bt));
         },
         onRemove: function(t) {
-          _t.prototype.onRemove.call(this, t), t.fire("popupclose", { popup: this }), this._source && (this._source.fire("popupclose", { popup: this }, !0), this._source instanceof Ct || this._source.off("preclick", Bt));
+          _t.prototype.onRemove.call(this, t), t.fire("popupclose", { popup: this }), this._source && (this._source.fire("popupclose", { popup: this }, !0), this._source instanceof It || this._source.off("preclick", Bt));
         },
         getEvents: function() {
           var t = _t.prototype.getEvents.call(this);
@@ -6588,7 +6586,7 @@ function Mo() {
           var n = t.offsetWidth;
           n = Math.min(n, this.options.maxWidth), n = Math.max(n, this.options.minWidth), e.width = n + 1 + "px", e.whiteSpace = "", e.height = "";
           var r = t.offsetHeight, a = this.options.maxHeight, l = "leaflet-popup-scrolled";
-          a && r > a ? (e.height = a + "px", D(t, l)) : q(t, l), this._containerWidth = this._container.offsetWidth;
+          a && r > a ? (e.height = a + "px", D(t, l)) : j(t, l), this._containerWidth = this._container.offsetWidth;
         },
         _animateZoom: function(t) {
           var e = this._map._latLngToNewLayerPoint(this._latlng, t.zoom, t.center), n = this._getAnchor();
@@ -6600,9 +6598,9 @@ function Mo() {
               this._autopanning = !1;
               return;
             }
-            var t = this._map, e = parseInt(ce(this._container, "marginBottom"), 10) || 0, n = this._container.offsetHeight + e, r = this._containerWidth, a = new C(this._containerLeft, -n - this._containerBottom);
+            var t = this._map, e = parseInt(ce(this._container, "marginBottom"), 10) || 0, n = this._container.offsetHeight + e, r = this._containerWidth, a = new I(this._containerLeft, -n - this._containerBottom);
             a._add(Nt(this._container));
-            var l = t.layerPointToContainerPoint(a), d = k(this.options.autoPanPadding), m = k(this.options.autoPanPaddingTopLeft || d), _ = k(this.options.autoPanPaddingBottomRight || d), y = t.getSize(), w = 0, S = 0;
+            var l = t.layerPointToContainerPoint(a), u = k(this.options.autoPanPadding), m = k(this.options.autoPanPaddingTopLeft || u), _ = k(this.options.autoPanPaddingBottomRight || u), y = t.getSize(), w = 0, S = 0;
             l.x + r + _.x > y.x && (w = l.x + r - y.x + _.x), l.x - w - m.x < 0 && (w = l.x - m.x), l.y + n + _.y > y.y && (S = l.y + n - y.y + _.y), l.y - S - m.y < 0 && (S = l.y - m.y), (w || S) && (this.options.keepInView && (this._autopanning = !0), t.fire("autopanstart").panBy([w, S]));
           }
         },
@@ -6610,7 +6608,7 @@ function Mo() {
           return k(this._source && this._source._getPopupAnchor ? this._source._getPopupAnchor() : [0, 0]);
         }
       }), da = function(t, e) {
-        return new qe(t, e);
+        return new je(t, e);
       };
       R.mergeOptions({
         closePopupOnClick: !0
@@ -6621,7 +6619,7 @@ function Mo() {
         // @method openPopup(content: String|HTMLElement, latlng: LatLng, options?: Popup options): this
         // Creates a popup with the specified content and options and opens it in the given point on a map.
         openPopup: function(t, e, n) {
-          return this._initOverlay(qe, t, e, n).openOn(this), this;
+          return this._initOverlay(je, t, e, n).openOn(this), this;
         },
         // @method closePopup(popup?: Popup): this
         // Closes the popup previously opened with [openPopup](#map-openpopup) (or the given one).
@@ -6634,7 +6632,7 @@ function Mo() {
         // necessary event listeners. If a `Function` is passed it will receive
         // the layer as the first argument and should return a `String` or `HTMLElement`.
         bindPopup: function(t, e) {
-          return this._popup = this._initOverlay(qe, this._popup, t, e), this._popupHandlersAdded || (this.on({
+          return this._popup = this._initOverlay(je, this._popup, t, e), this._popupHandlersAdded || (this.on({
             click: this._openPopup,
             keypress: this._onKeyPress,
             remove: this.closePopup,
@@ -6685,7 +6683,7 @@ function Mo() {
           if (!(!this._popup || !this._map)) {
             Zt(t);
             var e = t.layer || t.target;
-            if (this._popup._source === e && !(e instanceof Ct)) {
+            if (this._popup._source === e && !(e instanceof It)) {
               this._map.hasLayer(this._popup) ? this.closePopup() : this.openPopup(t.latlng);
               return;
             }
@@ -6699,7 +6697,7 @@ function Mo() {
           t.originalEvent.keyCode === 13 && this._openPopup(t);
         }
       });
-      var je = _t.extend({
+      var qe = _t.extend({
         // @section
         // @aka Tooltip options
         options: {
@@ -6744,8 +6742,8 @@ function Mo() {
         _adjustPan: function() {
         },
         _setPosition: function(t) {
-          var e, n, r = this._map, a = this._container, l = r.latLngToContainerPoint(r.getCenter()), d = r.layerPointToContainerPoint(t), m = this.options.direction, _ = a.offsetWidth, y = a.offsetHeight, w = k(this.options.offset), S = this._getAnchor();
-          m === "top" ? (e = _ / 2, n = y) : m === "bottom" ? (e = _ / 2, n = 0) : m === "center" ? (e = _ / 2, n = y / 2) : m === "right" ? (e = 0, n = y / 2) : m === "left" ? (e = _, n = y / 2) : d.x < l.x ? (m = "right", e = 0, n = y / 2) : (m = "left", e = _ + (w.x + S.x) * 2, n = y / 2), t = t.subtract(k(e, n, !0)).add(w).add(S), q(a, "leaflet-tooltip-right"), q(a, "leaflet-tooltip-left"), q(a, "leaflet-tooltip-top"), q(a, "leaflet-tooltip-bottom"), D(a, "leaflet-tooltip-" + m), K(a, t);
+          var e, n, r = this._map, a = this._container, l = r.latLngToContainerPoint(r.getCenter()), u = r.layerPointToContainerPoint(t), m = this.options.direction, _ = a.offsetWidth, y = a.offsetHeight, w = k(this.options.offset), S = this._getAnchor();
+          m === "top" ? (e = _ / 2, n = y) : m === "bottom" ? (e = _ / 2, n = 0) : m === "center" ? (e = _ / 2, n = y / 2) : m === "right" ? (e = 0, n = y / 2) : m === "left" ? (e = _, n = y / 2) : u.x < l.x ? (m = "right", e = 0, n = y / 2) : (m = "left", e = _ + (w.x + S.x) * 2, n = y / 2), t = t.subtract(k(e, n, !0)).add(w).add(S), j(a, "leaflet-tooltip-right"), j(a, "leaflet-tooltip-left"), j(a, "leaflet-tooltip-top"), j(a, "leaflet-tooltip-bottom"), D(a, "leaflet-tooltip-" + m), K(a, t);
         },
         _updatePosition: function() {
           var t = this._map.latLngToLayerPoint(this._latlng);
@@ -6762,7 +6760,7 @@ function Mo() {
           return k(this._source && this._source._getTooltipAnchor && !this.options.sticky ? this._source._getTooltipAnchor() : [0, 0]);
         }
       }), ua = function(t, e) {
-        return new je(t, e);
+        return new qe(t, e);
       };
       R.include({
         // @method openTooltip(tooltip: Tooltip): this
@@ -6771,7 +6769,7 @@ function Mo() {
         // @method openTooltip(content: String|HTMLElement, latlng: LatLng, options?: Tooltip options): this
         // Creates a tooltip with the specified content and options and open it.
         openTooltip: function(t, e, n) {
-          return this._initOverlay(je, t, e, n).openOn(this), this;
+          return this._initOverlay(qe, t, e, n).openOn(this), this;
         },
         // @method closeTooltip(tooltip: Tooltip): this
         // Closes the tooltip given as parameter.
@@ -6784,7 +6782,7 @@ function Mo() {
         // necessary event listeners. If a `Function` is passed it will receive
         // the layer as the first argument and should return a `String` or `HTMLElement`.
         bindTooltip: function(t, e) {
-          return this._tooltip && this.isTooltipOpen() && this.unbindTooltip(), this._tooltip = this._initOverlay(je, this._tooltip, t, e), this._initTooltipInteractions(), this._tooltip.options.permanent && this._map && this._map.hasLayer(this) && this.openTooltip(), this;
+          return this._tooltip && this.isTooltipOpen() && this.unbindTooltip(), this._tooltip = this._initOverlay(qe, this._tooltip, t, e), this._initTooltipInteractions(), this._tooltip.options.permanent && this._map && this._map.hasLayer(this) && this.openTooltip(), this;
         },
         // @method unbindTooltip(): this
         // Removes the tooltip previously bound with `bindTooltip`.
@@ -7031,7 +7029,7 @@ function Mo() {
         // Normalizes the [tileSize option](#gridlayer-tilesize) into a point. Used by the `createTile()` method.
         getTileSize: function() {
           var t = this.options.tileSize;
-          return t instanceof C ? t : new C(t, t);
+          return t instanceof I ? t : new I(t, t);
         },
         _updateZIndex: function() {
           this._container && this.options.zIndex !== void 0 && this.options.zIndex !== null && (this._container.style.zIndex = this.options.zIndex);
@@ -7103,17 +7101,17 @@ function Mo() {
           this._removeAllTiles(), this._tileZoom = void 0;
         },
         _retainParent: function(t, e, n, r) {
-          var a = Math.floor(t / 2), l = Math.floor(e / 2), d = n - 1, m = new C(+a, +l);
-          m.z = +d;
+          var a = Math.floor(t / 2), l = Math.floor(e / 2), u = n - 1, m = new I(+a, +l);
+          m.z = +u;
           var _ = this._tileCoordsToKey(m), y = this._tiles[_];
-          return y && y.active ? (y.retain = !0, !0) : (y && y.loaded && (y.retain = !0), d > r ? this._retainParent(a, l, d, r) : !1);
+          return y && y.active ? (y.retain = !0, !0) : (y && y.loaded && (y.retain = !0), u > r ? this._retainParent(a, l, u, r) : !1);
         },
         _retainChildren: function(t, e, n, r) {
           for (var a = 2 * t; a < 2 * t + 2; a++)
             for (var l = 2 * e; l < 2 * e + 2; l++) {
-              var d = new C(a, l);
-              d.z = n + 1;
-              var m = this._tileCoordsToKey(d), _ = this._tiles[m];
+              var u = new I(a, l);
+              u.z = n + 1;
+              var m = this._tileCoordsToKey(u), _ = this._tiles[m];
               if (_ && _.active) {
                 _.retain = !0;
                 continue;
@@ -7169,7 +7167,7 @@ function Mo() {
           if (e) {
             var n = this._clampZoom(e.getZoom());
             if (t === void 0 && (t = e.getCenter()), this._tileZoom !== void 0) {
-              var r = this._getTiledPixelBounds(t), a = this._pxBoundsToTileRange(r), l = a.getCenter(), d = [], m = this.options.keepBuffer, _ = new W(
+              var r = this._getTiledPixelBounds(t), a = this._pxBoundsToTileRange(r), l = a.getCenter(), u = [], m = this.options.keepBuffer, _ = new W(
                 a.getBottomLeft().subtract([m, -m]),
                 a.getTopRight().add([m, -m])
               );
@@ -7177,7 +7175,7 @@ function Mo() {
                 throw new Error("Attempted to load an infinite number of tiles");
               for (var y in this._tiles) {
                 var w = this._tiles[y].coords;
-                (w.z !== this._tileZoom || !_.contains(new C(w.x, w.y))) && (this._tiles[y].current = !1);
+                (w.z !== this._tileZoom || !_.contains(new I(w.x, w.y))) && (this._tiles[y].current = !1);
               }
               if (Math.abs(n - this._tileZoom) > 1) {
                 this._setView(t, n);
@@ -7185,19 +7183,19 @@ function Mo() {
               }
               for (var S = a.min.y; S <= a.max.y; S++)
                 for (var M = a.min.x; M <= a.max.x; M++) {
-                  var tt = new C(M, S);
+                  var tt = new I(M, S);
                   if (tt.z = this._tileZoom, !!this._isValidTile(tt)) {
                     var Y = this._tiles[this._tileCoordsToKey(tt)];
-                    Y ? Y.current = !0 : d.push(tt);
+                    Y ? Y.current = !0 : u.push(tt);
                   }
                 }
-              if (d.sort(function(rt, ee) {
+              if (u.sort(function(rt, ee) {
                 return rt.distanceTo(l) - ee.distanceTo(l);
-              }), d.length !== 0) {
+              }), u.length !== 0) {
                 this._loading || (this._loading = !0, this.fire("loading"));
                 var ht = document.createDocumentFragment();
-                for (M = 0; M < d.length; M++)
-                  this._addTile(d[M], ht);
+                for (M = 0; M < u.length; M++)
+                  this._addTile(u[M], ht);
                 this._level.el.appendChild(ht);
               }
             }
@@ -7219,8 +7217,8 @@ function Mo() {
           return this._tileCoordsToBounds(this._keyToTileCoords(t));
         },
         _tileCoordsToNwSe: function(t) {
-          var e = this._map, n = this.getTileSize(), r = t.scaleBy(n), a = r.add(n), l = e.unproject(r, t.z), d = e.unproject(a, t.z);
-          return [l, d];
+          var e = this._map, n = this.getTileSize(), r = t.scaleBy(n), a = r.add(n), l = e.unproject(r, t.z), u = e.unproject(a, t.z);
+          return [l, u];
         },
         // converts tile coordinates to its geographical bounds
         _tileCoordsToBounds: function(t) {
@@ -7233,7 +7231,7 @@ function Mo() {
         },
         // converts tile cache key to coordinates
         _keyToTileCoords: function(t) {
-          var e = t.split(":"), n = new C(+e[0], +e[1]);
+          var e = t.split(":"), n = new I(+e[0], +e[1]);
           return n.z = +e[2], n;
         },
         _removeTile: function(t) {
@@ -7275,7 +7273,7 @@ function Mo() {
           return t.scaleBy(this.getTileSize()).subtract(this._level.origin);
         },
         _wrapCoords: function(t) {
-          var e = new C(
+          var e = new I(
             this._wrapX ? $(t.x, this._wrapX) : t.x,
             this._wrapY ? $(t.y, this._wrapY) : t.y
           );
@@ -7470,8 +7468,8 @@ function Mo() {
           this.wmsParams[e] = this._crs.code, te.prototype.onAdd.call(this, t);
         },
         getTileUrl: function(t) {
-          var e = this._tileCoordsToNwSe(t), n = this._crs, r = it(n.project(e[0]), n.project(e[1])), a = r.min, l = r.max, d = (this._wmsVersion >= 1.3 && this._crs === tr ? [a.y, a.x, l.y, l.x] : [a.x, a.y, l.x, l.y]).join(","), m = te.prototype.getTileUrl.call(this, t);
-          return m + pt(this.wmsParams, m, this.options.uppercase) + (this.options.uppercase ? "&BBOX=" : "&bbox=") + d;
+          var e = this._tileCoordsToNwSe(t), n = this._crs, r = it(n.project(e[0]), n.project(e[1])), a = r.min, l = r.max, u = (this._wmsVersion >= 1.3 && this._crs === tr ? [a.y, a.x, l.y, l.x] : [a.x, a.y, l.x, l.y]).join(","), m = te.prototype.getTileUrl.call(this, t);
+          return m + pt(this.wmsParams, m, this.options.uppercase) + (this.options.uppercase ? "&BBOX=" : "&bbox=") + u;
         },
         // @method setParams(params: Object, noRedraw?: Boolean): this
         // Merges an object with the new parameters and re-requests tiles on the current screen (unless `noRedraw` was set to true).
@@ -7648,11 +7646,11 @@ function Mo() {
         },
         _updatePoly: function(t, e) {
           if (this._drawing) {
-            var n, r, a, l, d = t._parts, m = d.length, _ = this._ctx;
+            var n, r, a, l, u = t._parts, m = u.length, _ = this._ctx;
             if (m) {
               for (_.beginPath(), n = 0; n < m; n++) {
-                for (r = 0, a = d[n].length; r < a; r++)
-                  l = d[n][r], _[r ? "lineTo" : "moveTo"](l.x, l.y);
+                for (r = 0, a = u[n].length; r < a; r++)
+                  l = u[n][r], _[r ? "lineTo" : "moveTo"](l.x, l.y);
                 e && _.closePath();
               }
               this._fillStroke(_, t);
@@ -7684,7 +7682,7 @@ function Mo() {
         },
         _handleMouseOut: function(t) {
           var e = this._hoveredLayer;
-          e && (q(this._container, "leaflet-interactive"), this._fireEvent([e], t, "mouseout"), this._hoveredLayer = null, this._mouseHoverThrottled = !1);
+          e && (j(this._container, "leaflet-interactive"), this._fireEvent([e], t, "mouseout"), this._hoveredLayer = null, this._mouseHoverThrottled = !1);
         },
         _handleMouseHover: function(t, e) {
           if (!this._mouseHoverThrottled) {
@@ -7908,7 +7906,7 @@ function Mo() {
           K(this._box, e.min), this._box.style.width = n.x + "px", this._box.style.height = n.y + "px";
         },
         _finish: function() {
-          this._moved && (H(this._box), q(this._container, "leaflet-crosshair")), ue(), wi(), U(document, {
+          this._moved && (H(this._box), j(this._container, "leaflet-crosshair")), ue(), wi(), U(document, {
             contextmenu: Zt,
             mousemove: this._onMouseMove,
             mouseup: this._onMouseUp,
@@ -7988,7 +7986,7 @@ function Mo() {
         addHooks: function() {
           if (!this._draggable) {
             var t = this._map;
-            this._draggable = new It(t._mapPane, t._container), this._draggable.on({
+            this._draggable = new Ct(t._mapPane, t._container), this._draggable.on({
               dragstart: this._onDragStart,
               drag: this._onDrag,
               dragend: this._onDragEnd
@@ -7997,7 +7995,7 @@ function Mo() {
           D(this._map._container, "leaflet-grab leaflet-touch-drag"), this._draggable.enable(), this._positions = [], this._times = [];
         },
         removeHooks: function() {
-          q(this._map._container, "leaflet-grab"), q(this._map._container, "leaflet-touch-drag"), this._draggable.disable();
+          j(this._map._container, "leaflet-grab"), j(this._map._container, "leaflet-touch-drag"), this._draggable.disable();
         },
         moved: function() {
           return this._draggable && this._draggable._moved;
@@ -8042,8 +8040,8 @@ function Mo() {
           }
         },
         _onPreDragWrap: function() {
-          var t = this._worldWidth, e = Math.round(t / 2), n = this._initialWorldOffset, r = this._draggable._newPos.x, a = (r - e + n) % t + e - n, l = (r + e + n) % t - e - n, d = Math.abs(a + n) < Math.abs(l + n) ? a : l;
-          this._draggable._absPos = this._draggable._newPos.clone(), this._draggable._newPos.x = d;
+          var t = this._worldWidth, e = Math.round(t / 2), n = this._initialWorldOffset, r = this._draggable._newPos.x, a = (r - e + n) % t + e - n, l = (r + e + n) % t - e - n, u = Math.abs(a + n) < Math.abs(l + n) ? a : l;
+          this._draggable._absPos = this._draggable._newPos.clone(), this._draggable._newPos.x = u;
         },
         _onDragEnd: function(t) {
           var e = this._map, n = e.options, r = !n.inertia || t.noInertia || this._times.length < 2;
@@ -8051,11 +8049,11 @@ function Mo() {
             e.fire("moveend");
           else {
             this._prunePositions(+/* @__PURE__ */ new Date());
-            var a = this._lastPos.subtract(this._positions[0]), l = (this._lastTime - this._times[0]) / 1e3, d = n.easeLinearity, m = a.multiplyBy(d / l), _ = m.distanceTo([0, 0]), y = Math.min(n.inertiaMaxSpeed, _), w = m.multiplyBy(y / _), S = y / (n.inertiaDeceleration * d), M = w.multiplyBy(-S / 2).round();
+            var a = this._lastPos.subtract(this._positions[0]), l = (this._lastTime - this._times[0]) / 1e3, u = n.easeLinearity, m = a.multiplyBy(u / l), _ = m.distanceTo([0, 0]), y = Math.min(n.inertiaMaxSpeed, _), w = m.multiplyBy(y / _), S = y / (n.inertiaDeceleration * u), M = w.multiplyBy(-S / 2).round();
             !M.x && !M.y ? e.fire("moveend") : (M = e._limitOffset(M, e.options.maxBounds), et(function() {
               e.panBy(M, {
                 duration: S,
-                easeLinearity: d,
+                easeLinearity: u,
                 noMoveStart: !0,
                 animate: !0
               });
@@ -8193,8 +8191,8 @@ function Mo() {
         _performZoom: function() {
           var t = this._map, e = t.getZoom(), n = this._map.options.zoomSnap || 0;
           t._stop();
-          var r = this._delta / (this._map.options.wheelPxPerZoomLevel * 4), a = 4 * Math.log(2 / (1 + Math.exp(-Math.abs(r)))) / Math.LN2, l = n ? Math.ceil(a / n) * n : a, d = t._limitZoom(e + (this._delta > 0 ? l : -l)) - e;
-          this._delta = 0, this._startTime = null, d && (t.options.scrollWheelZoom === "center" ? t.setZoom(e + d) : t.setZoomAround(this._lastMousePos, e + d));
+          var r = this._delta / (this._map.options.wheelPxPerZoomLevel * 4), a = 4 * Math.log(2 / (1 + Math.exp(-Math.abs(r)))) / Math.LN2, l = n ? Math.ceil(a / n) * n : a, u = t._limitZoom(e + (this._delta > 0 ? l : -l)) - e;
+          this._delta = 0, this._startTime = null, u && (t.options.scrollWheelZoom === "center" ? t.setZoom(e + u) : t.setZoomAround(this._lastMousePos, e + u));
         }
       });
       R.addInitHook("addHandler", "scrollWheelZoom", _r);
@@ -8219,7 +8217,7 @@ function Mo() {
         _onDown: function(t) {
           if (clearTimeout(this._holdTimeout), t.touches.length === 1) {
             var e = t.touches[0];
-            this._startPos = this._newPos = new C(e.clientX, e.clientY), this._holdTimeout = setTimeout(f(function() {
+            this._startPos = this._newPos = new I(e.clientX, e.clientY), this._holdTimeout = setTimeout(f(function() {
               this._cancel(), this._isTapValid() && (A(document, "touchend", J), A(document, "touchend touchcancel", this._cancelClickPrevent), this._simulateEvent("contextmenu", e));
             }, this), va), A(document, "touchend touchcancel contextmenu", this._cancel, this), A(document, "touchmove", this._onMove, this);
           }
@@ -8232,7 +8230,7 @@ function Mo() {
         },
         _onMove: function(t) {
           var e = t.touches[0];
-          this._newPos = new C(e.clientX, e.clientY);
+          this._newPos = new I(e.clientX, e.clientY);
         },
         _isTapValid: function() {
           return this._newPos.distanceTo(this._startPos) <= this._map.options.tapTolerance;
@@ -8271,7 +8269,7 @@ function Mo() {
           D(this._map._container, "leaflet-touch-zoom"), A(this._map._container, "touchstart", this._onTouchStart, this);
         },
         removeHooks: function() {
-          q(this._map._container, "leaflet-touch-zoom"), U(this._map._container, "touchstart", this._onTouchStart, this);
+          j(this._map._container, "leaflet-touch-zoom"), U(this._map._container, "touchstart", this._onTouchStart, this);
         },
         _onTouchStart: function(t) {
           var e = this._map;
@@ -8293,8 +8291,8 @@ function Mo() {
               this._center = e.unproject(e.project(this._pinchStartLatLng, this._zoom).subtract(l), this._zoom);
             }
             this._moved || (e._moveStart(!0, !1), this._moved = !0), at(this._animRequest);
-            var d = f(e._move, e, this._center, this._zoom, { pinch: !0, round: !1 }, void 0);
-            this._animRequest = et(d, this, !0), J(t);
+            var u = f(e._move, e, this._center, this._zoom, { pinch: !0, round: !1 }, void 0);
+            this._animRequest = et(u, this, !0), J(t);
           }
         },
         _onTouchEnd: function() {
@@ -8305,7 +8303,7 @@ function Mo() {
           this._zooming = !1, at(this._animRequest), U(document, "touchmove", this._onTouchMove, this), U(document, "touchend touchcancel", this._onTouchEnd, this), this._map.options.zoomAnimation ? this._map._animateZoom(this._center, this._map._limitZoom(this._zoom), !0, this._map.options.zoomSnap) : this._map._resetView(this._center, this._map._limitZoom(this._zoom));
         }
       });
-      R.addInitHook("addHandler", "touchZoom", yr), R.BoxZoom = pr, R.DoubleClickZoom = fr, R.Drag = mr, R.Keyboard = gr, R.ScrollWheelZoom = _r, R.TapHold = vr, R.TouchZoom = yr, s.Bounds = W, s.Browser = E, s.CRS = wt, s.Canvas = hr, s.Circle = Ri, s.CircleMarker = Be, s.Class = xt, s.Control = dt, s.DivIcon = ar, s.DivOverlay = _t, s.DomEvent = Os, s.DomUtil = Ms, s.Draggable = It, s.Evented = ae, s.FeatureGroup = $t, s.GeoJSON = Pt, s.GridLayer = ve, s.Handler = gt, s.Icon = Xt, s.ImageOverlay = He, s.LatLng = Z, s.LatLngBounds = nt, s.Layer = ut, s.LayerGroup = Yt, s.LineUtil = Vs, s.Map = R, s.Marker = Ne, s.Mixin = Ws, s.Path = Ct, s.Point = C, s.PolyUtil = Hs, s.Polygon = Jt, s.Polyline = Tt, s.Popup = qe, s.PosAnimation = Un, s.Projection = Ys, s.Rectangle = ur, s.Renderer = Et, s.SVG = be, s.SVGOverlay = sr, s.TileLayer = te, s.Tooltip = je, s.Transformation = hi, s.Util = is, s.VideoOverlay = rr, s.bind = f, s.bounds = it, s.canvas = cr, s.circle = ra, s.circleMarker = na, s.control = me, s.divIcon = pa, s.extend = h, s.featureGroup = ta, s.geoJSON = nr, s.geoJson = oa, s.gridLayer = fa, s.icon = ea, s.imageOverlay = la, s.latLng = O, s.latLngBounds = G, s.layerGroup = Qs, s.map = Rs, s.marker = ia, s.point = k, s.polygon = aa, s.polyline = sa, s.popup = da, s.rectangle = _a, s.setOptions = z, s.stamp = p, s.svg = dr, s.svgOverlay = ca, s.tileLayer = or, s.tooltip = ua, s.transformation = oe, s.version = o, s.videoOverlay = ha;
+      R.addInitHook("addHandler", "touchZoom", yr), R.BoxZoom = pr, R.DoubleClickZoom = fr, R.Drag = mr, R.Keyboard = gr, R.ScrollWheelZoom = _r, R.TapHold = vr, R.TouchZoom = yr, s.Bounds = W, s.Browser = E, s.CRS = wt, s.Canvas = hr, s.Circle = Ri, s.CircleMarker = Be, s.Class = xt, s.Control = dt, s.DivIcon = ar, s.DivOverlay = _t, s.DomEvent = Os, s.DomUtil = Ms, s.Draggable = Ct, s.Evented = ae, s.FeatureGroup = $t, s.GeoJSON = Pt, s.GridLayer = ve, s.Handler = gt, s.Icon = Xt, s.ImageOverlay = He, s.LatLng = Z, s.LatLngBounds = nt, s.Layer = ut, s.LayerGroup = Yt, s.LineUtil = Vs, s.Map = R, s.Marker = Ne, s.Mixin = Ws, s.Path = It, s.Point = I, s.PolyUtil = Hs, s.Polygon = Jt, s.Polyline = Tt, s.Popup = je, s.PosAnimation = Un, s.Projection = Ys, s.Rectangle = ur, s.Renderer = Et, s.SVG = be, s.SVGOverlay = sr, s.TileLayer = te, s.Tooltip = qe, s.Transformation = hi, s.Util = is, s.VideoOverlay = rr, s.bind = f, s.bounds = it, s.canvas = cr, s.circle = ra, s.circleMarker = na, s.control = me, s.divIcon = pa, s.extend = h, s.featureGroup = ta, s.geoJSON = nr, s.geoJson = oa, s.gridLayer = fa, s.icon = ea, s.imageOverlay = la, s.latLng = O, s.latLngBounds = G, s.layerGroup = Qs, s.map = Rs, s.marker = ia, s.point = k, s.polygon = aa, s.polyline = sa, s.popup = da, s.rectangle = _a, s.setOptions = z, s.stamp = p, s.svg = dr, s.svgOverlay = ca, s.tileLayer = or, s.tooltip = ua, s.transformation = oe, s.version = o, s.videoOverlay = ha;
       var ya = window.L;
       s.noConflict = function() {
         return window.L = ya, this;
@@ -8373,8 +8371,8 @@ class ts extends Ot {
         this.vehicleName = s.find((p) => p.vehicle_id === this.vehicleId)?.name ?? "";
         const o = await Mt(this.hass, this.vehicleId);
         this.mapConfig = o.map_config, this.trips = o.trips;
-        const h = this.config.trip_id ?? "", u = ri(this.vehicleId);
-        h && this.trips.some((p) => p.id === h) ? this.selectedTripId = h : u && this.trips.some((p) => p.id === u) && (this.selectedTripId = u), (!this.selectedTripId || !this.trips.some((p) => p.id === this.selectedTripId)) && (this.selectedTripId = this.trips.find((p) => p.status === "active")?.id ?? this.trips[0]?.id ?? ""), this.selectedTripId && !h && Dt({ vehicleId: this.vehicleId, tripId: this.selectedTripId, source: "map" });
+        const h = this.config.trip_id ?? "", d = ri(this.vehicleId);
+        h && this.trips.some((p) => p.id === h) ? this.selectedTripId = h : d && this.trips.some((p) => p.id === d) && (this.selectedTripId = d), (!this.selectedTripId || !this.trips.some((p) => p.id === this.selectedTripId)) && (this.selectedTripId = this.trips.find((p) => p.status === "active")?.id ?? this.trips[0]?.id ?? ""), this.selectedTripId && !h && Dt({ vehicleId: this.vehicleId, tripId: this.selectedTripId, source: "map" });
         const f = this.selectedTripId ? await Mt(this.hass, this.vehicleId, this.selectedTripId) : o;
         this.mapConfig = f.map_config ?? this.mapConfig, this.drives = Oo(f.drives), this.places = f.stops ?? [];
         const x = new Set(this.drives.map((p) => p.id));
@@ -8404,12 +8402,12 @@ class ts extends Ot {
     }
     for (const x of this.layers) x.remove();
     this.layers = [];
-    const u = vt.latLngBounds([]), f = P(this.hass);
+    const d = vt.latLngBounds([]), f = P(this.hass);
     for (const [x, p] of (this.data?.segments ?? []).entries()) {
       const v = p.points.map((z) => vt.latLng(z.latitude, z.longitude));
       if (!v.length) continue;
-      const $ = this.drives.findIndex((z) => z.id === p.drive_id), b = this.driveColor($ >= 0 ? $ : x), I = vt.polyline(v, { color: b, weight: 4, opacity: 0.85 }).addTo(this.map);
-      this.layers.push(I), v.forEach((z) => u.extend(z));
+      const $ = this.drives.findIndex((z) => z.id === p.drive_id), b = this.driveColor($ >= 0 ? $ : x), C = vt.polyline(v, { color: b, weight: 4, opacity: 0.85 }).addTo(this.map);
+      this.layers.push(C), v.forEach((z) => d.extend(z));
       const T = vt.circleMarker(v[0], { radius: 6, color: b, fillOpacity: 1 }).bindTooltip(f.mapStart).bindPopup(this.endpointPopup(f.mapStart, p.points[0])).addTo(this.map), B = vt.circleMarker(v[v.length - 1], { radius: 6, color: "#111", fillColor: b, fillOpacity: 1 }).bindTooltip(f.mapEnd).bindPopup(this.endpointPopup(f.mapEnd, p.points[p.points.length - 1])).addTo(this.map);
       this.layers.push(T, B);
       for (const z of p.gaps) {
@@ -8419,14 +8417,14 @@ class ts extends Ot {
     }
     for (const x of this.places) {
       if (!this.showPlaces || x.latitude == null || x.longitude == null || x.confirmed === !1) continue;
-      const p = ["campsite", "rv_site", "wild_camp", "overnight"].includes(x.place_kind || x.place_type || x.stop_type), v = vt.circleMarker([x.latitude, x.longitude], { radius: p ? 9 : 7, color: p ? "#7b1fa2" : "#455a64", fillColor: p ? "#ce93d8" : "#90a4ae", fillOpacity: 0.95, weight: 2 }), $ = x.rating_overall ? ` · ${x.rating_overall}/5` : "", b = document.createElement("div"), I = document.createElement("strong");
-      I.textContent = x.name || "Ort", b.append(I, document.createElement("br")), b.append(document.createTextNode(`${x.place_type || x.stop_type}${$}`), document.createElement("br")), b.append(document.createTextNode(x.description || "")), v.bindPopup(b), v.addTo(this.map), this.layers.push(v), u.extend([x.latitude, x.longitude]);
+      const p = ["campsite", "rv_site", "wild_camp", "overnight"].includes(x.place_kind || x.place_type || x.stop_type), v = vt.circleMarker([x.latitude, x.longitude], { radius: p ? 9 : 7, color: p ? "#7b1fa2" : "#455a64", fillColor: p ? "#ce93d8" : "#90a4ae", fillOpacity: 0.95, weight: 2 }), $ = x.rating_overall ? ` · ${x.rating_overall}/5` : "", b = document.createElement("div"), C = document.createElement("strong");
+      C.textContent = x.name || "Ort", b.append(C, document.createElement("br")), b.append(document.createTextNode(`${x.place_type || x.stop_type}${$}`), document.createElement("br")), b.append(document.createTextNode(x.description || "")), v.bindPopup(b), v.addTo(this.map), this.layers.push(v), d.extend([x.latitude, x.longitude]);
     }
     if (this.draftPoint) {
       const x = vt.circleMarker([this.draftPoint.latitude, this.draftPoint.longitude], { radius: 10, color: "#f57c00", fillColor: "#ffcc80", fillOpacity: 0.9, weight: 3 }).bindTooltip(f.mapAddPlace ?? "Ort hinzufügen").addTo(this.map);
-      this.layers.push(x), u.extend([this.draftPoint.latitude, this.draftPoint.longitude]);
+      this.layers.push(x), d.extend([this.draftPoint.latitude, this.draftPoint.longitude]);
     }
-    this.fitMapPending && u.isValid() && (this.map.fitBounds(u.pad(0.08)), this.fitMapPending = !1), setTimeout(() => this.map?.invalidateSize(), 0);
+    this.fitMapPending && d.isValid() && (this.map.fitBounds(d.pad(0.08)), this.fitMapPending = !1), setTimeout(() => this.map?.invalidateSize(), 0);
   }
   onMapClick = (i) => {
     if (!this.addPlaceMode) return;
@@ -8435,7 +8433,7 @@ class ts extends Ot {
   };
   endpointPopup(i, s) {
     const o = document.createElement("div");
-    o.append(document.createTextNode(`${i}: ${j(s.recorded_at, this.hass)}`), document.createElement("br"));
+    o.append(document.createTextNode(`${i}: ${q(s.recorded_at, this.hass)}`), document.createElement("br"));
     const h = document.createElement("button");
     return h.type = "button", h.textContent = P(this.hass).mapAddPlace ?? "Ort hinzufügen", h.addEventListener("click", () => this.startMapPlace(s.latitude, s.longitude, s.recorded_at)), o.append(h), o;
   }
@@ -8443,10 +8441,10 @@ class ts extends Ot {
     this.addPlaceMode = !0, this.draftPoint = { latitude: i, longitude: s, recorded_at: o }, !this.draftArrived && o && (this.draftArrived = this.localDateTime(o)), this.requestUpdate(), this.queueMapRender();
   }
   nearestRoutePoint(i, s) {
-    return (this.data?.segments ?? []).flatMap((h) => h.points).reduce((h, u) => {
-      if (!h) return u;
-      const f = (u.latitude - i) ** 2 + (u.longitude - s) ** 2, x = (h.latitude - i) ** 2 + (h.longitude - s) ** 2;
-      return f < x ? u : h;
+    return (this.data?.segments ?? []).flatMap((h) => h.points).reduce((h, d) => {
+      if (!h) return d;
+      const f = (d.latitude - i) ** 2 + (d.longitude - s) ** 2, x = (h.latitude - i) ** 2 + (h.longitude - s) ** 2;
+      return f < x ? d : h;
     }, void 0);
   }
   localDateTime(i) {
@@ -8505,8 +8503,8 @@ class ts extends Ot {
   driveRow(i, s) {
     const o = P(this.hass), h = i.source === "manual" ? o.sourceManual : i.source === "gpx" ? o.sourceGpx ?? o.sourceGps : o.sourceGps;
     return g`<label class="drive-row" style=${`--drive-color:${this.driveColor(s)}`}>
-      <input type="checkbox" value=${i.id} .checked=${this.selectedDriveIds.includes(i.id)} @change=${(u) => {
-      this.toggleDrive(u);
+      <input type="checkbox" value=${i.id} .checked=${this.selectedDriveIds.includes(i.id)} @change=${(d) => {
+      this.toggleDrive(d);
     }}>
       <span class="drive-info"><strong>${Te(i.started_at, this.hass)} · ${zr(i.started_at, this.hass)} → ${i.ended_at ? `${Te(i.ended_at, this.hass)} · ${zr(i.ended_at, this.hass)}` : "–"}</strong><span>${(i.distance_m / 1e3).toFixed(1)} km · ${i.duration_seconds ? St(i.duration_seconds, this.hass) : "–"} · ${h}</span></span>
     </label>`;
@@ -8517,7 +8515,7 @@ class ts extends Ot {
     }}><input aria-label=${i.placeName ?? "Name"} placeholder=${i.placeName ?? "Name"} .value=${this.draftName} @input=${(o) => this.draftName = o.currentTarget.value} required><select aria-label=${i.placeCategory ?? "Kategorie"} .value=${this.draftType} @change=${(o) => this.draftType = o.currentTarget.value}><option value="other">${i.placeOther ?? "Sonstiger Ort"}</option><option value="fuel_stop">${i.placeFuel ?? "Tankpause"}</option><option value="restaurant">${i.placeRestaurant ?? "Restaurant"}</option><option value="attraction">${i.placeAttraction ?? "Sehenswürdigkeit"}</option><option value="ferry">${i.placeFerry ?? "Fähre"}</option><option value="campsite">${i.placeCampsite ?? "Campingplatz"}</option><option value="rv_site">${i.placeRvSite ?? "Wohnmobilstellplatz"}</option><option value="wild_camp">${i.placeWildCamp ?? "Freistehplatz"}</option></select><label>${i.placeArrived ?? "Ankunft"}<input type="datetime-local" .value=${this.draftArrived} @input=${(o) => this.draftArrived = o.currentTarget.value} required></label><textarea aria-label=${i.placeDescription ?? "Beschreibung"} placeholder=${i.placeDescription ?? "Beschreibung"} .value=${this.draftDescription} @input=${(o) => this.draftDescription = o.currentTarget.value}></textarea><button type="submit" ?disabled=${this.draftSaving}>${this.draftSaving ? i.saving : i.save}</button></form></section>` : g`<section class="map-place-capture"><button type="button" @click=${() => this.toggleAddPlace()}>${i.mapCancelPlace ?? "Ortserfassung abbrechen"}</button><p class="muted">${i.mapPlaceHint}</p></section>` : g`<section class="map-place-capture"><button type="button" @click=${() => this.toggleAddPlace()}>${i.mapAddPlace ?? "Ort hinzufügen"}</button></section>` : "";
   }
   render() {
-    const i = P(this.hass), s = this.config, o = this.selectedTrip(), h = this.selectedDrives(), u = h.reduce((x, p) => x + p.distance_m, 0) / 1e3, f = s.tile_attribution ?? this.mapConfig?.tile_attribution ?? void 0;
+    const i = P(this.hass), s = this.config, o = this.selectedTrip(), h = this.selectedDrives(), d = h.reduce((x, p) => x + p.distance_m, 0) / 1e3, f = s.tile_attribution ?? this.mapConfig?.tile_attribution ?? void 0;
     return g`<ha-card>
       <header class="map-header">
         <div><h2>${i.mapTitle}</h2><p class="vehicle-context">${this.vehicleName || i.mapVehicle}</p></div>
@@ -8526,7 +8524,7 @@ class ts extends Ot {
     }} .value=${this.selectedTripId}>${this.trips.map((x) => g`<option value=${x.id}>${x.title}</option>`)}</select></label>` : ""}
       </header>
       ${o ? g`<div class="metrics" aria-label=${i.mapTrip}>
-        <div class="metric"><span>${i.mapTotalDistance}</span><strong>${u.toFixed(1)} km</strong></div>
+        <div class="metric"><span>${i.mapTotalDistance}</span><strong>${d.toFixed(1)} km</strong></div>
         <div class="metric"><span>${i.mapSelectedDrives}</span><strong>${h.length} / ${this.drives.length}</strong></div>
         <div class="metric"><span>${i.mapTripPeriod}</span><strong>${Xa(o, this.hass) || "–"}</strong></div>
       </div>` : ""}
@@ -8719,8 +8717,8 @@ class es extends Ot {
       this.error = o === "place_name_required" ? "Bitte einen Namen eingeben." : `Aufenthalt konnte nicht gespeichert werden${h[o] ? `: ${h[o]}` : ". Bitte Eingaben prüfen und erneut versuchen."}`, this.interruptionSaving = !1, this.requestUpdate();
     }
   }
-  section(i, s, o, h, u = !1) {
-    return g`<section class="journal-section"><details ?open=${u} @toggle=${(f) => this.onSectionToggle(f)}><summary><span class="section-title"><span aria-hidden="true">${s}</span><strong>${i}</strong></span>${o === void 0 ? "" : g`<span class="count">${o}</span>`}</summary><div class="section-content">${h}</div></details></section>`;
+  section(i, s, o, h, d = !1) {
+    return g`<section class="journal-section"><details ?open=${d} @toggle=${(f) => this.onSectionToggle(f)}><summary><span class="section-title"><span aria-hidden="true">${s}</span><strong>${i}</strong></span>${o === void 0 ? "" : g`<span class="count">${o}</span>`}</summary><div class="section-content">${h}</div></details></section>`;
   }
   onSectionToggle(i) {
     const s = i.currentTarget;
@@ -8732,20 +8730,20 @@ class es extends Ot {
     const s = this.overview?.trips ?? [];
     return g`<section class="entry" aria-labelledby="journal-entry-title"><div class="entry-icon" aria-hidden="true">🚐</div><h2 id="journal-entry-title">${i.journalEntry ?? "Reise auswählen oder neu anlegen"}</h2><p class="muted">${i.journalEntryHint ?? "Öffne eine Reise, um ihre Fahrten, Orte, Karte und Exporte zu sehen."}</p>${s.length ? g`<label class="picker-label">${i.journalSelect ?? "Reise auswählen"}<select aria-label=${i.journalSelect ?? "Reise auswählen"} .value=${this.selectedTripId} @change=${(o) => {
       this.selectedTripId = o.currentTarget.value, this.requestUpdate();
-    }}><option value="">${i.journalChoose ?? "Bitte auswählen …"}</option>${s.map((o) => g`<option value=${o.id}>${o.title} · ${qt(o.status, this.hass)} · ${kt(o, this.hass)}</option>`)}</select></label>` : g`<p class="muted">${i.noTrip}</p>`}<div class="actions"><button type="button" @click=${() => {
+    }}><option value="">${i.journalChoose ?? "Bitte auswählen …"}</option>${s.map((o) => g`<option value=${o.id}>${o.title} · ${jt(o.status, this.hass)} · ${kt(o, this.hass)}</option>`)}</select></label>` : g`<p class="muted">${i.noTrip}</p>`}<div class="actions"><button type="button" @click=${() => {
       this.openTrip();
     }} ?disabled=${!this.selectedTripId || this.loading}>${i.journalOpen ?? "Reise öffnen"}</button><button type="button" class="secondary" @click=${() => this.openTripCreateDialog()}>${i.newTrip}</button></div><camper-travel-journal-manager-card .hass=${this.hass} .config=${{ vehicle_id: this.vehicleId, journal_section: "trip-create" }} @trip-created=${(o) => {
       this.onTripCreated(o);
     }}></camper-travel-journal-manager-card></section>`;
   }
   renderOpenTrip(i, s) {
-    const o = this.detail, h = (o?.stops ?? []).filter((T) => T.confirmed !== !1), u = h.filter((T) => Fr.has(T.place_kind || T.place_type || T.stop_type)), f = (o?.drives ?? []).reduce((T, B) => T + B.distance_m, 0) / 1e3, x = o?.expense_summary, p = x?.mixed_currency ? i.mixedCurrency : x?.total_minor !== void 0 && x.currency ? yt(x.total_minor, x.currency, this.hass) : yt(0, "EUR", this.hass), v = (T) => g`<camper-travel-journal-manager-card .hass=${this.hass} .config=${{ vehicle_id: this.vehicleId, trip_id: s.id, journal_section: T }}></camper-travel-journal-manager-card>`, $ = g`<camper-travel-journal-map-card .hass=${this.hass} .config=${{ vehicle_id: this.vehicleId, trip_id: s.id }}></camper-travel-journal-map-card>`, b = o?.interruptions ?? [], I = [...o?.drives ?? []].sort((T, B) => T.started_at.localeCompare(B.started_at)).flatMap((T) => {
+    const o = this.detail, h = (o?.stops ?? []).filter((T) => T.confirmed !== !1), d = h.filter((T) => Fr.has(T.place_kind || T.place_type || T.stop_type)), f = (o?.drives ?? []).reduce((T, B) => T + B.distance_m, 0) / 1e3, x = o?.expense_summary, p = x?.mixed_currency ? i.mixedCurrency : x?.total_minor !== void 0 && x.currency ? yt(x.total_minor, x.currency, this.hass) : yt(0, "EUR", this.hass), v = (T) => g`<camper-travel-journal-manager-card .hass=${this.hass} .config=${{ vehicle_id: this.vehicleId, trip_id: s.id, journal_section: T }}></camper-travel-journal-manager-card>`, $ = g`<camper-travel-journal-map-card .hass=${this.hass} .config=${{ vehicle_id: this.vehicleId, trip_id: s.id }}></camper-travel-journal-map-card>`, b = o?.interruptions ?? [], C = [...o?.drives ?? []].sort((T, B) => T.started_at.localeCompare(B.started_at)).flatMap((T) => {
       const B = b.find((pt) => pt.previous_drive_id === T.id), z = (o?.stops ?? []).find((pt) => pt.id === B?.existing_place_id);
-      return [g`<article class="drive-item"><strong>${i.drive ?? "Fahrt"}</strong><span>${j(T.started_at, this.hass)} → ${T.ended_at ? j(T.ended_at, this.hass) : i.notAvailable ?? "Nicht verfügbar"}</span><span>${(T.distance_m / 1e3).toFixed(1)} km · ${T.duration_seconds ? St(T.duration_seconds, this.hass) : "–"} · ${T.source === "gpx" ? i.sourceGpx ?? "GPX-importiert" : T.source === "manual" ? i.sourceManual : i.sourceGps}</span></article>`, ...B ? [g`<article class="interruption-item"><strong>${B.status === "pause" ? i.drivePause ?? "Fahrtpause" : B.status === "ignored" ? i.interruptionIgnored ?? "Ignoriert" : z ? `${i.assignedStay ?? "Aufenthalt"}: ${z.name}` : i.interruptionUnassigned ?? "Nicht zugeordnet"}</strong><span>${j(B.started_at, this.hass)} → ${j(B.ended_at, this.hass)} · ${St(B.duration_seconds, this.hass)}</span>${B.status === "unassigned" ? g`<button type="button" class="compact-action" @click=${() => this.openInterruptionDialog(B)}>${i.assignStay ?? "Aufenthalt zuordnen"}</button>` : ""}</article>`] : []];
+      return [g`<article class="drive-item"><strong>${i.drive ?? "Fahrt"}</strong><span>${q(T.started_at, this.hass)} → ${T.ended_at ? q(T.ended_at, this.hass) : i.notAvailable ?? "Nicht verfügbar"}</span><span>${(T.distance_m / 1e3).toFixed(1)} km · ${T.duration_seconds ? St(T.duration_seconds, this.hass) : "–"} · ${T.source === "gpx" ? i.sourceGpx ?? "GPX-importiert" : T.source === "manual" ? i.sourceManual : i.sourceGps}</span></article>`, ...B ? [g`<article class="interruption-item"><strong>${B.status === "pause" ? i.drivePause ?? "Fahrtpause" : B.status === "ignored" ? i.interruptionIgnored ?? "Ignoriert" : z ? `${i.assignedStay ?? "Aufenthalt"}: ${z.name}` : i.interruptionUnassigned ?? "Nicht zugeordnet"}</strong><span>${q(B.started_at, this.hass)} → ${q(B.ended_at, this.hass)} · ${St(B.duration_seconds, this.hass)}</span>${B.status === "unassigned" ? g`<button type="button" class="compact-action" @click=${() => this.openInterruptionDialog(B)}>${i.assignStay ?? "Aufenthalt zuordnen"}</button>` : ""}</article>`] : []];
     });
-    return g`<header class="trip-header"><div><p class="eyebrow">${i.journalOpenTrip ?? "Geöffnete Reise"}</p><h2>${s.title}</h2><p class="muted">${s.destination || i.noDestination} · ${kt(s, this.hass)} · ${qt(s.status, this.hass)}${this.vehicleName ? ` · ${this.vehicleName}` : ""}</p></div><button type="button" class="secondary" @click=${() => this.closeTrip()}>${i.journalClose ?? "Reise schließen / wechseln"}</button></header>
-      ${this.section(i.journalOverview ?? "Reiseübersicht", "▣", void 0, g`<div class="metric-grid"><div><span>${i.distance}</span><strong>${f.toFixed(1)} km</strong></div><div><span>${i.drives}</span><strong>${o?.drives.length ?? 0}</strong></div><div><span>${i.stops}</span><strong>${h.filter((T) => !Fr.has(T.place_kind || T.place_type || T.stop_type)).length}</strong></div><div><span>${i.overnights ?? "Übernachtungsplätze"}</span><strong>${u.length}</strong></div><div><span>${i.costs}</span><strong>${p}</strong></div></div>`)}
-      ${this.section(i.journalDrives ?? "Fahrten und Unterbrechungen", "↔", (o?.drives.length ?? 0) + b.length, g`${I.length ? I : g`<p class="muted">${i.noDrives ?? "Keine Fahrten erfasst."}</p>`}`)}
+    return g`<header class="trip-header"><div><p class="eyebrow">${i.journalOpenTrip ?? "Geöffnete Reise"}</p><h2>${s.title}</h2><p class="muted">${s.destination || i.noDestination} · ${kt(s, this.hass)} · ${jt(s.status, this.hass)}${this.vehicleName ? ` · ${this.vehicleName}` : ""}</p></div><button type="button" class="secondary" @click=${() => this.closeTrip()}>${i.journalClose ?? "Reise schließen / wechseln"}</button></header>
+      ${this.section(i.journalOverview ?? "Reiseübersicht", "▣", void 0, g`<div class="metric-grid"><div><span>${i.distance}</span><strong>${f.toFixed(1)} km</strong></div><div><span>${i.drives}</span><strong>${o?.drives.length ?? 0}</strong></div><div><span>${i.stops}</span><strong>${h.filter((T) => !Fr.has(T.place_kind || T.place_type || T.stop_type)).length}</strong></div><div><span>${i.overnights ?? "Übernachtungsplätze"}</span><strong>${d.length}</strong></div><div><span>${i.costs}</span><strong>${p}</strong></div></div>`)}
+      ${this.section(i.journalDrives ?? "Fahrten und Unterbrechungen", "↔", (o?.drives.length ?? 0) + b.length, g`${C.length ? C : g`<p class="muted">${i.noDrives ?? "Keine Fahrten erfasst."}</p>`}`)}
       ${this.section(i.placesAndStays ?? "Orte & Aufenthalte", "●", h.length, g`<p class="muted">${i.journalStopsHint ?? "Bestätigte Aufenthalte dieser Reise."}</p>${v("places")}`)}
       ${this.section(i.expenses, "€", o?.expenses?.length ?? 0, g`${v("expenses")}`)}
       ${this.section(i.mapTitle ?? "Reisekarte", "⌖", void 0, $)}
@@ -8756,7 +8754,7 @@ class es extends Ot {
       T.preventDefault(), this.closeInterruptionDialog();
     }}><form method="dialog" @submit=${(T) => {
       T.preventDefault(), this.saveInterruption();
-    }}><h3>${i.assignStay ?? "Aufenthalt zuordnen"}</h3><p class="muted">${this.interruptionDialog ? `${j(this.interruptionDialog.started_at, this.hass)} → ${j(this.interruptionDialog.ended_at, this.hass)}` : ""}</p><label>${i.interruptionAction ?? "Aktion"}<select .value=${this.interruptionAction} @change=${(T) => {
+    }}><h3>${i.assignStay ?? "Aufenthalt zuordnen"}</h3><p class="muted">${this.interruptionDialog ? `${q(this.interruptionDialog.started_at, this.hass)} → ${q(this.interruptionDialog.ended_at, this.hass)}` : ""}</p><label>${i.interruptionAction ?? "Aktion"}<select .value=${this.interruptionAction} @change=${(T) => {
       this.interruptionAction = T.currentTarget.value, this.requestUpdate();
     }}><option value="stop">${i.assignStop ?? "Zwischenstopp zuordnen"}</option><option value="overnight">${i.assignOvernight ?? "Übernachtungsplatz zuordnen"}</option><option value="pause">${i.drivePause ?? "Als Fahrtpause kennzeichnen"}</option><option value="ignored">${i.interruptionIgnored ?? "Als nicht relevant markieren"}</option></select></label>${this.interruptionAction === "stop" || this.interruptionAction === "overnight" ? g`<label>${i.existingPlace ?? "Bestehender Ort"}<select .value=${this.interruptionPlaceId} @change=${(T) => {
       this.interruptionPlaceId = T.currentTarget.value, this.requestUpdate();

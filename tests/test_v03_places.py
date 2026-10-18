@@ -2,6 +2,7 @@
 
 import tempfile
 import unittest
+from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -152,13 +153,27 @@ class V03PlaceTests(unittest.TestCase):
         self.assertEqual(gaps[1]["next_start_point"]["latitude"], 53.11)
         self.assertEqual(self.store.list_stops("v1", self.trip), [])
 
-    def test_derived_interruptions_report_existing_confirmed_place(self):
+    def test_derived_interruptions_offer_existing_place_without_confirming_it(self):
         first = self.store.create_manual_drive("v1", datetime(2026, 10, 13, 10, tzinfo=UTC), "A", "B", 1, 60, self.now, self.trip)
         second = self.store.create_manual_drive("v1", datetime(2026, 10, 13, 13, tzinfo=UTC), "C", "D", 1, 60, self.now, self.trip)
         stop = self.store.create_stop(Stop("", "v1", "Bereits erfasst", datetime(2026, 10, 13, 11, tzinfo=UTC), arrived_at=datetime(2026, 10, 13, 11, tzinfo=UTC), departed_at=datetime(2026, 10, 13, 12, tzinfo=UTC), trip_id=self.trip, automatic=False), self.now)
         gap = self.store.list_trip_interruptions("v1", self.trip)[0]
-        self.assertEqual((gap["previous_drive_id"], gap["next_drive_id"], gap["existing_place_id"]), (first, second, stop))
-        self.assertEqual(gap["status"], "stop")
+        self.assertEqual((gap["previous_drive_id"], gap["next_drive_id"], gap["existing_place_id"]), (first, second, None))
+        self.assertEqual(gap["status"], "unassigned")
+        self.assertEqual([candidate["id"] for candidate in gap["existing_places"]], [stop])
+
+    def test_existing_place_can_be_explicitly_assigned_without_modifying_it(self):
+        first = self.store.create_manual_drive("v1", datetime(2026, 10, 13, 10, tzinfo=UTC), "A", "B", 1, 60, self.now, self.trip)
+        second = self.store.create_manual_drive("v1", datetime(2026, 10, 13, 13, tzinfo=UTC), "C", "D", 1, 60, self.now, self.trip)
+        stop = self.store.create_stop(Stop("", "v1", "Kuhhirten", datetime(2026, 10, 13, 11, tzinfo=UTC), arrived_at=datetime(2026, 10, 13, 11, tzinfo=UTC), departed_at=datetime(2026, 10, 13, 12, tzinfo=UTC), trip_id=self.trip, automatic=False, address="Bremen"), self.now)
+        before = self.store.list_stops("v1", self.trip)[0]
+        gap_id = f"{first}:{second}"
+        self.store.assign_interruption(self.trip, gap_id, self.now, status="stop", stop_id=stop)
+        after = self.store.list_stops("v1", self.trip)[0]
+        self.assertEqual(self.store.list_trip_interruptions("v1", self.trip)[0]["status"], "stop")
+        self.assertEqual(self.store.list_trip_interruptions("v1", self.trip)[0]["existing_place_id"], stop)
+        self.assertEqual((after["name"], after["address"], after["id"]), (before["name"], before["address"], stop))
+        self.assertEqual(self.store.connection.execute("SELECT count(*) FROM stops WHERE id=?", (stop,)).fetchone()[0], 1)
 
     def test_interruption_assignment_is_persistent_reversible_and_does_not_duplicate_place(self):
         first = self.store.create_manual_drive("v1", datetime(2026, 10, 13, 10, tzinfo=UTC), "A", "B", 1, 60, self.now, self.trip)
@@ -189,6 +204,25 @@ class V03PlaceTests(unittest.TestCase):
         self.assertEqual(self.store.create_stop_from_interruption(self.trip, f"{first}:{second}", self.now, name="Duplikat", place_type="rv_site", overnight=True), stop)
         self.assertEqual(len(self.store.list_stops("v1", self.trip)), 1)
         self.assertEqual(self.store.list_trip_interruptions("v1", self.trip)[0]["status"], "overnight")
+
+    def test_concurrent_creation_reuses_the_committed_place(self):
+        first = self.store.create_manual_drive("v1", datetime(2026, 10, 13, 10, tzinfo=UTC), "A", "B", 1, 60, self.now, self.trip)
+        second = self.store.create_manual_drive("v1", datetime(2026, 10, 13, 13, tzinfo=UTC), "C", "D", 1, 60, self.now, self.trip)
+        database = Path(self.directory.name) / "journal.db"
+
+        def create(name: str) -> str:
+            store = SQLiteStore(database)
+            store.open()
+            try:
+                return store.create_stop_from_interruption(self.trip, f"{first}:{second}", self.now, name=name, place_type="rv_site", overnight=True)
+            finally:
+                store.close()
+
+        with ThreadPoolExecutor(max_workers=2) as executor:
+            results = list(executor.map(create, ("Kuhhirten A", "Kuhhirten B")))
+        self.assertEqual(results[0], results[1])
+        self.assertEqual(self.store.connection.execute("SELECT count(*) FROM stops WHERE trip_id=?", (self.trip,)).fetchone()[0], 1)
+        self.assertEqual(self.store.connection.execute("SELECT count(*) FROM interruption_links WHERE trip_id=?", (self.trip,)).fetchone()[0], 1)
 
     def test_interruption_assignment_rejects_invalid_or_cross_trip_place(self):
         first = self.store.create_manual_drive("v1", datetime(2026, 10, 13, 10, tzinfo=UTC), "A", "B", 1, 60, self.now, self.trip)
