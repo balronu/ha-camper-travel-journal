@@ -169,6 +169,27 @@ class V03PlaceTests(unittest.TestCase):
         self.assertEqual((gap["status"], gap["existing_place_id"]), ("pause", None))
         self.assertEqual(len(self.store.list_stops("v1", self.trip)), 1)
 
+    def test_create_place_from_interruption_uses_real_gap_times_and_available_point(self):
+        first = self.store.create_manual_drive("v1", datetime(2026, 10, 13, 10, tzinfo=UTC), "A", "B", 1, 60, self.now, self.trip)
+        second = self.store.create_manual_drive("v1", datetime(2026, 10, 13, 13, tzinfo=UTC), "C", "D", 1, 60, self.now, self.trip)
+        with self.store.transaction() as connection:
+            point = connection.execute("INSERT INTO gps_points(vehicle_id,recorded_at,latitude,longitude) VALUES(?,?,?,?)", ("v1", "2026-10-13T11:59:00+00:00", 53.08, 8.8))
+            connection.execute("INSERT INTO drive_gps_points(drive_id,gps_point_id,ordinal,association_source) VALUES(?,?,?,?)", (first, point.lastrowid, 0, "test"))
+        stop = self.store.create_stop_from_interruption(self.trip, f"{first}:{second}", self.now, name="Kuhhirten", place_type="rv_site", overnight=True)
+        saved = self.store.list_stops("v1", self.trip)[0]
+        self.assertEqual((saved["id"], saved["arrived_at"], saved["departed_at"], saved["latitude"], saved["place_kind"]), (stop, "2026-10-13T11:00:00+00:00", "2026-10-13T12:00:00+00:00", 53.08, "rv_site"))
+        self.assertEqual(self.store.list_trip_interruptions("v1", self.trip)[0]["status"], "overnight")
+
+    def test_interruption_assignment_rejects_invalid_or_cross_trip_place(self):
+        first = self.store.create_manual_drive("v1", datetime(2026, 10, 13, 10, tzinfo=UTC), "A", "B", 1, 60, self.now, self.trip)
+        second = self.store.create_manual_drive("v1", datetime(2026, 10, 13, 13, tzinfo=UTC), "C", "D", 1, 60, self.now, self.trip)
+        with self.assertRaisesRegex(ValueError, "interruption_status_invalid"):
+            self.store.assign_interruption(self.trip, f"{first}:{second}", self.now, status="unknown")
+        with self.assertRaisesRegex(ValueError, "interruption_place_required"):
+            self.store.assign_interruption(self.trip, f"{first}:{second}", self.now, status="stop")
+        self.store.assign_interruption(self.trip, f"{first}:{second}", self.now, status="ignored")
+        self.assertEqual(self.store.list_trip_interruptions("v1", self.trip)[0]["status"], "ignored")
+
     def test_public_export_defaults_to_private_fields(self):
         stop = {"id": "p1", "name": "Geheimer Ort", "place_type": "restaurant", "latitude": 50.0, "longitude": 8.0, "description": "privat", "review_text": "privat", "rating_overall": 4}
         payload = build_public_trip_export({"id": self.trip, "title": "Reise", "destination": "Ziel"}, [stop])
