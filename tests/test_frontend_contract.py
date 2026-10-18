@@ -33,18 +33,18 @@ def test_frontend_contract_is_linked_from_both_primary_readmes():
 
 
 def test_release_version_is_aligned_across_project_and_readmes():
-    assert 'version = "0.3.0-beta.7"' in (ROOT / "pyproject.toml").read_text(encoding="utf-8")
+    assert 'version = "0.3.0-beta.8"' in (ROOT / "pyproject.toml").read_text(encoding="utf-8")
     for name in ("README.md", "README.de.md", "README.en.md"):
         text = (ROOT / name).read_text(encoding="utf-8")
         assert "v0.2.0" in text
         assert "v0.1.0" not in text
 
 
-def test_integration_version_contract_is_beta5():
+def test_integration_version_contract_is_beta8():
     init = (ROOT / "custom_components/camper_travel_journal/__init__.py").read_text(encoding="utf-8")
     manifest = json.loads((ROOT / "custom_components/camper_travel_journal/manifest.json").read_text(encoding="utf-8"))
-    assert manifest["version"] == "0.3.0-beta.7"
-    assert 'VERSION = "0.3.0-beta.7"' in init
+    assert manifest["version"] == "0.3.0-beta.8"
+    assert 'VERSION = "0.3.0-beta.8"' in init
 
 
 def test_local_home_assistant_brand_asset_is_present():
