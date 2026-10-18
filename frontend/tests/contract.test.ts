@@ -13,9 +13,10 @@ const bundle = resolve(root, "../custom_components/camper_travel_journal/fronten
 
 describe("frontend release contract", () => {
   it("keeps backend, npm metadata and beta bundle aligned", () => {
-    expect(manifest.version).toBe("0.3.0-beta.9");
+    expect(manifest.version).toBe("0.3.0-beta.10");
     expect(pkg.version).toBe(manifest.version);
     expect(existsSync(bundle)).toBe(true);
+    expect(readFileSync(bundle, "utf8")).toContain("0.3.0-beta.10");
   });
   it("registers the central card in the catalog while retaining legacy elements", () => {
     const source = readFileSync(resolve(root, "src/index.ts"), "utf8");

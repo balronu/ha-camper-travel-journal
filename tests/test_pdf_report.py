@@ -117,3 +117,26 @@ def test_expense_heading_keeps_table_start_together_and_long_tables_split(monkey
     long_en, _ = pdf_report.render_trip_report(_report(expenses=90), language="en")
     assert long_de.count(b"/Type /Page") > short_de.count(b"/Type /Page")
     assert long_en.count(b"/Type /Page") > short_en.count(b"/Type /Page")
+
+
+def test_report_uses_actual_expense_date_and_marks_legacy_date_unknown():
+    import custom_components.camper_travel_journal.pdf_report as pdf_report
+
+    report = _report(drives=0, expenses=2, stops=0)
+    report["expenses"][0].update(occurred_on="2026-01-02", occurred_time="07:15")
+    report["expenses"][1].pop("occurred_at", None)
+    captured = {}
+    original = pdf_report._ReportDocTemplate.build
+    pdf_report._ReportDocTemplate.build = lambda _document, story: captured.setdefault("story", story)
+    try:
+        pdf_report.render_trip_report(report, language="de")
+    finally:
+        pdf_report._ReportDocTemplate.build = original
+    texts = []
+    for item in captured["story"]:
+        if hasattr(item, "getPlainText"):
+            texts.append(item.getPlainText())
+        if isinstance(item, Table):
+            texts.extend(cell.getPlainText() for row in item._cellvalues for cell in row if hasattr(cell, "getPlainText"))
+    assert "02.01.2026, 07:15" in texts
+    assert "Ausgabendatum unbekannt" in texts

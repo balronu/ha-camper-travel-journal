@@ -9,7 +9,7 @@ lokal in einer eigenen SQLite-Datenbank.
 
 [🇬🇧 English](README.en.md) · [🇩🇪 Deutsche Hauptdokumentation](README.md)
 
-**Aktuelle stabile Version: v0.2.0 · beta.8 in Vorbereitung**
+**Aktuelle stabile Version: v0.2.0 · v0.3.0-beta.10 in Vorbereitung**
 
 Für neue Dashboards wird ab beta.3 die zentrale Journal Card empfohlen. Der
 Ablauf lautet: Reise auswählen, öffnen, bearbeiten und wieder schließen. Die

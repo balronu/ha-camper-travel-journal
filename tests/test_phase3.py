@@ -34,7 +34,15 @@ class Phase3Tests(unittest.TestCase):
         self.assertEqual(row["name"], "Camping")
         self.assertEqual(row["description"], "Nacht")
         self.assertEqual(self.store.list_expenses(trip)[0]["amount_minor"], 2345)
-        self.assertEqual(self.store.connection.execute("SELECT value FROM schema_meta WHERE key='version'").fetchone()[0], "9")
+        self.assertEqual(self.store.connection.execute("SELECT value FROM schema_meta WHERE key='version'").fetchone()[0], "10")
+
+    def test_actual_expense_date_time_and_capture_timestamp_are_distinct(self):
+        trip = self.store.create_trip("v1", "Datum", self.now, self.now)
+        self.store.create_expense(Expense("", trip, self.now, "fuel", 100, "EUR", occurred_on="2026-01-02", occurred_time="07:15"), self.now)
+        row = self.store.list_expenses(trip)[0]
+        self.assertEqual(row["occurred_on"], "2026-01-02")
+        self.assertEqual(row["occurred_time"], "07:15")
+        self.assertEqual(row["created_at"], self.now.isoformat())
 
     def test_deleting_trip_preserves_drive_and_unassigns_it(self):
         trip = self.store.create_trip("v1", "Alpen", self.now, self.now)
@@ -115,7 +123,7 @@ class Phase3Tests(unittest.TestCase):
             connection.execute("ALTER TABLE drives DROP COLUMN end_label")
         self.store.close()
         self.store.open()
-        self.assertEqual(self.store.connection.execute("SELECT value FROM schema_meta WHERE key='version'").fetchone()[0], "9")
+        self.assertEqual(self.store.connection.execute("SELECT value FROM schema_meta WHERE key='version'").fetchone()[0], "10")
         self.assertEqual(self.store.list_trips("v1")[0]["id"], trip)
         legacy = self.store.list_drives("v1")[0]
         self.assertEqual((legacy["id"], legacy["source"]), ("legacy", "gps"))
@@ -142,7 +150,7 @@ class Phase3Tests(unittest.TestCase):
         self.store.open()
         columns = {row[1] for row in self.store.connection.execute("PRAGMA table_info(trips)")}
         self.assertNotIn("interrupted", columns)
-        self.assertEqual(self.store.connection.execute("SELECT value FROM schema_meta WHERE key='version'").fetchone()[0], "9")
+        self.assertEqual(self.store.connection.execute("SELECT value FROM schema_meta WHERE key='version'").fetchone()[0], "10")
 
 
 if __name__ == "__main__":

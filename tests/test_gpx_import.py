@@ -49,7 +49,11 @@ class GPXImportTests(unittest.TestCase):
             first = store.import_gpx("v", preview, None, now)
             self.assertEqual(first["points_imported"], 3)
             self.assertIsNone(first["trip_id"])
-            self.assertEqual(store.list_drives("v")[0]["assignment_status"], "unassigned")
+            drive = store.list_drives("v")[0]
+            self.assertEqual(drive["assignment_status"], "unassigned")
+            self.assertEqual((drive["start_latitude"], drive["start_longitude"]), (49.0, 7.0))
+            self.assertEqual((drive["end_latitude"], drive["end_longitude"]), (49.02, 7.0))
+            self.assertEqual((drive["start_label"], drive["end_label"]), ("49.00000, 7.00000", "49.02000, 7.00000"))
             with self.assertRaisesRegex(ValueError, "gpx_already_imported"):
                 store.import_gpx("v", preview, None, now)
             self.assertEqual(store.diagnostic_counts("v")["gps_points"], 3)

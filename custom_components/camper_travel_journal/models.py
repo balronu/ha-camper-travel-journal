@@ -44,6 +44,10 @@ class Drive:
     source: str = "gps"
     start_label: str | None = None
     end_label: str | None = None
+    start_latitude: float | None = None
+    start_longitude: float | None = None
+    end_latitude: float | None = None
+    end_longitude: float | None = None
 
 
 @dataclass(frozen=True, slots=True)
@@ -84,6 +88,8 @@ class Expense:
     odometer_km: float | None = None
     stay_id: str | None = None
     place_id: str | None = None
+    occurred_on: str | None = None
+    occurred_time: str | None = None
 
 
 @dataclass(frozen=True, slots=True)

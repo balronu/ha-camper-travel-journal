@@ -408,22 +408,27 @@ if websocket_api is not None:
             connection.send_result(msg["id"], {"stop_id": stop_id})
         except Exception as err: _send_error(connection, msg, err)
 
-    @websocket_api.websocket_command({**_base("camper_travel_journal/create_expense"), vol.Required("trip_id"): str, vol.Required("occurred_at"): str, vol.Required("category"): str, vol.Required("amount_minor"): vol.Coerce(int), vol.Optional("currency", default="EUR"): str, vol.Optional("note"): str, vol.Optional("odometer_km"): vol.Coerce(float), vol.Optional("place_id"): str, vol.Optional("stay_id"): str})
+    @websocket_api.websocket_command({**_base("camper_travel_journal/create_expense"), vol.Required("trip_id"): str, vol.Optional("occurred_at"): str, vol.Optional("occurred_on"): str, vol.Optional("occurred_time"): str, vol.Required("category"): str, vol.Required("amount_minor"): vol.Coerce(int), vol.Optional("currency", default="EUR"): str, vol.Optional("note"): str, vol.Optional("odometer_km"): vol.Coerce(float), vol.Optional("place_id"): str, vol.Optional("stay_id"): str})
     @websocket_api.async_response
     async def ws_create_expense(hass, connection, msg):
         try:
-            expense = Expense(id="", trip_id=msg["trip_id"], occurred_at=_timestamp(msg["occurred_at"]), category=validate_expense_category(msg["category"]), amount_minor=validate_amount(msg["amount_minor"]), currency=validate_expense_currency(msg["currency"]), note=msg.get("note"), odometer_km=msg.get("odometer_km"), place_id=msg.get("place_id"), stay_id=msg.get("stay_id"))
+            actual_on = _date(msg.get("occurred_on"), required=True) if msg.get("occurred_on") else None
+            legacy_at = _timestamp(msg.get("occurred_at"), required=False) if msg.get("occurred_at") else _now()
+            if actual_on is None:
+                actual_on = legacy_at.date().isoformat()
+            expense = Expense(id="", trip_id=msg["trip_id"], occurred_at=legacy_at, category=validate_expense_category(msg["category"]), amount_minor=validate_amount(msg["amount_minor"]), currency=validate_expense_currency(msg["currency"]), note=msg.get("note"), odometer_km=msg.get("odometer_km"), place_id=msg.get("place_id"), stay_id=msg.get("stay_id"), occurred_on=actual_on, occurred_time=msg.get("occurred_time"))
             result = await _call(hass, msg, "create_expense", expense, _now())
             connection.send_result(msg["id"], {"expense_id": result})
         except Exception as err: _send_error(connection, msg, err)
 
-    @websocket_api.websocket_command({**_base("camper_travel_journal/update_expense"), vol.Required("expense_id"): str, vol.Optional("occurred_at"): str, vol.Optional("category"): str, vol.Optional("amount_minor"): vol.Coerce(int), vol.Optional("currency"): str, vol.Optional("note"): str, vol.Optional("odometer_km"): vol.Coerce(float), vol.Optional("place_id"): str, vol.Optional("stay_id"): str})
+    @websocket_api.websocket_command({**_base("camper_travel_journal/update_expense"), vol.Required("expense_id"): str, vol.Optional("occurred_at"): str, vol.Optional("occurred_on"): str, vol.Optional("occurred_time"): str, vol.Optional("category"): str, vol.Optional("amount_minor"): vol.Coerce(int), vol.Optional("currency"): str, vol.Optional("note"): str, vol.Optional("odometer_km"): vol.Coerce(float), vol.Optional("place_id"): str, vol.Optional("stay_id"): str})
     @websocket_api.async_response
     async def ws_update_expense(hass, connection, msg):
         try:
-            fields = {key: msg[key] for key in ("currency", "note", "odometer_km", "amount_minor", "place_id", "stay_id") if key in msg}
+            fields = {key: msg[key] for key in ("currency", "note", "odometer_km", "amount_minor", "place_id", "stay_id", "occurred_on", "occurred_time") if key in msg}
             if "category" in msg: fields["category"] = validate_expense_category(msg["category"])
             if "occurred_at" in msg: fields["occurred_at"] = _timestamp(msg["occurred_at"])
+            if "occurred_on" in msg: fields["occurred_on"] = _date(msg["occurred_on"], required=True)
             if "amount_minor" in fields: fields["amount_minor"] = validate_amount(fields["amount_minor"])
             if "currency" in fields: fields["currency"] = validate_expense_currency(fields["currency"])
             await _call(hass, msg, "update_expense", msg["expense_id"], _now(), **fields)

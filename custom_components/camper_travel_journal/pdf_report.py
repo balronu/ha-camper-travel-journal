@@ -6,6 +6,7 @@ from datetime import datetime
 from io import BytesIO
 import re
 from typing import Any
+from urllib.parse import urlsplit
 from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 from xml.sax.saxutils import escape
 
@@ -109,6 +110,21 @@ def _markup(value: Any) -> str:
     return escape(_text(value)).replace("\n", "<br/>")
 
 
+def _place_details(stop: dict[str, Any], style: ParagraphStyle, language: str) -> Paragraph:
+    """Render place details with a compact, safe website link label."""
+    lines = [_text(stop.get("address")), _text(stop.get("description"))]
+    website = _text(stop.get("website_url"))
+    if website:
+        parsed = urlsplit(website)
+        if parsed.scheme.lower() in {"http", "https"} and parsed.netloc and not any(char.isspace() for char in website):
+            href = escape(website, {"\"": "&quot;", "'": "&apos;"})
+            lines.append(f'<link href="{href}">{"Webseite öffnen" if language == "de" else "Open website"}</link>')
+    content = "<br/>".join(escape(line) for line in lines[:2] if line)
+    if website and lines and lines[-1].startswith("<link "):
+        content = f"{content}<br/>{lines[-1]}" if content else lines[-1]
+    return Paragraph(content or "–", style)
+
+
 def _category_label(category: Any, language: str) -> str:
     value = _text(category)
     return COST_LABELS[language].get(value, value or "–")
@@ -162,8 +178,8 @@ def render_trip_report(report: dict[str, Any], *, language: str = "de", time_zon
     """Render a validated, read-only trip snapshot as a printable A4 report."""
     language = "en" if language.lower().startswith("en") else "de"
     labels = {
-        "de": {"report": "Reisebericht", "vehicle": "Fahrzeug", "period": "Reisezeitraum", "destination": "Reiseziel", "distance": "Gesamtkilometer", "drives": "Fahrten", "costs": "Gesamtkosten", "drive_list": "Fahrten", "interruptions": "Aufenthalte und Fahrtunterbrechungen", "start": "Start", "end": "Ende", "distance_short": "Entfernung", "duration": "Dauer", "source": "Herkunft", "route": "Strecke", "cost_summary": "Kosten nach Kategorien", "category": "Kategorie", "amount": "Betrag", "expenses": "Ausgaben", "description": "Beschreibung", "stops": "Orte und Bewertungen", "notes": "Reisenotizen", "name": "Name", "period_short": "Zeitraum", "type": "Kategorie", "rating": "Bewertung", "details": "Details"},
-        "en": {"report": "Travel report", "vehicle": "Vehicle", "period": "Travel period", "destination": "Destination", "distance": "Total distance", "drives": "Drives", "costs": "Total costs", "drive_list": "Drives", "interruptions": "Stays and drive interruptions", "start": "Start", "end": "End", "distance_short": "Distance", "duration": "Duration", "source": "Source", "route": "Route", "cost_summary": "Costs by category", "category": "Category", "amount": "Amount", "expenses": "Expenses", "description": "Description", "stops": "Places and ratings", "notes": "Trip notes", "name": "Name", "period_short": "Period", "type": "Category", "rating": "Rating", "details": "Details"},
+        "de": {"report": "Reisebericht", "vehicle": "Fahrzeug", "period": "Reisezeitraum", "destination": "Reiseziel", "distance": "Gesamtkilometer", "drives": "Fahrten", "costs": "Gesamtkosten", "drive_list": "Fahrten", "interruptions": "Aufenthalte und Fahrtunterbrechungen", "start": "Start", "end": "Ende", "distance_short": "Entfernung", "duration": "Dauer", "source": "Herkunft", "route": "Strecke", "cost_summary": "Kosten nach Kategorien", "category": "Kategorie", "amount": "Betrag", "expenses": "Ausgaben", "description": "Beschreibung", "stops": "Orte und Bewertungen", "notes": "Reisenotizen", "name": "Name", "period_short": "Zeitraum", "type": "Kategorie", "rating": "Bewertung", "details": "Details", "unknown_date": "Ausgabendatum unbekannt", "time": "Uhrzeit"},
+        "en": {"report": "Travel report", "vehicle": "Vehicle", "period": "Travel period", "destination": "Destination", "distance": "Total distance", "drives": "Drives", "costs": "Total costs", "drive_list": "Drives", "interruptions": "Stays and drive interruptions", "start": "Start", "end": "End", "distance_short": "Distance", "duration": "Duration", "source": "Source", "route": "Route", "cost_summary": "Costs by category", "category": "Category", "amount": "Amount", "expenses": "Expenses", "description": "Description", "stops": "Places and ratings", "notes": "Trip notes", "name": "Name", "period_short": "Period", "type": "Category", "rating": "Rating", "details": "Details", "unknown_date": "Expense date unknown", "time": "Time"},
     }[language]
     styles = getSampleStyleSheet(); body = ParagraphStyle("ReportBody", parent=styles["BodyText"], fontName="Helvetica", fontSize=8.5, leading=10.5, spaceAfter=2); small = ParagraphStyle("ReportSmall", parent=body, fontSize=7.5, leading=9); date_style = ParagraphStyle("ReportDate", parent=body, leading=10); right = ParagraphStyle("ReportRight", parent=body, alignment=TA_RIGHT); heading = ParagraphStyle("ReportHeading", parent=styles["Heading2"], fontName="Helvetica-Bold", fontSize=13, leading=16, textColor=colors.HexColor("#17324d"), spaceBefore=12, spaceAfter=7, keepWithNext=1); title = ParagraphStyle("ReportTitle", parent=styles["Title"], fontName="Helvetica-Bold", fontSize=23, leading=27, textColor=colors.HexColor("#17324d"), alignment=TA_CENTER, spaceAfter=8)
     trip = report["trip"]; period = _period(trip, language, time_zone); now = datetime.now(_local_zone(time_zone)).strftime("%d.%m.%Y %H:%M" if language == "de" else "%m/%d/%Y %I:%M %p"); stream = BytesIO(); doc = _ReportDocTemplate(stream, created=now, language=language)
@@ -192,14 +208,18 @@ def render_trip_report(report: dict[str, Any], *, language: str = "de", time_zon
     expenses = report.get("expenses", [])
     if expenses:
         story.append(Paragraph(labels["expenses"], heading)); rows = [[labels["period_short"], labels["category"], labels["amount"], labels["description"]]]
-        for expense in sorted(expenses, key=lambda item: (item.get("occurred_at", ""), item.get("id", ""))):
-            note, place = _text(expense.get("note")), _text(expense.get("place_name")); note = f"{note} · {place}" if note and place else note or place; rows.append([_paragraph(_date_time(expense.get("occurred_at"), language, time_zone), date_style), _paragraph(_category_label(expense.get("category"), language), body), _paragraph(_money(expense.get("amount_minor"), expense.get("currency"), language), body), _paragraph(note, small)])
+        for expense in sorted(expenses, key=lambda item: (item.get("occurred_on") or item.get("created_at") or "", item.get("id", ""))):
+            note, place = _text(expense.get("note")), _text(expense.get("place_name")); note = f"{note} · {place}" if note and place else note or place
+            actual_date = _date(expense.get("occurred_on"), language, time_zone) if expense.get("occurred_on") else labels["unknown_date"]
+            actual_time = _time(f"2000-01-01T{expense['occurred_time']}:00+00:00", language, time_zone) if expense.get("occurred_time") else ""
+            date_text = f"{actual_date}, {actual_time}" if actual_time else actual_date
+            rows.append([_paragraph(date_text, date_style), _paragraph(_category_label(expense.get("category"), language), body), _paragraph(_money(expense.get("amount_minor"), expense.get("currency"), language), body), _paragraph(note, small)])
         story.append(_table(rows, [31 * mm, 32 * mm, 29 * mm, doc.width - 92 * mm]))
     stops = report.get("stops", [])
     if stops:
         rows = [[labels["name"], labels["type"], labels["period_short"], labels["duration"], labels["rating"], labels["details"]]]
         for stop in sorted(stops, key=lambda item: (item.get("arrived_at") or item.get("occurred_at", ""), item.get("id", ""))):
-            start, end = stop.get("arrived_at") or stop.get("occurred_at"), stop.get("departed_at"); period_value = f"{_date_time(start, language, time_zone)}\n{_date_time(end, language, time_zone)}" if end else _date_time(start, language, time_zone); rating = f"{stop['rating_overall']}/5" if stop.get("rating_overall") is not None else "–"; details = "\n".join(filter(None, [_text(stop.get("address")), _text(stop.get("description")), _text(stop.get("website_url"))])); rows.append([_paragraph(stop.get("name"), body), _paragraph(_place_label(stop.get("place_type") or stop.get("stop_type"), language), body), _paragraph(period_value, date_style), _paragraph(_duration(stop.get("duration_seconds"), language), body), _paragraph(rating, body), _paragraph(details, small)])
+            start, end = stop.get("arrived_at") or stop.get("occurred_at"), stop.get("departed_at"); period_value = f"{_date_time(start, language, time_zone)}\n{_date_time(end, language, time_zone)}" if end else _date_time(start, language, time_zone); rating = f"{stop['rating_overall']}/5" if stop.get("rating_overall") is not None else "–"; rows.append([_paragraph(stop.get("name"), body), _paragraph(_place_label(stop.get("place_type") or stop.get("stop_type"), language), body), _paragraph(period_value, date_style), _paragraph(_duration(stop.get("duration_seconds"), language), body), _paragraph(rating, body), _place_details(stop, small, language)])
         stop_table = _table(rows, [35 * mm, 31 * mm, 42 * mm, 22 * mm, 19 * mm, doc.width - 149 * mm])
         story.append(KeepTogether([Paragraph(labels["stops"], heading), stop_table]))
     doc.build(story); return stream.getvalue(), _safe_filename(_text(trip.get("title")), period)
