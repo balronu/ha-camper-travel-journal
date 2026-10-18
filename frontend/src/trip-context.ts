@@ -21,3 +21,9 @@ export function publishActiveTrip(detail: TripContextDetail): void {
   window.dispatchEvent(new CustomEvent<TripContextDetail>(ACTIVE_TRIP_CHANGED_EVENT, { detail }));
 }
 
+/** Clear the dashboard-local context without touching backend data. */
+export function clearActiveTrip(vehicleId: string, source = "journal"): void {
+  if (!vehicleId || typeof window === "undefined") return;
+  try { window.sessionStorage.removeItem(storageKey(vehicleId)); } catch { /* private browsing */ }
+  window.dispatchEvent(new CustomEvent<TripContextDetail>(ACTIVE_TRIP_CHANGED_EVENT, { detail: { vehicleId, tripId: "", source } }));
+}

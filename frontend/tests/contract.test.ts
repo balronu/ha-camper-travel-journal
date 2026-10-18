@@ -13,7 +13,7 @@ const bundle = resolve(root, "../custom_components/camper_travel_journal/fronten
 
 describe("frontend release contract", () => {
   it("keeps backend, npm metadata and beta bundle aligned", () => {
-    expect(manifest.version).toBe("0.3.0-beta.2");
+    expect(manifest.version).toBe("0.3.0-beta.3");
     expect(pkg.version).toBe(manifest.version);
     expect(existsSync(bundle)).toBe(true);
   });
@@ -25,6 +25,7 @@ describe("frontend release contract", () => {
     expect(source).toContain("camper-travel-journal-manager-card");
     expect(source).toContain("camper-travel-journal-diagnostics-card");
     expect(source).toContain("camper-travel-journal-map-card");
+    expect(source).toContain("camper-travel-journal-journal-card");
     expect(source).toContain("Diagnose");
     expect(source).toContain("Reiseübersicht");
     expect(source).toContain("Reiseverwaltung");
@@ -143,6 +144,21 @@ describe("frontend release contract", () => {
     expect(map).toContain('height: clamp(');
     expect(map).toContain('focus-visible');
     expect(map).toContain('tile_attribution');
+  });
+  it("keeps the central journal entry gated and trip-scoped", () => {
+    const journal = readFileSync(resolve(root, "src/journal-card.ts"), "utf8");
+    const manager = readFileSync(resolve(root, "src/manager-card.ts"), "utf8");
+    const map = readFileSync(resolve(root, "src/map-card.ts"), "utf8");
+    expect(journal).toContain("Reise auswählen oder neu anlegen");
+    expect(journal).toContain("camper-travel-journal-manager-card");
+    expect(journal).toContain("camper-travel-journal-map-card");
+    expect(journal).toContain("clearActiveTrip");
+    expect(journal).toContain("journalClose");
+    expect(journal).toContain("trip_id: trip.id");
+    expect(manager).toContain("embeddedSection");
+    expect(manager).toContain("starPicker");
+    expect(manager).toContain('role="radio"');
+    expect(map).toContain("embeddedTripId");
   });
   it("sorts map drive segments in ascending start-time order", () => {
     expect(sortDrivesChronologically([
