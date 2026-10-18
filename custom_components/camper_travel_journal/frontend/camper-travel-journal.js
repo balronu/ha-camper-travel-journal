@@ -1633,7 +1633,7 @@ class Qe extends Ot {
     if (this.editingExpenseDate && !/^\d{4}-\d{2}-\d{2}$/.test(this.editingExpenseDate)) return this.fail(s.dateInvalid);
     this.expenseSavingId = i.id;
     try {
-      await co(this.hass, this.vehicleId, i.id, { amount_minor: o, category: this.editingCategory, ...this.editingExpenseDate ? { occurred_on: this.editingExpenseDate } : {}, ...this.editingExpenseTimeEnabled && this.editingExpenseTime ? { occurred_time: this.editingExpenseTime } : {} }), this.actionError = "", this.editingExpenseId = "", this.closeEditor(!0), await this.refreshAfterWrite(() => qi({ vehicleId: this.vehicleId, tripId: i.trip_id ?? this.activeTripId }));
+      await co(this.hass, this.vehicleId, i.id, { amount_minor: o, category: this.editingCategory, ...this.editingExpenseDate ? { occurred_on: this.editingExpenseDate } : {}, occurred_time: this.editingExpenseTimeEnabled && this.editingExpenseTime ? this.editingExpenseTime : null }), this.actionError = "", this.editingExpenseId = "", this.closeEditor(!0), await this.refreshAfterWrite(() => qi({ vehicleId: this.vehicleId, tripId: i.trip_id ?? this.activeTripId }));
     } catch {
       this.fail(s.expenseEditError);
     } finally {

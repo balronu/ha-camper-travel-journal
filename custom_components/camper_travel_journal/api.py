@@ -421,7 +421,7 @@ if websocket_api is not None:
             connection.send_result(msg["id"], {"expense_id": result})
         except Exception as err: _send_error(connection, msg, err)
 
-    @websocket_api.websocket_command({**_base("camper_travel_journal/update_expense"), vol.Required("expense_id"): str, vol.Optional("occurred_at"): str, vol.Optional("occurred_on"): str, vol.Optional("occurred_time"): str, vol.Optional("category"): str, vol.Optional("amount_minor"): vol.Coerce(int), vol.Optional("currency"): str, vol.Optional("note"): str, vol.Optional("odometer_km"): vol.Coerce(float), vol.Optional("place_id"): str, vol.Optional("stay_id"): str})
+    @websocket_api.websocket_command({**_base("camper_travel_journal/update_expense"), vol.Required("expense_id"): str, vol.Optional("occurred_at"): str, vol.Optional("occurred_on"): vol.Any(str, None), vol.Optional("occurred_time"): vol.Any(str, None), vol.Optional("category"): str, vol.Optional("amount_minor"): vol.Coerce(int), vol.Optional("currency"): str, vol.Optional("note"): str, vol.Optional("odometer_km"): vol.Coerce(float), vol.Optional("place_id"): str, vol.Optional("stay_id"): str})
     @websocket_api.async_response
     async def ws_update_expense(hass, connection, msg):
         try:

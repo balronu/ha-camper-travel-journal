@@ -2,7 +2,7 @@ import unittest
 
 try:
     from reportlab.platypus import Paragraph, Table
-    from custom_components.camper_travel_journal.pdf_report import _category_label, _date, _date_time, _duration, _place_label, _time, render_trip_report
+    from custom_components.camper_travel_journal.pdf_report import _category_label, _date, _date_time, _duration, _expense_time, _place_label, _time, render_trip_report
 except ModuleNotFoundError as error:  # pragma: no cover - CI installs manifest dependency
     if error.name != "reportlab":
         raise
@@ -68,6 +68,13 @@ def test_report_uses_home_assistant_timezone_and_localized_categories():
     assert _date_time("2026-10-13T12:30:00+00:00", "en") == "10/13/26 12:30 PM"
 
 
+def test_expense_wall_clock_time_never_shifts_with_home_assistant_timezone():
+    assert _expense_time("12:00", "de") == "12:00"
+    assert _expense_time("12:00", "de") == _expense_time("12:00", "de")
+    assert _expense_time("23:30", "en") == "11:30 PM"
+    assert _expense_time(None, "de") == ""
+
+
 def test_report_accepts_overnight_places_ratings_and_linked_expenses():
     report = _report(drives=1, expenses=3, stops=8)
     for index, stop in enumerate(report["stops"]):
@@ -129,7 +136,7 @@ def test_report_uses_actual_expense_date_and_marks_legacy_date_unknown():
     original = pdf_report._ReportDocTemplate.build
     pdf_report._ReportDocTemplate.build = lambda _document, story: captured.setdefault("story", story)
     try:
-        pdf_report.render_trip_report(report, language="de")
+        pdf_report.render_trip_report(report, language="de", time_zone="Europe/Berlin")
     finally:
         pdf_report._ReportDocTemplate.build = original
     texts = []

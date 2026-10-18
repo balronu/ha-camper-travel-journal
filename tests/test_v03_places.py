@@ -241,6 +241,13 @@ class V03PlaceTests(unittest.TestCase):
         self.assertNotIn("description", payload["places"][0])
         self.assertNotIn("review_text", payload["places"][0])
 
+    def test_public_export_expense_flag_is_reserved_until_expense_contract_exists(self):
+        payload = build_public_trip_export(
+            {"id": self.trip, "title": "Reise"}, [], include_expenses=True
+        )
+        self.assertEqual(payload["expenses"], [])
+        self.assertTrue(payload["privacy"]["expenses"])
+
     def test_place_and_trip_validation_prevents_cross_vehicle_links(self):
         self.store.insert_vehicle("v2", "Other", "device_tracker.other", self.now)
         other_trip = self.store.create_trip("v2", "Other trip", self.now, self.now)

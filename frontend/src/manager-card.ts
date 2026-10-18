@@ -217,7 +217,7 @@ export class ManagerCard extends TravelCard {
     if (!this.hass || this.expenseSavingId) return; const lang = messages(this.hass); const amountMinor = parseAmountMinor(this.editingAmount); if (amountMinor === null) return this.fail(lang.amountInvalid); if (!isExpenseCategory(this.editingCategory)) return this.fail(lang.categoryInvalid);
     if (this.editingExpenseDate && !/^\d{4}-\d{2}-\d{2}$/.test(this.editingExpenseDate)) return this.fail(lang.dateInvalid);
     this.expenseSavingId = expense.id;
-    try { await updateExpense(this.hass, this.vehicleId, expense.id, { amount_minor: amountMinor, category: this.editingCategory, ...(this.editingExpenseDate ? { occurred_on: this.editingExpenseDate } : {}), ...(this.editingExpenseTimeEnabled && this.editingExpenseTime ? { occurred_time: this.editingExpenseTime } : {}) }); this.actionError = ""; this.editingExpenseId = ""; this.closeEditor(true); await this.refreshAfterWrite(() => notifyExpensesChanged({ vehicleId: this.vehicleId, tripId: expense.trip_id ?? this.activeTripId })); }
+    try { await updateExpense(this.hass, this.vehicleId, expense.id, { amount_minor: amountMinor, category: this.editingCategory, ...(this.editingExpenseDate ? { occurred_on: this.editingExpenseDate } : {}), occurred_time: this.editingExpenseTimeEnabled && this.editingExpenseTime ? this.editingExpenseTime : null }); this.actionError = ""; this.editingExpenseId = ""; this.closeEditor(true); await this.refreshAfterWrite(() => notifyExpensesChanged({ vehicleId: this.vehicleId, tripId: expense.trip_id ?? this.activeTripId })); }
     catch { this.fail(lang.expenseEditError); }
     finally { this.expenseSavingId = ""; this.requestUpdate(); }
   }

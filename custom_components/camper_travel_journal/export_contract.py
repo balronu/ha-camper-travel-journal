@@ -8,7 +8,12 @@ EXPORT_CONTRACT_VERSION = "1.0"
 
 
 def build_public_trip_export(trip: dict[str, Any], places: list[dict[str, Any]], *, include_coordinates: bool = False, include_descriptions: bool = False, include_expenses: bool = False, include_notes: bool = False) -> dict[str, Any]:
-    """Build a JSON-compatible public snapshot; private fields are opt-in."""
+    """Build a JSON-compatible public place snapshot; private fields are opt-in.
+
+    ``include_expenses`` is retained as a privacy-contract flag, but expenses
+    are not part of this provider-neutral contract yet because the function
+    accepts no expense records. It therefore emits an explicit empty list.
+    """
     public_places = []
     for place in places:
         item: dict[str, Any] = {

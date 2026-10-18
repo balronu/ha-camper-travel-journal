@@ -66,6 +66,14 @@ def _time(value: str | None, language: str, time_zone: str = "UTC") -> str:
     return "" if parsed is None else parsed.strftime("%H:%M" if language == "de" else "%I:%M %p")
 
 
+def _expense_time(value: str | None, language: str) -> str:
+    """Format a stored wall-clock time without applying a timezone shift."""
+    if not value or not re.fullmatch(r"(?:[01]\d|2[0-3]):[0-5]\d", value):
+        return ""
+    parsed = datetime.strptime(value, "%H:%M")
+    return parsed.strftime("%H:%M" if language == "de" else "%I:%M %p")
+
+
 def _date_time(value: str | None, language: str, time_zone: str = "UTC") -> str:
     parsed = _localized_datetime(value, time_zone)
     if language == "en" and parsed is not None:
@@ -211,7 +219,7 @@ def render_trip_report(report: dict[str, Any], *, language: str = "de", time_zon
         for expense in sorted(expenses, key=lambda item: (item.get("occurred_on") or item.get("created_at") or "", item.get("id", ""))):
             note, place = _text(expense.get("note")), _text(expense.get("place_name")); note = f"{note} · {place}" if note and place else note or place
             actual_date = _date(expense.get("occurred_on"), language, time_zone) if expense.get("occurred_on") else labels["unknown_date"]
-            actual_time = _time(f"2000-01-01T{expense['occurred_time']}:00+00:00", language, time_zone) if expense.get("occurred_time") else ""
+            actual_time = _expense_time(expense.get("occurred_time"), language)
             date_text = f"{actual_date}, {actual_time}" if actual_time else actual_date
             rows.append([_paragraph(date_text, date_style), _paragraph(_category_label(expense.get("category"), language), body), _paragraph(_money(expense.get("amount_minor"), expense.get("currency"), language), body), _paragraph(note, small)])
         story.append(_table(rows, [31 * mm, 32 * mm, 29 * mm, doc.width - 92 * mm]))

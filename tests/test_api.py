@@ -243,6 +243,19 @@ async def test_transition_and_write_commands_complete():
 
 
 @pytest.mark.asyncio
+async def test_update_expense_preserves_explicit_null_time_semantics():
+    hass = FakeHass()
+    connection = FakeConnection()
+    await api.ws_update_expense.__wrapped__(hass, connection, {
+        "id": 7, "vehicle_id": "v1", "expense_id": "e1", "occurred_time": None,
+    })
+    assert connection.errors == []
+    method, _args, kwargs = hass.worker.calls[-1]
+    assert method == "update_expense"
+    assert kwargs["occurred_time"] is None
+
+
+@pytest.mark.asyncio
 async def test_interruption_assignment_commands_are_authenticated_and_scoped():
     hass = FakeHass()
     connection = FakeConnection()
