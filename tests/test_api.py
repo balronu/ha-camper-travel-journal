@@ -97,6 +97,14 @@ def test_timestamp_and_amount_validation():
         api._runtime(type("Hass", (), {"data": {}})(), "missing")
 
 
+def test_websocket_errors_are_stable_and_do_not_leak_exception_details():
+    connection = FakeConnection()
+    api._send_error(connection, {"id": 99}, ValueError("database path=/private/trip.sqlite"))
+    assert connection.errors == [(99, "request_failed", "request_failed")]
+    api._send_error(connection, {"id": 100}, ValueError("website_url_invalid"))
+    assert connection.errors[-1] == (100, "website_url_invalid", "website_url_invalid")
+
+
 @pytest.mark.asyncio
 async def test_create_trip_command_validates_and_returns_id():
     hass = FakeHass()

@@ -87,7 +87,12 @@ async def _call(hass: HomeAssistant, msg: dict, method: str, *args, **kwargs):
 
 
 def _send_error(connection, msg: dict, error: Exception) -> None:
-    connection.send_error(msg["id"], getattr(error, "args", ["request_failed"])[0], str(error))
+    """Return a stable, non-sensitive public error contract at the API edge."""
+    raw_code = getattr(error, "args", ("request_failed",))[0] if getattr(error, "args", None) else "request_failed"
+    code = raw_code if isinstance(raw_code, str) and raw_code.isidentifier() and len(raw_code) <= 64 else "request_failed"
+    # The frontend translates stable codes; never expose exception text, SQL,
+    # paths or trip data through the websocket boundary.
+    connection.send_error(msg["id"], code, code)
 
 
 def _simplify_points(points: list[dict], tolerance_m: float) -> list[dict]:
