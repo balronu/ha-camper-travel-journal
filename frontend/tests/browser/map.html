@@ -34,13 +34,14 @@ const text = card.shadowRoot?.textContent ?? "";
 const details = card.shadowRoot?.querySelector("details");
 if (details) { details.open = true; details.dispatchEvent(new Event("toggle")); }
 const detailsOpened = Boolean(details?.open);
-const selectNone = card.shadowRoot?.querySelectorAll("button")[1];
+const selectNone = [...(card.shadowRoot?.querySelectorAll("button") ?? [])].find((button) => /^(Select none|Alle abwählen)$/.test(button.textContent?.trim() ?? ""));
 selectNone?.click();
 await new Promise((resolve) => setTimeout(resolve, 50));
-const noneSelected = [...(card.shadowRoot?.querySelectorAll("input[type=checkbox]") ?? [])].every((input) => !(input instanceof HTMLInputElement) || !input.checked);
+const driveInputs = () => [...(card.shadowRoot?.querySelectorAll("input[type=checkbox]") ?? [])].filter((input) => !input.closest(".place-filter"));
+const noneSelected = driveInputs().every((input) => !(input instanceof HTMLInputElement) || !input.checked);
 card.shadowRoot?.querySelector("button")?.click();
 await new Promise((resolve) => setTimeout(resolve, 50));
-const allSelected = [...(card.shadowRoot?.querySelectorAll("input[type=checkbox]") ?? [])].every((input) => !(input instanceof HTMLInputElement) || input.checked);
+const allSelected = driveInputs().every((input) => !(input instanceof HTMLInputElement) || input.checked);
 result.textContent = JSON.stringify({
   routeCalls,
   hasLeafletMap: Boolean(card.shadowRoot?.querySelector(".leaflet-container")),
