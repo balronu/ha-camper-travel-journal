@@ -174,8 +174,8 @@ def render_trip_report(report: dict[str, Any], *, language: str = "de", time_zon
     """Render one validated trip snapshot without writing it to disk."""
     language = "en" if language.lower().startswith("en") else "de"
     labels = {
-        "de": {"report": "Reisebericht", "vehicle": "Fahrzeug", "period": "Reisezeitraum", "distance": "Gesamtkilometer", "drives": "Fahrten", "costs": "Gesamtkosten", "drive_list": "Fahrten", "date": "Datum", "time": "Uhrzeit", "distance_short": "Entfernung", "duration": "Dauer", "route": "Strecke", "cost_summary": "Kosten nach Kategorien", "category": "Kategorie", "amount": "Betrag", "expenses": "Ausgaben", "description": "Beschreibung", "stops": "Zwischenstopps und Notizen", "notes": "Reisenotizen", "name": "Name", "note": "Notiz", "none": "Keine Einträge gespeichert."},
-        "en": {"report": "Travel report", "vehicle": "Vehicle", "period": "Travel period", "distance": "Total distance", "drives": "Drives", "costs": "Total costs", "drive_list": "Drives", "date": "Date", "time": "Time", "distance_short": "Distance", "duration": "Duration", "route": "Route", "cost_summary": "Costs by category", "category": "Category", "amount": "Amount", "expenses": "Expenses", "description": "Description", "stops": "Stops and notes", "notes": "Trip notes", "name": "Name", "note": "Note", "none": "No entries saved."},
+        "de": {"report": "Reisebericht", "vehicle": "Fahrzeug", "period": "Reisezeitraum", "distance": "Gesamtkilometer", "drives": "Fahrten", "costs": "Gesamtkosten", "drive_list": "Fahrten", "date": "Datum", "time": "Uhrzeit", "distance_short": "Entfernung", "duration": "Dauer", "route": "Strecke", "cost_summary": "Kosten nach Kategorien", "category": "Kategorie", "amount": "Betrag", "expenses": "Ausgaben", "description": "Beschreibung", "stops": "Orte und Zwischenstopps", "notes": "Reisenotizen", "name": "Name", "note": "Notiz", "type": "Typ", "rating": "Bewertung", "none": "Keine Einträge gespeichert."},
+        "en": {"report": "Travel report", "vehicle": "Vehicle", "period": "Travel period", "distance": "Total distance", "drives": "Drives", "costs": "Total costs", "drive_list": "Drives", "date": "Date", "time": "Time", "distance_short": "Distance", "duration": "Duration", "route": "Route", "cost_summary": "Costs by category", "category": "Category", "amount": "Amount", "expenses": "Expenses", "description": "Description", "stops": "Places and stops", "notes": "Trip notes", "name": "Name", "note": "Note", "type": "Type", "rating": "Rating", "none": "No entries saved."},
     }[language]
     styles = getSampleStyleSheet()
     body = ParagraphStyle("ReportBody", parent=styles["BodyText"], fontName="Helvetica", fontSize=9, leading=12, spaceAfter=3)
@@ -220,14 +220,18 @@ def render_trip_report(report: dict[str, Any], *, language: str = "de", time_zon
         story.append(Paragraph(labels["expenses"], heading))
         rows = [[labels["date"], labels["category"], labels["amount"], labels["description"]]]
         for expense in sorted(expenses, key=lambda item: (item.get("occurred_at", ""), item.get("id", ""))):
-            rows.append([_date(expense.get("occurred_at"), language, time_zone), _markup(_category_label(expense.get("category"), language)), _money(expense.get("amount_minor"), expense.get("currency"), language), Paragraph(_markup(expense.get("note")) or "–", small)])
+            note = _text(expense.get("note"))
+            if _text(expense.get("place_name")):
+                note = f"{note} · {expense['place_name']}" if note else str(expense["place_name"])
+            rows.append([_date(expense.get("occurred_at"), language, time_zone), _markup(_category_label(expense.get("category"), language)), _money(expense.get("amount_minor"), expense.get("currency"), language), Paragraph(_markup(note) or "–", small)])
         story.append(_table(rows, [25 * mm, 32 * mm, 29 * mm, doc.width - 86 * mm]))
     stops = report.get("stops", [])
     if stops:
         story.append(Paragraph(labels["stops"], heading))
-        rows = [[labels["date"], labels["name"], labels["note"]]]
+        rows = [[labels["date"], labels["name"], labels["type"], labels["duration"], labels["rating"], labels["note"]]]
         for stop in sorted(stops, key=lambda item: (item.get("occurred_at", ""), item.get("id", ""))):
-            rows.append([_date(stop.get("occurred_at"), language, time_zone), Paragraph(_markup(stop.get("name")) or "–", body), Paragraph(_markup(stop.get("description")) or "–", small)])
-        story.append(_table(rows, [25 * mm, 40 * mm, doc.width - 65 * mm]))
+            rating = f"{stop['rating_overall']}/5" if stop.get("rating_overall") else "–"
+            rows.append([_date(stop.get("occurred_at"), language, time_zone), Paragraph(_markup(stop.get("name")) or "–", body), _markup(stop.get("place_type") or stop.get("stop_type")), _duration(stop.get("duration_seconds"), language), rating, Paragraph(_markup(stop.get("description")) or "–", small)])
+        story.append(_table(rows, [22 * mm, 31 * mm, 25 * mm, 22 * mm, 18 * mm, doc.width - 118 * mm]))
     doc.build(story)
     return stream.getvalue(), _safe_filename(_text(trip.get("title")), period)

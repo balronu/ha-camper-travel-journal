@@ -216,6 +216,7 @@ if websocket_api is not None:
                 "trips": await _call(hass, msg, "list_trips", msg["vehicle_id"]),
                 "drives": await _call(hass, msg, "list_drives", msg["vehicle_id"], trip_id=trip_id) if trip_id else await _call(hass, msg, "list_drives", msg["vehicle_id"]),
                 "stops": await _call(hass, msg, "list_stops", msg["vehicle_id"], trip_id=trip_id),
+                "stop_suggestions": await _call(hass, msg, "list_stop_suggestions", msg["vehicle_id"], trip_id=trip_id) if trip_id else await _call(hass, msg, "list_stop_suggestions", msg["vehicle_id"]),
             }
             result["map_config"] = _map_config(_runtime(hass, msg["vehicle_id"]).values)
             if trip_id:
@@ -346,22 +347,29 @@ if websocket_api is not None:
             connection.send_result(msg["id"], {"success": True})
         except Exception as err: _send_error(connection, msg, err)
 
-    @websocket_api.websocket_command({**_base("camper_travel_journal/create_stop"), vol.Required("trip_id"): str, vol.Required("occurred_at"): str, vol.Optional("name", default=""): str, vol.Optional("category", default="other"): str, vol.Optional("latitude"): vol.Coerce(float), vol.Optional("longitude"): vol.Coerce(float)})
+    @websocket_api.websocket_command({**_base("camper_travel_journal/create_stop"), vol.Optional("trip_id"): str, vol.Optional("drive_id"): str, vol.Required("occurred_at"): str, vol.Optional("arrived_at"): str, vol.Optional("departed_at"): str, vol.Optional("name", default=""): str, vol.Optional("category", default="other"): str, vol.Optional("place_type"): str, vol.Optional("address", default=""): str, vol.Optional("description", default=""): str, vol.Optional("latitude"): vol.Coerce(float), vol.Optional("longitude"): vol.Coerce(float)})
     @websocket_api.async_response
     async def ws_create_stop(hass, connection, msg):
         try:
-            stop = Stop(id="", vehicle_id=msg["vehicle_id"], trip_id=msg["trip_id"], name=msg["name"] or "Zwischenstopp", occurred_at=_timestamp(msg["occurred_at"]), latitude=msg.get("latitude"), longitude=msg.get("longitude"), stop_type=msg["category"], automatic=False)
+            occurred = _timestamp(msg["occurred_at"])
+            arrived = _timestamp(msg.get("arrived_at"), required=False) or occurred
+            departed = _timestamp(msg.get("departed_at"), required=False)
+            category = msg.get("place_type") or msg["category"]
+            stop = Stop(id="", vehicle_id=msg["vehicle_id"], trip_id=msg.get("trip_id"), drive_id=msg.get("drive_id"), name=msg["name"] or "Zwischenstopp", occurred_at=occurred, arrived_at=arrived, departed_at=departed, latitude=msg.get("latitude"), longitude=msg.get("longitude"), description=msg.get("description", ""), stop_type=category, place_type=category, address=msg.get("address", ""), automatic=False, source="manual", confirmed=True)
             result = await _call(hass, msg, "create_stop", stop, _now())
             connection.send_result(msg["id"], {"stop_id": result})
         except Exception as err: _send_error(connection, msg, err)
 
-    @websocket_api.websocket_command({**_base("camper_travel_journal/update_stop"), vol.Required("stop_id"): str, vol.Optional("name"): str, vol.Optional("occurred_at"): str, vol.Optional("category"): str, vol.Optional("description"): str, vol.Optional("latitude"): vol.Coerce(float), vol.Optional("longitude"): vol.Coerce(float)})
+    @websocket_api.websocket_command({**_base("camper_travel_journal/update_stop"), vol.Required("stop_id"): str, vol.Optional("trip_id"): str, vol.Optional("drive_id"): str, vol.Optional("name"): str, vol.Optional("occurred_at"): str, vol.Optional("arrived_at"): str, vol.Optional("departed_at"): str, vol.Optional("category"): str, vol.Optional("place_type"): str, vol.Optional("address"): str, vol.Optional("description"): str, vol.Optional("latitude"): vol.Coerce(float), vol.Optional("longitude"): vol.Coerce(float)})
     @websocket_api.async_response
     async def ws_update_stop(hass, connection, msg):
         try:
-            fields = {key: msg[key] for key in ("name", "category", "description", "latitude", "longitude") if key in msg}
+            fields = {key: msg[key] for key in ("name", "category", "place_type", "address", "description", "latitude", "longitude", "trip_id", "drive_id") if key in msg}
             if "occurred_at" in msg: fields["occurred_at"] = _timestamp(msg["occurred_at"])
+            if "arrived_at" in msg: fields["arrived_at"] = _timestamp(msg["arrived_at"], required=False)
+            if "departed_at" in msg: fields["departed_at"] = _timestamp(msg["departed_at"], required=False)
             if "category" in fields: fields["stop_type"] = fields.pop("category")
+            if "place_type" in fields: fields["stop_type"] = fields["place_type"]
             await _call(hass, msg, "update_stop", msg["stop_id"], _now(), **fields)
             connection.send_result(msg["id"], {"success": True})
         except Exception as err: _send_error(connection, msg, err)
@@ -374,20 +382,20 @@ if websocket_api is not None:
             connection.send_result(msg["id"], {"success": True})
         except Exception as err: _send_error(connection, msg, err)
 
-    @websocket_api.websocket_command({**_base("camper_travel_journal/create_expense"), vol.Required("trip_id"): str, vol.Required("occurred_at"): str, vol.Required("category"): str, vol.Required("amount_minor"): vol.Coerce(int), vol.Optional("currency", default="EUR"): str, vol.Optional("note"): str, vol.Optional("odometer_km"): vol.Coerce(float)})
+    @websocket_api.websocket_command({**_base("camper_travel_journal/create_expense"), vol.Required("trip_id"): str, vol.Required("occurred_at"): str, vol.Required("category"): str, vol.Required("amount_minor"): vol.Coerce(int), vol.Optional("currency", default="EUR"): str, vol.Optional("note"): str, vol.Optional("odometer_km"): vol.Coerce(float), vol.Optional("place_id"): str, vol.Optional("stay_id"): str})
     @websocket_api.async_response
     async def ws_create_expense(hass, connection, msg):
         try:
-            expense = Expense(id="", trip_id=msg["trip_id"], occurred_at=_timestamp(msg["occurred_at"]), category=validate_expense_category(msg["category"]), amount_minor=validate_amount(msg["amount_minor"]), currency=validate_expense_currency(msg["currency"]), note=msg.get("note"), odometer_km=msg.get("odometer_km"))
+            expense = Expense(id="", trip_id=msg["trip_id"], occurred_at=_timestamp(msg["occurred_at"]), category=validate_expense_category(msg["category"]), amount_minor=validate_amount(msg["amount_minor"]), currency=validate_expense_currency(msg["currency"]), note=msg.get("note"), odometer_km=msg.get("odometer_km"), place_id=msg.get("place_id"), stay_id=msg.get("stay_id"))
             result = await _call(hass, msg, "create_expense", expense, _now())
             connection.send_result(msg["id"], {"expense_id": result})
         except Exception as err: _send_error(connection, msg, err)
 
-    @websocket_api.websocket_command({**_base("camper_travel_journal/update_expense"), vol.Required("expense_id"): str, vol.Optional("occurred_at"): str, vol.Optional("category"): str, vol.Optional("amount_minor"): vol.Coerce(int), vol.Optional("currency"): str, vol.Optional("note"): str, vol.Optional("odometer_km"): vol.Coerce(float)})
+    @websocket_api.websocket_command({**_base("camper_travel_journal/update_expense"), vol.Required("expense_id"): str, vol.Optional("occurred_at"): str, vol.Optional("category"): str, vol.Optional("amount_minor"): vol.Coerce(int), vol.Optional("currency"): str, vol.Optional("note"): str, vol.Optional("odometer_km"): vol.Coerce(float), vol.Optional("place_id"): str, vol.Optional("stay_id"): str})
     @websocket_api.async_response
     async def ws_update_expense(hass, connection, msg):
         try:
-            fields = {key: msg[key] for key in ("currency", "note", "odometer_km", "amount_minor") if key in msg}
+            fields = {key: msg[key] for key in ("currency", "note", "odometer_km", "amount_minor", "place_id", "stay_id") if key in msg}
             if "category" in msg: fields["category"] = validate_expense_category(msg["category"])
             if "occurred_at" in msg: fields["occurred_at"] = _timestamp(msg["occurred_at"])
             if "amount_minor" in fields: fields["amount_minor"] = validate_amount(fields["amount_minor"])
@@ -401,6 +409,63 @@ if websocket_api is not None:
     async def ws_delete_expense(hass, connection, msg):
         try:
             await _call(hass, msg, "delete_expense", msg["expense_id"])
+            connection.send_result(msg["id"], {"success": True})
+        except Exception as err: _send_error(connection, msg, err)
+
+    @websocket_api.websocket_command({**_base("camper_travel_journal/update_overnight"), vol.Required("place_id"): str, vol.Optional("place_kind"): str, vol.Optional("website_url"): str, vol.Optional("booking_note"): str, vol.Optional("large_rv_suitable"): bool})
+    @websocket_api.async_response
+    async def ws_update_overnight(hass, connection, msg):
+        try:
+            fields = {key: msg[key] for key in ("place_kind", "website_url", "booking_note", "large_rv_suitable") if key in msg}
+            await _call(hass, msg, "upsert_overnight_details", msg["place_id"], _now(), **fields)
+            connection.send_result(msg["id"], {"success": True})
+        except Exception as err: _send_error(connection, msg, err)
+
+    @websocket_api.websocket_command({**_base("camper_travel_journal/update_rating"), vol.Required("place_id"): str, vol.Required("overall"): vol.Coerce(int), vol.Optional("large_rv_access"): vol.Coerce(int), vol.Optional("space_maneuvering"): vol.Coerce(int), vol.Optional("facilities"): vol.Coerce(int), vol.Optional("surroundings"): vol.Coerce(int), vol.Optional("review_text", default=""): str, vol.Optional("rated_at"): str})
+    @websocket_api.async_response
+    async def ws_update_rating(hass, connection, msg):
+        try:
+            fields = {key: msg[key] for key in ("overall", "large_rv_access", "space_maneuvering", "facilities", "surroundings", "review_text", "rated_at") if key in msg}
+            await _call(hass, msg, "upsert_place_rating", msg["place_id"], _now(), **fields)
+            connection.send_result(msg["id"], {"success": True})
+        except Exception as err: _send_error(connection, msg, err)
+
+    @websocket_api.websocket_command({**_base("camper_travel_journal/delete_rating"), vol.Required("place_id"): str})
+    @websocket_api.async_response
+    async def ws_delete_rating(hass, connection, msg):
+        try:
+            await _call(hass, msg, "delete_place_rating", msg["place_id"])
+            connection.send_result(msg["id"], {"success": True})
+        except Exception as err: _send_error(connection, msg, err)
+
+    @websocket_api.websocket_command({**_base("camper_travel_journal/list_stop_suggestions"), vol.Optional("trip_id"): str, vol.Optional("status", default="pending"): str})
+    @websocket_api.async_response
+    async def ws_list_stop_suggestions(hass, connection, msg):
+        try:
+            connection.send_result(msg["id"], {"suggestions": await _call(hass, msg, "list_stop_suggestions", msg["vehicle_id"], trip_id=msg.get("trip_id"), status=msg.get("status", "pending"))})
+        except Exception as err: _send_error(connection, msg, err)
+
+    @websocket_api.websocket_command({**_base("camper_travel_journal/generate_stop_suggestions"), vol.Optional("trip_id"): str, vol.Optional("minimum_minutes", default=10): vol.Coerce(int), vol.Optional("radius_m", default=150): vol.Coerce(float)})
+    @websocket_api.async_response
+    async def ws_generate_stop_suggestions(hass, connection, msg):
+        try:
+            result = await _call(hass, msg, "generate_stop_suggestions", msg["vehicle_id"], _now(), minimum_minutes=msg.get("minimum_minutes", 10), radius_m=msg.get("radius_m", 150), trip_id=msg.get("trip_id"))
+            connection.send_result(msg["id"], {"suggestions": result})
+        except Exception as err: _send_error(connection, msg, err)
+
+    @websocket_api.websocket_command({**_base("camper_travel_journal/accept_stop_suggestion"), vol.Required("suggestion_id"): str, vol.Optional("trip_id"): str, vol.Optional("name", default="GPS-Stopp"): str, vol.Optional("place_type", default="other"): str})
+    @websocket_api.async_response
+    async def ws_accept_stop_suggestion(hass, connection, msg):
+        try:
+            stop_id = await _call(hass, msg, "accept_stop_suggestion", msg["suggestion_id"], _now(), name=msg.get("name", "GPS-Stopp"), place_type=msg.get("place_type", "other"), trip_id=msg.get("trip_id"))
+            connection.send_result(msg["id"], {"stop_id": stop_id})
+        except Exception as err: _send_error(connection, msg, err)
+
+    @websocket_api.websocket_command({**_base("camper_travel_journal/dismiss_stop_suggestion"), vol.Required("suggestion_id"): str})
+    @websocket_api.async_response
+    async def ws_dismiss_stop_suggestion(hass, connection, msg):
+        try:
+            await _call(hass, msg, "dismiss_stop_suggestion", msg["suggestion_id"], _now())
             connection.send_result(msg["id"], {"success": True})
         except Exception as err: _send_error(connection, msg, err)
 
@@ -433,7 +498,7 @@ if websocket_api is not None:
             connection.send_result(msg["id"], result)
         except Exception as err: _send_error(connection, msg, err)
 
-    COMMANDS = (ws_list_vehicles, ws_export_pdf, ws_list, ws_route, ws_diagnostics, ws_create_trip, ws_update_trip, ws_delete_trip, ws_transition_trip, ws_link_drives, ws_unlink_drive, ws_create_manual_drive, ws_update_manual_drive, ws_delete_manual_drive, ws_create_stop, ws_update_stop, ws_delete_stop, ws_create_expense, ws_update_expense, ws_delete_expense, ws_analyze_gpx, ws_import_gpx)
+    COMMANDS = (ws_list_vehicles, ws_export_pdf, ws_list, ws_route, ws_diagnostics, ws_create_trip, ws_update_trip, ws_delete_trip, ws_transition_trip, ws_link_drives, ws_unlink_drive, ws_create_manual_drive, ws_update_manual_drive, ws_delete_manual_drive, ws_create_stop, ws_update_stop, ws_delete_stop, ws_create_expense, ws_update_expense, ws_delete_expense, ws_update_overnight, ws_update_rating, ws_delete_rating, ws_list_stop_suggestions, ws_generate_stop_suggestions, ws_accept_stop_suggestion, ws_dismiss_stop_suggestion, ws_analyze_gpx, ws_import_gpx)
 else:
     COMMANDS = ()
 

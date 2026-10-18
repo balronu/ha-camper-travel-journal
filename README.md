@@ -196,3 +196,14 @@ bewahren.
 ## Lizenz
 
 Camper Travel Journal steht unter der [MIT-Lizenz](LICENSE).
+# v0.3.0 development status
+
+The `feature/v0.3.0-places` branch builds on schema v8 without changing the
+v0.2.0 stable installation. It adds authenticated place/overnight/rating APIs,
+explicit GPS stop suggestions, linked expense context, extended PDF sections,
+confirmed map markers, and a provider-neutral public export contract.
+
+GPS suggestions remain pending until a user accepts them. Coordinates,
+descriptions, notes, and expenses are excluded from the public export unless
+explicitly enabled by the caller. No WordPress connection or publication is
+implemented.

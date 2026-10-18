@@ -61,3 +61,15 @@ def test_report_uses_home_assistant_timezone_and_localized_categories():
     assert _time("2026-01-01T23:30:00+00:00", "de", "Europe/Berlin") == "00:30"
     assert _category_label("fuel", "de") == "Kraftstoff"
     assert _category_label("other", "en") == "Other"
+
+
+def test_report_accepts_overnight_places_ratings_and_linked_expenses():
+    report = _report(drives=1, expenses=3, stops=8)
+    for index, stop in enumerate(report["stops"]):
+        stop.update({"place_type": "campsite" if index % 2 else "restaurant", "arrived_at": "2026-10-13T15:00:00+00:00", "departed_at": "2026-10-14T08:00:00+00:00", "duration_seconds": 61200, "rating_overall": 4 if index % 3 else None, "large_rv_access": 5, "space_maneuvering": 4, "facilities": None, "surroundings": 3})
+    for expense in report["expenses"]:
+        expense["place_name"] = "Campingplatz"; expense["place_id"] = "stop-1"
+    german, _ = render_trip_report(report, language="de", time_zone="Europe/Berlin")
+    english, _ = render_trip_report(report, language="en", time_zone="Europe/Berlin")
+    assert german.startswith(b"%PDF-") and english.startswith(b"%PDF-")
+    assert german.count(b"/Type /Page") >= 1 and english.count(b"/Type /Page") >= 1

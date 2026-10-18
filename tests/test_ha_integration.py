@@ -154,7 +154,7 @@ else:
         await client.send_json({"id": 2, "type": "camper_travel_journal/list", "vehicle_id": entry.entry_id})
         listed = await client.receive_json()
         assert listed["success"] is True
-        assert set(listed["result"]) == {"trips", "drives", "stops", "map_config"}
+        assert set(listed["result"]) == {"trips", "drives", "stops", "stop_suggestions", "map_config"}
         assert listed["result"]["map_config"] == {"provider": "none", "tile_url": None, "tile_attribution": None}
 
         await client.send_json({"id": 3, "type": "camper_travel_journal/diagnostics", "vehicle_id": entry.entry_id})
@@ -188,6 +188,13 @@ else:
             "camper_travel_journal/create_expense",
             "camper_travel_journal/update_expense",
             "camper_travel_journal/delete_expense",
+            "camper_travel_journal/update_overnight",
+            "camper_travel_journal/update_rating",
+            "camper_travel_journal/delete_rating",
+            "camper_travel_journal/list_stop_suggestions",
+            "camper_travel_journal/generate_stop_suggestions",
+            "camper_travel_journal/accept_stop_suggestion",
+            "camper_travel_journal/dismiss_stop_suggestion",
             "camper_travel_journal/analyze_gpx",
             "camper_travel_journal/import_gpx",
         ]

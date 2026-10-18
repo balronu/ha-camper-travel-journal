@@ -15,6 +15,7 @@ export class MapCard extends TravelCard {
   private trips: Snapshot["trips"] = [];
   private selectedTripId = "";
   private drives: Snapshot["drives"] = [];
+  private places: Snapshot["stops"] = [];
   private selectedDriveIds: string[] = [];
   private driveSelectionInitialized = false;
   private data?: RouteResponse;
@@ -29,6 +30,7 @@ export class MapCard extends TravelCard {
   private vehicleName = "";
   private driveSectionsOpen = false;
   private fitMapPending = true;
+  private showPlaces = true;
 
   connectedCallback() {
     super.connectedCallback();
@@ -71,6 +73,7 @@ export class MapCard extends TravelCard {
       const details = this.selectedTripId ? await list(this.hass, this.vehicleId, this.selectedTripId) : overview;
       this.mapConfig = details.map_config ?? this.mapConfig;
       this.drives = sortDrivesChronologically(details.drives);
+      this.places = details.stops ?? [];
       const available = new Set(this.drives.map((drive) => drive.id));
       this.selectedDriveIds = this.selectedDriveIds.filter((id) => available.has(id));
       if (!this.driveSelectionInitialized) {
@@ -136,6 +139,23 @@ export class MapCard extends TravelCard {
         const marker = L.circleMarker(gapPoint, { radius: 8, color: "#f57c00", fillOpacity: 0.9 }).bindTooltip(`${lang.mapGap}: ${gap.seconds}s`).addTo(this.map);
         this.layers.push(marker);
       }
+    }
+    for (const place of this.places) {
+      if (!this.showPlaces) continue;
+      if (place.latitude == null || place.longitude == null || place.confirmed === false) continue;
+      const overnight = ["campsite", "rv_site", "wild_camp", "overnight"].includes(place.place_kind || place.place_type || place.stop_type);
+      const marker = L.circleMarker([place.latitude, place.longitude], { radius: overnight ? 9 : 7, color: overnight ? "#7b1fa2" : "#455a64", fillColor: overnight ? "#ce93d8" : "#90a4ae", fillOpacity: 0.95, weight: 2 });
+      const rating = place.rating_overall ? ` · ${place.rating_overall}/5` : "";
+      const popup = document.createElement("div");
+      const title = document.createElement("strong");
+      title.textContent = place.name || "Ort";
+      popup.append(title, document.createElement("br"));
+      popup.append(document.createTextNode(`${place.place_type || place.stop_type}${rating}`), document.createElement("br"));
+      popup.append(document.createTextNode(place.description || ""));
+      marker.bindPopup(popup);
+      marker.addTo(this.map);
+      this.layers.push(marker);
+      bounds.extend([place.latitude, place.longitude]);
     }
     if (this.fitMapPending && bounds.isValid()) {
       this.map.fitBounds(bounds.pad(0.08));
@@ -207,6 +227,7 @@ export class MapCard extends TravelCard {
         <div class="drive-actions"><button class="secondary" type="button" @click=${() => void this.selectAllDrives()}>${lang.mapSelectAll}</button><button class="secondary" type="button" @click=${() => void this.selectNoDrives()}>${lang.mapSelectNone}</button></div>
         <div class="drive-list">${this.drives.map((drive, index) => this.driveRow(drive, index))}</div>
       </details>` : ""}
+      <label class="place-filter"><input type="checkbox" .checked=${this.showPlaces} @change=${(event: Event) => { this.showPlaces = (event.currentTarget as HTMLInputElement).checked; this.queueMapRender(); this.requestUpdate(); }}> ${lang.mapPlaces ?? "Orte anzeigen"}</label>
       ${this.error ? html`<p class="error" role="alert">${this.error}</p>` : ""}
       ${this.tileError ? html`<p class="error" role="alert">${messages(this.hass).mapTilesUnavailable ?? (this.hass?.locale?.language?.toLowerCase().startsWith("de") ? "Die Hintergrundkarte konnte nicht geladen werden. Die GPS-Route bleibt sichtbar." : "The background map could not be loaded. The GPS route remains visible.")}</p>` : !manualConfig.tile_url && !this.mapConfig?.tile_url ? html`<p class="muted" role="status">${messages(this.hass).mapTilesNotConfigured ?? (this.hass?.locale?.language?.toLowerCase().startsWith("de") ? "Keine Hintergrundkarte konfiguriert. Die GPS-Route bleibt sichtbar." : "No background map is configured. The GPS route remains visible.")}</p>` : ""}
       ${this.data?.truncated ? html`<p class="muted">${lang.mapTruncated}: ${this.data.returned_points} / ${this.data.total_points}</p>` : ""}

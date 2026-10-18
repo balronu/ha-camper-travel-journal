@@ -224,3 +224,10 @@
 - Read-only Vorschau mit UTC-Zeitstempeln, Fahrtenerkennung, Sprung-/Lückenhinweisen und Duplikatkonflikten.
 - Atomarer, idempotenter Import in bestehende Fahrzeuge und Reisen.
 - Manager-Karte mit Dateiauswahl, Vorschau und ausdrücklicher Bestätigung.
+# v0.3.0 (development)
+
+- Added authenticated place, overnight-detail, rating, expense-link and GPS-stop-suggestion APIs on top of schema v8.
+- Added gap-aware, deduplicated pending GPS suggestions with explicit accept/dismiss actions; suggestions never become public stops automatically.
+- Extended the ReportLab report with place type, stay duration, ratings and linked expense context while preserving timezone-aware output.
+- Added a provider-neutral public export contract with coordinates, descriptions, notes and expenses opt-in only.
+- Extended the map bundle with confirmed place markers and typed place API helpers. No fifth card was added.

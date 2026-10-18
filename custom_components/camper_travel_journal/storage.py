@@ -8,6 +8,7 @@ SQLite connection may be used directly from an event-loop callback.
 import asyncio
 import sqlite3
 import uuid
+from math import asin, cos, radians, sin, sqrt
 from collections.abc import Iterator
 from contextlib import contextmanager
 from datetime import datetime, timedelta, timezone
@@ -15,7 +16,7 @@ from pathlib import Path
 
 from .travel import validate_amount, validate_expense_category, validate_expense_currency
 
-SCHEMA_VERSION = 7
+SCHEMA_VERSION = 8
 SCHEMA_SQL = """
 PRAGMA foreign_keys = ON;
 CREATE TABLE IF NOT EXISTS schema_meta (key TEXT PRIMARY KEY, value TEXT NOT NULL);
@@ -135,6 +136,8 @@ class SQLiteStore:
                     self._migrate_v6()
                 if previous < 7:
                     self._migrate_v7()
+                if previous < 8:
+                    self._migrate_v8()
                 connection.execute("INSERT OR REPLACE INTO schema_meta(key, value) VALUES('version', ?)", (str(SCHEMA_VERSION),))
         except Exception:
             self.close()
@@ -247,6 +250,71 @@ class SQLiteStore:
                     "INSERT OR IGNORE INTO drive_gps_points(drive_id,gps_point_id,ordinal,association_source) VALUES(?,?,?,?)",
                     (drive_id, point[0], ordinal, "interval_reconstructed"),
                 )
+
+    def _migrate_v8(self) -> None:
+        """Add the v0.3.0 place foundation without rewriting v7 data."""
+        if self.connection is None:
+            raise RuntimeError("store is not open")
+        stop_columns = {row[1] for row in self.connection.execute("PRAGMA table_info(stops)")}
+        additions = {
+            "drive_id": "TEXT REFERENCES drives(id) ON DELETE SET NULL",
+            "place_type": "TEXT NOT NULL DEFAULT 'other'",
+            "address": "TEXT NOT NULL DEFAULT ''",
+            "source": "TEXT NOT NULL DEFAULT 'legacy'",
+            "confirmed": "INTEGER NOT NULL DEFAULT 1",
+        }
+        for name, definition in additions.items():
+            if name not in stop_columns:
+                self.connection.execute(f"ALTER TABLE stops ADD COLUMN {name} {definition}")
+        self.connection.execute("UPDATE stops SET place_type=stop_type WHERE place_type='other' AND stop_type <> 'other'")
+        self.connection.execute("UPDATE stops SET source=CASE WHEN automatic=1 THEN 'legacy' ELSE 'manual' END WHERE source='legacy'")
+        self.connection.executescript("""
+        CREATE INDEX IF NOT EXISTS idx_stops_drive ON stops(drive_id);
+        CREATE INDEX IF NOT EXISTS idx_stops_type ON stops(vehicle_id, place_type, occurred_at);
+        CREATE TABLE IF NOT EXISTS overnight_details (
+          place_id TEXT PRIMARY KEY REFERENCES stops(id) ON DELETE CASCADE,
+          place_kind TEXT NOT NULL DEFAULT 'other',
+          website_url TEXT,
+          booking_note TEXT,
+          large_rv_suitable INTEGER,
+          created_at TEXT NOT NULL,
+          updated_at TEXT NOT NULL
+        );
+        CREATE TABLE IF NOT EXISTS place_ratings (
+          place_id TEXT PRIMARY KEY REFERENCES stops(id) ON DELETE CASCADE,
+          overall INTEGER NOT NULL CHECK(overall BETWEEN 1 AND 5),
+          large_rv_access INTEGER CHECK(large_rv_access BETWEEN 1 AND 5),
+          space_maneuvering INTEGER CHECK(space_maneuvering BETWEEN 1 AND 5),
+          facilities INTEGER CHECK(facilities BETWEEN 1 AND 5),
+          surroundings INTEGER CHECK(surroundings BETWEEN 1 AND 5),
+          review_text TEXT NOT NULL DEFAULT '',
+          rated_at TEXT,
+          created_at TEXT NOT NULL,
+          updated_at TEXT NOT NULL
+        );
+        CREATE TABLE IF NOT EXISTS stop_suggestions (
+          id TEXT PRIMARY KEY,
+          vehicle_id TEXT NOT NULL REFERENCES vehicles(id) ON DELETE CASCADE,
+          trip_id TEXT REFERENCES trips(id) ON DELETE SET NULL,
+          drive_id TEXT REFERENCES drives(id) ON DELETE SET NULL,
+          arrived_at TEXT NOT NULL,
+          departed_at TEXT,
+          latitude REAL NOT NULL,
+          longitude REAL NOT NULL,
+          source TEXT NOT NULL DEFAULT 'gps_suggestion',
+          status TEXT NOT NULL DEFAULT 'pending' CHECK(status IN ('pending','accepted','dismissed')),
+          created_at TEXT NOT NULL,
+          updated_at TEXT NOT NULL,
+          UNIQUE(vehicle_id, arrived_at, latitude, longitude)
+        );
+        CREATE INDEX IF NOT EXISTS idx_overnight_places_kind ON overnight_details(place_kind);
+        CREATE INDEX IF NOT EXISTS idx_suggestions_vehicle_status ON stop_suggestions(vehicle_id, status, arrived_at);
+        """)
+        expense_columns = {row[1] for row in self.connection.execute("PRAGMA table_info(expenses)")}
+        if "place_id" not in expense_columns:
+            self.connection.execute("ALTER TABLE expenses ADD COLUMN place_id TEXT REFERENCES stops(id) ON DELETE SET NULL")
+        self.connection.execute("UPDATE expenses SET place_id=stay_id WHERE place_id IS NULL AND stay_id IS NOT NULL")
+        self.connection.execute("CREATE INDEX IF NOT EXISTS idx_expenses_place ON expenses(place_id)")
 
     def close(self) -> None:
         if self.connection is not None:
@@ -535,32 +603,211 @@ class SQLiteStore:
     def create_stop(self, stop, now: datetime) -> str:
         stop_id = stop.id or str(uuid.uuid4())
         with self.transaction() as connection:
+            vehicle = connection.execute("SELECT 1 FROM vehicles WHERE id=?", (stop.vehicle_id,)).fetchone()
+            if vehicle is None:
+                raise ValueError("vehicle_not_found")
+            if stop.trip_id is not None:
+                trip = connection.execute("SELECT vehicle_id FROM trips WHERE id=?", (stop.trip_id,)).fetchone()
+                if trip is None:
+                    raise ValueError("trip_not_found")
+                if trip[0] != stop.vehicle_id:
+                    raise ValueError("vehicle_mismatch")
+            if stop.drive_id is not None:
+                drive = connection.execute("SELECT vehicle_id FROM drives WHERE id=?", (stop.drive_id,)).fetchone()
+                if drive is None:
+                    raise ValueError("drive_not_found")
+                if drive[0] != stop.vehicle_id:
+                    raise ValueError("vehicle_mismatch")
+            if stop.arrived_at and stop.departed_at and stop.departed_at < stop.arrived_at:
+                raise ValueError("stop_time_range_invalid")
             stamp = utc_iso(now)
-            connection.execute("INSERT INTO stops(id,vehicle_id,trip_id,name,occurred_at,arrived_at,departed_at,latitude,longitude,description,stop_type,automatic,created_at,updated_at) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?)", (stop_id, stop.vehicle_id, stop.trip_id, stop.name.strip(), utc_iso(stop.occurred_at), utc_iso(stop.arrived_at) if stop.arrived_at else None, utc_iso(stop.departed_at) if stop.departed_at else None, stop.latitude, stop.longitude, stop.description.strip(), stop.stop_type, int(stop.automatic), stamp, stamp))
+            place_type = stop.place_type or stop.stop_type
+            connection.execute("INSERT INTO stops(id,vehicle_id,trip_id,drive_id,name,occurred_at,arrived_at,departed_at,latitude,longitude,description,stop_type,place_type,address,source,automatic,confirmed,created_at,updated_at) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)", (stop_id, stop.vehicle_id, stop.trip_id, stop.drive_id, stop.name.strip(), utc_iso(stop.occurred_at), utc_iso(stop.arrived_at) if stop.arrived_at else None, utc_iso(stop.departed_at) if stop.departed_at else None, stop.latitude, stop.longitude, stop.description.strip(), place_type, place_type, (stop.address or "").strip(), stop.source, int(stop.automatic), int(stop.confirmed), stamp, stamp))
         return stop_id
 
     def list_stops(self, vehicle_id: str, trip_id: str | None = None) -> list[dict]:
         if self.connection is None: raise RuntimeError("store is not open")
-        query = "SELECT * FROM stops WHERE vehicle_id=?"; args: list = [vehicle_id]
+        query = "SELECT s.*, od.place_kind, od.website_url, od.booking_note, od.large_rv_suitable, pr.overall AS rating_overall, pr.large_rv_access, pr.space_maneuvering, pr.facilities, pr.surroundings, pr.review_text, pr.rated_at FROM stops s LEFT JOIN overnight_details od ON od.place_id=s.id LEFT JOIN place_ratings pr ON pr.place_id=s.id WHERE s.vehicle_id=?"; args: list = [vehicle_id]
         if trip_id: query += " AND trip_id=?"; args.append(trip_id)
-        return [dict(row) for row in self.connection.execute(query + " ORDER BY occurred_at", args).fetchall()]
+        query += " ORDER BY s.occurred_at"
+        result = []
+        for row in self.connection.execute(query, args).fetchall():
+            item = dict(row)
+            arrived = item.get("arrived_at") or item.get("occurred_at")
+            departed = item.get("departed_at")
+            item["duration_seconds"] = 0
+            if arrived and departed:
+                try:
+                    item["duration_seconds"] = max(0, int((datetime.fromisoformat(departed) - datetime.fromisoformat(arrived)).total_seconds()))
+                except ValueError:
+                    pass
+            item["confirmed"] = bool(item.get("confirmed", 1))
+            item["automatic"] = bool(item.get("automatic", 0))
+            result.append(item)
+        return result
 
     def delete_stop(self, stop_id: str) -> None:
         with self.transaction() as connection: connection.execute("DELETE FROM stops WHERE id=?", (stop_id,))
 
     def update_stop(self, stop_id: str, now: datetime, **fields) -> None:
-        allowed = {"trip_id", "name", "occurred_at", "arrived_at", "departed_at", "latitude", "longitude", "description", "stop_type", "automatic"}
+        allowed = {"trip_id", "drive_id", "name", "occurred_at", "arrived_at", "departed_at", "latitude", "longitude", "description", "stop_type", "place_type", "address", "source", "automatic", "confirmed"}
         changes = {key: value for key, value in fields.items() if key in allowed and value is not None}
         for key in ("occurred_at", "arrived_at", "departed_at"):
             if isinstance(changes.get(key), datetime):
                 changes[key] = utc_iso(changes[key])
         if "name" in changes: changes["name"] = changes["name"].strip()
+        if "address" in changes: changes["address"] = changes["address"].strip()
+        if "place_type" in changes: changes["stop_type"] = changes["place_type"]
+        if "arrived_at" in changes and "departed_at" in changes and changes["arrived_at"] and changes["departed_at"] and changes["departed_at"] < changes["arrived_at"]:
+            raise ValueError("stop_time_range_invalid")
         if not changes: return
         changes["updated_at"] = utc_iso(now)
         assignments = ",".join(f"{key}=?" for key in changes)
         with self.transaction() as connection:
+            current = connection.execute("SELECT vehicle_id FROM stops WHERE id=?", (stop_id,)).fetchone()
+            if current is None:
+                raise ValueError("stop_not_found")
+            vehicle_id = current[0]
+            if "trip_id" in changes and changes["trip_id"]:
+                trip = connection.execute("SELECT vehicle_id FROM trips WHERE id=?", (changes["trip_id"],)).fetchone()
+                if trip is None: raise ValueError("trip_not_found")
+                if trip[0] != vehicle_id: raise ValueError("vehicle_mismatch")
+            if "drive_id" in changes and changes["drive_id"]:
+                drive = connection.execute("SELECT vehicle_id FROM drives WHERE id=?", (changes["drive_id"],)).fetchone()
+                if drive is None: raise ValueError("drive_not_found")
+                if drive[0] != vehicle_id: raise ValueError("vehicle_mismatch")
             cursor = connection.execute(f"UPDATE stops SET {assignments} WHERE id=?", (*changes.values(), stop_id))
             if cursor.rowcount != 1: raise ValueError("stop_not_found")
+
+    def upsert_overnight_details(self, place_id: str, now: datetime, **fields) -> None:
+        """Store only overnight-specific data in its normalized 1:1 table."""
+        allowed = {"place_kind", "website_url", "booking_note", "large_rv_suitable"}
+        changes = {key: value for key, value in fields.items() if key in allowed}
+        if not changes:
+            return
+        if "website_url" in changes and changes["website_url"] is not None:
+            changes["website_url"] = changes["website_url"].strip() or None
+        stamp = utc_iso(now)
+        with self.transaction() as connection:
+            if connection.execute("SELECT 1 FROM stops WHERE id=?", (place_id,)).fetchone() is None:
+                raise ValueError("stop_not_found")
+            existing = connection.execute("SELECT 1 FROM overnight_details WHERE place_id=?", (place_id,)).fetchone()
+            if existing is None:
+                values = {"place_kind": "other", "website_url": None, "booking_note": None, "large_rv_suitable": None, **changes}
+                connection.execute("INSERT INTO overnight_details(place_id,place_kind,website_url,booking_note,large_rv_suitable,created_at,updated_at) VALUES(?,?,?,?,?,?,?)", (place_id, values["place_kind"], values["website_url"], values["booking_note"], values["large_rv_suitable"], stamp, stamp))
+            else:
+                changes["updated_at"] = stamp
+                assignments = ",".join(f"{key}=?" for key in changes)
+                connection.execute(f"UPDATE overnight_details SET {assignments} WHERE place_id=?", (*changes.values(), place_id))
+
+    def upsert_place_rating(self, place_id: str, now: datetime, **fields) -> None:
+        """Persist an optional rating; overall is independent and mandatory per rating."""
+        allowed = {"overall", "large_rv_access", "space_maneuvering", "facilities", "surroundings", "review_text", "rated_at"}
+        changes = {key: value for key, value in fields.items() if key in allowed}
+        if "overall" not in changes or not isinstance(changes["overall"], int) or not 1 <= changes["overall"] <= 5:
+            raise ValueError("rating_overall_invalid")
+        for key in ("large_rv_access", "space_maneuvering", "facilities", "surroundings"):
+            if changes.get(key) is not None and (not isinstance(changes[key], int) or not 1 <= changes[key] <= 5):
+                raise ValueError("rating_criterion_invalid")
+        changes["review_text"] = str(changes.get("review_text") or "").strip()
+        stamp = utc_iso(now)
+        with self.transaction() as connection:
+            if connection.execute("SELECT 1 FROM stops WHERE id=?", (place_id,)).fetchone() is None:
+                raise ValueError("stop_not_found")
+            existing = connection.execute("SELECT 1 FROM place_ratings WHERE place_id=?", (place_id,)).fetchone()
+            if existing is None:
+                values = {key: changes.get(key) for key in ("overall", "large_rv_access", "space_maneuvering", "facilities", "surroundings", "review_text", "rated_at")}
+                connection.execute("INSERT INTO place_ratings(place_id,overall,large_rv_access,space_maneuvering,facilities,surroundings,review_text,rated_at,created_at,updated_at) VALUES(?,?,?,?,?,?,?,?,?,?)", (place_id, values["overall"], values["large_rv_access"], values["space_maneuvering"], values["facilities"], values["surroundings"], values["review_text"], values["rated_at"], stamp, stamp))
+            else:
+                changes["updated_at"] = stamp
+                assignments = ",".join(f"{key}=?" for key in changes)
+                connection.execute(f"UPDATE place_ratings SET {assignments} WHERE place_id=?", (*changes.values(), place_id))
+
+    def delete_place_rating(self, place_id: str) -> None:
+        with self.transaction() as connection:
+            connection.execute("DELETE FROM place_ratings WHERE place_id=?", (place_id,))
+
+    def list_stop_suggestions(self, vehicle_id: str, *, trip_id: str | None = None, status: str = "pending") -> list[dict]:
+        if self.connection is None: raise RuntimeError("store is not open")
+        if status not in {"pending", "accepted", "dismissed", "all"}:
+            raise ValueError("suggestion_status_invalid")
+        query = "SELECT * FROM stop_suggestions WHERE vehicle_id=?"
+        args: list = [vehicle_id]
+        if trip_id:
+            query += " AND trip_id=?"; args.append(trip_id)
+        if status != "all":
+            query += " AND status=?"; args.append(status)
+        return [dict(row) for row in self.connection.execute(query + " ORDER BY arrived_at", args).fetchall()]
+
+    @staticmethod
+    def _distance_m(latitude_a: float, longitude_a: float, latitude_b: float, longitude_b: float) -> float:
+        earth = 6_371_000.0
+        lat1, lat2 = radians(latitude_a), radians(latitude_b)
+        dlat, dlon = lat2 - lat1, radians(longitude_b - longitude_a)
+        value = sin(dlat / 2) ** 2 + cos(lat1) * cos(lat2) * sin(dlon / 2) ** 2
+        return 2 * earth * asin(min(1.0, sqrt(value)))
+
+    def generate_stop_suggestions(self, vehicle_id: str, now: datetime, *, minimum_minutes: int = 10, radius_m: float = 150.0, max_gap_minutes: int = 10, trip_id: str | None = None) -> list[dict]:
+        """Create pending suggestions from contiguous, gap-free stationary GPS windows.
+
+        This never creates a confirmed stop and never treats a GPS outage as a stay.
+        """
+        if self.connection is None: raise RuntimeError("store is not open")
+        if minimum_minutes < 1 or radius_m <= 0:
+            raise ValueError("suggestion_parameters_invalid")
+        rows = self.connection.execute("SELECT recorded_at,latitude,longitude FROM gps_points WHERE vehicle_id=? ORDER BY recorded_at,id", (vehicle_id,)).fetchall()
+        candidates: list[tuple] = []
+        window: list = []
+        max_gap = timedelta(minutes=max_gap_minutes)
+        minimum = timedelta(minutes=minimum_minutes)
+        def flush() -> None:
+            nonlocal window
+            if len(window) >= 2:
+                start = datetime.fromisoformat(window[0][0]); end = datetime.fromisoformat(window[-1][0])
+                if end - start >= minimum:
+                    lat = sum(float(row[1]) for row in window) / len(window)
+                    lon = sum(float(row[2]) for row in window) / len(window)
+                    candidates.append((start, end, lat, lon))
+            window = []
+        for row in rows:
+            current = datetime.fromisoformat(row[0])
+            if not window:
+                window = [row]; continue
+            previous = datetime.fromisoformat(window[-1][0])
+            if current - previous > max_gap or self._distance_m(float(window[0][1]), float(window[0][2]), float(row[1]), float(row[2])) > radius_m:
+                flush()
+            window.append(row)
+        flush()
+        created: list[dict] = []
+        with self.transaction() as connection:
+            for start, end, lat, lon in candidates:
+                overlap = connection.execute("SELECT 1 FROM stops WHERE vehicle_id=? AND confirmed=1 AND latitude IS NOT NULL AND longitude IS NOT NULL AND ((arrived_at IS NULL AND occurred_at BETWEEN ? AND ?) OR (arrived_at <= ? AND (departed_at IS NULL OR departed_at >= ?))) LIMIT 1", (vehicle_id, utc_iso(start), utc_iso(end), utc_iso(end), utc_iso(start))).fetchone()
+                if overlap:
+                    continue
+                existing = connection.execute("SELECT 1 FROM stop_suggestions WHERE vehicle_id=? AND status IN ('pending','accepted') AND arrived_at=? AND abs(latitude-?) < 0.002 AND abs(longitude-?) < 0.002", (vehicle_id, utc_iso(start), lat, lon)).fetchone()
+                if existing:
+                    continue
+                suggestion_id = str(uuid.uuid4()); stamp = utc_iso(now)
+                connection.execute("INSERT INTO stop_suggestions(id,vehicle_id,trip_id,arrived_at,departed_at,latitude,longitude,created_at,updated_at) VALUES(?,?,?,?,?,?,?,?,?)", (suggestion_id, vehicle_id, trip_id, utc_iso(start), utc_iso(end), lat, lon, stamp, stamp))
+                created.append(dict(connection.execute("SELECT * FROM stop_suggestions WHERE id=?", (suggestion_id,)).fetchone()))
+        return created
+
+    def accept_stop_suggestion(self, suggestion_id: str, now: datetime, *, name: str = "GPS-Stopp", place_type: str = "other", trip_id: str | None = None) -> str:
+        if self.connection is None: raise RuntimeError("store is not open")
+        row = self.connection.execute("SELECT * FROM stop_suggestions WHERE id=?", (suggestion_id,)).fetchone()
+        if row is None: raise ValueError("suggestion_not_found")
+        if row["status"] != "pending": raise ValueError("suggestion_not_pending")
+        selected_trip = trip_id or row["trip_id"]
+        stop = type("SuggestionStop", (), {"id": "", "vehicle_id": row["vehicle_id"], "trip_id": selected_trip, "drive_id": row["drive_id"], "name": name, "occurred_at": datetime.fromisoformat(row["arrived_at"]), "arrived_at": datetime.fromisoformat(row["arrived_at"]), "departed_at": datetime.fromisoformat(row["departed_at"]) if row["departed_at"] else None, "latitude": row["latitude"], "longitude": row["longitude"], "description": "", "stop_type": place_type, "place_type": place_type, "address": "", "source": "gps_suggestion", "automatic": True, "confirmed": True})()
+        stop_id = self.create_stop(stop, now)
+        with self.transaction() as connection:
+            connection.execute("UPDATE stop_suggestions SET status='accepted',updated_at=? WHERE id=?", (utc_iso(now), suggestion_id))
+        return stop_id
+
+    def dismiss_stop_suggestion(self, suggestion_id: str, now: datetime) -> None:
+        with self.transaction() as connection:
+            cursor = connection.execute("UPDATE stop_suggestions SET status='dismissed',updated_at=? WHERE id=? AND status='pending'", (utc_iso(now), suggestion_id))
+            if cursor.rowcount != 1: raise ValueError("suggestion_not_pending")
 
     def create_expense(self, expense, now: datetime) -> str:
         expense_id = expense.id or str(uuid.uuid4())
@@ -569,14 +816,20 @@ class SQLiteStore:
         currency = validate_expense_currency(expense.currency)
         with self.transaction() as connection:
             stamp = utc_iso(now)
-            if connection.execute("SELECT 1 FROM trips WHERE id=?", (expense.trip_id,)).fetchone() is None:
+            trip = connection.execute("SELECT vehicle_id FROM trips WHERE id=?", (expense.trip_id,)).fetchone()
+            if trip is None:
                 raise ValueError("trip_not_found")
-            connection.execute("INSERT INTO expenses(id,trip_id,occurred_at,category,amount_minor,currency,note,created_at,updated_at,odometer_km,stay_id) VALUES(?,?,?,?,?,?,?,?,?,?,?)", (expense_id, expense.trip_id, utc_iso(expense.occurred_at), category, amount_minor, currency, expense.note, stamp, stamp, expense.odometer_km, expense.stay_id))
+            place_id = expense.place_id or expense.stay_id
+            if place_id is not None:
+                place = connection.execute("SELECT vehicle_id,trip_id FROM stops WHERE id=?", (place_id,)).fetchone()
+                if place is None: raise ValueError("place_not_found")
+                if place[0] != trip[0] or place[1] not in (None, expense.trip_id): raise ValueError("vehicle_mismatch")
+            connection.execute("INSERT INTO expenses(id,trip_id,occurred_at,category,amount_minor,currency,note,created_at,updated_at,odometer_km,stay_id,place_id) VALUES(?,?,?,?,?,?,?,?,?,?,?,?)", (expense_id, expense.trip_id, utc_iso(expense.occurred_at), category, amount_minor, currency, expense.note, stamp, stamp, expense.odometer_km, expense.stay_id, place_id))
         return expense_id
 
     def list_expenses(self, trip_id: str) -> list[dict]:
         if self.connection is None: raise RuntimeError("store is not open")
-        return [dict(row) for row in self.connection.execute("SELECT * FROM expenses WHERE trip_id=? ORDER BY occurred_at DESC", (trip_id,)).fetchall()]
+        return [dict(row) for row in self.connection.execute("SELECT e.*, s.name AS place_name FROM expenses e LEFT JOIN stops s ON s.id=COALESCE(e.place_id,e.stay_id) WHERE e.trip_id=? ORDER BY e.occurred_at DESC", (trip_id,)).fetchall()]
 
     def delete_expense(self, expense_id: str) -> None:
         with self.transaction() as connection:
@@ -585,7 +838,7 @@ class SQLiteStore:
                 raise ValueError("expense_not_found")
 
     def update_expense(self, expense_id: str, now: datetime, **fields) -> None:
-        allowed = {"trip_id", "occurred_at", "category", "amount_minor", "currency", "note", "odometer_km", "stay_id"}
+        allowed = {"trip_id", "occurred_at", "category", "amount_minor", "currency", "note", "odometer_km", "stay_id", "place_id"}
         changes = {key: value for key, value in fields.items() if key in allowed and value is not None}
         if "amount_minor" in changes: changes["amount_minor"] = validate_amount(changes["amount_minor"])
         if "category" in changes: changes["category"] = validate_expense_category(changes["category"])
@@ -595,6 +848,11 @@ class SQLiteStore:
         changes["updated_at"] = utc_iso(now)
         assignments = ",".join(f"{key}=?" for key in changes)
         with self.transaction() as connection:
+            if "place_id" in changes and changes["place_id"]:
+                expense = connection.execute("SELECT trip_id FROM expenses WHERE id=?", (expense_id,)).fetchone()
+                if expense is None: raise ValueError("expense_not_found")
+                place = connection.execute("SELECT 1 FROM stops WHERE id=? AND (trip_id IS NULL OR trip_id=?)", (changes["place_id"], expense[0])).fetchone()
+                if place is None: raise ValueError("place_not_found")
             cursor = connection.execute(f"UPDATE expenses SET {assignments} WHERE id=?", (*changes.values(), expense_id))
             if cursor.rowcount != 1: raise ValueError("expense_not_found")
 

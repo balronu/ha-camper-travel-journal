@@ -87,6 +87,12 @@ def test_timestamp_and_amount_validation():
         api._timestamp(123)
     with pytest.raises(ValueError, match="timestamp_must_be_utc"):
         api._timestamp("2026-10-01T12:00:00")
+    with pytest.raises(ValueError, match="date_invalid"):
+        api._date(123)
+    with pytest.raises(ValueError, match="date_invalid"):
+        api._date("not-a-date")
+    with pytest.raises(ValueError, match="trip_date_range_invalid"):
+        api._date_range("2026-10-02", "2026-10-01")
     with pytest.raises(ValueError, match="vehicle_not_loaded"):
         api._runtime(type("Hass", (), {"data": {}})(), "missing")
 
@@ -251,4 +257,18 @@ async def test_phase3_crud_and_assignment_commands_complete():
     await api.ws_delete_stop.__wrapped__(hass, connection, {"id": 11, "vehicle_id": "v1", "stop_id": "s1"})
     await api.ws_update_expense.__wrapped__(hass, connection, {"id": 12, "vehicle_id": "v1", "expense_id": "e1", "category": "fuel", "amount_minor": 200, "currency": "eur", "occurred_at": "2026-10-01T12:00:00Z", "note": "Tank"})
     await api.ws_delete_expense.__wrapped__(hass, connection, {"id": 13, "vehicle_id": "v1", "expense_id": "e1"})
+    assert len(connection.results) == 7, connection.errors
+
+
+@pytest.mark.asyncio
+async def test_phase4_place_and_suggestion_commands_complete():
+    hass = FakeHass()
+    connection = FakeConnection()
+    await api.ws_update_overnight.__wrapped__(hass, connection, {"id": 20, "vehicle_id": "v1", "place_id": "s1", "place_kind": "campsite", "large_rv_suitable": True})
+    await api.ws_update_rating.__wrapped__(hass, connection, {"id": 21, "vehicle_id": "v1", "place_id": "s1", "overall": 5, "facilities": 4, "review_text": "Gut"})
+    await api.ws_delete_rating.__wrapped__(hass, connection, {"id": 22, "vehicle_id": "v1", "place_id": "s1"})
+    await api.ws_list_stop_suggestions.__wrapped__(hass, connection, {"id": 23, "vehicle_id": "v1", "trip_id": "t1"})
+    await api.ws_generate_stop_suggestions.__wrapped__(hass, connection, {"id": 24, "vehicle_id": "v1", "trip_id": "t1", "minimum_minutes": 10, "radius_m": 150})
+    await api.ws_accept_stop_suggestion.__wrapped__(hass, connection, {"id": 25, "vehicle_id": "v1", "suggestion_id": "g1", "trip_id": "t1", "name": "Rast", "place_type": "parking"})
+    await api.ws_dismiss_stop_suggestion.__wrapped__(hass, connection, {"id": 26, "vehicle_id": "v1", "suggestion_id": "g1"})
     assert len(connection.results) == 7, connection.errors
