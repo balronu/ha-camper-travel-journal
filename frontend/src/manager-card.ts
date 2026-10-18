@@ -1,6 +1,6 @@
 import { css, html } from "lit";
 import { TravelCard, defineOnce } from "./base-card";
-import { analyzeGPX, createExpense, createManualDrive, createTrip, deleteExpense, deleteManualDrive, deleteTrip, exportPdf, importGPX, linkDrives, list, listVehicles, transition, unlinkDrive, updateExpense, updateManualDrive, updateTrip, type Drive, type Expense, type GPXPreview, type Snapshot } from "./api";
+import { acceptStopSuggestion, analyzeGPX, createExpense, createManualDrive, createTrip, deleteExpense, deleteManualDrive, deleteTrip, dismissStopSuggestion, exportPdf, generateStopSuggestions, importGPX, linkDrives, list, listVehicles, transition, unlinkDrive, updateExpense, updateManualDrive, updateTrip, type Drive, type Expense, type GPXPreview, type Snapshot, type StopSuggestion } from "./api";
 import { notifyExpensesChanged, notifyTravelChanged } from "./expense-events";
 import { categoryLabel, EXPENSE_CATEGORIES, formatDateTime, formatDuration, formatMoneyMinor, formatTripPeriod, isExpenseCategory, messages, parseAmountMinor, statusLabel, type ExpenseCategory } from "./i18n";
 
@@ -16,6 +16,9 @@ export class ManagerCard extends TravelCard {
   private pdfBusyTripId = "";
   private pdfSelectedTripId = "";
   private vehicleName = "";
+  private async refreshSuggestions(tripId: string) { if (!this.hass) return; try { await generateStopSuggestions(this.hass, this.vehicleId, tripId); await this.refresh(); } catch { this.fail(messages(this.hass).loadError); } }
+  private async acceptSuggestion(suggestion: StopSuggestion, tripId: string) { if (!this.hass) return; try { await acceptStopSuggestion(this.hass, this.vehicleId, suggestion.id, tripId); await this.refresh(); notifyTravelChanged({ vehicleId: this.vehicleId, tripId }); } catch { this.fail(messages(this.hass).loadError); } }
+  private async dismissSuggestion(suggestion: StopSuggestion, tripId: string) { if (!this.hass) return; try { await dismissStopSuggestion(this.hass, this.vehicleId, suggestion.id); await this.refresh(); notifyTravelChanged({ vehicleId: this.vehicleId, tripId }); } catch { this.fail(messages(this.hass).loadError); } }
 
   connectedCallback() { super.connectedCallback(); void this.refresh(); }
   protected onHassConnectionChanged() { void this.refresh(); }
@@ -169,7 +172,11 @@ export class ManagerCard extends TravelCard {
     const trip = trips.find((item) => item.id === tripId) ?? trips[0];
     return html`<section class="pdf-export"><h3>${lang.pdfExportTitle}</h3><div class="pdf-export-row"><select aria-label=${lang.pdfExportTrip} .value=${trip.id} @change=${(event: Event) => { this.pdfSelectedTripId = (event.currentTarget as HTMLSelectElement).value; this.requestUpdate(); }}>${trips.map((item) => html`<option value=${item.id}>${item.title}</option>`)}</select><button type="button" @click=${() => void this.downloadPdf(trip)} ?disabled=${Boolean(this.pdfBusyTripId)}>${this.pdfBusyTripId ? lang.pdfExporting : lang.pdfExport}</button></div></section>`;
   }
-  render() { const lang = messages(this.hass); const trips = this.snapshot?.trips ?? []; return html`${this.renderGpx(lang, trips, this.gpxPreview)}${this.renderPdfExport(lang, trips)}${this.renderLegacy()}`; }
+  private renderSuggestions(lang: ReturnType<typeof messages>, tripId: string) {
+    const suggestions = this.snapshot?.stop_suggestions ?? [];
+    return html`<section><h3>${lang.gpsSuggestions ?? "GPS-Stoppvorschläge"}</h3><button type="button" @click=${() => void this.refreshSuggestions(tripId)}>${lang.generateSuggestions ?? "Vorschläge aktualisieren"}</button>${suggestions.length ? html`<ul>${suggestions.map((suggestion) => html`<li>${formatDateTime(suggestion.arrived_at, this.hass)} – ${formatDateTime(suggestion.departed_at || suggestion.arrived_at, this.hass)} <button type="button" @click=${() => void this.acceptSuggestion(suggestion, tripId)}>${lang.accept ?? "Übernehmen"}</button><button type="button" class="secondary" @click=${() => void this.dismissSuggestion(suggestion, tripId)}>${lang.dismiss ?? "Verwerfen"}</button></li>`)}</ul>` : html`<p class="muted">${lang.noSuggestions ?? "Keine offenen Vorschläge."}</p>`}</section>`;
+  }
+  render() { const lang = messages(this.hass); const trips = this.snapshot?.trips ?? []; return html`${this.renderGpx(lang, trips, this.gpxPreview)}${this.renderPdfExport(lang, trips)}${this.selected ? this.renderSuggestions(lang, this.selected) : ""}${this.renderLegacy()}`; }
   private renderLegacy() {
     const lang = messages(this.hass); const trips = this.snapshot?.trips ?? []; const expenses = this.snapshot?.expenses ?? []; const summary = this.snapshot?.expense_summary;
     const total = summary?.mixed_currency ? lang.mixedCurrency : summary?.total_minor !== undefined && summary.currency ? formatMoneyMinor(summary.total_minor, summary.currency, this.hass) : formatMoneyMinor(0, "EUR", this.hass); const error = this.loadError || this.actionError;

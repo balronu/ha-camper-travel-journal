@@ -77,6 +77,8 @@ export class SummaryCard extends TravelCard {
     const trip = this.snapshot?.trips[0];
     const trips = this.trips;
     const km = (this.snapshot?.drives ?? []).reduce((sum, drive) => sum + drive.distance_m, 0) / 1000;
+    const confirmedStops = (this.snapshot?.stops ?? []).filter((stop) => stop.confirmed !== false);
+    const overnightCount = confirmedStops.filter((stop) => ["campsite", "rv_site", "wild_camp", "overnight"].includes(stop.place_kind || stop.place_type || stop.stop_type)).length;
     const summary = this.snapshot?.expense_summary;
     const total = summary?.mixed_currency ? lang.mixedCurrency : summary?.total_minor !== undefined && summary.currency ? formatMoneyMinor(summary.total_minor, summary.currency, this.hass) : formatMoneyMinor(0, "EUR", this.hass);
     const error = this.loadError || this.actionError;

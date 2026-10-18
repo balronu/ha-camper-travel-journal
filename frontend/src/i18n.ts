@@ -23,6 +23,7 @@ type Messages = {
   gpxVehicle: string; gpxVehicleFixed: string; gpxTargetTrip: string; gpxNoTrip: string; gpxSelectTrip: string; gpxSummary: string; gpxSelectedDrives: string; gpxDistance: string; gpxPeriod: string; gpxPeriodWarning: string; gpxGapBoundary: string;
   mapTitle: string; mapVehicle?: string; mapTrip?: string; mapTotalDistance?: string; mapSelectedDrives?: string; mapTripPeriod?: string; mapDriveSegments: string; mapExpandSegments?: string; mapCollapseSegments?: string; mapSelectAll?: string; mapSelectNone?: string; mapStart: string; mapEnd: string; mapGap: string; mapTruncated: string; mapNoPoints: string; mapRouteImageAlt: string; mapAttribution: string; mapTilesNotConfigured?: string; mapTilesUnavailable?: string;
   pdfExportTitle: string; pdfExportTrip: string; pdfExport: string; pdfExporting: string; pdfExportError: string;
+  overnights?: string; gpsSuggestions?: string; generateSuggestions?: string; accept?: string; dismiss?: string; noSuggestions?: string;
 };
 
 const de: Messages = {

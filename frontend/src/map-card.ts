@@ -15,6 +15,7 @@ export class MapCard extends TravelCard {
   private trips: Snapshot["trips"] = [];
   private selectedTripId = "";
   private drives: Snapshot["drives"] = [];
+  private places: Snapshot["stops"] = [];
   private selectedDriveIds: string[] = [];
   private driveSelectionInitialized = false;
   private data?: RouteResponse;
@@ -71,6 +72,7 @@ export class MapCard extends TravelCard {
       const details = this.selectedTripId ? await list(this.hass, this.vehicleId, this.selectedTripId) : overview;
       this.mapConfig = details.map_config ?? this.mapConfig;
       this.drives = sortDrivesChronologically(details.drives);
+      this.places = details.stops ?? [];
       const available = new Set(this.drives.map((drive) => drive.id));
       this.selectedDriveIds = this.selectedDriveIds.filter((id) => available.has(id));
       if (!this.driveSelectionInitialized) {
@@ -136,6 +138,22 @@ export class MapCard extends TravelCard {
         const marker = L.circleMarker(gapPoint, { radius: 8, color: "#f57c00", fillOpacity: 0.9 }).bindTooltip(`${lang.mapGap}: ${gap.seconds}s`).addTo(this.map);
         this.layers.push(marker);
       }
+    }
+    for (const place of this.places) {
+      if (place.latitude == null || place.longitude == null || place.confirmed === false) continue;
+      const overnight = ["campsite", "rv_site", "wild_camp", "overnight"].includes(place.place_kind || place.place_type || place.stop_type);
+      const marker = L.circleMarker([place.latitude, place.longitude], { radius: overnight ? 9 : 7, color: overnight ? "#7b1fa2" : "#455a64", fillColor: overnight ? "#ce93d8" : "#90a4ae", fillOpacity: 0.95, weight: 2 });
+      const rating = place.rating_overall ? ` · ${place.rating_overall}/5` : "";
+      const popup = document.createElement("div");
+      const title = document.createElement("strong");
+      title.textContent = place.name || "Ort";
+      popup.append(title, document.createElement("br"));
+      popup.append(document.createTextNode(`${place.place_type || place.stop_type}${rating}`), document.createElement("br"));
+      popup.append(document.createTextNode(place.description || ""));
+      marker.bindPopup(popup);
+      marker.addTo(this.map);
+      this.layers.push(marker);
+      bounds.extend([place.latitude, place.longitude]);
     }
     if (this.fitMapPending && bounds.isValid()) {
       this.map.fitBounds(bounds.pad(0.08));

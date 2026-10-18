@@ -7,6 +7,7 @@ from pathlib import Path
 
 from custom_components.camper_travel_journal.models import Expense, Stop
 from custom_components.camper_travel_journal.storage import SQLiteStore
+from custom_components.camper_travel_journal.export_contract import build_public_trip_export
 
 UTC = timezone.utc
 
@@ -49,6 +50,25 @@ class V03PlaceTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "rating_overall_invalid"):
             self.store.upsert_place_rating(stop, self.now, overall=6)
         self.assertIsNone(self.store.list_stops("v1", self.trip)[0]["rating_overall"])
+
+    def test_gap_aware_suggestions_are_pending_deduplicated_and_confirmable(self):
+        for minute in (0, 5, 10, 15):
+            self.store.connection.execute("INSERT INTO gps_points(vehicle_id,recorded_at,latitude,longitude) VALUES(?,?,?,?)", ("v1", f"2026-10-18T12:{minute:02d}:00+00:00", 50.0 + minute * 0.00001, 8.0))
+        self.store.connection.commit()
+        suggestions = self.store.generate_stop_suggestions("v1", self.now)
+        self.assertEqual(len(suggestions), 1)
+        self.assertEqual(suggestions[0]["status"], "pending")
+        self.assertEqual(self.store.generate_stop_suggestions("v1", self.now), [])
+        stop_id = self.store.accept_stop_suggestion(suggestions[0]["id"], self.now, trip_id=self.trip)
+        self.assertEqual(self.store.list_stops("v1", self.trip)[0]["id"], stop_id)
+        self.assertEqual(self.store.list_stop_suggestions("v1", status="all")[0]["status"], "accepted")
+
+    def test_public_export_defaults_to_private_fields(self):
+        stop = {"id": "p1", "name": "Geheimer Ort", "place_type": "restaurant", "latitude": 50.0, "longitude": 8.0, "description": "privat", "review_text": "privat", "rating_overall": 4}
+        payload = build_public_trip_export({"id": self.trip, "title": "Reise", "destination": "Ziel"}, [stop])
+        self.assertNotIn("location", payload["places"][0])
+        self.assertNotIn("description", payload["places"][0])
+        self.assertNotIn("review_text", payload["places"][0])
 
 
 if __name__ == "__main__":
