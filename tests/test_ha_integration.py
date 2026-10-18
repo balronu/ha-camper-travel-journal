@@ -204,6 +204,8 @@ else:
         hass: HomeAssistant, hass_ws_client, enable_custom_integrations
     ):
         """Exercise both registered commands against an isolated HA runtime."""
+        import sqlite3
+
         tracker = "device_tracker.websocket_interruption"
         hass.states.async_set(tracker, "home", {"latitude": 49.0, "longitude": 7.0, "gps_accuracy": 5})
         entry = MockConfigEntry(domain=DOMAIN, data=_data(tracker))
@@ -252,15 +254,65 @@ else:
             "type": "camper_travel_journal/create_stop",
             "vehicle_id": entry.entry_id,
             "trip_id": trip_id,
-            "occurred_at": "2026-10-18T10:00:00Z",
-            "name": "Bestehender Ort",
-            "category": "parking",
+            "occurred_at": "2026-10-18T09:00:00Z",
+            "arrived_at": "2026-10-18T09:00:00Z",
+            "departed_at": "2026-10-18T11:00:00Z",
+            "name": "Kuhhirten",
+            "category": "rv_site",
+            "address": "Bremen, Kuhhirten",
+            "description": "Bestehende Stellplatznotiz",
         })
         assert existing_stop["success"] is True
         existing_stop_id = existing_stop["result"]["stop_id"]
 
-        assigned = await command({
+        overnight = await command({
             "id": 14,
+            "type": "camper_travel_journal/update_overnight",
+            "vehicle_id": entry.entry_id,
+            "place_id": existing_stop_id,
+            "place_kind": "rv_site",
+            "website_url": "https://stellplatz-bremen.de/",
+            "booking_note": "Vorhandene Buchungsnotiz",
+            "large_rv_suitable": True,
+        })
+        rating = await command({
+            "id": 15,
+            "type": "camper_travel_journal/update_rating",
+            "vehicle_id": entry.entry_id,
+            "place_id": existing_stop_id,
+            "overall": 5,
+            "large_rv_access": 4,
+            "space_maneuvering": 4,
+            "facilities": 3,
+            "surroundings": 5,
+            "review_text": "Unveränderte Bremen-Bewertung",
+            "rated_at": "2026-10-18T11:00:00Z",
+        })
+        assert overnight["success"] is True and rating["success"] is True
+
+        async def read_database(query: str, parameters: tuple = ()) -> list[tuple]:
+            database = hass.config.path("camper_travel_journal.db")
+
+            def read() -> list[tuple]:
+                with sqlite3.connect(f"file:{database}?mode=ro", uri=True) as connection:
+                    return connection.execute(query, parameters).fetchall()
+
+            return await hass.async_add_executor_job(read)
+
+        snapshot_query = (
+            "SELECT s.id,s.vehicle_id,s.trip_id,s.drive_id,s.name,s.occurred_at,s.arrived_at,s.departed_at,"
+            "s.latitude,s.longitude,s.description,s.stop_type,s.place_type,s.address,s.source,s.automatic,s.confirmed,"
+            "od.place_kind,od.website_url,od.booking_note,od.large_rv_suitable,"
+            "pr.overall,pr.large_rv_access,pr.space_maneuvering,pr.facilities,pr.surroundings,pr.review_text,pr.rated_at "
+            "FROM stops s LEFT JOIN overnight_details od ON od.place_id=s.id "
+            "LEFT JOIN place_ratings pr ON pr.place_id=s.id WHERE s.id=?"
+        )
+        before_snapshot = (await read_database(snapshot_query, (existing_stop_id,)))[0]
+        assert len(await read_database("SELECT id FROM stops WHERE vehicle_id=? AND trip_id=?", (entry.entry_id, trip_id))) == 1
+        assert await read_database("SELECT trip_id,interruption_id,stop_id FROM interruption_links") == []
+
+        assigned = await command({
+            "id": 16,
             "type": "camper_travel_journal/assign_interruption",
             "vehicle_id": entry.entry_id,
             "trip_id": trip_id,
@@ -268,17 +320,38 @@ else:
             "status": "stop",
             "stop_id": existing_stop_id,
         })
-        assert assigned == {"id": 14, "type": "result", "success": True, "result": {"success": True}}
+        assert assigned == {"id": 16, "type": "result", "success": True, "result": {"success": True}}
 
-        listed = await command({"id": 15, "type": "camper_travel_journal/list", "vehicle_id": entry.entry_id, "trip_id": trip_id})
+        links = await read_database(
+            "SELECT trip_id,interruption_id,status,stop_id FROM interruption_links"
+        )
+        assert links == [(trip_id, interruption_id, "stop", existing_stop_id)]
+        assert len(await read_database("SELECT id FROM stops WHERE vehicle_id=? AND trip_id=?", (entry.entry_id, trip_id))) == 1
+        assert (await read_database(snapshot_query, (existing_stop_id,)))[0] == before_snapshot
+
+        listed = await command({"id": 17, "type": "camper_travel_journal/list", "vehicle_id": entry.entry_id, "trip_id": trip_id})
         interruption = next(item for item in listed["result"]["interruptions"] if item["id"] == interruption_id)
         assert (interruption["status"], interruption["existing_place_id"]) == ("stop", existing_stop_id)
 
-        third = await command(drive_message(16, "2026-10-18T16:00:00Z"))
-        fourth = await command(drive_message(17, "2026-10-18T20:00:00Z"))
+        repeated_assignment = await command({
+            "id": 18,
+            "type": "camper_travel_journal/assign_interruption",
+            "vehicle_id": entry.entry_id,
+            "trip_id": trip_id,
+            "interruption_id": interruption_id,
+            "status": "stop",
+            "stop_id": existing_stop_id,
+        })
+        assert repeated_assignment == {"id": 18, "type": "result", "success": True, "result": {"success": True}}
+        assert len(await read_database("SELECT trip_id,interruption_id,stop_id FROM interruption_links")) == 1
+        assert len(await read_database("SELECT id FROM stops WHERE vehicle_id=? AND trip_id=?", (entry.entry_id, trip_id))) == 1
+        assert (await read_database(snapshot_query, (existing_stop_id,)))[0] == before_snapshot
+
+        third = await command(drive_message(19, "2026-10-18T16:00:00Z"))
+        fourth = await command(drive_message(20, "2026-10-18T20:00:00Z"))
         second_interruption = f"{third['result']['drive_id']}:{fourth['result']['drive_id']}"
         created = await command({
-            "id": 18,
+            "id": 21,
             "type": "camper_travel_journal/create_stop_from_interruption",
             "vehicle_id": entry.entry_id,
             "trip_id": trip_id,
@@ -288,7 +361,7 @@ else:
             "overnight": True,
         })
         repeated = await command({
-            "id": 19,
+            "id": 22,
             "type": "camper_travel_journal/create_stop_from_interruption",
             "vehicle_id": entry.entry_id,
             "trip_id": trip_id,
@@ -302,7 +375,7 @@ else:
         assert repeated["result"] == created["result"]
 
         invalid = await command({
-            "id": 20,
+            "id": 23,
             "type": "camper_travel_journal/create_stop_from_interruption",
             "vehicle_id": entry.entry_id,
             "trip_id": trip_id,
@@ -313,13 +386,13 @@ else:
         assert invalid["error"]["code"] == "place_name_required"
 
         other_trip = await command({
-            "id": 21,
+            "id": 24,
             "type": "camper_travel_journal/create_trip",
             "vehicle_id": entry.entry_id,
             "title": "Other trip",
         })
         cross_trip = await command({
-            "id": 22,
+            "id": 25,
             "type": "camper_travel_journal/assign_interruption",
             "vehicle_id": entry.entry_id,
             "trip_id": other_trip["result"]["trip_id"],
@@ -330,7 +403,7 @@ else:
         assert cross_trip["error"]["code"] == "interruption_not_found"
 
         cross_vehicle = await command({
-            "id": 23,
+            "id": 26,
             "type": "camper_travel_journal/assign_interruption",
             "vehicle_id": "not-loaded",
             "trip_id": trip_id,
