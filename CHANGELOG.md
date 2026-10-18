@@ -10,6 +10,13 @@
 - Summary, Manager und Map synchronisieren den aktiven Reisekontext pro
   Lovelace-Dashboard und Fahrzeug; der PDF-Export verwendet dieselbe Reise.
 - Ortsformulare sind auf iPhone-Breiten einspaltig und touch-freundlicher.
+- Fahrtunterbrechungen zwischen aufeinanderfolgenden Fahrten werden read-only
+  abgeleitet, als unbestätigt angezeigt und erst nach ausdrücklicher Benennung
+  als Ort gespeichert.
+- Die Map Card bietet einen sichtbaren, nicht automatisch speichernden Modus
+  „Ort hinzufügen“; Kartenklicks erzeugen zunächst nur eine Vorschau.
+- Fahrtübersichten und PDF-Berichte enthalten Start-/Enddatum, Uhrzeit, Dauer,
+  Strecke und Herkunft der Fahrt.
 - Produktive Reisen, Fahrten, GPS-Punkte und Kosten bleiben unverändert.
 
 ## 0.2.0 – Stable

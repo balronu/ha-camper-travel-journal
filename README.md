@@ -200,8 +200,12 @@ Camper Travel Journal steht unter der [MIT-Lizenz](LICENSE).
 
 The `feature/v0.3.0-beta.2` branch builds on schema v8 without changing the
 v0.2.0 stable installation. It adds authenticated place/overnight/rating APIs,
-explicit GPS stop suggestions, linked expense context, extended PDF sections,
-confirmed map markers, and a provider-neutral public export contract.
+explicit GPS stop suggestions, derived read-only gaps between consecutive
+drives, linked expense context, extended PDF sections, confirmed map markers,
+and an explicit map mode for manually adding a place. A gap between drives is
+not a proven stay and is never stored automatically; only a user-confirmed
+place is shown as a place in the manager, map, and PDF. The release also
+contains a provider-neutral public export contract.
 
 GPS suggestions remain pending until a user accepts them. Coordinates,
 descriptions, notes, and expenses are excluded from the public export unless

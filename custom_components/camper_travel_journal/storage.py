@@ -529,6 +529,69 @@ class SQLiteStore:
         if trip_id: query += " AND td.trip_id=?"; args.append(trip_id)
         return [self._drive_dict(row) for row in self.connection.execute(query + " ORDER BY d.started_at DESC", args).fetchall()]
 
+    def list_trip_interruptions(self, vehicle_id: str, trip_id: str) -> list[dict]:
+        """Derive gaps between consecutive assigned drives without persisting them.
+
+        A gap only proves that no assigned drive is stored for that interval.  It
+        is intentionally not a GPS stay and never creates a stop by itself.
+        Endpoint coordinates are returned only when an actual associated GPS
+        point exists for the adjacent drive.
+        """
+        if self.connection is None:
+            raise RuntimeError("store is not open")
+        trip = self.connection.execute(
+            "SELECT vehicle_id FROM trips WHERE id=?", (trip_id,)
+        ).fetchone()
+        if trip is None:
+            raise ValueError("trip_not_found")
+        if trip[0] != vehicle_id:
+            raise ValueError("vehicle_mismatch")
+        drives = self.connection.execute(
+            "SELECT d.id,d.started_at,d.ended_at FROM drives d "
+            "JOIN trip_drives td ON td.drive_id=d.id "
+            "WHERE td.trip_id=? AND d.vehicle_id=? "
+            "ORDER BY d.started_at,d.id",
+            (trip_id, vehicle_id),
+        ).fetchall()
+        result: list[dict] = []
+        for previous, following in zip(drives, drives[1:]):
+            previous_end = datetime.fromisoformat(previous[2])
+            following_start = datetime.fromisoformat(following[1])
+            seconds = int((following_start - previous_end).total_seconds())
+            if seconds <= 0:
+                continue
+            last = self.connection.execute(
+                "SELECT p.recorded_at,p.latitude,p.longitude "
+                "FROM drive_gps_points dgp JOIN gps_points p ON p.id=dgp.gps_point_id "
+                "WHERE dgp.drive_id=? ORDER BY dgp.ordinal DESC LIMIT 1",
+                (previous[0],),
+            ).fetchone()
+            first = self.connection.execute(
+                "SELECT p.recorded_at,p.latitude,p.longitude "
+                "FROM drive_gps_points dgp JOIN gps_points p ON p.id=dgp.gps_point_id "
+                "WHERE dgp.drive_id=? ORDER BY dgp.ordinal LIMIT 1",
+                (following[0],),
+            ).fetchone()
+            existing = self.connection.execute(
+                "SELECT id FROM stops WHERE vehicle_id=? AND trip_id=? "
+                "AND arrived_at IS NOT NULL AND departed_at IS NOT NULL "
+                "AND arrived_at < ? AND departed_at > ? ORDER BY occurred_at LIMIT 1",
+                (vehicle_id, trip_id, following[1], previous[2]),
+            ).fetchone()
+            result.append({
+                "id": f"{previous[0]}:{following[0]}",
+                "status": "confirmed_place" if existing else "unconfirmed",
+                "previous_drive_id": previous[0],
+                "next_drive_id": following[0],
+                "started_at": previous[2],
+                "ended_at": following[1],
+                "duration_seconds": seconds,
+                "previous_end_point": dict(last) if last else None,
+                "next_start_point": dict(first) if first else None,
+                "existing_place_id": existing[0] if existing else None,
+            })
+        return result
+
     def list_available_drives(self, vehicle_id: str) -> list[dict]:
         if self.connection is None: raise RuntimeError("store is not open")
         return [self._drive_dict(row) for row in self.connection.execute("SELECT d.*, NULL AS trip_id FROM drives d LEFT JOIN trip_drives td ON td.drive_id=d.id WHERE d.vehicle_id=? AND td.drive_id IS NULL ORDER BY d.started_at DESC", (vehicle_id,)).fetchall()]

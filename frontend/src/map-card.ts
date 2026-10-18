@@ -1,7 +1,7 @@
 import { css, html, unsafeCSS } from "lit";
 import { TravelCard, defineOnce } from "./base-card";
-import { list, listVehicles, route, type Drive, type MapConfig, type RouteResponse, type Snapshot } from "./api";
-import { formatCompactTripPeriod, formatDate, formatTime, messages } from "./i18n";
+import { createStop, list, listVehicles, route, type Drive, type MapConfig, type RouteResponse, type Snapshot } from "./api";
+import { formatCompactTripPeriod, formatDate, formatDateTime, formatDuration, formatTime, messages } from "./i18n";
 import * as L from "leaflet";
 import leafletCss from "leaflet/dist/leaflet.css?inline";
 import { sortDrivesChronologically } from "./map-utils";
@@ -32,6 +32,13 @@ export class MapCard extends TravelCard {
   private driveSectionsOpen = false;
   private fitMapPending = true;
   private showPlaces = true;
+  private addPlaceMode = false;
+  private draftPoint?: { latitude: number; longitude: number; recorded_at?: string };
+  private draftName = "";
+  private draftType = "other";
+  private draftArrived = "";
+  private draftDescription = "";
+  private draftSaving = false;
   private readonly onActiveTripChanged = (event: Event) => {
     const detail = (event as CustomEvent<TripContextDetail>).detail;
     if (detail?.vehicleId !== this.vehicleId || detail.tripId === this.selectedTripId) return;
@@ -121,6 +128,8 @@ export class MapCard extends TravelCard {
       this.map = L.map(host, { zoomControl: true, attributionControl: true });
       this.map.setView([51.0, 10.0], 5);
     }
+    this.map.off("click", this.onMapClick);
+    if (this.addPlaceMode) this.map.on("click", this.onMapClick);
     const manualConfig = this.config as MapCardConfig;
     const tileUrl = manualConfig.tile_url ?? this.mapConfig?.tile_url ?? undefined;
     const tileAttribution = manualConfig.tile_attribution ?? this.mapConfig?.tile_attribution ?? undefined;
@@ -136,6 +145,7 @@ export class MapCard extends TravelCard {
     for (const layer of this.layers) layer.remove();
     this.layers = [];
     const bounds = L.latLngBounds([]);
+    const lang = messages(this.hass);
     for (const [index, segment] of (this.data?.segments ?? []).entries()) {
       const points = segment.points.map((point) => L.latLng(point.latitude, point.longitude));
       if (!points.length) continue;
@@ -144,9 +154,8 @@ export class MapCard extends TravelCard {
       const line = L.polyline(points, { color, weight: 4, opacity: 0.85 }).addTo(this.map);
       this.layers.push(line);
       points.forEach((point) => bounds.extend(point));
-      const lang = messages(this.hass);
-      const start = L.circleMarker(points[0], { radius: 6, color, fillOpacity: 1 }).bindTooltip(lang.mapStart).addTo(this.map);
-      const end = L.circleMarker(points[points.length - 1], { radius: 6, color: "#111", fillColor: color, fillOpacity: 1 }).bindTooltip(lang.mapEnd).addTo(this.map);
+      const start = L.circleMarker(points[0], { radius: 6, color, fillOpacity: 1 }).bindTooltip(lang.mapStart).bindPopup(this.endpointPopup(lang.mapStart, segment.points[0])).addTo(this.map);
+      const end = L.circleMarker(points[points.length - 1], { radius: 6, color: "#111", fillColor: color, fillOpacity: 1 }).bindTooltip(lang.mapEnd).bindPopup(this.endpointPopup(lang.mapEnd, segment.points[segment.points.length - 1])).addTo(this.map);
       this.layers.push(start, end);
       for (const gap of segment.gaps) {
         const gapPoint = points[Math.max(0, Math.floor(points.length / 2))];
@@ -171,11 +180,77 @@ export class MapCard extends TravelCard {
       this.layers.push(marker);
       bounds.extend([place.latitude, place.longitude]);
     }
+    if (this.draftPoint) {
+      const preview = L.circleMarker([this.draftPoint.latitude, this.draftPoint.longitude], { radius: 10, color: "#f57c00", fillColor: "#ffcc80", fillOpacity: 0.9, weight: 3 }).bindTooltip(lang.mapAddPlace ?? "Ort hinzufügen").addTo(this.map);
+      this.layers.push(preview);
+      bounds.extend([this.draftPoint.latitude, this.draftPoint.longitude]);
+    }
     if (this.fitMapPending && bounds.isValid()) {
       this.map.fitBounds(bounds.pad(0.08));
       this.fitMapPending = false;
     }
     setTimeout(() => this.map?.invalidateSize(), 0);
+  }
+
+  private readonly onMapClick = (event: L.LeafletMouseEvent) => {
+    if (!this.addPlaceMode) return;
+    const point = this.nearestRoutePoint(event.latlng.lat, event.latlng.lng);
+    this.draftPoint = { latitude: event.latlng.lat, longitude: event.latlng.lng, recorded_at: point?.recorded_at };
+    if (!this.draftArrived && point?.recorded_at) this.draftArrived = this.localDateTime(point.recorded_at);
+    this.requestUpdate();
+    this.queueMapRender();
+  };
+
+  private endpointPopup(label: string, point: { recorded_at: string; latitude: number; longitude: number }) {
+    const popup = document.createElement("div");
+    popup.append(document.createTextNode(`${label}: ${formatDateTime(point.recorded_at, this.hass)}`), document.createElement("br"));
+    const button = document.createElement("button");
+    button.type = "button"; button.textContent = messages(this.hass).mapAddPlace ?? "Ort hinzufügen";
+    button.addEventListener("click", () => this.startMapPlace(point.latitude, point.longitude, point.recorded_at));
+    popup.append(button);
+    return popup;
+  }
+
+  private startMapPlace(latitude: number, longitude: number, recordedAt?: string) {
+    this.addPlaceMode = true; this.draftPoint = { latitude, longitude, recorded_at: recordedAt };
+    if (!this.draftArrived && recordedAt) this.draftArrived = this.localDateTime(recordedAt);
+    this.requestUpdate(); this.queueMapRender();
+  }
+
+  private nearestRoutePoint(latitude: number, longitude: number) {
+    const points = (this.data?.segments ?? []).flatMap((segment) => segment.points);
+    return points.reduce<typeof points[number] | undefined>((nearest, point) => {
+      if (!nearest) return point;
+      const distance = (point.latitude - latitude) ** 2 + (point.longitude - longitude) ** 2;
+      const nearestDistance = (nearest.latitude - latitude) ** 2 + (nearest.longitude - longitude) ** 2;
+      return distance < nearestDistance ? point : nearest;
+    }, undefined);
+  }
+
+  private localDateTime(value: string) {
+    const date = new Date(value); const pad = (n: number) => String(n).padStart(2, "0");
+    return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`;
+  }
+
+  private toggleAddPlace() {
+    this.addPlaceMode = !this.addPlaceMode;
+    if (!this.addPlaceMode) { this.draftPoint = undefined; this.draftName = ""; this.draftArrived = ""; this.draftDescription = ""; }
+    this.requestUpdate(); this.queueMapRender();
+  }
+
+  private async saveDraftPlace() {
+    if (!this.hass || !this.selectedTripId || !this.draftPoint || !this.draftName.trim() || !this.draftArrived || this.draftSaving) return;
+    this.draftSaving = true;
+    try {
+      await createStop(this.hass, this.vehicleId, this.selectedTripId, {
+        name: this.draftName.trim(), place_type: this.draftType, category: this.draftType,
+        occurred_at: new Date(this.draftArrived).toISOString(), arrived_at: new Date(this.draftArrived).toISOString(),
+        latitude: this.draftPoint.latitude, longitude: this.draftPoint.longitude, description: this.draftDescription,
+      });
+      this.toggleAddPlace();
+      await this.refresh(true);
+    } catch { this.error = messages(this.hass).placeSaveError ?? messages(this.hass).loadError; }
+    finally { this.draftSaving = false; this.requestUpdate(); }
   }
 
   private driveColor(index: number) { return COLORS[index % COLORS.length]; }
@@ -214,10 +289,18 @@ export class MapCard extends TravelCard {
 
   private driveRow(drive: Drive, index: number) {
     const lang = messages(this.hass);
+    const source = drive.source === "manual" ? lang.sourceManual : drive.source === "gpx" ? (lang.sourceGpx ?? lang.sourceGps) : lang.sourceGps;
     return html`<label class="drive-row" style=${`--drive-color:${this.driveColor(index)}`}>
       <input type="checkbox" value=${drive.id} .checked=${this.selectedDriveIds.includes(drive.id)} @change=${(event: Event) => void this.toggleDrive(event)}>
-      <span class="drive-info"><strong>${formatDate(drive.started_at, this.hass)} · ${formatTime(drive.started_at, this.hass)}</strong><span>${(drive.distance_m / 1000).toFixed(1)} km · ${drive.source === "manual" ? lang.sourceManual : lang.sourceGps}</span></span>
+      <span class="drive-info"><strong>${formatDate(drive.started_at, this.hass)} · ${formatTime(drive.started_at, this.hass)} → ${drive.ended_at ? `${formatDate(drive.ended_at, this.hass)} · ${formatTime(drive.ended_at, this.hass)}` : "–"}</strong><span>${(drive.distance_m / 1000).toFixed(1)} km · ${drive.duration_seconds ? formatDuration(drive.duration_seconds, this.hass) : "–"} · ${source}</span></span>
     </label>`;
+  }
+
+  private renderPlaceCapture(lang: ReturnType<typeof messages>, selectedTrip: Snapshot["trips"][number] | undefined) {
+    if (!selectedTrip) return "";
+    if (!this.addPlaceMode) return html`<section class="map-place-capture"><button type="button" @click=${() => this.toggleAddPlace()}>${lang.mapAddPlace ?? "Ort hinzufügen"}</button></section>`;
+    if (!this.draftPoint) return html`<section class="map-place-capture"><button type="button" @click=${() => this.toggleAddPlace()}>${lang.mapCancelPlace ?? "Ortserfassung abbrechen"}</button><p class="muted">${lang.mapPlaceHint}</p></section>`;
+    return html`<section class="map-place-capture"><button type="button" @click=${() => this.toggleAddPlace()}>${lang.mapCancelPlace ?? "Ortserfassung abbrechen"}</button><p class="muted">${lang.mapPlaceHint}</p><form class="form-grid" @submit=${(event: SubmitEvent) => { event.preventDefault(); void this.saveDraftPlace(); }}><input aria-label=${lang.placeName ?? "Name"} placeholder=${lang.placeName ?? "Name"} .value=${this.draftName} @input=${(event: InputEvent) => this.draftName = (event.currentTarget as HTMLInputElement).value} required><select aria-label=${lang.placeCategory ?? "Kategorie"} .value=${this.draftType} @change=${(event: Event) => this.draftType = (event.currentTarget as HTMLSelectElement).value}><option value="other">${lang.placeOther ?? "Sonstiger Ort"}</option><option value="fuel_stop">${lang.placeFuel ?? "Tankpause"}</option><option value="restaurant">${lang.placeRestaurant ?? "Restaurant"}</option><option value="attraction">${lang.placeAttraction ?? "Sehenswürdigkeit"}</option><option value="ferry">${lang.placeFerry ?? "Fähre"}</option><option value="campsite">${lang.placeCampsite ?? "Campingplatz"}</option><option value="rv_site">${lang.placeRvSite ?? "Wohnmobilstellplatz"}</option><option value="wild_camp">${lang.placeWildCamp ?? "Freistehplatz"}</option></select><label>${lang.placeArrived ?? "Ankunft"}<input type="datetime-local" .value=${this.draftArrived} @input=${(event: InputEvent) => this.draftArrived = (event.currentTarget as HTMLInputElement).value} required></label><textarea aria-label=${lang.placeDescription ?? "Beschreibung"} placeholder=${lang.placeDescription ?? "Beschreibung"} .value=${this.draftDescription} @input=${(event: InputEvent) => this.draftDescription = (event.currentTarget as HTMLTextAreaElement).value}></textarea><button type="submit" ?disabled=${this.draftSaving}>${this.draftSaving ? lang.saving : lang.save}</button></form></section>`;
   }
 
   render() {
@@ -243,6 +326,7 @@ export class MapCard extends TravelCard {
         <div class="drive-list">${this.drives.map((drive, index) => this.driveRow(drive, index))}</div>
       </details>` : ""}
       <label class="place-filter"><input type="checkbox" .checked=${this.showPlaces} @change=${(event: Event) => { this.showPlaces = (event.currentTarget as HTMLInputElement).checked; this.queueMapRender(); this.requestUpdate(); }}> ${lang.mapPlaces ?? "Orte anzeigen"}</label>
+      ${this.renderPlaceCapture(lang, selectedTrip)}
       ${this.error ? html`<p class="error" role="alert">${this.error}</p>` : ""}
       ${this.tileError ? html`<p class="error" role="alert">${messages(this.hass).mapTilesUnavailable ?? (this.hass?.locale?.language?.toLowerCase().startsWith("de") ? "Die Hintergrundkarte konnte nicht geladen werden. Die GPS-Route bleibt sichtbar." : "The background map could not be loaded. The GPS route remains visible.")}</p>` : !manualConfig.tile_url && !this.mapConfig?.tile_url ? html`<p class="muted" role="status">${messages(this.hass).mapTilesNotConfigured ?? (this.hass?.locale?.language?.toLowerCase().startsWith("de") ? "Keine Hintergrundkarte konfiguriert. Die GPS-Route bleibt sichtbar." : "No background map is configured. The GPS route remains visible.")}</p>` : ""}
       ${this.data?.truncated ? html`<p class="muted">${lang.mapTruncated}: ${this.data.returned_points} / ${this.data.total_points}</p>` : ""}
@@ -278,6 +362,10 @@ MapCard.styles = [TravelCard.styles, unsafeCSS(LEAFLET_CSS), css`
   .drive-info { display: grid; gap: 2px; min-width: 0; font-size: .83rem; }
   .drive-info span { color: var(--secondary-text-color); font-size: .76rem; }
   .map { height: clamp(300px, 58vh, 620px); min-height: 280px; border-radius: 9px; overflow: hidden; background: var(--secondary-background-color); }
+  .map-place-capture { display: grid; gap: 8px; margin: 10px 0; padding: 10px; border: 1px solid var(--divider-color); border-radius: 8px; }
+  .map-place-capture .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr)); gap: 8px; }
+  .map-place-capture input, .map-place-capture select, .map-place-capture textarea { box-sizing: border-box; min-width: 0; width: 100%; }
+  .map-place-capture textarea { min-height: 4rem; }
   .attribution { margin: 6px 0 0; color: var(--secondary-text-color); font-size: .72rem; }
   button:focus-visible, input:focus-visible, select:focus-visible, summary:focus-visible { outline: 2px solid var(--primary-color); outline-offset: 2px; }
   @media (max-width: 600px) {
