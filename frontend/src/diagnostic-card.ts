@@ -14,6 +14,8 @@ export class DiagnosticCard extends LitElement {
     button { min-height: 40px; border: 0; border-radius: 8px; padding: 8px 12px; cursor: pointer; color: var(--text-primary-color, #fff); background: var(--primary-color); }
     button.secondary { color: var(--primary-text-color); background: var(--secondary-background-color); }
     .error { color: var(--error-color); } .muted { color: var(--secondary-text-color); }
+    .migration-notice { margin:0 0 12px; padding:12px; border:1px solid var(--warning-color,#f57c00); border-inline-start:5px solid var(--warning-color,#f57c00); border-radius:8px; background:color-mix(in srgb,var(--warning-color,#f57c00) 12%,var(--card-background-color)); }
+    .migration-notice strong { display:block; } .migration-notice p { margin:6px 0; } .migration-notice a { color:var(--primary-color); }
     pre, textarea { max-height: 16rem; width: 100%; box-sizing: border-box; overflow: auto; white-space: pre-wrap; font-size: .78rem; background: var(--secondary-background-color); padding: 8px; }
   `;
 
@@ -56,6 +58,17 @@ export class DiagnosticCard extends LitElement {
   private selectReport() {
     const target = this.shadowRoot?.querySelector<HTMLTextAreaElement>('textarea[aria-label="Diagnosebericht zum manuellen Kopieren"]');
     target?.select();
+  }
+
+  protected updated() {
+    if (this.shadowRoot?.querySelector(".migration-notice")) return;
+    const card = this.shadowRoot?.querySelector("ha-card");
+    if (!card) return;
+    const notice = document.createElement("aside"); notice.className = "migration-notice"; notice.setAttribute("role", "note");
+    const title = document.createElement("strong"); title.textContent = "IMPORTANT: THE LOVELACE CARDS HAVE CHANGED!";
+    const text = document.createElement("p"); text.textContent = "Use the central Camper Travel Journal card for new dashboards. This legacy card remains supported for compatibility.";
+    const link = document.createElement("a"); link.href = "https://github.com/balronu/ha-camper-travel-journal/blob/main/README.md#migration"; link.target = "_blank"; link.rel = "noreferrer"; link.textContent = "Migration guide";
+    notice.append(title, text, link); card.prepend(notice);
   }
 
   render() {

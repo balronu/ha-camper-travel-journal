@@ -6,7 +6,7 @@
 
 <h1 align="center">Camper Travel Journal</h1>
 <p align="center">Your digital camper travel journal for Home Assistant</p>
-<p align="center"><strong>Current stable version: v0.2.0</strong></p>
+<p align="center"><strong>Current stable version: v0.2.0 · v0.3.0-beta.5 in preparation</strong></p>
 
 <p align="center">
   <a href="https://github.com/balronu/ha-camper-travel-journal/releases/latest"><img src="https://img.shields.io/github/v/release/balronu/ha-camper-travel-journal?label=Release" alt="Release"></a>
@@ -72,6 +72,21 @@ configurable options.
 
 ## Dashboard cards
 
+> **IMPORTANT – LOVELACE CARDS HAVE CHANGED!**
+>
+> v0.3.0 consolidates the previous card structure. New dashboards only need
+> `Camper Travel Journal – Reisetagebuch`. Summary, Manager, Map and
+> Diagnostics remain functional for existing dashboards, but are no longer
+> offered for new cards and display a migration notice. Existing trips,
+> drives, GPS data, overnight places, ratings and expenses are retained.
+
+### Migration {#migration}
+
+After updating, manually replace the previous individual cards in dashboards
+with the central Journal Card. HACS does not provide a custom warning banner;
+the notice is therefore shown inside every legacy card and documented here and
+in the release notes.
+
 For new dashboards, use the central Journal Card:
 
 ```yaml
@@ -96,9 +111,9 @@ type: custom:camper-travel-journal-manager-card
 vehicle_id: <config-entry-id>
 ```
 
-The stable release provides exactly four Lovelace card types: Summary Card,
-Manager Card, Map Card and the optional Diagnostics Card. Normal use does not
-require the Diagnostics Card. The Map Card displays stored GPS
+The central Journal Card is the only new card type offered by the Lovelace
+catalog. Existing Summary, Manager, Map and Diagnostics cards remain usable in
+YAML and existing dashboards. The Map Card displays stored GPS
 lines and drive segments, does not calculate road routes, and uses no geocoding
 or routing service:
 
@@ -166,7 +181,8 @@ issues or tests.
 - The scope is focused on the travel journal, drives, expenses and GPX import.
 - Historical beta changes remain documented in the changelog; the current map
   and PDF features are part of the stable release.
-- Stops exist in the backend but are not fully manageable from Lovelace yet.
+- Before Stable, beta.5 additionally requires an authenticated test in an
+  isolated Home Assistant instance.
 - Retention calculates candidates but does not automatically delete in this
   version.
 - Mobile Safari/WebKit and productive installations still need practical
