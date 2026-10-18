@@ -1663,10 +1663,10 @@ function So(c) {
 }
 async function Eo(c, n, r = bo) {
   const o = { state: "not_run", durationMs: null };
-  if (!c?.connection) return { version: "0.3.0-beta.2", connectionBefore: "unavailable", connectionAfter: "unavailable", authentication: o, vehicles: o, trips: o, vehicleId: Gi(n) };
+  if (!c?.connection) return { version: "0.3.0-beta.3", connectionBefore: "unavailable", connectionAfter: "unavailable", authentication: o, vehicles: o, trips: o, vehicleId: Gi(n) };
   const h = Rs(c), u = await Vi(c, { type: "auth/current_user" }, Po, r), m = await Vi(c, { type: "camper_travel_journal/list_vehicles" }, $o, r), x = m.value?.vehicles?.filter((re) => typeof re.vehicle_id == "string") ?? [], p = x.length === 1 ? x[0].vehicle_id : void 0, T = await Vi(c, { type: "camper_travel_journal/list", vehicle_id: p ?? n }, So, r), { value: w, ...M } = u, { value: E, ...W } = m, { value: z, ...Wt } = T;
   return {
-    version: "0.3.0-beta.2",
+    version: "0.3.0-beta.3",
     connectionBefore: h,
     connectionAfter: Rs(c),
     authentication: M,
