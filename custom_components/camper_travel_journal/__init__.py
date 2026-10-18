@@ -14,7 +14,7 @@ from .runtime import Runtime
 from .storage import AsyncSQLiteWorker
 from .api import async_register as async_register_api
 
-VERSION = "0.3.0-beta.3"
+VERSION = "0.3.0-beta.4"
 
 PLATFORMS: list[str] = []
 CONFIG_SCHEMA = cv.config_entry_only_config_schema(DOMAIN) if cv else None
@@ -83,4 +83,4 @@ async def async_unload_entry(hass, entry):
     return True
 
 DOMAIN = "camper_travel_journal"
-VERSION = "0.3.0-beta.3"
+VERSION = "0.3.0-beta.4"

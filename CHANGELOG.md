@@ -2,6 +2,16 @@
 
 🇩🇪 Deutsch | 🇬🇧 [English](README.en.md)
 
+## 0.3.0-beta.4 – verknüpfte Fahrtunterbrechungen
+
+- Fahrtunterbrechungen erscheinen chronologisch zwischen den zugehörigen Fahrten.
+- „Aufenthalt zuordnen“ öffnet einen mobilen Dialog für bestehende Orte,
+  Übernachtungsplätze, neue Einträge, Fahrtpausen und irrelevante Stopps.
+- Entscheidungen bleiben in der additiven Schema-9-Tabelle persistent und
+  können geändert werden, ohne GPS-Rohdaten oder Orte zu duplizieren.
+- Die zentrale Journal Card verwendet dafür weiterhin ausschließlich die aktive
+  Reise-ID; Legacy-Karten bleiben kompatibel.
+
 ## 0.3.0-beta.3 – zentrale Journal-Oberfläche
 
 - Neue zentrale `camper-travel-journal-journal-card` als empfohlener Einstieg
