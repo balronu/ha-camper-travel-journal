@@ -67,6 +67,15 @@ Where old intervals do not overlap another drive, migration 7 may add
 unassigned; the route API does not present them as exact. The migration is
 transactional and idempotent.
 
+## Schema version 9 – interruption decisions
+
+Migration 9 adds `interruption_links`, an additive table that persists a user
+decision for a derived gap between two assigned drives. It stores the trip,
+the stable `previous_drive_id:next_drive_id` key, one of `unassigned`, `stop`,
+`overnight`, `pause` or `ignored`, and an optional existing/new stop. It never
+copies GPS points, deletes raw data, or confirms a stay without explicit user
+action. Reassignment updates only the link; deleting a place nulls the link.
+
 ## Schema versioning and recovery
 
 `schema_meta.version` is checked during startup. A newer unsupported version

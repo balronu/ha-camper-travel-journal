@@ -235,6 +235,25 @@ async def test_transition_and_write_commands_complete():
 
 
 @pytest.mark.asyncio
+async def test_interruption_assignment_commands_are_authenticated_and_scoped():
+    hass = FakeHass()
+    connection = FakeConnection()
+    await api.ws_assign_interruption.__wrapped__(hass, connection, {"id": 51, "vehicle_id": "v1", "trip_id": "t1", "interruption_id": "d1:d2", "status": "pause"})
+    await api.ws_create_stop_from_interruption.__wrapped__(hass, connection, {"id": 52, "vehicle_id": "v1", "trip_id": "t1", "interruption_id": "d1:d2", "name": "Raststätte", "place_type": "parking", "overnight": False})
+    assert connection.results == [(51, {"success": True}), (52, {"stop_id": None})]
+    assert [method for method, _, _ in hass.worker.calls[-2:]] == ["assign_interruption", "create_stop_from_interruption"]
+
+
+@pytest.mark.asyncio
+async def test_interruption_creation_rejects_blank_name_without_backend_write():
+    hass = FakeHass()
+    connection = FakeConnection()
+    await api.ws_create_stop_from_interruption.__wrapped__(hass, connection, {"id": 53, "vehicle_id": "v1", "trip_id": "t1", "interruption_id": "d1:d2", "name": "   "})
+    assert connection.errors[0][2] == "place_name_required"
+    assert not hass.worker.calls
+
+
+@pytest.mark.asyncio
 async def test_create_expense_preserves_canonical_camping_id_over_websocket():
     hass = FakeHass()
     connection = FakeConnection()

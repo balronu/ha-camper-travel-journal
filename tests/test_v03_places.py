@@ -29,8 +29,8 @@ class V03PlaceTests(unittest.TestCase):
         stop = self.store.create_stop(Stop("", "v1", "Stellplatz", self.now, trip_id=self.trip, automatic=False), self.now)
         expense = self.store.create_expense(Expense("", self.trip, self.now, "camping", 2400, "EUR", stay_id=stop), self.now)
         tables = self.store.table_names()
-        self.assertEqual(self.store.connection.execute("SELECT value FROM schema_meta WHERE key='version'").fetchone()[0], "8")
-        self.assertTrue({"overnight_details", "place_ratings", "stop_suggestions"}.issubset(tables))
+        self.assertEqual(self.store.connection.execute("SELECT value FROM schema_meta WHERE key='version'").fetchone()[0], "9")
+        self.assertTrue({"overnight_details", "place_ratings", "stop_suggestions", "interruption_links"}.issubset(tables))
         row = self.store.list_expenses(self.trip)[0]
         self.assertEqual((row["stay_id"], row["place_id"]), (stop, stop))
         self.assertEqual(expense, row["id"])
@@ -140,7 +140,7 @@ class V03PlaceTests(unittest.TestCase):
 
         gaps = self.store.list_trip_interruptions("v1", self.trip)
         self.assertEqual([gap["duration_seconds"] for gap in gaps], [18 * 3600 + 57 * 60, 11 * 60])
-        self.assertEqual(gaps[0]["status"], "unconfirmed")
+        self.assertEqual(gaps[0]["status"], "unassigned")
         self.assertEqual(gaps[0]["previous_end_point"]["latitude"], 53.08)
         self.assertEqual(gaps[1]["next_start_point"]["latitude"], 53.11)
         self.assertEqual(self.store.list_stops("v1", self.trip), [])
@@ -151,7 +151,44 @@ class V03PlaceTests(unittest.TestCase):
         stop = self.store.create_stop(Stop("", "v1", "Bereits erfasst", datetime(2026, 10, 13, 11, tzinfo=UTC), arrived_at=datetime(2026, 10, 13, 11, tzinfo=UTC), departed_at=datetime(2026, 10, 13, 12, tzinfo=UTC), trip_id=self.trip, automatic=False), self.now)
         gap = self.store.list_trip_interruptions("v1", self.trip)[0]
         self.assertEqual((gap["previous_drive_id"], gap["next_drive_id"], gap["existing_place_id"]), (first, second, stop))
-        self.assertEqual(gap["status"], "confirmed_place")
+        self.assertEqual(gap["status"], "stop")
+
+    def test_interruption_assignment_is_persistent_reversible_and_does_not_duplicate_place(self):
+        first = self.store.create_manual_drive("v1", datetime(2026, 10, 13, 10, tzinfo=UTC), "A", "B", 1, 60, self.now, self.trip)
+        second = self.store.create_manual_drive("v1", datetime(2026, 10, 13, 13, tzinfo=UTC), "C", "D", 1, 60, self.now, self.trip)
+        stop = self.store.create_stop(Stop("", "v1", "Kuhhirten", datetime(2026, 10, 13, 11, tzinfo=UTC), arrived_at=datetime(2026, 10, 13, 11, tzinfo=UTC), departed_at=datetime(2026, 10, 13, 12, tzinfo=UTC), trip_id=self.trip, automatic=False), self.now)
+        gap_id = f"{first}:{second}"
+        self.store.assign_interruption(self.trip, gap_id, self.now, status="overnight", stop_id=stop)
+        self.assertEqual(self.store.list_trip_interruptions("v1", self.trip)[0]["status"], "overnight")
+        self.assertEqual(self.store.list_trip_interruptions("v1", self.trip)[0]["existing_place_id"], stop)
+        self.store.close()
+        self.store.open()
+        self.assertEqual(self.store.list_trip_interruptions("v1", self.trip)[0]["status"], "overnight")
+        self.store.assign_interruption(self.trip, gap_id, self.now, status="pause")
+        gap = self.store.list_trip_interruptions("v1", self.trip)[0]
+        self.assertEqual((gap["status"], gap["existing_place_id"]), ("pause", None))
+        self.assertEqual(len(self.store.list_stops("v1", self.trip)), 1)
+
+    def test_create_place_from_interruption_uses_real_gap_times_and_available_point(self):
+        first = self.store.create_manual_drive("v1", datetime(2026, 10, 13, 10, tzinfo=UTC), "A", "B", 1, 60, self.now, self.trip)
+        second = self.store.create_manual_drive("v1", datetime(2026, 10, 13, 13, tzinfo=UTC), "C", "D", 1, 60, self.now, self.trip)
+        with self.store.transaction() as connection:
+            point = connection.execute("INSERT INTO gps_points(vehicle_id,recorded_at,latitude,longitude) VALUES(?,?,?,?)", ("v1", "2026-10-13T11:59:00+00:00", 53.08, 8.8))
+            connection.execute("INSERT INTO drive_gps_points(drive_id,gps_point_id,ordinal,association_source) VALUES(?,?,?,?)", (first, point.lastrowid, 0, "test"))
+        stop = self.store.create_stop_from_interruption(self.trip, f"{first}:{second}", self.now, name="Kuhhirten", place_type="rv_site", overnight=True)
+        saved = self.store.list_stops("v1", self.trip)[0]
+        self.assertEqual((saved["id"], saved["arrived_at"], saved["departed_at"], saved["latitude"], saved["place_kind"]), (stop, "2026-10-13T11:00:00+00:00", "2026-10-13T13:00:00+00:00", 53.08, "rv_site"))
+        self.assertEqual(self.store.list_trip_interruptions("v1", self.trip)[0]["status"], "overnight")
+
+    def test_interruption_assignment_rejects_invalid_or_cross_trip_place(self):
+        first = self.store.create_manual_drive("v1", datetime(2026, 10, 13, 10, tzinfo=UTC), "A", "B", 1, 60, self.now, self.trip)
+        second = self.store.create_manual_drive("v1", datetime(2026, 10, 13, 13, tzinfo=UTC), "C", "D", 1, 60, self.now, self.trip)
+        with self.assertRaisesRegex(ValueError, "interruption_status_invalid"):
+            self.store.assign_interruption(self.trip, f"{first}:{second}", self.now, status="unknown")
+        with self.assertRaisesRegex(ValueError, "interruption_place_required"):
+            self.store.assign_interruption(self.trip, f"{first}:{second}", self.now, status="stop")
+        self.store.assign_interruption(self.trip, f"{first}:{second}", self.now, status="ignored")
+        self.assertEqual(self.store.list_trip_interruptions("v1", self.trip)[0]["status"], "ignored")
 
     def test_public_export_defaults_to_private_fields(self):
         stop = {"id": "p1", "name": "Geheimer Ort", "place_type": "restaurant", "latitude": 50.0, "longitude": 8.0, "description": "privat", "review_text": "privat", "rating_overall": 4}

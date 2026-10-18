@@ -191,6 +191,7 @@ if websocket_api is not None:
                 "vehicle_name": vehicle_name,
                 "trip": trip,
                 "drives": await _call(hass, msg, "list_drives", vehicle_id, trip_id=trip_id),
+                "interruptions": await _call(hass, msg, "list_trip_interruptions", vehicle_id, trip_id),
                 "stops": await _call(hass, msg, "list_stops", vehicle_id, trip_id=trip_id),
                 "expenses": await _call(hass, msg, "list_expenses", trip_id),
                 "expense_summary": await _call(hass, msg, "expense_summary", trip_id),
@@ -382,6 +383,24 @@ if websocket_api is not None:
         try:
             await _call(hass, msg, "delete_stop", msg["stop_id"])
             connection.send_result(msg["id"], {"success": True})
+        except Exception as err: _send_error(connection, msg, err)
+
+    @websocket_api.websocket_command({**_base("camper_travel_journal/assign_interruption"), vol.Required("trip_id"): str, vol.Required("interruption_id"): str, vol.Required("status"): str, vol.Optional("stop_id"): str})
+    @websocket_api.async_response
+    async def ws_assign_interruption(hass, connection, msg):
+        try:
+            await _call(hass, msg, "assign_interruption", msg["trip_id"], msg["interruption_id"], _now(), status=msg["status"], stop_id=msg.get("stop_id"))
+            connection.send_result(msg["id"], {"success": True})
+        except Exception as err: _send_error(connection, msg, err)
+
+    @websocket_api.websocket_command({**_base("camper_travel_journal/create_stop_from_interruption"), vol.Required("trip_id"): str, vol.Required("interruption_id"): str, vol.Required("name"): str, vol.Optional("place_type", default="other"): str, vol.Optional("overnight", default=False): bool, vol.Optional("address", default=""): str, vol.Optional("description", default=""): str})
+    @websocket_api.async_response
+    async def ws_create_stop_from_interruption(hass, connection, msg):
+        try:
+            if not msg["name"].strip():
+                raise ValueError("place_name_required")
+            stop_id = await _call(hass, msg, "create_stop_from_interruption", msg["trip_id"], msg["interruption_id"], _now(), name=msg["name"], place_type=msg.get("place_type", "other"), overnight=msg.get("overnight", False), address=msg.get("address", ""), description=msg.get("description", ""))
+            connection.send_result(msg["id"], {"stop_id": stop_id})
         except Exception as err: _send_error(connection, msg, err)
 
     @websocket_api.websocket_command({**_base("camper_travel_journal/create_expense"), vol.Required("trip_id"): str, vol.Required("occurred_at"): str, vol.Required("category"): str, vol.Required("amount_minor"): vol.Coerce(int), vol.Optional("currency", default="EUR"): str, vol.Optional("note"): str, vol.Optional("odometer_km"): vol.Coerce(float), vol.Optional("place_id"): str, vol.Optional("stay_id"): str})

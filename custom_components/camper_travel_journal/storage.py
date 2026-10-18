@@ -16,7 +16,7 @@ from pathlib import Path
 
 from .travel import validate_amount, validate_expense_category, validate_expense_currency
 
-SCHEMA_VERSION = 8
+SCHEMA_VERSION = 9
 SCHEMA_SQL = """
 PRAGMA foreign_keys = ON;
 CREATE TABLE IF NOT EXISTS schema_meta (key TEXT PRIMARY KEY, value TEXT NOT NULL);
@@ -138,6 +138,8 @@ class SQLiteStore:
                     self._migrate_v7()
                 if previous < 8:
                     self._migrate_v8()
+                if previous < 9:
+                    self._migrate_v9()
                 connection.execute("INSERT OR REPLACE INTO schema_meta(key, value) VALUES('version', ?)", (str(SCHEMA_VERSION),))
         except Exception:
             self.close()
@@ -315,6 +317,26 @@ class SQLiteStore:
             self.connection.execute("ALTER TABLE expenses ADD COLUMN place_id TEXT REFERENCES stops(id) ON DELETE SET NULL")
         self.connection.execute("UPDATE expenses SET place_id=stay_id WHERE place_id IS NULL AND stay_id IS NOT NULL")
         self.connection.execute("CREATE INDEX IF NOT EXISTS idx_expenses_place ON expenses(place_id)")
+
+    def _migrate_v9(self) -> None:
+        """Persist user decisions for derived drive interruptions only."""
+        if self.connection is None:
+            raise RuntimeError("store is not open")
+        self.connection.executescript("""
+        CREATE TABLE IF NOT EXISTS interruption_links (
+          trip_id TEXT NOT NULL REFERENCES trips(id) ON DELETE CASCADE,
+          interruption_id TEXT NOT NULL,
+          previous_drive_id TEXT NOT NULL REFERENCES drives(id) ON DELETE CASCADE,
+          next_drive_id TEXT NOT NULL REFERENCES drives(id) ON DELETE CASCADE,
+          status TEXT NOT NULL CHECK(status IN ('unassigned','stop','overnight','pause','ignored')),
+          stop_id TEXT REFERENCES stops(id) ON DELETE SET NULL,
+          created_at TEXT NOT NULL,
+          updated_at TEXT NOT NULL,
+          PRIMARY KEY(trip_id, interruption_id),
+          UNIQUE(trip_id, previous_drive_id, next_drive_id)
+        );
+        CREATE INDEX IF NOT EXISTS idx_interruption_links_stop ON interruption_links(stop_id);
+        """)
 
     def close(self) -> None:
         if self.connection is not None:
@@ -578,9 +600,21 @@ class SQLiteStore:
                 "AND arrived_at < ? AND departed_at > ? ORDER BY occurred_at LIMIT 1",
                 (vehicle_id, trip_id, following[1], previous[2]),
             ).fetchone()
+            interruption_id = f"{previous[0]}:{following[0]}"
+            link = self.connection.execute(
+                "SELECT status,stop_id FROM interruption_links WHERE trip_id=? AND interruption_id=?",
+                (trip_id, interruption_id),
+            ).fetchone()
+            overnight = False
+            if link and link[1]:
+                overnight = self.connection.execute(
+                    "SELECT 1 FROM overnight_details WHERE place_id=?", (link[1],)
+                ).fetchone() is not None
+            status = link[0] if link else ("overnight" if overnight else "stop" if existing else "unassigned")
+            stop_id = link[1] if link else (existing[0] if existing else None)
             result.append({
-                "id": f"{previous[0]}:{following[0]}",
-                "status": "confirmed_place" if existing else "unconfirmed",
+                "id": interruption_id,
+                "status": status,
                 "previous_drive_id": previous[0],
                 "next_drive_id": following[0],
                 "started_at": previous[2],
@@ -588,9 +622,80 @@ class SQLiteStore:
                 "duration_seconds": seconds,
                 "previous_end_point": dict(last) if last else None,
                 "next_start_point": dict(first) if first else None,
-                "existing_place_id": existing[0] if existing else None,
+                "existing_place_id": stop_id,
             })
         return result
+
+    def _interruption_row(self, trip_id: str, interruption_id: str):
+        """Resolve a derived interruption without trusting client-supplied times."""
+        if self.connection is None:
+            raise RuntimeError("store is not open")
+        parts = interruption_id.split(":", 1)
+        if len(parts) != 2:
+            raise ValueError("interruption_not_found")
+        row = self.connection.execute(
+            "SELECT d1.vehicle_id,d1.id AS previous_drive_id,d2.id AS next_drive_id "
+            "FROM drives d1 JOIN drives d2 ON d2.id=? "
+            "JOIN trip_drives t1 ON t1.drive_id=d1.id AND t1.trip_id=? "
+            "JOIN trip_drives t2 ON t2.drive_id=d2.id AND t2.trip_id=? "
+            "WHERE d1.id=? AND d1.ended_at < d2.started_at",
+            (parts[1], trip_id, trip_id, parts[0]),
+        ).fetchone()
+        if row is None:
+            raise ValueError("interruption_not_found")
+        return row
+
+    def assign_interruption(self, trip_id: str, interruption_id: str, now: datetime, *, status: str, stop_id: str | None = None) -> None:
+        """Store a reversible, confirmed user decision for a derived gap."""
+        if status not in {"unassigned", "stop", "overnight", "pause", "ignored"}:
+            raise ValueError("interruption_status_invalid")
+        row = self._interruption_row(trip_id, interruption_id)
+        if status in {"stop", "overnight"}:
+            if not stop_id:
+                raise ValueError("interruption_place_required")
+            place = self.connection.execute(
+                "SELECT vehicle_id,trip_id FROM stops WHERE id=?", (stop_id,)
+            ).fetchone()
+            if place is None:
+                raise ValueError("place_not_found")
+            if place[0] != row[0] or place[1] not in (None, trip_id):
+                raise ValueError("vehicle_mismatch")
+        else:
+            stop_id = None
+        stamp = utc_iso(now)
+        with self.transaction() as connection:
+            connection.execute(
+                "INSERT INTO interruption_links(trip_id,interruption_id,previous_drive_id,next_drive_id,status,stop_id,created_at,updated_at) "
+                "VALUES(?,?,?,?,?,?,?,?) ON CONFLICT(trip_id,interruption_id) DO UPDATE SET "
+                "previous_drive_id=excluded.previous_drive_id,next_drive_id=excluded.next_drive_id,status=excluded.status,stop_id=excluded.stop_id,updated_at=excluded.updated_at",
+                (trip_id, interruption_id, row[1], row[2], status, stop_id, stamp, stamp),
+            )
+
+    def create_stop_from_interruption(self, trip_id: str, interruption_id: str, now: datetime, *, name: str, place_type: str = "other", overnight: bool = False, address: str = "", description: str = "") -> str:
+        """Create one place from the derived gap, then persist its classification."""
+        row = self._interruption_row(trip_id, interruption_id)
+        drives = self.connection.execute(
+            "SELECT started_at,ended_at FROM drives WHERE id IN (?,?) ORDER BY started_at",
+            (row[1], row[2]),
+        ).fetchall()
+        started = datetime.fromisoformat(drives[0][1])
+        ended = datetime.fromisoformat(drives[1][0])
+        points = self.connection.execute(
+            "SELECT p.latitude,p.longitude FROM drive_gps_points dgp JOIN gps_points p ON p.id=dgp.gps_point_id WHERE dgp.drive_id=? ORDER BY dgp.ordinal DESC LIMIT 1",
+            (row[1],),
+        ).fetchone()
+        stop = type("InterruptionStop", (), {
+            "id": "", "vehicle_id": row[0], "trip_id": trip_id, "drive_id": row[1],
+            "name": name, "occurred_at": started, "arrived_at": started, "departed_at": ended,
+            "latitude": points[0] if points else None, "longitude": points[1] if points else None,
+            "description": description, "stop_type": place_type, "place_type": place_type,
+            "address": address, "source": "interruption", "automatic": False, "confirmed": True,
+        })()
+        stop_id = self.create_stop(stop, now)
+        if overnight:
+            self.upsert_overnight_details(stop_id, now, place_kind=place_type)
+        self.assign_interruption(trip_id, interruption_id, now, status="overnight" if overnight else "stop", stop_id=stop_id)
+        return stop_id
 
     def list_available_drives(self, vehicle_id: str) -> list[dict]:
         if self.connection is None: raise RuntimeError("store is not open")
