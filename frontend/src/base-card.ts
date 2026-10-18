@@ -34,7 +34,9 @@ export abstract class TravelCard extends LitElement {
   protected onHassConnectionChanged() {}
   protected onConfigChanged() {}
   protected updated() {
-    if (this.tagName.toLowerCase().includes("journal-card") || this.shadowRoot?.querySelector(".migration-notice")) return;
+    // Embedded legacy cards are implementation details of the central Journal
+    // card. Only standalone legacy cards should advertise migration.
+    if (this.tagName.toLowerCase().includes("journal-card") || this.config.journal_section || this.config.trip_id || this.shadowRoot?.querySelector(".migration-notice")) return;
     const card = this.shadowRoot?.querySelector("ha-card");
     if (!card) return;
     const lang = messages(this.hass);

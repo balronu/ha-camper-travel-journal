@@ -33,6 +33,8 @@ export class JournalCard extends TravelCard {
   private interruptionDescription = "";
   private interruptionWebsite = "";
   private interruptionSaving = false;
+  private overviewRequest = 0;
+  private detailRequest = 0;
 
   connectedCallback() {
     super.connectedCallback();
@@ -52,21 +54,27 @@ export class JournalCard extends TravelCard {
     if (!this.interruptionDialog && dialog.open) dialog.close();
   }
 
-  private async refreshOverview() {
-    if (!this.hass || !this.vehicleId) return;
+  private async refreshOverview(): Promise<boolean> {
+    if (!this.hass || !this.vehicleId) return false;
+    const request = ++this.overviewRequest;
     this.loading = true; this.error = ""; this.requestUpdate();
     try {
-      this.overview = await list(this.hass, this.vehicleId);
+      const overview = await list(this.hass, this.vehicleId);
+      if (request !== this.overviewRequest) return false;
+      this.overview = overview;
       try { this.vehicleName = (await listVehicles(this.hass)).find((vehicle) => vehicle.vehicle_id === this.vehicleId)?.name ?? ""; } catch { this.vehicleName = ""; }
       const remembered = readActiveTrip(this.vehicleId);
       this.selectedTripId = this.overview.trips.some((trip) => trip.id === (this.openTripId || remembered)) ? (this.openTripId || remembered) : "";
       if (this.openTripId && this.overview.trips.some((trip) => trip.id === this.openTripId)) await this.loadDetail(this.openTripId);
-    } catch { this.error = messages(this.hass).loadError; }
-    finally { this.loading = false; this.requestUpdate(); }
+      return true;
+    } catch { if (request === this.overviewRequest) this.error = messages(this.hass).loadError; return false; }
+    finally { if (request === this.overviewRequest) { this.loading = false; this.requestUpdate(); } }
   }
   private async loadDetail(tripId: string) {
     if (!this.hass || !tripId) return;
-    this.detail = await list(this.hass, this.vehicleId, tripId);
+    const request = ++this.detailRequest;
+    const detail = await list(this.hass, this.vehicleId, tripId);
+    if (request === this.detailRequest && this.openTripId === tripId) this.detail = detail;
   }
   private async openTrip(tripId = this.selectedTripId) {
     if (!tripId || !this.overview?.trips.some((trip) => trip.id === tripId)) return;
@@ -115,10 +123,23 @@ export class JournalCard extends TravelCard {
       } else {
         await assignInterruption(this.hass, this.vehicleId, this.openTripId, item.id, this.interruptionAction);
       }
-      await this.loadDetail(this.openTripId);
+      const refreshed = await this.refreshOverview();
+      if (!refreshed) {
+        this.error = "Aufenthalt gespeichert, aber die Reiseübersicht konnte nicht aktualisiert werden. Bitte später erneut laden.";
+        this.interruptionSaving = false; this.requestUpdate();
+        return;
+      }
       this.closeInterruptionDialog();
     } catch (error) {
-      this.error = error instanceof Error && error.message === "place_name_required" ? "Bitte einen Namen eingeben." : messages(this.hass).loadError;
+      const code = error instanceof Error ? error.message : "";
+      const details: Record<string, string> = {
+        interruption_not_found: "Die Unterbrechung existiert nicht mehr.",
+        interruption_place_required: "Bitte einen Ort auswählen.",
+        trip_not_found: "Die Reise existiert nicht mehr.",
+        vehicle_mismatch: "Reise und Fahrzeug passen nicht zusammen.",
+        website_url_invalid: "Die Webseite muss mit http:// oder https:// beginnen.",
+      };
+      this.error = code === "place_name_required" ? "Bitte einen Namen eingeben." : `Aufenthalt konnte nicht gespeichert werden${details[code] ? `: ${details[code]}` : ". Bitte Eingaben prüfen und erneut versuchen."}`;
       this.interruptionSaving = false; this.requestUpdate();
     }
   }

@@ -2,6 +2,12 @@
 
 🇩🇪 Deutsch | 🇬🇧 [English](README.en.md)
 
+## 0.3.0-beta.6 – Praxis-Fixes
+
+- Fehlerbehandlung und Refresh nach der Aufenthaltserfassung aus GPS-Unterbrechungen korrigiert.
+- Diagnosekarte wieder im Home-Assistant-Kartenkatalog registriert.
+- Legacy-Migrationshinweis aus eingebetteten Karten der zentralen Journal-Karte entfernt.
+
 ## 0.3.0-beta.5 – zentrale Kartenmigration
 
 - Nur die zentrale Journal Card wird im Lovelace-Kartenkatalog für neue
