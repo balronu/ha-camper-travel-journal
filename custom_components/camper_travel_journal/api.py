@@ -519,7 +519,7 @@ if websocket_api is not None:
             connection.send_result(msg["id"], result)
         except Exception as err: _send_error(connection, msg, err)
 
-    COMMANDS = (ws_list_vehicles, ws_export_pdf, ws_list, ws_route, ws_diagnostics, ws_create_trip, ws_update_trip, ws_delete_trip, ws_transition_trip, ws_link_drives, ws_unlink_drive, ws_create_manual_drive, ws_update_manual_drive, ws_delete_manual_drive, ws_create_stop, ws_update_stop, ws_delete_stop, ws_create_expense, ws_update_expense, ws_delete_expense, ws_update_overnight, ws_update_rating, ws_delete_rating, ws_list_stop_suggestions, ws_generate_stop_suggestions, ws_accept_stop_suggestion, ws_dismiss_stop_suggestion, ws_analyze_gpx, ws_import_gpx)
+    COMMANDS = (ws_list_vehicles, ws_export_pdf, ws_list, ws_route, ws_diagnostics, ws_create_trip, ws_update_trip, ws_delete_trip, ws_transition_trip, ws_link_drives, ws_unlink_drive, ws_create_manual_drive, ws_update_manual_drive, ws_delete_manual_drive, ws_create_stop, ws_update_stop, ws_delete_stop, ws_assign_interruption, ws_create_stop_from_interruption, ws_create_expense, ws_update_expense, ws_delete_expense, ws_update_overnight, ws_update_rating, ws_delete_rating, ws_list_stop_suggestions, ws_generate_stop_suggestions, ws_accept_stop_suggestion, ws_dismiss_stop_suggestion, ws_analyze_gpx, ws_import_gpx)
 else:
     COMMANDS = ()
 

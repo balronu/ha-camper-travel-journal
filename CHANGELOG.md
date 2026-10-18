@@ -1,5 +1,13 @@
 # Änderungsprotokoll
 
+## 0.3.0-beta.8 – WebSocket-Hotfix
+
+- Registriert die vorhandenen authentifizierten Befehle `assign_interruption`
+  und `create_stop_from_interruption` beim Home-Assistant-Integrationsstart.
+- Ergänzt einen echten isolierten Home-Assistant-WebSocket-Regressionspfad für
+  Registrierung, Zuordnung, neue Aufenthalte, Idempotenz und Grenzen.
+- Keine Datenbankmigration und keine Änderung produktiver Daten.
+
 🇩🇪 Deutsch | 🇬🇧 [English](README.en.md)
 
 ## 0.3.0-beta.6 – Praxis-Fixes
