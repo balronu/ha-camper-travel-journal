@@ -171,6 +171,18 @@ describe("frontend release contract", () => {
     expect(journal).toContain("onSectionToggle");
     expect(journal).toContain("details.open = false");
   });
+  it("uses one shared, accessible modal editor for every CRUD editor", () => {
+    const manager = readFileSync(resolve(root, "src/manager-card.ts"), "utf8");
+    expect(manager).toContain('dialog class="editor-dialog"');
+    expect(manager).toContain('dialog.showModal()');
+    expect(manager).toContain('event.preventDefault(); close();');
+    expect(manager).toContain("discardPrompt");
+    for (const kind of ["trip-create", "trip-edit", "drive-create", "drive-edit", "place-create", "place-edit", "expense-create", "expense-edit", "rating-edit"]) {
+      expect(manager).toContain(`openEditor(\"${kind}\"`);
+    }
+    expect(manager).toContain("max-height:calc(100dvh - 2rem)");
+    expect(manager).toContain('role="alert"');
+  });
   it("sorts map drive segments in ascending start-time order", () => {
     expect(sortDrivesChronologically([
       { id: "late", started_at: "2026-10-13T12:00:00Z" },
