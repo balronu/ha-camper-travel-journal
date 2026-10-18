@@ -177,7 +177,7 @@ class V03PlaceTests(unittest.TestCase):
             connection.execute("INSERT INTO drive_gps_points(drive_id,gps_point_id,ordinal,association_source) VALUES(?,?,?,?)", (first, point.lastrowid, 0, "test"))
         stop = self.store.create_stop_from_interruption(self.trip, f"{first}:{second}", self.now, name="Kuhhirten", place_type="rv_site", overnight=True)
         saved = self.store.list_stops("v1", self.trip)[0]
-        self.assertEqual((saved["id"], saved["arrived_at"], saved["departed_at"], saved["latitude"], saved["place_kind"]), (stop, "2026-10-13T11:00:00+00:00", "2026-10-13T12:00:00+00:00", 53.08, "rv_site"))
+        self.assertEqual((saved["id"], saved["arrived_at"], saved["departed_at"], saved["latitude"], saved["place_kind"]), (stop, "2026-10-13T11:00:00+00:00", "2026-10-13T13:00:00+00:00", 53.08, "rv_site"))
         self.assertEqual(self.store.list_trip_interruptions("v1", self.trip)[0]["status"], "overnight")
 
     def test_interruption_assignment_rejects_invalid_or_cross_trip_place(self):
