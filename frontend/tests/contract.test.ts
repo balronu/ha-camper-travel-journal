@@ -183,6 +183,16 @@ describe("frontend release contract", () => {
     expect(manager).toContain("max-height:calc(100dvh - 2rem)");
     expect(manager).toContain('role="alert"');
   });
+  it("keeps central trip creation on the shared modal path", () => {
+    const journal = readFileSync(resolve(root, "src/journal-card.ts"), "utf8");
+    const manager = readFileSync(resolve(root, "src/manager-card.ts"), "utf8");
+    expect(journal).not.toContain('class="new-trip');
+    expect(journal).toContain('journal_section: "trip-create"');
+    expect(journal).toContain("trip-created");
+    expect(manager).toContain('this.embeddedSection() === "trip-create"');
+    expect(manager).toContain("openTripCreate()");
+    expect(manager).toContain("tripSaving");
+  });
   it("sorts map drive segments in ascending start-time order", () => {
     expect(sortDrivesChronologically([
       { id: "late", started_at: "2026-10-13T12:00:00Z" },

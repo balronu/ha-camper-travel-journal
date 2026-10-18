@@ -176,3 +176,22 @@ jobs:
           if (result.visibleTemplateLeak) throw new Error('frontend template source leaked into visible DOM');
           console.log(JSON.stringify(result));
           NODE
+      - name: Run shared modal editor interaction regression
+        run: |
+          python3 -m http.server 8765 --bind 127.0.0.1 >/tmp/camper-travel-journal-modal-http.log 2>&1 &
+          server_pid=$!
+          trap 'kill "$server_pid"' EXIT
+          sleep 0.3
+          chromium --headless --no-sandbox --disable-gpu --virtual-time-budget=25000 \
+            --dump-dom http://127.0.0.1:8765/frontend/tests/browser/modal-editors.html >/tmp/camper-travel-journal-modal-dom.html
+          node - <<'NODE'
+          const fs = require('fs');
+          const html = fs.readFileSync('/tmp/camper-travel-journal-modal-dom.html', 'utf8');
+          const match = html.match(/<pre id="result">([\s\S]*?)<\/pre>/);
+          if (!match) throw new Error('modal harness returned no result');
+          const result = JSON.parse(match[1]);
+          if (result.savedCount !== result.requiredKinds || result.savedCount !== 9) throw new Error(`expected all 9 modal kinds to save: ${JSON.stringify(result)}`);
+          for (const key of ['retainedOnError', 'discardPrompt', 'invalidGuard', 'keyboardFocus', 'centralDialogOnly', 'centralNarrow', 'noDuplicateTripCreate', 'modalAria']) if (!result[key]) throw new Error(`${key}=false`);
+          if (result.visibleTemplateLeak) throw new Error('frontend template source leaked into visible DOM');
+          console.log(JSON.stringify(result));
+          NODE

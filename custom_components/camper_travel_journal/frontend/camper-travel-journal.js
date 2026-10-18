@@ -24,7 +24,7 @@ const Wr = (c) => new Ur(typeof c == "string" ? c : c + "", void 0, nn), Mt = (c
     throw Error("Value passed to 'css' function must be a 'css' function result: " + m + ". Use 'unsafeCSS' to pass non-literal values, but take care to ensure page security.");
   })(h) + c[u + 1], c[0]);
   return new Ur(s, c, nn);
-}, ka = (c, i) => {
+}, Sa = (c, i) => {
   if (en) c.adoptedStyleSheets = i.map((s) => s instanceof CSSStyleSheet ? s : s.styleSheet);
   else for (const s of i) {
     const o = document.createElement("style"), h = Ye.litNonce;
@@ -35,10 +35,10 @@ const Wr = (c) => new Ur(typeof c == "string" ? c : c + "", void 0, nn), Mt = (c
   for (const o of i.cssRules) s += o.cssText;
   return Wr(s);
 })(c) : c;
-const { is: La, defineProperty: Ia, getOwnPropertyDescriptor: Ca, getOwnPropertyNames: Aa, getOwnPropertySymbols: Da, getPrototypeOf: Ma } = Object, ti = globalThis, Pr = ti.trustedTypes, za = Pr ? Pr.emptyScript : "", Oa = ti.reactiveElementPolyfillSupport, Te = (c, i) => c, Ji = { toAttribute(c, i) {
+const { is: ka, defineProperty: La, getOwnPropertyDescriptor: Ia, getOwnPropertyNames: Ca, getOwnPropertySymbols: Aa, getPrototypeOf: Da } = Object, ti = globalThis, Pr = ti.trustedTypes, Ma = Pr ? Pr.emptyScript : "", za = ti.reactiveElementPolyfillSupport, Te = (c, i) => c, Ji = { toAttribute(c, i) {
   switch (i) {
     case Boolean:
-      c = c ? za : null;
+      c = c ? Ma : null;
       break;
     case Object:
     case Array:
@@ -63,7 +63,7 @@ const { is: La, defineProperty: Ia, getOwnPropertyDescriptor: Ca, getOwnProperty
       }
   }
   return s;
-} }, Hr = (c, i) => !La(c, i), Er = { attribute: !0, type: String, converter: Ji, reflect: !1, useDefault: !1, hasChanged: Hr };
+} }, Hr = (c, i) => !ka(c, i), Er = { attribute: !0, type: String, converter: Ji, reflect: !1, useDefault: !1, hasChanged: Hr };
 Symbol.metadata ??= /* @__PURE__ */ Symbol("metadata"), ti.litPropertyMetadata ??= /* @__PURE__ */ new WeakMap();
 let ie = class extends HTMLElement {
   static addInitializer(i) {
@@ -75,11 +75,11 @@ let ie = class extends HTMLElement {
   static createProperty(i, s = Er) {
     if (s.state && (s.attribute = !1), this._$Ei(), this.prototype.hasOwnProperty(i) && ((s = Object.create(s)).wrapped = !0), this.elementProperties.set(i, s), !s.noAccessor) {
       const o = /* @__PURE__ */ Symbol(), h = this.getPropertyDescriptor(i, o, s);
-      h !== void 0 && Ia(this.prototype, i, h);
+      h !== void 0 && La(this.prototype, i, h);
     }
   }
   static getPropertyDescriptor(i, s, o) {
-    const { get: h, set: u } = Ca(this.prototype, i) ?? { get() {
+    const { get: h, set: u } = Ia(this.prototype, i) ?? { get() {
       return this[s];
     }, set(m) {
       this[s] = m;
@@ -94,13 +94,13 @@ let ie = class extends HTMLElement {
   }
   static _$Ei() {
     if (this.hasOwnProperty(Te("elementProperties"))) return;
-    const i = Ma(this);
+    const i = Da(this);
     i.finalize(), i.l !== void 0 && (this.l = [...i.l]), this.elementProperties = new Map(i.elementProperties);
   }
   static finalize() {
     if (this.hasOwnProperty(Te("finalized"))) return;
     if (this.finalized = !0, this._$Ei(), this.hasOwnProperty(Te("properties"))) {
-      const s = this.properties, o = [...Aa(s), ...Da(s)];
+      const s = this.properties, o = [...Ca(s), ...Aa(s)];
       for (const h of o) this.createProperty(h, s[h]);
     }
     const i = this[Symbol.metadata];
@@ -146,7 +146,7 @@ let ie = class extends HTMLElement {
   }
   createRenderRoot() {
     const i = this.shadowRoot ?? this.attachShadow(this.constructor.shadowRootOptions);
-    return ka(i, this.constructor.elementStyles), i;
+    return Sa(i, this.constructor.elementStyles), i;
   }
   connectedCallback() {
     this.renderRoot ??= this.createRenderRoot(), this.enableUpdating(!0), this._$EO?.forEach((i) => i.hostConnected?.());
@@ -246,15 +246,15 @@ let ie = class extends HTMLElement {
   firstUpdated(i) {
   }
 };
-ie.elementStyles = [], ie.shadowRootOptions = { mode: "open" }, ie[Te("elementProperties")] = /* @__PURE__ */ new Map(), ie[Te("finalized")] = /* @__PURE__ */ new Map(), Oa?.({ ReactiveElement: ie }), (ti.reactiveElementVersions ??= []).push("2.1.2");
-const rn = globalThis, Sr = (c) => c, Xe = rn.trustedTypes, kr = Xe ? Xe.createPolicy("lit-html", { createHTML: (c) => c }) : void 0, jr = "$lit$", At = `lit$${Math.random().toFixed(9).slice(2)}$`, qr = "?" + At, Na = `<${qr}>`, jt = document, Pe = () => jt.createComment(""), Ee = (c) => c === null || typeof c != "object" && typeof c != "function", sn = Array.isArray, Ra = (c) => sn(c) || typeof c?.[Symbol.iterator] == "function", Ui = `[ \t
+ie.elementStyles = [], ie.shadowRootOptions = { mode: "open" }, ie[Te("elementProperties")] = /* @__PURE__ */ new Map(), ie[Te("finalized")] = /* @__PURE__ */ new Map(), za?.({ ReactiveElement: ie }), (ti.reactiveElementVersions ??= []).push("2.1.2");
+const rn = globalThis, Sr = (c) => c, Xe = rn.trustedTypes, kr = Xe ? Xe.createPolicy("lit-html", { createHTML: (c) => c }) : void 0, jr = "$lit$", Ct = `lit$${Math.random().toFixed(9).slice(2)}$`, qr = "?" + Ct, Oa = `<${qr}>`, jt = document, Pe = () => jt.createComment(""), Ee = (c) => c === null || typeof c != "object" && typeof c != "function", sn = Array.isArray, Na = (c) => sn(c) || typeof c?.[Symbol.iterator] == "function", Ui = `[ \t
 \f\r]`, xe = /<(?:(!--|\/[^a-zA-Z])|(\/?[a-zA-Z][^>\s]*)|(\/?$))/g, Lr = /-->/g, Ir = />/g, Ft = RegExp(`>|${Ui}(?:([^\\s"'>=/]+)(${Ui}*=${Ui}*(?:[^ \t
-\f\r"'\`<>=]|("|')|))|$)`, "g"), Cr = /'/g, Ar = /"/g, Gr = /^(?:script|style|textarea|title)$/i, Ba = (c) => (i, ...s) => ({ _$litType$: c, strings: i, values: s }), g = Ba(1), ne = /* @__PURE__ */ Symbol.for("lit-noChange"), X = /* @__PURE__ */ Symbol.for("lit-nothing"), Dr = /* @__PURE__ */ new WeakMap(), Ut = jt.createTreeWalker(jt, 129);
+\f\r"'\`<>=]|("|')|))|$)`, "g"), Cr = /'/g, Ar = /"/g, Gr = /^(?:script|style|textarea|title)$/i, Ra = (c) => (i, ...s) => ({ _$litType$: c, strings: i, values: s }), g = Ra(1), ne = /* @__PURE__ */ Symbol.for("lit-noChange"), X = /* @__PURE__ */ Symbol.for("lit-nothing"), Dr = /* @__PURE__ */ new WeakMap(), Ut = jt.createTreeWalker(jt, 129);
 function Kr(c, i) {
   if (!sn(c) || !c.hasOwnProperty("raw")) throw Error("invalid template strings array");
   return kr !== void 0 ? kr.createHTML(i) : i;
 }
-const Za = (c, i) => {
+const Ba = (c, i) => {
   const s = c.length - 1, o = [];
   let h, u = i === 2 ? "<svg>" : i === 3 ? "<math>" : "", m = xe;
   for (let x = 0; x < s; x++) {
@@ -262,7 +262,7 @@ const Za = (c, i) => {
     let b, P, y = -1, I = 0;
     for (; I < p.length && (m.lastIndex = I, P = m.exec(p), P !== null); ) I = m.lastIndex, m === xe ? P[1] === "!--" ? m = Lr : P[1] !== void 0 ? m = Ir : P[2] !== void 0 ? (Gr.test(P[2]) && (h = RegExp("</" + P[2], "g")), m = Ft) : P[3] !== void 0 && (m = Ft) : m === Ft ? P[0] === ">" ? (m = h ?? xe, y = -1) : P[1] === void 0 ? y = -2 : (y = m.lastIndex - P[2].length, b = P[1], m = P[3] === void 0 ? Ft : P[3] === '"' ? Ar : Cr) : m === Ar || m === Cr ? m = Ft : m === Lr || m === Ir ? m = xe : (m = Ft, h = void 0);
     const w = m === Ft && c[x + 1].startsWith("/>") ? " " : "";
-    u += m === xe ? p + Na : y >= 0 ? (o.push(b), p.slice(0, y) + jr + p.slice(y) + At + w) : p + At + (y === -2 ? x : w);
+    u += m === xe ? p + Oa : y >= 0 ? (o.push(b), p.slice(0, y) + jr + p.slice(y) + Ct + w) : p + Ct + (y === -2 ? x : w);
   }
   return [Kr(c, u + (c[s] || "<?>") + (i === 2 ? "</svg>" : i === 3 ? "</math>" : "")), o];
 };
@@ -271,7 +271,7 @@ class Se {
     let h;
     this.parts = [];
     let u = 0, m = 0;
-    const x = i.length - 1, p = this.parts, [b, P] = Za(i, s);
+    const x = i.length - 1, p = this.parts, [b, P] = Ba(i, s);
     if (this.el = Se.createElement(b, o), Ut.currentNode = this.el.content, s === 2 || s === 3) {
       const y = this.el.content.firstChild;
       y.replaceWith(...y.childNodes);
@@ -279,11 +279,11 @@ class Se {
     for (; (h = Ut.nextNode()) !== null && p.length < x; ) {
       if (h.nodeType === 1) {
         if (h.hasAttributes()) for (const y of h.getAttributeNames()) if (y.endsWith(jr)) {
-          const I = P[m++], w = h.getAttribute(y).split(At), B = /([.?@])?(.*)/.exec(I);
-          p.push({ type: 1, index: u, name: B[2], strings: w, ctor: B[1] === "." ? Ua : B[1] === "?" ? Wa : B[1] === "@" ? Ha : ei }), h.removeAttribute(y);
-        } else y.startsWith(At) && (p.push({ type: 6, index: u }), h.removeAttribute(y));
+          const I = P[m++], w = h.getAttribute(y).split(Ct), B = /([.?@])?(.*)/.exec(I);
+          p.push({ type: 1, index: u, name: B[2], strings: w, ctor: B[1] === "." ? Fa : B[1] === "?" ? Ua : B[1] === "@" ? Wa : ei }), h.removeAttribute(y);
+        } else y.startsWith(Ct) && (p.push({ type: 6, index: u }), h.removeAttribute(y));
         if (Gr.test(h.tagName)) {
-          const y = h.textContent.split(At), I = y.length - 1;
+          const y = h.textContent.split(Ct), I = y.length - 1;
           if (I > 0) {
             h.textContent = Xe ? Xe.emptyScript : "";
             for (let w = 0; w < I; w++) h.append(y[w], Pe()), Ut.nextNode(), p.push({ type: 2, index: ++u });
@@ -293,7 +293,7 @@ class Se {
       } else if (h.nodeType === 8) if (h.data === qr) p.push({ type: 2, index: u });
       else {
         let y = -1;
-        for (; (y = h.data.indexOf(At, y + 1)) !== -1; ) p.push({ type: 7, index: u }), y += At.length - 1;
+        for (; (y = h.data.indexOf(Ct, y + 1)) !== -1; ) p.push({ type: 7, index: u }), y += Ct.length - 1;
       }
       u++;
     }
@@ -309,7 +309,7 @@ function re(c, i, s = c, o) {
   const u = Ee(i) ? void 0 : i._$litDirective$;
   return h?.constructor !== u && (h?._$AO?.(!1), u === void 0 ? h = void 0 : (h = new u(c), h._$AT(c, s, o)), o !== void 0 ? (s._$Co ??= [])[o] = h : s._$Cl = h), h !== void 0 && (i = re(c, h._$AS(c, i.values), h, o)), i;
 }
-class Fa {
+class Za {
   constructor(i, s) {
     this._$AV = [], this._$AN = void 0, this._$AD = i, this._$AM = s;
   }
@@ -326,7 +326,7 @@ class Fa {
     for (; p !== void 0; ) {
       if (m === p.index) {
         let b;
-        p.type === 2 ? b = new ke(u, u.nextSibling, this, i) : p.type === 1 ? b = new p.ctor(u, p.name, p.strings, this, i) : p.type === 6 && (b = new ja(u, this, i)), this._$AV.push(b), p = o[++x];
+        p.type === 2 ? b = new ke(u, u.nextSibling, this, i) : p.type === 1 ? b = new p.ctor(u, p.name, p.strings, this, i) : p.type === 6 && (b = new Ha(u, this, i)), this._$AV.push(b), p = o[++x];
       }
       m !== p?.index && (u = Ut.nextNode(), m++);
     }
@@ -356,7 +356,7 @@ class ke {
     return this._$AB;
   }
   _$AI(i, s = this) {
-    i = re(this, i, s), Ee(i) ? i === X || i == null || i === "" ? (this._$AH !== X && this._$AR(), this._$AH = X) : i !== this._$AH && i !== ne && this._(i) : i._$litType$ !== void 0 ? this.$(i) : i.nodeType !== void 0 ? this.T(i) : Ra(i) ? this.k(i) : this._(i);
+    i = re(this, i, s), Ee(i) ? i === X || i == null || i === "" ? (this._$AH !== X && this._$AR(), this._$AH = X) : i !== this._$AH && i !== ne && this._(i) : i._$litType$ !== void 0 ? this.$(i) : i.nodeType !== void 0 ? this.T(i) : Na(i) ? this.k(i) : this._(i);
   }
   O(i) {
     return this._$AA.parentNode.insertBefore(i, this._$AB);
@@ -371,7 +371,7 @@ class ke {
     const { values: s, _$litType$: o } = i, h = typeof o == "number" ? this._$AC(i) : (o.el === void 0 && (o.el = Se.createElement(Kr(o.h, o.h[0]), this.options)), o);
     if (this._$AH?._$AD === h) this._$AH.p(s);
     else {
-      const u = new Fa(h, this), m = u.u(this.options);
+      const u = new Za(h, this), m = u.u(this.options);
       u.p(s), this.T(m), this._$AH = u;
     }
   }
@@ -421,7 +421,7 @@ class ei {
     i === X ? this.element.removeAttribute(this.name) : this.element.setAttribute(this.name, i ?? "");
   }
 }
-class Ua extends ei {
+class Fa extends ei {
   constructor() {
     super(...arguments), this.type = 3;
   }
@@ -429,7 +429,7 @@ class Ua extends ei {
     this.element[this.name] = i === X ? void 0 : i;
   }
 }
-let Wa = class extends ei {
+let Ua = class extends ei {
   constructor() {
     super(...arguments), this.type = 4;
   }
@@ -437,7 +437,7 @@ let Wa = class extends ei {
     this.element.toggleAttribute(this.name, !!i && i !== X);
   }
 };
-class Ha extends ei {
+class Wa extends ei {
   constructor(i, s, o, h, u) {
     super(i, s, o, h, u), this.type = 5;
   }
@@ -450,7 +450,7 @@ class Ha extends ei {
     typeof this._$AH == "function" ? this._$AH.call(this.options?.host ?? this.element, i) : this._$AH.handleEvent(i);
   }
 }
-class ja {
+class Ha {
   constructor(i, s, o) {
     this.element = i, this.type = 6, this._$AN = void 0, this._$AM = s, this.options = o;
   }
@@ -461,9 +461,9 @@ class ja {
     re(this, i);
   }
 }
-const qa = rn.litHtmlPolyfillSupport;
-qa?.(Se, ke), (rn.litHtmlVersions ??= []).push("3.3.3");
-const Ga = (c, i, s) => {
+const ja = rn.litHtmlPolyfillSupport;
+ja?.(Se, ke), (rn.litHtmlVersions ??= []).push("3.3.3");
+const qa = (c, i, s) => {
   const o = s?.renderBefore ?? i;
   let h = o._$litPart$;
   if (h === void 0) {
@@ -483,7 +483,7 @@ class Wt extends ie {
   }
   update(i) {
     const s = this.render();
-    this.hasUpdated || (this.renderOptions.isConnected = this.isConnected), super.update(i), this._$Do = Ga(s, this.renderRoot, this.renderOptions);
+    this.hasUpdated || (this.renderOptions.isConnected = this.isConnected), super.update(i), this._$Do = qa(s, this.renderRoot, this.renderOptions);
   }
   connectedCallback() {
     super.connectedCallback(), this._$Do?.setConnected(!0);
@@ -496,10 +496,10 @@ class Wt extends ie {
   }
 }
 Wt._$litElement$ = !0, Wt.finalized = !0, an.litElementHydrateSupport?.({ LitElement: Wt });
-const Ka = an.litElementPolyfillSupport;
-Ka?.({ LitElement: Wt });
+const Ga = an.litElementPolyfillSupport;
+Ga?.({ LitElement: Wt });
 (an.litElementVersions ??= []).push("4.2.2");
-const Vr = ["camping", "fuel", "toll", "parking", "food", "activities", "other"], Ve = Vr, Va = {
+const Vr = ["camping", "fuel", "toll", "parking", "food", "activities", "other"], Ve = Vr, Ka = {
   title: "Reisetagebuch",
   noDestination: "Kein Reiseziel",
   loading: "Reisedaten werden geladen …",
@@ -628,7 +628,7 @@ const Vr = ["camping", "fuel", "toll", "parking", "food", "activities", "other"]
   mapNoPoints: "Keine zugeordneten GPS-Punkte für diese Reise.",
   mapRouteImageAlt: "GPS-Routenkarte",
   mapAttribution: "© OpenStreetMap-Mitwirkende · GPS-Route, keine Straßenberechnung"
-}, Ya = {
+}, Va = {
   title: "Travel journal",
   noDestination: "No destination",
   loading: "Loading travel data …",
@@ -875,7 +875,7 @@ const Vr = ["camping", "fuel", "toll", "parking", "food", "activities", "other"]
 };
 function $(c) {
   const i = c?.locale?.language?.toLowerCase() ?? "de";
-  return { ...i.startsWith("de") ? Va : Ya, ...i.startsWith("de") ? Mr.de : Mr.en };
+  return { ...i.startsWith("de") ? Ka : Va, ...i.startsWith("de") ? Mr.de : Mr.en };
 }
 function Je(c) {
   return (c?.locale?.language ?? "").toLowerCase().startsWith("de") ? "de-DE" : "en-US";
@@ -901,7 +901,7 @@ function Et(c, i) {
 function St(c, i) {
   return c.start_date || c.end_date ? [c.start_date, c.end_date].filter(Boolean).map((s) => $e(s, i)).join(" – ") || "" : c.started_at ? `${$e(c.started_at, i)}${c.ended_at ? ` – ${$e(c.ended_at, i)}` : ""}` : "";
 }
-function Xa(c, i) {
+function Ya(c, i) {
   const s = c.start_date || c.started_at, o = c.end_date || c.ended_at;
   if (!s && !o) return "";
   const h = (b) => {
@@ -994,7 +994,7 @@ function ii(c, i) {
 async function F(c, i, s, o = {}) {
   return c.connection.sendMessagePromise({ type: i, vehicle_id: s, ...o });
 }
-const kt = (c, i, s) => F(c, "camper_travel_journal/list", i, s ? { trip_id: s } : {}), Ja = (c, i, s, o, h = 5e3) => F(c, "camper_travel_journal/route", i, { trip_id: s, drive_ids: o, max_points: h }), Yr = (c, i, s, o) => F(c, "camper_travel_journal/transition_trip", i, { trip_id: s, status: o }), Xr = (c, i, s, o = "", h = "", u = "") => F(c, "camper_travel_journal/create_trip", i, { title: s, start_date: o || void 0, end_date: h || void 0, destination: u }), Qa = (c, i, s, o) => F(c, "camper_travel_journal/update_trip", i, { trip_id: s, ...o }), to = (c, i, s) => F(c, "camper_travel_journal/delete_trip", i, { trip_id: s }), eo = (c, i, s, o) => F(c, "camper_travel_journal/unlink_drive", i, { trip_id: s, drive_id: o }), io = (c, i, s, o) => F(c, "camper_travel_journal/link_drives", i, { trip_id: s, drive_ids: o }), no = (c, i, s) => F(c, "camper_travel_journal/create_manual_drive", i, s), ro = (c, i, s, o) => F(c, "camper_travel_journal/update_manual_drive", i, { drive_id: s, ...o }), so = (c, i, s) => F(c, "camper_travel_journal/delete_manual_drive", i, { drive_id: s }), ao = (c, i, s, o) => F(c, "camper_travel_journal/create_expense", i, { trip_id: s, ...o }), oo = (c, i, s, o) => F(c, "camper_travel_journal/update_expense", i, { expense_id: s, ...o }), Jr = (c, i, s, o) => F(c, "camper_travel_journal/create_stop", i, { trip_id: s, ...o }), lo = (c, i, s, o) => F(c, "camper_travel_journal/update_stop", i, { stop_id: s, ...o }), ho = (c, i, s) => F(c, "camper_travel_journal/delete_stop", i, { stop_id: s }), Nr = (c, i, s, o, h, u) => F(c, "camper_travel_journal/assign_interruption", i, { trip_id: s, interruption_id: o, status: h, stop_id: u }), co = (c, i, s, o, h) => F(c, "camper_travel_journal/create_stop_from_interruption", i, { trip_id: s, interruption_id: o, ...h }), uo = (c, i, s, o) => F(c, "camper_travel_journal/update_overnight", i, { place_id: s, ...o }), po = (c, i, s, o) => F(c, "camper_travel_journal/update_rating", i, { place_id: s, ...o }), fo = (c, i, s) => F(c, "camper_travel_journal/delete_rating", i, { place_id: s }), mo = (c, i, s) => F(c, "camper_travel_journal/generate_stop_suggestions", i, { trip_id: s }), go = (c, i, s, o, h, u) => F(c, "camper_travel_journal/accept_stop_suggestion", i, { suggestion_id: s, trip_id: o, name: h, place_type: u }), _o = (c, i, s) => F(c, "camper_travel_journal/dismiss_stop_suggestion", i, { suggestion_id: s }), vo = (c, i, s) => F(c, "camper_travel_journal/delete_expense", i, { expense_id: s }), yo = (c, i, s) => F(c, "camper_travel_journal/export_pdf", i, { trip_id: s }), ni = async (c) => (await c.connection.sendMessagePromise({ type: "camper_travel_journal/list_vehicles" })).vehicles ?? [], bo = (c, i, s) => F(c, "camper_travel_journal/analyze_gpx", i, { content_base64: s }), xo = (c, i, s, o, h, u) => F(c, "camper_travel_journal/import_gpx", i, { content_base64: s, file_hash: o, drive_keys: h, trip_id: u }), Qi = "camper-travel-journal-expenses-changed", tn = "camper-travel-journal-data-changed";
+const Dt = (c, i, s) => F(c, "camper_travel_journal/list", i, s ? { trip_id: s } : {}), Xa = (c, i, s, o, h = 5e3) => F(c, "camper_travel_journal/route", i, { trip_id: s, drive_ids: o, max_points: h }), Yr = (c, i, s, o) => F(c, "camper_travel_journal/transition_trip", i, { trip_id: s, status: o }), Ja = (c, i, s, o = "", h = "", u = "") => F(c, "camper_travel_journal/create_trip", i, { title: s, start_date: o || void 0, end_date: h || void 0, destination: u }), Qa = (c, i, s, o) => F(c, "camper_travel_journal/update_trip", i, { trip_id: s, ...o }), to = (c, i, s) => F(c, "camper_travel_journal/delete_trip", i, { trip_id: s }), eo = (c, i, s, o) => F(c, "camper_travel_journal/unlink_drive", i, { trip_id: s, drive_id: o }), io = (c, i, s, o) => F(c, "camper_travel_journal/link_drives", i, { trip_id: s, drive_ids: o }), no = (c, i, s) => F(c, "camper_travel_journal/create_manual_drive", i, s), ro = (c, i, s, o) => F(c, "camper_travel_journal/update_manual_drive", i, { drive_id: s, ...o }), so = (c, i, s) => F(c, "camper_travel_journal/delete_manual_drive", i, { drive_id: s }), ao = (c, i, s, o) => F(c, "camper_travel_journal/create_expense", i, { trip_id: s, ...o }), oo = (c, i, s, o) => F(c, "camper_travel_journal/update_expense", i, { expense_id: s, ...o }), Xr = (c, i, s, o) => F(c, "camper_travel_journal/create_stop", i, { trip_id: s, ...o }), lo = (c, i, s, o) => F(c, "camper_travel_journal/update_stop", i, { stop_id: s, ...o }), ho = (c, i, s) => F(c, "camper_travel_journal/delete_stop", i, { stop_id: s }), Nr = (c, i, s, o, h, u) => F(c, "camper_travel_journal/assign_interruption", i, { trip_id: s, interruption_id: o, status: h, stop_id: u }), co = (c, i, s, o, h) => F(c, "camper_travel_journal/create_stop_from_interruption", i, { trip_id: s, interruption_id: o, ...h }), uo = (c, i, s, o) => F(c, "camper_travel_journal/update_overnight", i, { place_id: s, ...o }), po = (c, i, s, o) => F(c, "camper_travel_journal/update_rating", i, { place_id: s, ...o }), fo = (c, i, s) => F(c, "camper_travel_journal/delete_rating", i, { place_id: s }), mo = (c, i, s) => F(c, "camper_travel_journal/generate_stop_suggestions", i, { trip_id: s }), go = (c, i, s, o, h, u) => F(c, "camper_travel_journal/accept_stop_suggestion", i, { suggestion_id: s, trip_id: o, name: h, place_type: u }), _o = (c, i, s) => F(c, "camper_travel_journal/dismiss_stop_suggestion", i, { suggestion_id: s }), vo = (c, i, s) => F(c, "camper_travel_journal/delete_expense", i, { expense_id: s }), yo = (c, i, s) => F(c, "camper_travel_journal/export_pdf", i, { trip_id: s }), ni = async (c) => (await c.connection.sendMessagePromise({ type: "camper_travel_journal/list_vehicles" })).vehicles ?? [], bo = (c, i, s) => F(c, "camper_travel_journal/analyze_gpx", i, { content_base64: s }), xo = (c, i, s, o, h, u) => F(c, "camper_travel_journal/import_gpx", i, { content_base64: s, file_hash: o, drive_keys: h, trip_id: u }), Qi = "camper-travel-journal-expenses-changed", tn = "camper-travel-journal-data-changed";
 function ji(c) {
   window.dispatchEvent(new CustomEvent(Qi, { detail: c }));
 }
@@ -1013,7 +1013,7 @@ function ri(c) {
     return "";
   }
 }
-function Dt(c) {
+function At(c) {
   if (!(!c.vehicleId || !c.tripId || typeof window > "u")) {
     try {
       window.sessionStorage.setItem(on(c.vehicleId), c.tripId);
@@ -1031,7 +1031,7 @@ function wo(c, i = "journal") {
     window.dispatchEvent(new CustomEvent(yt, { detail: { vehicleId: c, tripId: "", source: i } }));
   }
 }
-class Qr extends zt {
+class Jr extends zt {
   snapshot;
   trips = [];
   selectedTripId = "";
@@ -1065,11 +1065,11 @@ class Qr extends zt {
     if (!this.hass || !this.vehicleId) return !1;
     this.loading = !0, this.requestUpdate();
     try {
-      const i = await kt(this.hass, this.vehicleId);
+      const i = await Dt(this.hass, this.vehicleId);
       this.trips = i.trips;
       const s = ri(this.vehicleId), h = i.trips.find((m) => m.id === (s || this.selectedTripId)) ?? this.chooseDefaultTrip(i.trips);
-      this.selectedTripId = h?.id ?? "", h && Dt({ vehicleId: this.vehicleId, tripId: h.id, source: "summary" });
-      const u = h ? await kt(this.hass, this.vehicleId, h.id) : i;
+      this.selectedTripId = h?.id ?? "", h && At({ vehicleId: this.vehicleId, tripId: h.id, source: "summary" });
+      const u = h ? await Dt(this.hass, this.vehicleId, h.id) : i;
       return this.snapshot = h ? { ...u, trips: [h] } : u, this.loadError = "", !0;
     } catch {
       return this.loadError = $(this.hass).loadError, !1;
@@ -1087,7 +1087,7 @@ class Qr extends zt {
       }
   }
   async selectTrip(i) {
-    !this.hass || this.loading || !this.trips.some((s) => s.id === i) || (this.selectedTripId = i, Dt({ vehicleId: this.vehicleId, tripId: i, source: "summary" }), await this.refresh());
+    !this.hass || this.loading || !this.trips.some((s) => s.id === i) || (this.selectedTripId = i, At({ vehicleId: this.vehicleId, tripId: i, source: "summary" }), await this.refresh());
   }
   render() {
     const i = $(this.hass), s = this.snapshot?.trips[0], o = this.trips, h = (this.snapshot?.drives ?? []).reduce((P, y) => P + y.distance_m, 0) / 1e3;
@@ -1098,13 +1098,14 @@ class Qr extends zt {
     }} ?disabled=${this.loading}>${o.map((P) => g`<option value=${P.id} ?selected=${P.id === this.selectedTripId}>${P.title} · ${Ht(P.status, this.hass)} · ${St(P, this.hass)}</option>`)}</select></label>` : ""}${p ? g`<p class="error" role="alert">${p}</p>` : s ? g`<p class="muted">${s.destination || i.noDestination} · ${Ht(s.status, this.hass)} · ${b}</p><div class="grid"><div class="metric"><span class="muted">${i.distance}</span><span class="value">${h.toFixed(1)} km</span></div><div class="metric"><span class="muted">${i.drives}</span><span class="value">${this.snapshot?.drives.length ?? 0}</span></div><div class="metric"><span class="muted">${i.stops}</span><span class="value">${this.snapshot?.stops.length ?? 0}</span></div><div class="metric"><span class="muted">${i.costs}</span><span class="value">${x}</span></div></div><div class="actions">${s.status === "planned" ? g`<button @click=${() => this.setStatus("active")}>${i.start}</button>` : s.status === "paused" ? g`<button @click=${() => this.setStatus("active")}>${i.resume}</button>` : ""}${s.status === "active" ? g`<button class="secondary" @click=${() => this.setStatus("paused")}>${i.pause}</button><button @click=${() => this.setStatus("completed")}>${i.complete}</button>` : ""}</div>` : g`<p class="muted">${i.noTrip}</p>`}${this.loading ? g`<p class="muted">${i.loading}</p>` : ""}</ha-card>`;
   }
 }
-Qr.styles = [zt.styles, Mt`.trip-selector{display:grid;gap:4px;margin:12px 0;font-size:.9em}.trip-selector select{min-width:0;width:100%;box-sizing:border-box;padding:6px}`];
-ii("camper-travel-journal-summary-card", Qr);
+Jr.styles = [zt.styles, Mt`.trip-selector{display:grid;gap:4px;margin:12px 0;font-size:.9em}.trip-selector select{min-width:0;width:100%;box-sizing:border-box;padding:6px}`];
+ii("camper-travel-journal-summary-card", Jr);
 class Qe extends zt {
   editorKind = "";
   editorTripId = "";
   editorDirty = !1;
   discardPrompt = !1;
+  tripSaving = !1;
   snapshot;
   loadError = "";
   actionError = "";
@@ -1266,7 +1267,7 @@ class Qe extends zt {
     try {
       const s = this.placePayload();
       let o = this.editingPlaceId;
-      o ? await lo(this.hass, this.vehicleId, o, s) : o = (await Jr(this.hass, this.vehicleId, i, s)).stop_id, ["campsite", "rv_site", "wild_camp", "overnight"].includes(this.placeType) && await uo(this.hass, this.vehicleId, o, { place_kind: this.placeType, website_url: this.placeWebsite }), this.resetPlaceForm(), this.closeEditor(!0), await this.refresh(), Q({ vehicleId: this.vehicleId, tripId: i });
+      o ? await lo(this.hass, this.vehicleId, o, s) : o = (await Xr(this.hass, this.vehicleId, i, s)).stop_id, ["campsite", "rv_site", "wild_camp", "overnight"].includes(this.placeType) && await uo(this.hass, this.vehicleId, o, { place_kind: this.placeType, website_url: this.placeWebsite }), this.resetPlaceForm(), this.closeEditor(!0), await this.refresh(), Q({ vehicleId: this.vehicleId, tripId: i });
     } catch {
       this.fail($(this.hass).placeSaveError ?? $(this.hass).loadError);
     } finally {
@@ -1291,7 +1292,7 @@ class Qe extends zt {
     const o = [this.ratingOverall, this.ratingAccess, this.ratingSpace, this.ratingFacilities, this.ratingSurroundings];
     if (!this.ratingOverall || o.slice(1).some((h) => h && (!/^\d$/.test(h) || Number(h) < 1 || Number(h) > 5))) return this.fail($(this.hass).ratingInvalid ?? $(this.hass).dateInvalid);
     try {
-      await po(this.hass, this.vehicleId, i, { overall: Number(this.ratingOverall), large_rv_access: this.ratingAccess ? Number(this.ratingAccess) : void 0, space_maneuvering: this.ratingSpace ? Number(this.ratingSpace) : void 0, facilities: this.ratingFacilities ? Number(this.ratingFacilities) : void 0, surroundings: this.ratingSurroundings ? Number(this.ratingSurroundings) : void 0, review_text: this.ratingText }), this.ratingPlaceId = "", await this.refresh(), Q({ vehicleId: this.vehicleId, tripId: s });
+      await po(this.hass, this.vehicleId, i, { overall: Number(this.ratingOverall), large_rv_access: this.ratingAccess ? Number(this.ratingAccess) : void 0, space_maneuvering: this.ratingSpace ? Number(this.ratingSpace) : void 0, facilities: this.ratingFacilities ? Number(this.ratingFacilities) : void 0, surroundings: this.ratingSurroundings ? Number(this.ratingSurroundings) : void 0, review_text: this.ratingText }), this.ratingPlaceId = "", this.closeEditor(!0), await this.refresh(), Q({ vehicleId: this.vehicleId, tripId: s });
     } catch {
       this.fail($(this.hass).ratingSaveError ?? $(this.hass).loadError);
     }
@@ -1324,9 +1325,9 @@ class Qe extends zt {
     try {
       const i = this.embeddedTripId() || ri(this.vehicleId);
       this.activeTripId || (this.activeTripId = i);
-      let s = await kt(this.hass, this.vehicleId, this.activeTripId || void 0);
+      let s = await Dt(this.hass, this.vehicleId, this.activeTripId || void 0);
       const o = s.trips.find((h) => h.id === this.activeTripId) ?? s.trips.find((h) => h.status === "active") ?? s.trips[0];
-      o && this.activeTripId !== o.id ? (this.activeTripId = o.id, this.embeddedTripId() || Dt({ vehicleId: this.vehicleId, tripId: this.activeTripId, source: "manager" }), s = await kt(this.hass, this.vehicleId, this.activeTripId)) : o && !this.embeddedTripId() && Dt({ vehicleId: this.vehicleId, tripId: o.id, source: "manager" }), this.snapshot = s;
+      o && this.activeTripId !== o.id ? (this.activeTripId = o.id, this.embeddedTripId() || At({ vehicleId: this.vehicleId, tripId: this.activeTripId, source: "manager" }), s = await Dt(this.hass, this.vehicleId, this.activeTripId)) : o && !this.embeddedTripId() && At({ vehicleId: this.vehicleId, tripId: o.id, source: "manager" }), this.snapshot = s;
       try {
         const h = await ni(this.hass);
         this.vehicleName = h.find((u) => u.vehicle_id === this.vehicleId)?.name || "";
@@ -1399,17 +1400,27 @@ class Qe extends zt {
     return !!(i.start_date && o < i.start_date || i.end_date && h > i.end_date);
   }
   async addTrip() {
-    if (!(!this.hass || !this.tripTitle.trim())) {
+    if (this.hass) {
+      if (!this.tripTitle.trim()) return this.fail($(this.hass).tripCreateError);
       if (this.tripStartDate && this.tripEndDate && this.tripEndDate < this.tripStartDate) return this.fail($(this.hass).dateInvalid);
-      try {
-        await Xr(this.hass, this.vehicleId, this.tripTitle, this.tripStartDate, this.tripEndDate, this.destination), this.actionError = "", this.tripTitle = "", this.destination = "", this.tripStartDate = "", this.tripEndDate = "", this.closeEditor(!0), await this.refresh(), Q({ vehicleId: this.vehicleId, tripId: this.activeTripId });
-      } catch {
-        this.fail($(this.hass).tripCreateError);
+      if (!this.tripSaving) {
+        this.tripSaving = !0, this.requestUpdate();
+        try {
+          const s = (await Ja(this.hass, this.vehicleId, this.tripTitle, this.tripStartDate, this.tripEndDate, this.destination)).trip_id;
+          this.actionError = "", this.tripTitle = "", this.destination = "", this.tripStartDate = "", this.tripEndDate = "", this.closeEditor(!0), await this.refresh(), Q({ vehicleId: this.vehicleId, tripId: s ?? this.activeTripId }), this.dispatchEvent(new CustomEvent("trip-created", { detail: { tripId: s }, bubbles: !0, composed: !0 }));
+        } catch {
+          this.fail($(this.hass).tripCreateError);
+        } finally {
+          this.tripSaving = !1, this.requestUpdate();
+        }
       }
     }
   }
   startTripCreate() {
     this.tripTitle = "", this.destination = "", this.tripStartDate = "", this.tripEndDate = "", this.openEditor("trip-create", this.activeTripId);
+  }
+  openTripCreate() {
+    this.startTripCreate();
   }
   startTripEdit(i) {
     this.editingTripId = i.id, this.editingTripTitle = i.title, this.editingDestination = i.destination || "", this.editingStartDate = i.start_date || "", this.editingEndDate = i.end_date || "", this.openEditor("trip-edit", i.id);
@@ -1464,7 +1475,7 @@ class Qe extends zt {
       }
   }
   toggleTripDetails(i) {
-    this.selected = this.selected === i ? "" : i, this.selected ? (this.activeTripId = i, Dt({ vehicleId: this.vehicleId, tripId: i, source: "manager" }), this.refresh()) : this.requestUpdate();
+    this.selected = this.selected === i ? "" : i, this.selected ? (this.activeTripId = i, At({ vehicleId: this.vehicleId, tripId: i, source: "manager" }), this.refresh()) : this.requestUpdate();
   }
   async addManualDrive(i) {
     if (!this.hass || this.manualSaving) return;
@@ -1717,7 +1728,7 @@ class Qe extends zt {
     })}<label>${i.ratingComment ?? "Kommentar"}<textarea .value=${this.ratingText} @input=${(y) => {
       this.ratingText = y.currentTarget.value, this.markEditorDirty();
     }}></textarea></label>` : ""}
-          <div class="dialog-actions"><button type="button" class="secondary" @click=${P}>${i.cancel}</button><button type="submit" ?disabled=${this.placeSaving || this.manualSaving || !!this.driveSavingId || !!this.expenseSavingId}>${i.save}</button></div>
+          <div class="dialog-actions"><button type="button" class="secondary" @click=${P}>${i.cancel}</button><button type="submit" ?disabled=${this.placeSaving || this.manualSaving || this.tripSaving || !!this.driveSavingId || !!this.expenseSavingId}>${this.tripSaving ? i.saving : i.save}</button></div>
         `}
       </form>
     </dialog>`;
@@ -1768,6 +1779,7 @@ class Qe extends zt {
   }
   render() {
     const i = $(this.hass), s = this.snapshot?.trips ?? [];
+    if (this.embeddedSection() === "trip-create") return g`${this.renderEditorDialog(i, "")}`;
     if (!this.embeddedTripId()) return g`${this.renderGpx(i, s, this.gpxPreview)}${this.renderPdfExport(i, s)}${this.activeTripId ? this.renderInterruptions(i, this.activeTripId) : ""}${this.activeTripId ? this.renderSuggestions(i, this.activeTripId) : ""}${this.activeTripId ? this.renderPlaces(i, this.activeTripId) : ""}${this.activeTripId ? this.renderRatingActions(i, this.activeTripId) : ""}${this.renderLegacy()}${this.renderEditorDialog(i, this.activeTripId)}`;
     const o = this.embeddedSection();
     return g`${o === "gpx" ? this.renderGpx(i, s, this.gpxPreview) : ""}${o === "pdf" ? this.renderPdfExport(i, s) : ""}${o === "places" ? g`${this.activeTripId ? this.renderInterruptions(i, this.activeTripId) : ""}${this.activeTripId ? this.renderSuggestions(i, this.activeTripId) : ""}${this.activeTripId ? this.renderPlaces(i, this.activeTripId) : ""}${this.activeTripId ? this.renderRatingActions(i, this.activeTripId) : ""}` : ""}${o === "expenses" ? this.renderEmbeddedExpenses(i) : ""}${this.renderEditorDialog(i, this.embeddedTripId())}`;
@@ -2070,7 +2082,7 @@ function Ao() {
       function at(t) {
         t && dn.call(window, t);
       }
-      var is = {
+      var es = {
         __proto__: null,
         extend: h,
         create: u,
@@ -2105,7 +2117,7 @@ function Ao() {
         r.constructor = e, e.prototype = r;
         for (var a in this)
           Object.prototype.hasOwnProperty.call(this, a) && a !== "prototype" && a !== "__super__" && (e[a] = this[a]);
-        return t.statics && h(e, t.statics), t.includes && (ns(t.includes), h.apply(null, [r].concat(t.includes))), h(r, t), delete r.statics, delete r.includes, r.options && (r.options = n.options ? u(n.options) : {}, h(r.options, t.options)), r._initHooks = [], r.callInitHooks = function() {
+        return t.statics && h(e, t.statics), t.includes && (is(t.includes), h.apply(null, [r].concat(t.includes))), h(r, t), delete r.statics, delete r.includes, r.options && (r.options = n.options ? u(n.options) : {}, h(r.options, t.options)), r._initHooks = [], r.callInitHooks = function() {
           if (!this._initHooksCalled) {
             n.callInitHooks && n.callInitHooks.call(this), this._initHooksCalled = !0;
             for (var l = 0, d = r._initHooks.length; l < d; l++)
@@ -2123,7 +2135,7 @@ function Ao() {
         };
         return this.prototype._initHooks = this.prototype._initHooks || [], this.prototype._initHooks.push(n), this;
       };
-      function ns(t) {
+      function is(t) {
         if (!(typeof L > "u" || !L || !L.Mixin)) {
           t = ct(t) ? t : [t];
           for (var e = 0; e < t.length; e++)
@@ -2666,12 +2678,12 @@ function Ao() {
         // @method distanceTo(otherLatLng: LatLng): Number
         // Returns the distance (in meters) to the given `LatLng` calculated using the [Spherical Law of Cosines](https://en.wikipedia.org/wiki/Spherical_law_of_cosines).
         distanceTo: function(t) {
-          return Lt.distance(this, O(t));
+          return kt.distance(this, O(t));
         },
         // @method wrap(): LatLng
         // Returns a new `LatLng` object with the longitude wrapped so it's always between -180 and +180 degrees.
         wrap: function() {
-          return Lt.wrapLatLng(this);
+          return kt.wrapLatLng(this);
         },
         // @method toBounds(sizeInMeters: Number): LatLngBounds
         // Returns a new `LatLngBounds` object in which each boundary is `sizeInMeters/2` meters apart from the `LatLng`.
@@ -2771,7 +2783,7 @@ function Ao() {
           var l = t.getSouthWest(), d = t.getNorthEast(), f = new Z(l.lat - r, l.lng - a), _ = new Z(d.lat - r, d.lng - a);
           return new nt(f, _);
         }
-      }, Lt = h({}, xt, {
+      }, kt = h({}, xt, {
         wrapLng: [-180, 180],
         // Mean Earth Radius, as recommended for use by
         // the International Union of Geodesy and Geophysics,
@@ -2835,14 +2847,14 @@ function Ao() {
       function oe(t, e, n, r) {
         return new hi(t, e, n, r);
       }
-      var ci = h({}, Lt, {
+      var ci = h({}, kt, {
         code: "EPSG:3857",
         projection: li,
         transformation: (function() {
           var t = 0.5 / (Math.PI * li.R);
           return oe(t, 0.5, -t, 0.5);
         })()
-      }), rs = h({}, ci, {
+      }), ns = h({}, ci, {
         code: "EPSG:900913"
       });
       function fn(t) {
@@ -2857,7 +2869,7 @@ function Ao() {
         }
         return n || "M0 0";
       }
-      var di = document.documentElement.style, Ie = "ActiveXObject" in window, ss = Ie && !document.addEventListener, gn = "msLaunchUri" in navigator && !("documentMode" in document), ui = pt("webkit"), _n = pt("android"), vn = pt("android 2") || pt("android 3"), as = parseInt(/WebKit\/([0-9]+)|$/.exec(navigator.userAgent)[1], 10), os = _n && pt("Google") && as < 537 && !("AudioNode" in window), pi = !!window.opera, yn = !gn && pt("chrome"), bn = pt("gecko") && !ui && !pi && !Ie, ls = !yn && pt("safari"), xn = pt("phantom"), wn = "OTransition" in di, hs = navigator.platform.indexOf("Win") === 0, Tn = Ie && "transition" in di, fi = "WebKitCSSMatrix" in window && "m11" in new window.WebKitCSSMatrix() && !vn, $n = "MozPerspective" in di, cs = !window.L_DISABLE_3D && (Tn || fi || $n) && !wn && !xn, le = typeof orientation < "u" || pt("mobile"), ds = le && ui, us = le && fi, Pn = !window.PointerEvent && window.MSPointerEvent, En = !!(window.PointerEvent || Pn), Sn = "ontouchstart" in window || !!window.TouchEvent, ps = !window.L_NO_TOUCH && (Sn || En), fs = le && pi, ms = le && bn, gs = (window.devicePixelRatio || window.screen.deviceXDPI / window.screen.logicalXDPI) > 1, _s = (function() {
+      var di = document.documentElement.style, Ie = "ActiveXObject" in window, rs = Ie && !document.addEventListener, gn = "msLaunchUri" in navigator && !("documentMode" in document), ui = pt("webkit"), _n = pt("android"), vn = pt("android 2") || pt("android 3"), ss = parseInt(/WebKit\/([0-9]+)|$/.exec(navigator.userAgent)[1], 10), as = _n && pt("Google") && ss < 537 && !("AudioNode" in window), pi = !!window.opera, yn = !gn && pt("chrome"), bn = pt("gecko") && !ui && !pi && !Ie, os = !yn && pt("safari"), xn = pt("phantom"), wn = "OTransition" in di, ls = navigator.platform.indexOf("Win") === 0, Tn = Ie && "transition" in di, fi = "WebKitCSSMatrix" in window && "m11" in new window.WebKitCSSMatrix() && !vn, $n = "MozPerspective" in di, hs = !window.L_DISABLE_3D && (Tn || fi || $n) && !wn && !xn, le = typeof orientation < "u" || pt("mobile"), cs = le && ui, ds = le && fi, Pn = !window.PointerEvent && window.MSPointerEvent, En = !!(window.PointerEvent || Pn), Sn = "ontouchstart" in window || !!window.TouchEvent, us = !window.L_NO_TOUCH && (Sn || En), ps = le && pi, fs = le && bn, ms = (window.devicePixelRatio || window.screen.deviceXDPI / window.screen.logicalXDPI) > 1, gs = (function() {
         var t = !1;
         try {
           var e = Object.defineProperty({}, "passive", {
@@ -2869,12 +2881,12 @@ function Ao() {
         } catch {
         }
         return t;
-      })(), vs = (function() {
+      })(), _s = (function() {
         return !!document.createElement("canvas").getContext;
-      })(), mi = !!(document.createElementNS && fn("svg").createSVGRect), ys = !!mi && (function() {
+      })(), mi = !!(document.createElementNS && fn("svg").createSVGRect), vs = !!mi && (function() {
         var t = document.createElement("div");
         return t.innerHTML = "<svg/>", (t.firstChild && t.firstChild.namespaceURI) === "http://www.w3.org/2000/svg";
-      })(), bs = !mi && (function() {
+      })(), ys = !mi && (function() {
         try {
           var t = document.createElement("div");
           t.innerHTML = '<v:shape adj="1"/>';
@@ -2883,78 +2895,78 @@ function Ao() {
         } catch {
           return !1;
         }
-      })(), xs = navigator.platform.indexOf("Mac") === 0, ws = navigator.platform.indexOf("Linux") === 0;
+      })(), bs = navigator.platform.indexOf("Mac") === 0, xs = navigator.platform.indexOf("Linux") === 0;
       function pt(t) {
         return navigator.userAgent.toLowerCase().indexOf(t) >= 0;
       }
       var E = {
         ie: Ie,
-        ielt9: ss,
+        ielt9: rs,
         edge: gn,
         webkit: ui,
         android: _n,
         android23: vn,
-        androidStock: os,
+        androidStock: as,
         opera: pi,
         chrome: yn,
         gecko: bn,
-        safari: ls,
+        safari: os,
         phantom: xn,
         opera12: wn,
-        win: hs,
+        win: ls,
         ie3d: Tn,
         webkit3d: fi,
         gecko3d: $n,
-        any3d: cs,
+        any3d: hs,
         mobile: le,
-        mobileWebkit: ds,
-        mobileWebkit3d: us,
+        mobileWebkit: cs,
+        mobileWebkit3d: ds,
         msPointer: Pn,
         pointer: En,
-        touch: ps,
+        touch: us,
         touchNative: Sn,
-        mobileOpera: fs,
-        mobileGecko: ms,
-        retina: gs,
-        passiveEvents: _s,
-        canvas: vs,
+        mobileOpera: ps,
+        mobileGecko: fs,
+        retina: ms,
+        passiveEvents: gs,
+        canvas: _s,
         svg: mi,
-        vml: bs,
-        inlineSvg: ys,
-        mac: xs,
-        linux: ws
+        vml: ys,
+        inlineSvg: vs,
+        mac: bs,
+        linux: xs
       }, kn = E.msPointer ? "MSPointerDown" : "pointerdown", Ln = E.msPointer ? "MSPointerMove" : "pointermove", In = E.msPointer ? "MSPointerUp" : "pointerup", Cn = E.msPointer ? "MSPointerCancel" : "pointercancel", gi = {
         touchstart: kn,
         touchmove: Ln,
         touchend: In,
         touchcancel: Cn
       }, An = {
-        touchstart: ks,
+        touchstart: Ss,
         touchmove: Ce,
         touchend: Ce,
         touchcancel: Ce
       }, Gt = {}, Dn = !1;
-      function Ts(t, e, n) {
-        return e === "touchstart" && Ss(), An[e] ? (n = An[e].bind(this, n), t.addEventListener(gi[e], n, !1), n) : (console.warn("wrong event specified:", e), y);
+      function ws(t, e, n) {
+        return e === "touchstart" && Es(), An[e] ? (n = An[e].bind(this, n), t.addEventListener(gi[e], n, !1), n) : (console.warn("wrong event specified:", e), y);
       }
-      function $s(t, e, n) {
+      function Ts(t, e, n) {
         if (!gi[e]) {
           console.warn("wrong event specified:", e);
           return;
         }
         t.removeEventListener(gi[e], n, !1);
       }
-      function Ps(t) {
+      function $s(t) {
         Gt[t.pointerId] = t;
       }
-      function Es(t) {
+      function Ps(t) {
         Gt[t.pointerId] && (Gt[t.pointerId] = t);
       }
       function Mn(t) {
         delete Gt[t.pointerId];
       }
-      function Ss() {
-        Dn || (document.addEventListener(kn, Ps, !0), document.addEventListener(Ln, Es, !0), document.addEventListener(In, Mn, !0), document.addEventListener(Cn, Mn, !0), Dn = !0);
+      function Es() {
+        Dn || (document.addEventListener(kn, $s, !0), document.addEventListener(Ln, Ps, !0), document.addEventListener(In, Mn, !0), document.addEventListener(Cn, Mn, !0), Dn = !0);
       }
       function Ce(t, e) {
         if (e.pointerType !== (e.MSPOINTER_TYPE_MOUSE || "mouse")) {
@@ -2964,17 +2976,17 @@ function Ao() {
           e.changedTouches = [e], t(e);
         }
       }
-      function ks(t, e) {
+      function Ss(t, e) {
         e.MSPOINTER_TYPE_TOUCH && e.pointerType === e.MSPOINTER_TYPE_TOUCH && J(e), Ce(t, e);
       }
-      function Ls(t) {
+      function ks(t) {
         var e = {}, n, r;
         for (r in t)
           n = t[r], e[r] = n && n.bind ? n.bind(t) : n;
         return t = e, e.type = "dblclick", e.detail = 2, e.isTrusted = !1, e._simulated = !0, e;
       }
-      var Is = 200;
-      function Cs(t, e) {
+      var Ls = 200;
+      function Is(t, e) {
         t.addEventListener("dblclick", e);
         var n = 0, r;
         function a(l) {
@@ -2990,7 +3002,7 @@ function Ao() {
               return _ instanceof HTMLInputElement || _ instanceof HTMLSelectElement;
             }))) {
               var f = Date.now();
-              f - n <= Is ? (r++, r === 2 && e(Ls(l))) : r = 1, n = f;
+              f - n <= Ls ? (r++, r === 2 && e(ks(l))) : r = 1, n = f;
             }
           }
         }
@@ -2999,7 +3011,7 @@ function Ao() {
           simDblclick: a
         };
       }
-      function As(t, e) {
+      function Cs(t, e) {
         t.removeEventListener("dblclick", e.dblclick), t.removeEventListener("click", e.simDblclick);
       }
       var _i = Me(
@@ -3063,9 +3075,9 @@ function Ao() {
         return t.correspondingElement && (t = t.correspondingElement), t.className.baseVal === void 0 ? t.className : t.className.baseVal;
       }
       function ot(t, e) {
-        "opacity" in t.style ? t.style.opacity = e : "filter" in t.style && Ds(t, e);
+        "opacity" in t.style ? t.style.opacity = e : "filter" in t.style && As(t, e);
       }
-      function Ds(t, e) {
+      function As(t, e) {
         var n = !1, r = "DXImageTransform.Microsoft.Alpha";
         try {
           n = t.filters.item(r);
@@ -3140,7 +3152,7 @@ function Ao() {
           boundingClientRect: e
         };
       }
-      var Ms = {
+      var Ds = {
         __proto__: null,
         TRANSFORM: _i,
         TRANSITION: he,
@@ -3220,7 +3232,7 @@ function Ao() {
         var l = function(f) {
           return n.call(r || t, f || window.event);
         }, d = l;
-        !E.touchNative && E.pointer && e.indexOf("touch") === 0 ? l = Ts(t, e, l) : E.touch && e === "dblclick" ? l = Cs(t, l) : "addEventListener" in t ? e === "touchstart" || e === "touchmove" || e === "wheel" || e === "mousewheel" ? t.addEventListener(Ei[e] || e, l, E.passiveEvents ? { passive: !1 } : !1) : e === "mouseenter" || e === "mouseleave" ? (l = function(f) {
+        !E.touchNative && E.pointer && e.indexOf("touch") === 0 ? l = ws(t, e, l) : E.touch && e === "dblclick" ? l = Is(t, l) : "addEventListener" in t ? e === "touchstart" || e === "touchmove" || e === "wheel" || e === "mousewheel" ? t.addEventListener(Ei[e] || e, l, E.passiveEvents ? { passive: !1 } : !1) : e === "mouseenter" || e === "mouseleave" ? (l = function(f) {
           f = f || window.event, Ii(t, f) && d(f);
         }, t.addEventListener(Ei[e], l, !1)) : t.addEventListener(e, d, !1) : t.attachEvent("on" + e, l), t[ft] = t[ft] || {}, t[ft][a] = l;
       }
@@ -3229,7 +3241,7 @@ function Ao() {
         var l = t[ft] && t[ft][a];
         if (!l)
           return this;
-        !E.touchNative && E.pointer && e.indexOf("touch") === 0 ? $s(t, e, l) : E.touch && e === "dblclick" ? As(t, l) : "removeEventListener" in t ? t.removeEventListener(Ei[e] || e, l, !1) : t.detachEvent("on" + e, l), t[ft][a] = null;
+        !E.touchNative && E.pointer && e.indexOf("touch") === 0 ? Ts(t, e, l) : E.touch && e === "dblclick" ? Cs(t, l) : "removeEventListener" in t ? t.removeEventListener(Ei[e] || e, l, !1) : t.detachEvent("on" + e, l), t[ft][a] = null;
       }
       function Rt(t) {
         return t.stopPropagation ? t.stopPropagation() : t.originalEvent ? t.originalEvent._stopped = !0 : t.cancelBubble = !0, this;
@@ -3264,11 +3276,11 @@ function Ao() {
           (t.clientY - r.top) / n.y - e.clientTop
         );
       }
-      var zs = E.linux && E.chrome ? window.devicePixelRatio : E.mac ? window.devicePixelRatio * 3 : window.devicePixelRatio > 0 ? 2 * window.devicePixelRatio : 1;
+      var Ms = E.linux && E.chrome ? window.devicePixelRatio : E.mac ? window.devicePixelRatio * 3 : window.devicePixelRatio > 0 ? 2 * window.devicePixelRatio : 1;
       function Fn(t) {
         return E.edge ? t.wheelDeltaY / 2 : (
           // Don't trust window-geometry-based delta
-          t.deltaY && t.deltaMode === 0 ? -t.deltaY / zs : (
+          t.deltaY && t.deltaMode === 0 ? -t.deltaY / Ms : (
             // Pixels
             t.deltaY && t.deltaMode === 1 ? -t.deltaY * 20 : (
               // Lines
@@ -3304,7 +3316,7 @@ function Ao() {
         }
         return n !== t;
       }
-      var Os = {
+      var zs = {
         __proto__: null,
         on: A,
         off: U,
@@ -3531,8 +3543,8 @@ function Ao() {
           t = O(t), e = e === void 0 ? d : e;
           var f = Math.max(l.x, l.y), _ = f * this.getZoomScale(d, e), v = a.distanceTo(r) || 1, T = 1.42, S = T * T;
           function M(V) {
-            var Ke = V ? -1 : 1, $a = V ? _ : f, Pa = _ * _ - f * f + Ke * S * S * v * v, Ea = 2 * $a * S * v, Fi = Pa / Ea, wr = Math.sqrt(Fi * Fi + 1) - Fi, Sa = wr < 1e-9 ? -18 : Math.log(wr);
-            return Sa;
+            var Ke = V ? -1 : 1, Ta = V ? _ : f, $a = _ * _ - f * f + Ke * S * S * v * v, Pa = 2 * Ta * S * v, Fi = $a / Pa, wr = Math.sqrt(Fi * Fi + 1) - Fi, Ea = wr < 1e-9 ? -18 : Math.log(wr);
+            return Ea;
           }
           function tt(V) {
             return (Math.exp(V) - Math.exp(-V)) / 2;
@@ -3547,17 +3559,17 @@ function Ao() {
           function ee(V) {
             return f * (Y(rt) / Y(rt + T * V));
           }
-          function ba(V) {
+          function ya(V) {
             return f * (Y(rt) * ht(rt + T * V) - tt(rt)) / S;
           }
-          function xa(V) {
+          function ba(V) {
             return 1 - Math.pow(1 - V, 1.5);
           }
-          var wa = Date.now(), br = (M(1) - rt) / T, Ta = n.duration ? 1e3 * n.duration : 1e3 * br * 0.8;
+          var xa = Date.now(), br = (M(1) - rt) / T, wa = n.duration ? 1e3 * n.duration : 1e3 * br * 0.8;
           function xr() {
-            var V = (Date.now() - wa) / Ta, Ke = xa(V) * br;
+            var V = (Date.now() - xa) / wa, Ke = ba(V) * br;
             V <= 1 ? (this._flyToFrame = et(xr, this), this._move(
-              this.unproject(r.add(a.subtract(r).multiplyBy(ba(Ke) / v)), d),
+              this.unproject(r.add(a.subtract(r).multiplyBy(ya(Ke) / v)), d),
               this.getScaleZoom(f / ee(Ke), d),
               { flyTo: !0 }
             )) : this._move(t, e)._moveEnd(!0);
@@ -4195,7 +4207,7 @@ function Ao() {
           this._animatingZoom && (this._mapPane && j(this._mapPane, "leaflet-zoom-anim"), this._animatingZoom = !1, this._move(this._animateToCenter, this._animateToZoom, void 0, !0), this._tempFireZoomEvent && this.fire("zoom"), delete this._tempFireZoomEvent, this.fire("move"), this._moveEnd(!0));
         }
       });
-      function Ns(t, e) {
+      function Os(t, e) {
         return new N(t, e);
       }
       var dt = bt.extend({
@@ -4441,7 +4453,7 @@ function Ao() {
             U(t, "click", J), e._preventClick = !1;
           });
         }
-      }), Rs = function(t, e, n) {
+      }), Ns = function(t, e, n) {
         return new Wn(t, e, n);
       }, Ci = dt.extend({
         // @section
@@ -4506,7 +4518,7 @@ function Ao() {
       }), N.addInitHook(function() {
         this.options.zoomControl && (this.zoomControl = new Ci(), this.addControl(this.zoomControl));
       });
-      var Bs = function(t) {
+      var Rs = function(t) {
         return new Ci(t);
       }, Hn = dt.extend({
         // @section
@@ -4560,16 +4572,16 @@ function Ao() {
           var e = Math.pow(10, (Math.floor(t) + "").length - 1), n = t / e;
           return n = n >= 10 ? 10 : n >= 5 ? 5 : n >= 3 ? 3 : n >= 2 ? 2 : 1, e * n;
         }
-      }), Zs = function(t) {
+      }), Bs = function(t) {
         return new Hn(t);
-      }, Fs = '<svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="12" height="8" viewBox="0 0 12 8" class="leaflet-attribution-flag"><path fill="#4C7BE1" d="M0 0h12v4H0z"/><path fill="#FFD500" d="M0 4h12v3H0z"/><path fill="#E0BC00" d="M0 7h12v1H0z"/></svg>', Ai = dt.extend({
+      }, Zs = '<svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="12" height="8" viewBox="0 0 12 8" class="leaflet-attribution-flag"><path fill="#4C7BE1" d="M0 0h12v4H0z"/><path fill="#FFD500" d="M0 4h12v3H0z"/><path fill="#E0BC00" d="M0 7h12v1H0z"/></svg>', Ai = dt.extend({
         // @section
         // @aka Control.Attribution options
         options: {
           position: "bottomright",
           // @option prefix: String|false = 'Leaflet'
           // The HTML text shown before the attributions. Pass `false` to disable.
-          prefix: '<a href="https://leafletjs.com" title="A JavaScript library for interactive maps">' + (E.inlineSvg ? Fs + " " : "") + "Leaflet</a>"
+          prefix: '<a href="https://leafletjs.com" title="A JavaScript library for interactive maps">' + (E.inlineSvg ? Zs + " " : "") + "Leaflet</a>"
         },
         initialize: function(t) {
           z(this, t), this._attributions = {};
@@ -4618,10 +4630,10 @@ function Ao() {
       }), N.addInitHook(function() {
         this.options.attributionControl && new Ai().addTo(this);
       });
-      var Us = function(t) {
+      var Fs = function(t) {
         return new Ai(t);
       };
-      dt.Layers = Wn, dt.Zoom = Ci, dt.Scale = Hn, dt.Attribution = Ai, me.layers = Rs, me.zoom = Bs, me.scale = Zs, me.attribution = Us;
+      dt.Layers = Wn, dt.Zoom = Ci, dt.Scale = Hn, dt.Attribution = Ai, me.layers = Ns, me.zoom = Rs, me.scale = Bs, me.attribution = Fs;
       var mt = bt.extend({
         initialize: function(t) {
           this._map = t;
@@ -4651,7 +4663,7 @@ function Ao() {
       mt.addTo = function(t, e) {
         return t.addHandler(e, this), this;
       };
-      var Ws = { Events: st }, jn = E.touch ? "touchstart mousedown" : "mousedown", It = ae.extend({
+      var Us = { Events: st }, jn = E.touch ? "touchstart mousedown" : "mousedown", Lt = ae.extend({
         options: {
           // @section
           // @aka Draggable options
@@ -4673,15 +4685,15 @@ function Ao() {
         // @method disable()
         // Disables the dragging ability
         disable: function() {
-          this._enabled && (It._dragging === this && this.finishDrag(!0), U(this._dragStartTarget, jn, this._onDown, this), this._enabled = !1, this._moved = !1);
+          this._enabled && (Lt._dragging === this && this.finishDrag(!0), U(this._dragStartTarget, jn, this._onDown, this), this._enabled = !1, this._moved = !1);
         },
         _onDown: function(t) {
           if (this._enabled && (this._moved = !1, !vi(this._element, "leaflet-zoom-anim"))) {
             if (t.touches && t.touches.length !== 1) {
-              It._dragging === this && this.finishDrag();
+              Lt._dragging === this && this.finishDrag();
               return;
             }
-            if (!(It._dragging || t.shiftKey || t.which !== 1 && t.button !== 1 && !t.touches) && (It._dragging = this, this._preventOutline && $i(this._element), xi(), de(), !this._moving)) {
+            if (!(Lt._dragging || t.shiftKey || t.which !== 1 && t.button !== 1 && !t.touches) && (Lt._dragging = this, this._preventOutline && $i(this._element), xi(), de(), !this._moving)) {
               this.fire("down");
               var e = t.touches ? t.touches[0] : t, n = Nn(this._element);
               this._startPoint = new C(e.clientX, e.clientY), this._startPos = Nt(this._element), this._parentScale = Pi(n);
@@ -4710,7 +4722,7 @@ function Ao() {
         finishDrag: function(t) {
           j(document.body, "leaflet-dragging"), this._lastTarget && (j(this._lastTarget, "leaflet-drag-target"), this._lastTarget = null), U(document, "mousemove touchmove", this._onMove, this), U(document, "mouseup touchend touchcancel", this._onUp, this), wi(), ue();
           var e = this._moved && this._moving;
-          this._moving = !1, It._dragging = !1, e && this.fire("dragend", {
+          this._moving = !1, Lt._dragging = !1, e && this.fire("dragend", {
             noInertia: t,
             distance: this._newPos.distanceTo(this._startPos)
           });
@@ -4752,7 +4764,7 @@ function Ao() {
         }
         return O([e / r, n / r]);
       }
-      var Hs = {
+      var Ws = {
         __proto__: null,
         clipPolygon: qn,
         polygonCenter: Gn,
@@ -4762,15 +4774,15 @@ function Ao() {
         if (!e || !t.length)
           return t.slice();
         var n = e * e;
-        return t = Gs(t, n), t = qs(t, n), t;
+        return t = qs(t, n), t = js(t, n), t;
       }
       function Vn(t, e, n) {
         return Math.sqrt(ge(t, e, n, !0));
       }
-      function js(t, e, n) {
+      function Hs(t, e, n) {
         return ge(t, e, n);
       }
-      function qs(t, e) {
+      function js(t, e) {
         var n = t.length, r = typeof Uint8Array < "u" ? Uint8Array : Array, a = new r(n);
         a[0] = a[n - 1] = 1, Mi(t, a, e, 0, n - 1);
         var l, d = [];
@@ -4784,9 +4796,9 @@ function Ao() {
           _ = ge(t[f], t[r], t[a], !0), _ > l && (d = f, l = _);
         l > n && (e[d] = 1, Mi(t, e, n, r, d), Mi(t, e, n, d, a));
       }
-      function Gs(t, e) {
+      function qs(t, e) {
         for (var n = [t[0]], r = 1, a = 0, l = t.length; r < l; r++)
-          Ks(t[r], t[a]) > e && (n.push(t[r]), a = r);
+          Gs(t[r], t[a]) > e && (n.push(t[r]), a = r);
         return a < l - 1 && n.push(t[l - 1]), n;
       }
       var Yn;
@@ -4808,7 +4820,7 @@ function Ao() {
         var n = 0;
         return t.x < e.min.x ? n |= 1 : t.x > e.max.x && (n |= 2), t.y < e.min.y ? n |= 4 : t.y > e.max.y && (n |= 8), n;
       }
-      function Ks(t, e) {
+      function Gs(t, e) {
         var n = e.x - t.x, r = e.y - t.y;
         return n * n + r * r;
       }
@@ -4850,11 +4862,11 @@ function Ao() {
         var rt = e.unproject(k(v));
         return O([rt.lat + T.lat, rt.lng + T.lng]);
       }
-      var Vs = {
+      var Ks = {
         __proto__: null,
         simplify: Kn,
         pointToSegmentDistance: Vn,
-        closestPointOnSegment: js,
+        closestPointOnSegment: Hs,
         clipSegment: Xn,
         _getEdgeIntersection: Ne,
         _getBitCode: Zt,
@@ -4883,23 +4895,23 @@ function Ao() {
             v = a * Math.sin(d), v = Math.pow((1 - v) / (1 + v), a / 2), _ = Math.PI / 2 - 2 * Math.atan(l * v) - d, d += _;
           return new Z(d * e, t.x * e / n);
         }
-      }, Ys = {
+      }, Vs = {
         __proto__: null,
         LonLat: zi,
         Mercator: Oi,
         SphericalMercator: li
-      }, Xs = h({}, Lt, {
+      }, Ys = h({}, kt, {
         code: "EPSG:3395",
         projection: Oi,
         transformation: (function() {
           var t = 0.5 / (Math.PI * Oi.R);
           return oe(t, 0.5, -t, 0.5);
         })()
-      }), tr = h({}, Lt, {
+      }), tr = h({}, kt, {
         code: "EPSG:4326",
         projection: zi,
         transformation: oe(1 / 180, 1, -1 / 180, 0.5)
-      }), Js = h({}, xt, {
+      }), Xs = h({}, xt, {
         projection: zi,
         transformation: oe(1, 0, -1, 0),
         scale: function(t) {
@@ -4914,7 +4926,7 @@ function Ao() {
         },
         infinite: !0
       });
-      xt.Earth = Lt, xt.EPSG3395 = Xs, xt.EPSG3857 = ci, xt.EPSG900913 = rs, xt.EPSG4326 = tr, xt.Simple = Js;
+      xt.Earth = kt, xt.EPSG3395 = Ys, xt.EPSG3857 = ci, xt.EPSG900913 = ns, xt.EPSG4326 = tr, xt.Simple = Xs;
       var ut = ae.extend({
         // Classes extending `L.Layer` will inherit the following options:
         options: {
@@ -5118,7 +5130,7 @@ function Ao() {
         getLayerId: function(t) {
           return p(t);
         }
-      }), Qs = function(t, e) {
+      }), Js = function(t, e) {
         return new Yt(t, e);
       }, wt = Yt.extend({
         addLayer: function(t) {
@@ -5152,7 +5164,7 @@ function Ao() {
           }
           return t;
         }
-      }), ta = function(t, e) {
+      }), Qs = function(t, e) {
         return new wt(t, e);
       }, Xt = bt.extend({
         /* @section
@@ -5240,7 +5252,7 @@ function Ao() {
           return E.retina && this.options[t + "RetinaUrl"] || this.options[t + "Url"];
         }
       });
-      function ea(t) {
+      function ta(t) {
         return new Xt(t);
       }
       var _e = Xt.extend({
@@ -5277,7 +5289,7 @@ function Ao() {
         },
         addHooks: function() {
           var t = this._marker._icon;
-          this._draggable || (this._draggable = new It(t, t, !0)), this._draggable.on({
+          this._draggable || (this._draggable = new Lt(t, t, !0)), this._draggable.on({
             dragstart: this._onDragStart,
             predrag: this._onPreDrag,
             drag: this._onDrag,
@@ -5506,10 +5518,10 @@ function Ao() {
           return this.options.icon.options.tooltipAnchor;
         }
       });
-      function ia(t, e) {
+      function ea(t, e) {
         return new Re(t, e);
       }
-      var Ct = ut.extend({
+      var It = ut.extend({
         // @section
         // @aka Path options
         options: {
@@ -5595,7 +5607,7 @@ function Ao() {
         _clickTolerance: function() {
           return (this.options.stroke ? this.options.weight / 2 : 0) + (this._renderer.options.tolerance || 0);
         }
-      }), Be = Ct.extend({
+      }), Be = It.extend({
         // @section
         // @aka CircleMarker options
         options: {
@@ -5630,7 +5642,7 @@ function Ao() {
         },
         setStyle: function(t) {
           var e = t && t.radius || this._radius;
-          return Ct.prototype.setStyle.call(this, t), this.setRadius(e), this;
+          return It.prototype.setStyle.call(this, t), this.setRadius(e), this;
         },
         _project: function() {
           this._point = this._map.latLngToLayerPoint(this._latlng), this._updateBounds();
@@ -5653,7 +5665,7 @@ function Ao() {
           return t.distanceTo(this._point) <= this._radius + this._clickTolerance();
         }
       });
-      function na(t, e) {
+      function ia(t, e) {
         return new Be(t, e);
       }
       var Ni = Be.extend({
@@ -5681,11 +5693,11 @@ function Ao() {
             this._map.layerPointToLatLng(this._point.add(t))
           );
         },
-        setStyle: Ct.prototype.setStyle,
+        setStyle: It.prototype.setStyle,
         _project: function() {
           var t = this._latlng.lng, e = this._latlng.lat, n = this._map, r = n.options.crs;
-          if (r.distance === Lt.distance) {
-            var a = Math.PI / 180, l = this._mRadius / Lt.R / a, d = n.project([e + l, t]), f = n.project([e - l, t]), _ = d.add(f).divideBy(2), v = n.unproject(_).lat, T = Math.acos((Math.cos(l * a) - Math.sin(e * a) * Math.sin(v * a)) / (Math.cos(e * a) * Math.cos(v * a))) / a;
+          if (r.distance === kt.distance) {
+            var a = Math.PI / 180, l = this._mRadius / kt.R / a, d = n.project([e + l, t]), f = n.project([e - l, t]), _ = d.add(f).divideBy(2), v = n.unproject(_).lat, T = Math.acos((Math.cos(l * a) - Math.sin(e * a) * Math.sin(v * a)) / (Math.cos(e * a) * Math.cos(v * a))) / a;
             (isNaN(T) || T === 0) && (T = l / Math.cos(Math.PI / 180 * e)), this._point = _.subtract(n.getPixelOrigin()), this._radius = isNaN(T) ? 0 : _.x - n.project([v, t - T]).x, this._radiusY = _.y - d.y;
           } else {
             var S = r.unproject(r.project(this._latlng).subtract([this._mRadius, 0]));
@@ -5694,10 +5706,10 @@ function Ao() {
           this._updateBounds();
         }
       });
-      function ra(t, e, n) {
+      function na(t, e, n) {
         return new Ni(t, e, n);
       }
-      var Tt = Ct.extend({
+      var Tt = It.extend({
         // @section
         // @aka Polyline options
         options: {
@@ -5828,7 +5840,7 @@ function Ao() {
           return !1;
         }
       });
-      function sa(t, e) {
+      function ra(t, e) {
         return new Tt(t, e);
       }
       Tt._flat = Jn;
@@ -5881,7 +5893,7 @@ function Ao() {
           return e || Tt.prototype._containsPoint.call(this, t, !0);
         }
       });
-      function aa(t, e) {
+      function sa(t, e) {
         return new Jt(t, e);
       }
       var $t = wt.extend({
@@ -6099,7 +6111,7 @@ function Ao() {
       function nr(t, e) {
         return new $t(t, e);
       }
-      var oa = nr, He = ut.extend({
+      var aa = nr, He = ut.extend({
         // @section
         // @aka ImageOverlay options
         options: {
@@ -6222,7 +6234,7 @@ function Ao() {
         getCenter: function() {
           return this._bounds.getCenter();
         }
-      }), la = function(t, e, n) {
+      }), oa = function(t, e, n) {
         return new He(t, e, n);
       }, rr = He.extend({
         // @section
@@ -6264,7 +6276,7 @@ function Ao() {
         // Returns the instance of [`HTMLVideoElement`](https://developer.mozilla.org/docs/Web/API/HTMLVideoElement)
         // used by this overlay.
       });
-      function ha(t, e, n) {
+      function la(t, e, n) {
         return new rr(t, e, n);
       }
       var sr = He.extend({
@@ -6276,7 +6288,7 @@ function Ao() {
         // Returns the instance of [`SVGElement`](https://developer.mozilla.org/docs/Web/API/SVGElement)
         // used by this overlay.
       });
-      function ca(t, e, n) {
+      function ha(t, e, n) {
         return new sr(t, e, n);
       }
       var gt = ut.extend({
@@ -6514,10 +6526,10 @@ function Ao() {
           return t = arguments.length ? t : this._source._map, !t.hasLayer(this) && t._popup && t._popup.options.autoClose && t.removeLayer(t._popup), t._popup = this, gt.prototype.openOn.call(this, t);
         },
         onAdd: function(t) {
-          gt.prototype.onAdd.call(this, t), t.fire("popupopen", { popup: this }), this._source && (this._source.fire("popupopen", { popup: this }, !0), this._source instanceof Ct || this._source.on("preclick", Rt));
+          gt.prototype.onAdd.call(this, t), t.fire("popupopen", { popup: this }), this._source && (this._source.fire("popupopen", { popup: this }, !0), this._source instanceof It || this._source.on("preclick", Rt));
         },
         onRemove: function(t) {
-          gt.prototype.onRemove.call(this, t), t.fire("popupclose", { popup: this }), this._source && (this._source.fire("popupclose", { popup: this }, !0), this._source instanceof Ct || this._source.off("preclick", Rt));
+          gt.prototype.onRemove.call(this, t), t.fire("popupclose", { popup: this }), this._source && (this._source.fire("popupclose", { popup: this }, !0), this._source instanceof It || this._source.off("preclick", Rt));
         },
         getEvents: function() {
           var t = gt.prototype.getEvents.call(this);
@@ -6562,7 +6574,7 @@ function Ao() {
         _getAnchor: function() {
           return k(this._source && this._source._getPopupAnchor ? this._source._getPopupAnchor() : [0, 0]);
         }
-      }), da = function(t, e) {
+      }), ca = function(t, e) {
         return new je(t, e);
       };
       N.mergeOptions({
@@ -6638,7 +6650,7 @@ function Ao() {
           if (!(!this._popup || !this._map)) {
             Bt(t);
             var e = t.layer || t.target;
-            if (this._popup._source === e && !(e instanceof Ct)) {
+            if (this._popup._source === e && !(e instanceof It)) {
               this._map.hasLayer(this._popup) ? this.closePopup() : this.openPopup(t.latlng);
               return;
             }
@@ -6714,7 +6726,7 @@ function Ao() {
         _getAnchor: function() {
           return k(this._source && this._source._getTooltipAnchor && !this.options.sticky ? this._source._getTooltipAnchor() : [0, 0]);
         }
-      }), ua = function(t, e) {
+      }), da = function(t, e) {
         return new qe(t, e);
       };
       N.include({
@@ -6844,7 +6856,7 @@ function Ao() {
           return null;
         }
       });
-      function pa(t) {
+      function ua(t) {
         return new ar(t);
       }
       Xt.Default = _e;
@@ -7248,7 +7260,7 @@ function Ao() {
           return !0;
         }
       });
-      function fa(t) {
+      function pa(t) {
         return new ve(t);
       }
       var te = ve.extend({
@@ -7432,10 +7444,10 @@ function Ao() {
           return h(this.wmsParams, t), e || this.redraw(), this;
         }
       });
-      function ma(t, e) {
+      function fa(t, e) {
         return new lr(t, e);
       }
-      te.WMS = lr, or.wms = ma;
+      te.WMS = lr, or.wms = fa;
       var Pt = ut.extend({
         // @section
         // @aka Renderer options
@@ -7687,7 +7699,7 @@ function Ao() {
         return function(t) {
           return document.createElement("<" + t + ' xmlns="urn:schemas-microsoft.com:vml" class="lvml">');
         };
-      })(), ga = {
+      })(), ma = {
         _initContainer: function() {
           this._container = R("div", "leaflet-vml-container");
         },
@@ -7773,7 +7785,7 @@ function Ao() {
           Vt(t._path);
         }
       });
-      E.vml && be.include(ga);
+      E.vml && be.include(ma);
       function dr(t) {
         return E.svg || E.vml ? new be(t) : null;
       }
@@ -7814,7 +7826,7 @@ function Ao() {
           ];
         }
       });
-      function _a(t, e) {
+      function ga(t, e) {
         return new ur(t, e);
       }
       be.create = Ge, be.pointsToPath = mn, $t.geometryToLayer = Ze, $t.coordsToLatLng = Ri, $t.coordsToLatLngs = Fe, $t.latLngToCoords = Bi, $t.latLngsToCoords = Ue, $t.getFeature = Qt, $t.asFeature = We, N.mergeOptions({
@@ -7941,7 +7953,7 @@ function Ao() {
         addHooks: function() {
           if (!this._draggable) {
             var t = this._map;
-            this._draggable = new It(t._mapPane, t._container), this._draggable.on({
+            this._draggable = new Lt(t._mapPane, t._container), this._draggable.on({
               dragstart: this._onDragStart,
               drag: this._onDrag,
               dragend: this._onDragEnd
@@ -8151,7 +8163,7 @@ function Ao() {
         }
       });
       N.addInitHook("addHandler", "scrollWheelZoom", _r);
-      var va = 600;
+      var _a = 600;
       N.mergeOptions({
         // @section Touch interaction options
         // @option tapHold: Boolean
@@ -8174,7 +8186,7 @@ function Ao() {
             var e = t.touches[0];
             this._startPos = this._newPos = new C(e.clientX, e.clientY), this._holdTimeout = setTimeout(m(function() {
               this._cancel(), this._isTapValid() && (A(document, "touchend", J), A(document, "touchend touchcancel", this._cancelClickPrevent), this._simulateEvent("contextmenu", e));
-            }, this), va), A(document, "touchend touchcancel contextmenu", this._cancel, this), A(document, "touchmove", this._onMove, this);
+            }, this), _a), A(document, "touchend touchcancel contextmenu", this._cancel, this), A(document, "touchmove", this._onMove, this);
           }
         },
         _cancelClickPrevent: function t() {
@@ -8258,10 +8270,10 @@ function Ao() {
           this._zooming = !1, at(this._animRequest), U(document, "touchmove", this._onTouchMove, this), U(document, "touchend touchcancel", this._onTouchEnd, this), this._map.options.zoomAnimation ? this._map._animateZoom(this._center, this._map._limitZoom(this._zoom), !0, this._map.options.zoomSnap) : this._map._resetView(this._center, this._map._limitZoom(this._zoom));
         }
       });
-      N.addInitHook("addHandler", "touchZoom", yr), N.BoxZoom = pr, N.DoubleClickZoom = fr, N.Drag = mr, N.Keyboard = gr, N.ScrollWheelZoom = _r, N.TapHold = vr, N.TouchZoom = yr, s.Bounds = W, s.Browser = E, s.CRS = xt, s.Canvas = hr, s.Circle = Ni, s.CircleMarker = Be, s.Class = bt, s.Control = dt, s.DivIcon = ar, s.DivOverlay = gt, s.DomEvent = Os, s.DomUtil = Ms, s.Draggable = It, s.Evented = ae, s.FeatureGroup = wt, s.GeoJSON = $t, s.GridLayer = ve, s.Handler = mt, s.Icon = Xt, s.ImageOverlay = He, s.LatLng = Z, s.LatLngBounds = nt, s.Layer = ut, s.LayerGroup = Yt, s.LineUtil = Vs, s.Map = N, s.Marker = Re, s.Mixin = Ws, s.Path = Ct, s.Point = C, s.PolyUtil = Hs, s.Polygon = Jt, s.Polyline = Tt, s.Popup = je, s.PosAnimation = Un, s.Projection = Ys, s.Rectangle = ur, s.Renderer = Pt, s.SVG = be, s.SVGOverlay = sr, s.TileLayer = te, s.Tooltip = qe, s.Transformation = hi, s.Util = is, s.VideoOverlay = rr, s.bind = m, s.bounds = it, s.canvas = cr, s.circle = ra, s.circleMarker = na, s.control = me, s.divIcon = pa, s.extend = h, s.featureGroup = ta, s.geoJSON = nr, s.geoJson = oa, s.gridLayer = fa, s.icon = ea, s.imageOverlay = la, s.latLng = O, s.latLngBounds = G, s.layerGroup = Qs, s.map = Ns, s.marker = ia, s.point = k, s.polygon = aa, s.polyline = sa, s.popup = da, s.rectangle = _a, s.setOptions = z, s.stamp = p, s.svg = dr, s.svgOverlay = ca, s.tileLayer = or, s.tooltip = ua, s.transformation = oe, s.version = o, s.videoOverlay = ha;
-      var ya = window.L;
+      N.addInitHook("addHandler", "touchZoom", yr), N.BoxZoom = pr, N.DoubleClickZoom = fr, N.Drag = mr, N.Keyboard = gr, N.ScrollWheelZoom = _r, N.TapHold = vr, N.TouchZoom = yr, s.Bounds = W, s.Browser = E, s.CRS = xt, s.Canvas = hr, s.Circle = Ni, s.CircleMarker = Be, s.Class = bt, s.Control = dt, s.DivIcon = ar, s.DivOverlay = gt, s.DomEvent = zs, s.DomUtil = Ds, s.Draggable = Lt, s.Evented = ae, s.FeatureGroup = wt, s.GeoJSON = $t, s.GridLayer = ve, s.Handler = mt, s.Icon = Xt, s.ImageOverlay = He, s.LatLng = Z, s.LatLngBounds = nt, s.Layer = ut, s.LayerGroup = Yt, s.LineUtil = Ks, s.Map = N, s.Marker = Re, s.Mixin = Us, s.Path = It, s.Point = C, s.PolyUtil = Ws, s.Polygon = Jt, s.Polyline = Tt, s.Popup = je, s.PosAnimation = Un, s.Projection = Vs, s.Rectangle = ur, s.Renderer = Pt, s.SVG = be, s.SVGOverlay = sr, s.TileLayer = te, s.Tooltip = qe, s.Transformation = hi, s.Util = es, s.VideoOverlay = rr, s.bind = m, s.bounds = it, s.canvas = cr, s.circle = na, s.circleMarker = ia, s.control = me, s.divIcon = ua, s.extend = h, s.featureGroup = Qs, s.geoJSON = nr, s.geoJson = aa, s.gridLayer = pa, s.icon = ta, s.imageOverlay = oa, s.latLng = O, s.latLngBounds = G, s.layerGroup = Js, s.map = Os, s.marker = ea, s.point = k, s.polygon = sa, s.polyline = ra, s.popup = ca, s.rectangle = ga, s.setOptions = z, s.stamp = p, s.svg = dr, s.svgOverlay = ha, s.tileLayer = or, s.tooltip = da, s.transformation = oe, s.version = o, s.videoOverlay = la;
+      var va = window.L;
       s.noConflict = function() {
-        return window.L = ya, this;
+        return window.L = va, this;
       }, window.L = s;
     }));
   })(we, we.exports)), we.exports;
@@ -8275,7 +8287,7 @@ function Mo(c) {
   });
 }
 const Fr = ["#1976d2", "#d32f2f", "#388e3c", "#7b1fa2", "#f57c00", "#00796b"], zo = Do.replace(/\s+/g, " ").trim();
-class ts extends zt {
+class Qr extends zt {
   trips = [];
   selectedTripId = "";
   drives = [];
@@ -8324,14 +8336,14 @@ class ts extends zt {
       try {
         const s = await ni(this.hass);
         this.vehicleName = s.find((p) => p.vehicle_id === this.vehicleId)?.name ?? "";
-        const o = await kt(this.hass, this.vehicleId);
+        const o = await Dt(this.hass, this.vehicleId);
         this.mapConfig = o.map_config, this.trips = o.trips;
         const h = this.config.trip_id ?? "", u = ri(this.vehicleId);
-        h && this.trips.some((p) => p.id === h) ? this.selectedTripId = h : u && this.trips.some((p) => p.id === u) && (this.selectedTripId = u), (!this.selectedTripId || !this.trips.some((p) => p.id === this.selectedTripId)) && (this.selectedTripId = this.trips.find((p) => p.status === "active")?.id ?? this.trips[0]?.id ?? ""), this.selectedTripId && !h && Dt({ vehicleId: this.vehicleId, tripId: this.selectedTripId, source: "map" });
-        const m = this.selectedTripId ? await kt(this.hass, this.vehicleId, this.selectedTripId) : o;
+        h && this.trips.some((p) => p.id === h) ? this.selectedTripId = h : u && this.trips.some((p) => p.id === u) && (this.selectedTripId = u), (!this.selectedTripId || !this.trips.some((p) => p.id === this.selectedTripId)) && (this.selectedTripId = this.trips.find((p) => p.status === "active")?.id ?? this.trips[0]?.id ?? ""), this.selectedTripId && !h && At({ vehicleId: this.vehicleId, tripId: this.selectedTripId, source: "map" });
+        const m = this.selectedTripId ? await Dt(this.hass, this.vehicleId, this.selectedTripId) : o;
         this.mapConfig = m.map_config ?? this.mapConfig, this.drives = Mo(m.drives), this.places = m.stops ?? [];
         const x = new Set(this.drives.map((p) => p.id));
-        this.selectedDriveIds = this.selectedDriveIds.filter((p) => x.has(p)), this.driveSelectionInitialized || (this.selectedDriveIds = this.drives.map((p) => p.id), this.driveSelectionInitialized = !0), this.data = await Ja(this.hass, this.vehicleId, this.selectedTripId || void 0, this.selectedDriveIds);
+        this.selectedDriveIds = this.selectedDriveIds.filter((p) => x.has(p)), this.driveSelectionInitialized || (this.selectedDriveIds = this.drives.map((p) => p.id), this.driveSelectionInitialized = !0), this.data = await Xa(this.hass, this.vehicleId, this.selectedTripId || void 0, this.selectedDriveIds);
       } catch {
         this.error = $(this.hass).loadError, this.data = void 0;
       } finally {
@@ -8413,7 +8425,7 @@ class ts extends zt {
     if (!(!this.hass || !this.selectedTripId || !this.draftPoint || !this.draftName.trim() || !this.draftArrived || this.draftSaving)) {
       this.draftSaving = !0;
       try {
-        await Jr(this.hass, this.vehicleId, this.selectedTripId, {
+        await Xr(this.hass, this.vehicleId, this.selectedTripId, {
           name: this.draftName.trim(),
           place_type: this.draftType,
           category: this.draftType,
@@ -8440,7 +8452,7 @@ class ts extends zt {
     return this.drives.filter((i) => this.selectedDriveIds.includes(i.id));
   }
   async selectTrip(i) {
-    this.selectedTripId = i.currentTarget.value, Dt({ vehicleId: this.vehicleId, tripId: this.selectedTripId, source: "map" }), this.selectedDriveIds = [], this.driveSelectionInitialized = !1, await this.refresh(!0);
+    this.selectedTripId = i.currentTarget.value, At({ vehicleId: this.vehicleId, tripId: this.selectedTripId, source: "map" }), this.selectedDriveIds = [], this.driveSelectionInitialized = !1, await this.refresh(!0);
   }
   async toggleDrive(i) {
     const s = i.currentTarget;
@@ -8481,7 +8493,7 @@ class ts extends zt {
       ${o ? g`<div class="metrics" aria-label=${i.mapTrip}>
         <div class="metric"><span>${i.mapTotalDistance}</span><strong>${u.toFixed(1)} km</strong></div>
         <div class="metric"><span>${i.mapSelectedDrives}</span><strong>${h.length} / ${this.drives.length}</strong></div>
-        <div class="metric"><span>${i.mapTripPeriod}</span><strong>${Xa(o, this.hass) || "–"}</strong></div>
+        <div class="metric"><span>${i.mapTripPeriod}</span><strong>${Ya(o, this.hass) || "–"}</strong></div>
       </div>` : ""}
       ${this.drives.length ? g`<details class="drive-details" .open=${this.driveSectionsOpen} @toggle=${(x) => this.onDriveSectionsToggle(x)}>
         <summary><span>${i.mapDriveSegments}</span><span class="summary-count">${h.length} / ${this.drives.length}</span></summary>
@@ -8506,7 +8518,7 @@ class ts extends zt {
     </ha-card>`;
   }
 }
-ts.styles = [zt.styles, Wr(zo), Mt`
+Qr.styles = [zt.styles, Wr(zo), Mt`
   :host { min-width: 0; }
   ha-card { overflow: hidden; }
   .map-header { display: flex; align-items: end; justify-content: space-between; gap: 12px; margin-bottom: 12px; }
@@ -8545,21 +8557,15 @@ ts.styles = [zt.styles, Wr(zo), Mt`
     .map { height: clamp(300px, 62vh, 560px); }
   }
 `];
-ii("camper-travel-journal-map-card", ts);
+ii("camper-travel-journal-map-card", Qr);
 const Xi = /* @__PURE__ */ new Set(["campsite", "rv_site", "wild_camp", "overnight"]);
-class es extends zt {
+class ts extends zt {
   overview;
   detail;
   openTripId = "";
   selectedTripId = "";
-  showNewTrip = !1;
-  newTitle = "";
-  newDestination = "";
-  newStart = "";
-  newEnd = "";
   loading = !1;
   error = "";
-  dirty = !1;
   onActiveTripChanged = (i) => {
     const s = i.detail;
     s?.vehicleId !== this.vehicleId || !s.tripId || s.tripId === this.openTripId || this.openTripId && this.openTrip(s.tripId);
@@ -8593,7 +8599,7 @@ class es extends zt {
     if (!(!this.hass || !this.vehicleId)) {
       this.loading = !0, this.error = "", this.requestUpdate();
       try {
-        this.overview = await kt(this.hass, this.vehicleId);
+        this.overview = await Dt(this.hass, this.vehicleId);
         try {
           this.vehicleName = (await ni(this.hass)).find((s) => s.vehicle_id === this.vehicleId)?.name ?? "";
         } catch {
@@ -8609,13 +8615,13 @@ class es extends zt {
     }
   }
   async loadDetail(i) {
-    !this.hass || !i || (this.detail = await kt(this.hass, this.vehicleId, i));
+    !this.hass || !i || (this.detail = await Dt(this.hass, this.vehicleId, i));
   }
   async openTrip(i = this.selectedTripId) {
-    if (!(!i || !this.overview?.trips.some((s) => s.id === i)) && !(this.dirty && !window.confirm($(this.hass).unsavedTripChange ?? "Ungespeicherte Änderungen verwerfen?"))) {
-      this.loading = !0, this.error = "", this.dirty = !1, this.openTripId = i, this.selectedTripId = i;
+    if (!(!i || !this.overview?.trips.some((s) => s.id === i))) {
+      this.loading = !0, this.error = "", this.openTripId = i, this.selectedTripId = i;
       try {
-        await this.loadDetail(i), Dt({ vehicleId: this.vehicleId, tripId: i, source: "journal" });
+        await this.loadDetail(i), At({ vehicleId: this.vehicleId, tripId: i, source: "journal" });
       } catch {
         this.error = $(this.hass).loadError, this.openTripId = "";
       } finally {
@@ -8624,32 +8630,17 @@ class es extends zt {
     }
   }
   closeTrip(i = !0) {
-    i && this.dirty && !window.confirm($(this.hass).unsavedTripChange ?? "Ungespeicherte Änderungen verwerfen?") || (this.openTripId = "", this.detail = void 0, this.dirty = !1, wo(this.vehicleId, "journal"), this.requestUpdate());
-  }
-  async createAndOpenTrip() {
-    if (!(!this.hass || !this.newTitle.trim())) {
-      if (this.newStart && this.newEnd && this.newEnd < this.newStart) {
-        this.error = $(this.hass).dateInvalid;
-        return;
-      }
-      this.loading = !0, this.error = "";
-      try {
-        const i = this.newTitle.trim(), s = await Xr(this.hass, this.vehicleId, i, this.newStart, this.newEnd, this.newDestination.trim());
-        this.showNewTrip = !1, this.newTitle = "", this.newDestination = "", this.newStart = "", this.newEnd = "", this.overview = await kt(this.hass, this.vehicleId);
-        const o = s.trip_id || this.overview.trips.find((h) => h.title === i)?.id || this.overview.trips[0]?.id;
-        o && await this.openTrip(o);
-      } catch {
-        this.error = $(this.hass).tripCreateError;
-      } finally {
-        this.loading = !1, this.requestUpdate();
-      }
-    }
+    this.openTripId = "", this.detail = void 0, wo(this.vehicleId, "journal"), this.requestUpdate();
   }
   trip() {
     return this.overview?.trips.find((i) => i.id === this.openTripId) ?? this.detail?.trips.find((i) => i.id === this.openTripId);
   }
-  markDirty() {
-    this.dirty = !0;
+  async onTripCreated(i) {
+    const s = i.detail?.tripId;
+    await this.refreshOverview(), s && await this.openTrip(s);
+  }
+  openTripCreateDialog() {
+    this.renderRoot.querySelector("camper-travel-journal-manager-card")?.openTripCreate?.();
   }
   openInterruptionDialog(i) {
     this.interruptionDialog = i, this.interruptionAction = i.status === "unassigned" ? "stop" : i.status === "overnight" ? "overnight" : i.status === "stop" ? "stop" : i.status, this.interruptionPlaceId = i.existing_place_id ?? "", this.interruptionName = "", this.interruptionType = "other", this.interruptionAddress = "", this.interruptionDescription = "", this.interruptionWebsite = "", this.requestUpdate();
@@ -8691,15 +8682,9 @@ class es extends zt {
       this.selectedTripId = o.currentTarget.value, this.requestUpdate();
     }}><option value="">${i.journalChoose ?? "Bitte auswählen …"}</option>${s.map((o) => g`<option value=${o.id}>${o.title} · ${Ht(o.status, this.hass)} · ${St(o, this.hass)}</option>`)}</select></label>` : g`<p class="muted">${i.noTrip}</p>`}<div class="actions"><button type="button" @click=${() => {
       this.openTrip();
-    }} ?disabled=${!this.selectedTripId || this.loading}>${i.journalOpen ?? "Reise öffnen"}</button><button type="button" class="secondary" @click=${() => {
-      this.showNewTrip = !this.showNewTrip, this.requestUpdate();
-    }}>${i.newTrip}</button></div>${this.showNewTrip ? g`<form class="new-trip form-grid" @submit=${(o) => {
-      o.preventDefault(), this.createAndOpenTrip();
-    }}><input aria-label=${i.tripName} placeholder=${i.tripName} .value=${this.newTitle} @input=${(o) => {
-      this.newTitle = o.currentTarget.value, this.markDirty();
-    }} required><input aria-label=${i.destination} placeholder=${i.destination} .value=${this.newDestination} @input=${(o) => this.newDestination = o.currentTarget.value}><label>${i.startDate}<input type="date" .value=${this.newStart} @input=${(o) => this.newStart = o.currentTarget.value}></label><label>${i.endDate}<input type="date" .value=${this.newEnd} @input=${(o) => this.newEnd = o.currentTarget.value}></label><div class="actions"><button type="submit" ?disabled=${this.loading}>${i.create}</button><button type="button" class="secondary" @click=${() => {
-      this.showNewTrip = !1, this.requestUpdate();
-    }}>${i.cancel}</button></div></form>` : ""}</section>`;
+    }} ?disabled=${!this.selectedTripId || this.loading}>${i.journalOpen ?? "Reise öffnen"}</button><button type="button" class="secondary" @click=${() => this.openTripCreateDialog()}>${i.newTrip}</button></div><camper-travel-journal-manager-card .hass=${this.hass} .config=${{ vehicle_id: this.vehicleId, journal_section: "trip-create" }} @trip-created=${(o) => {
+      this.onTripCreated(o);
+    }}></camper-travel-journal-manager-card></section>`;
   }
   renderOpenTrip(i, s) {
     const o = this.detail, h = (o?.stops ?? []).filter((w) => w.confirmed !== !1), u = h.filter((w) => Xi.has(w.place_kind || w.place_type || w.stop_type)), m = (o?.drives ?? []).reduce((w, B) => w + B.distance_m, 0) / 1e3, x = o?.expense_summary, p = x?.mixed_currency ? i.mixedCurrency : x?.total_minor !== void 0 && x.currency ? vt(x.total_minor, x.currency, this.hass) : vt(0, "EUR", this.hass), b = (w) => g`<camper-travel-journal-manager-card .hass=${this.hass} .config=${{ vehicle_id: this.vehicleId, trip_id: s.id, journal_section: w }}></camper-travel-journal-manager-card>`, P = g`<camper-travel-journal-map-card .hass=${this.hass} .config=${{ vehicle_id: this.vehicleId, trip_id: s.id }}></camper-travel-journal-map-card>`, y = o?.interruptions ?? [], I = [...o?.drives ?? []].sort((w, B) => w.started_at.localeCompare(B.started_at)).flatMap((w) => {
@@ -8732,7 +8717,7 @@ class es extends zt {
     return g`<ha-card><h1>${i.title}</h1>${s ? this.renderOpenTrip(i, s) : this.renderPicker(i)}${this.error && !s ? g`<p class="error" role="alert">${this.error}</p>` : ""}${this.loading && !s ? g`<p class="muted" role="status">${i.loading}</p>` : ""}</ha-card>`;
   }
 }
-es.styles = [zt.styles, Mt`
+ts.styles = [zt.styles, Mt`
   :host { min-width: 0; } ha-card { padding: 0; overflow: hidden; } h1 { margin: 0; padding: 18px 18px 12px; font-size: 1.35rem; } h2 { margin: 0; } .entry, .trip-header { padding: 18px; } .entry { text-align: center; } .entry-icon { font-size: 2.4rem; } .entry h2 { margin: 8px 0; } .picker-label { display: grid; gap: 6px; text-align: left; margin: 18px 0 0; } select, input, textarea { box-sizing: border-box; min-width: 0; width: 100%; border: 1px solid var(--divider-color); border-radius: 8px; padding: 9px; background: var(--card-background-color); color: var(--primary-text-color); font: inherit; } .trip-header { display: flex; justify-content: space-between; gap: 14px; align-items: start; border-block: 1px solid var(--divider-color); background: var(--secondary-background-color); } .eyebrow { margin: 0 0 4px; color: var(--secondary-text-color); font-size: .78rem; text-transform: uppercase; letter-spacing: .04em; } .muted { color: var(--secondary-text-color); } .actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; } .form-grid { display: grid; grid-template-columns: repeat(auto-fit,minmax(9rem,1fr)); gap: 10px; align-items: end; } .form-grid label { display: grid; gap: 5px; text-align: left; } .new-trip { margin-top: 16px; padding: 14px; border: 1px solid var(--divider-color); border-radius: 10px; text-align: left; } .journal-section { border-bottom: 1px solid var(--divider-color); } .journal-section details { padding: 0 18px; } .journal-section summary { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 14px 0; cursor: pointer; list-style: none; } .journal-section summary::-webkit-details-marker { display:none; } .section-title { display: flex; gap: 9px; align-items: center; } .section-title span { color: var(--primary-color); width: 1.2em; text-align: center; } .count { color: var(--secondary-text-color); } .section-content { padding: 0 0 16px; min-width: 0; } .metric-grid { display: grid; grid-template-columns: repeat(auto-fit,minmax(7rem,1fr)); gap: 8px; } .metric-grid > div { padding: 10px; border-radius: 9px; background: var(--secondary-background-color); } .metric-grid span, .metric-grid strong { display: block; } .metric-grid span { color: var(--secondary-text-color); font-size: .78rem; } .metric-grid strong { margin-top: 3px; } .drive-item, .interruption-item { display: grid; gap: 3px; padding: 10px; margin-bottom: 7px; border-radius: 8px; background: var(--secondary-background-color); } .interruption-item { border-inline-start: 4px solid var(--warning-color, #f57c00); } camper-travel-journal-manager-card, camper-travel-journal-map-card { display: block; min-width: 0; } button:focus-visible, input:focus-visible, select:focus-visible, summary:focus-visible { outline: 2px solid var(--primary-color); outline-offset: 2px; } @media (max-width: 600px) { h1 { padding: 14px; } .entry, .trip-header { padding: 14px; } .trip-header { flex-direction: column; } .trip-header button { width: 100%; } .journal-section details { padding-inline: 14px; } .form-grid { grid-template-columns: 1fr; } .metric-grid { grid-template-columns: repeat(2,minmax(0,1fr)); } }
   .compact-action { justify-self: start; padding: 5px 8px; font-size: .85em; }
   dialog { max-width: min(32rem, calc(100vw - 2rem)); width: calc(100% - 2rem); border: 0; border-radius: 12px; padding: 0; color: var(--primary-text-color); background: var(--card-background-color); }
@@ -8742,7 +8727,7 @@ es.styles = [zt.styles, Mt`
   dialog textarea { min-height: 4rem; }
   .dialog-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 4px; }
 `];
-ii("camper-travel-journal-journal-card", es);
+ii("camper-travel-journal-journal-card", ts);
 function Oo(c, i) {
   return c.vehicle_id || i.length !== 1 ? c : { ...c, vehicle_id: i[0].vehicle_id };
 }
