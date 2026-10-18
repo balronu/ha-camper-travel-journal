@@ -279,8 +279,8 @@ class Ee {
     for (; (h = Ut.nextNode()) !== null && p.length < x; ) {
       if (h.nodeType === 1) {
         if (h.hasAttributes()) for (const b of h.getAttributeNames()) if (b.endsWith(Ws)) {
-          const z = P[m++], T = h.getAttribute(b).split(It), F = /([.?@])?(.*)/.exec(z);
-          p.push({ type: 1, index: u, name: F[2], strings: T, ctor: F[1] === "." ? Ua : F[1] === "?" ? Ha : F[1] === "@" ? ja : ii }), h.removeAttribute(b);
+          const z = P[m++], T = h.getAttribute(b).split(It), B = /([.?@])?(.*)/.exec(z);
+          p.push({ type: 1, index: u, name: B[2], strings: T, ctor: B[1] === "." ? Ua : B[1] === "?" ? Ha : B[1] === "@" ? ja : ii }), h.removeAttribute(b);
         } else b.startsWith(It) && (p.push({ type: 6, index: u }), h.removeAttribute(b));
         if (Gs.test(h.tagName)) {
           const b = h.textContent.split(It), z = b.length - 1;
@@ -538,10 +538,10 @@ class zt extends Ht {
 function ni(c, n) {
   customElements.get(c) || customElements.define(c, n);
 }
-async function Z(c, n, r, o = {}) {
+async function F(c, n, r, o = {}) {
   return c.connection.sendMessagePromise({ type: n, vehicle_id: r, ...o });
 }
-const St = (c, n, r) => Z(c, "camper_travel_journal/list", n, r ? { trip_id: r } : {}), Ka = (c, n, r, o, h = 5e3) => Z(c, "camper_travel_journal/route", n, { trip_id: r, drive_ids: o, max_points: h }), Ks = (c, n, r, o) => Z(c, "camper_travel_journal/transition_trip", n, { trip_id: r, status: o }), Ys = (c, n, r, o = "", h = "", u = "") => Z(c, "camper_travel_journal/create_trip", n, { title: r, start_date: o || void 0, end_date: h || void 0, destination: u }), Ya = (c, n, r, o) => Z(c, "camper_travel_journal/update_trip", n, { trip_id: r, ...o }), Xa = (c, n, r) => Z(c, "camper_travel_journal/delete_trip", n, { trip_id: r }), Ja = (c, n, r, o) => Z(c, "camper_travel_journal/unlink_drive", n, { trip_id: r, drive_id: o }), Qa = (c, n, r, o) => Z(c, "camper_travel_journal/link_drives", n, { trip_id: r, drive_ids: o }), to = (c, n, r) => Z(c, "camper_travel_journal/create_manual_drive", n, r), eo = (c, n, r, o) => Z(c, "camper_travel_journal/update_manual_drive", n, { drive_id: r, ...o }), io = (c, n, r) => Z(c, "camper_travel_journal/delete_manual_drive", n, { drive_id: r }), no = (c, n, r, o) => Z(c, "camper_travel_journal/create_expense", n, { trip_id: r, ...o }), so = (c, n, r, o) => Z(c, "camper_travel_journal/update_expense", n, { expense_id: r, ...o }), Xs = (c, n, r, o) => Z(c, "camper_travel_journal/create_stop", n, { trip_id: r, ...o }), ro = (c, n, r, o) => Z(c, "camper_travel_journal/update_stop", n, { stop_id: r, ...o }), ao = (c, n, r) => Z(c, "camper_travel_journal/delete_stop", n, { stop_id: r }), Ms = (c, n, r, o, h, u) => Z(c, "camper_travel_journal/assign_interruption", n, { trip_id: r, interruption_id: o, status: h, stop_id: u }), oo = (c, n, r, o, h) => Z(c, "camper_travel_journal/create_stop_from_interruption", n, { trip_id: r, interruption_id: o, ...h }), lo = (c, n, r, o) => Z(c, "camper_travel_journal/update_overnight", n, { place_id: r, ...o }), ho = (c, n, r, o) => Z(c, "camper_travel_journal/update_rating", n, { place_id: r, ...o }), co = (c, n, r) => Z(c, "camper_travel_journal/delete_rating", n, { place_id: r }), uo = (c, n, r) => Z(c, "camper_travel_journal/generate_stop_suggestions", n, { trip_id: r }), po = (c, n, r, o, h, u) => Z(c, "camper_travel_journal/accept_stop_suggestion", n, { suggestion_id: r, trip_id: o, name: h, place_type: u }), fo = (c, n, r) => Z(c, "camper_travel_journal/dismiss_stop_suggestion", n, { suggestion_id: r }), mo = (c, n, r) => Z(c, "camper_travel_journal/delete_expense", n, { expense_id: r }), go = (c, n, r) => Z(c, "camper_travel_journal/export_pdf", n, { trip_id: r }), si = async (c) => (await c.connection.sendMessagePromise({ type: "camper_travel_journal/list_vehicles" })).vehicles ?? [], _o = (c, n, r) => Z(c, "camper_travel_journal/analyze_gpx", n, { content_base64: r }), vo = (c, n, r, o, h, u) => Z(c, "camper_travel_journal/import_gpx", n, { content_base64: r, file_hash: o, drive_keys: h, trip_id: u }), Js = ["camping", "fuel", "toll", "parking", "food", "activities", "other"], Ke = Js, yo = {
+const St = (c, n, r) => F(c, "camper_travel_journal/list", n, r ? { trip_id: r } : {}), Ka = (c, n, r, o, h = 5e3) => F(c, "camper_travel_journal/route", n, { trip_id: r, drive_ids: o, max_points: h }), Ks = (c, n, r, o) => F(c, "camper_travel_journal/transition_trip", n, { trip_id: r, status: o }), Ys = (c, n, r, o = "", h = "", u = "") => F(c, "camper_travel_journal/create_trip", n, { title: r, start_date: o || void 0, end_date: h || void 0, destination: u }), Ya = (c, n, r, o) => F(c, "camper_travel_journal/update_trip", n, { trip_id: r, ...o }), Xa = (c, n, r) => F(c, "camper_travel_journal/delete_trip", n, { trip_id: r }), Ja = (c, n, r, o) => F(c, "camper_travel_journal/unlink_drive", n, { trip_id: r, drive_id: o }), Qa = (c, n, r, o) => F(c, "camper_travel_journal/link_drives", n, { trip_id: r, drive_ids: o }), to = (c, n, r) => F(c, "camper_travel_journal/create_manual_drive", n, r), eo = (c, n, r, o) => F(c, "camper_travel_journal/update_manual_drive", n, { drive_id: r, ...o }), io = (c, n, r) => F(c, "camper_travel_journal/delete_manual_drive", n, { drive_id: r }), no = (c, n, r, o) => F(c, "camper_travel_journal/create_expense", n, { trip_id: r, ...o }), so = (c, n, r, o) => F(c, "camper_travel_journal/update_expense", n, { expense_id: r, ...o }), Xs = (c, n, r, o) => F(c, "camper_travel_journal/create_stop", n, { trip_id: r, ...o }), ro = (c, n, r, o) => F(c, "camper_travel_journal/update_stop", n, { stop_id: r, ...o }), ao = (c, n, r) => F(c, "camper_travel_journal/delete_stop", n, { stop_id: r }), Ms = (c, n, r, o, h, u) => F(c, "camper_travel_journal/assign_interruption", n, { trip_id: r, interruption_id: o, status: h, stop_id: u }), oo = (c, n, r, o, h) => F(c, "camper_travel_journal/create_stop_from_interruption", n, { trip_id: r, interruption_id: o, ...h }), lo = (c, n, r, o) => F(c, "camper_travel_journal/update_overnight", n, { place_id: r, ...o }), ho = (c, n, r, o) => F(c, "camper_travel_journal/update_rating", n, { place_id: r, ...o }), co = (c, n, r) => F(c, "camper_travel_journal/delete_rating", n, { place_id: r }), uo = (c, n, r) => F(c, "camper_travel_journal/generate_stop_suggestions", n, { trip_id: r }), po = (c, n, r, o, h, u) => F(c, "camper_travel_journal/accept_stop_suggestion", n, { suggestion_id: r, trip_id: o, name: h, place_type: u }), fo = (c, n, r) => F(c, "camper_travel_journal/dismiss_stop_suggestion", n, { suggestion_id: r }), mo = (c, n, r) => F(c, "camper_travel_journal/delete_expense", n, { expense_id: r }), go = (c, n, r) => F(c, "camper_travel_journal/export_pdf", n, { trip_id: r }), si = async (c) => (await c.connection.sendMessagePromise({ type: "camper_travel_journal/list_vehicles" })).vehicles ?? [], _o = (c, n, r) => F(c, "camper_travel_journal/analyze_gpx", n, { content_base64: r }), vo = (c, n, r, o, h, u) => F(c, "camper_travel_journal/import_gpx", n, { content_base64: r, file_hash: o, drive_keys: h, trip_id: u }), Js = ["camping", "fuel", "toll", "parking", "food", "activities", "other"], Ke = Js, yo = {
   title: "Reisetagebuch",
   noDestination: "Kein Reiseziel",
   loading: "Reisedaten werden geladen …",
@@ -1664,13 +1664,13 @@ function Lo(c) {
 async function ko(c, n, r = To) {
   const o = { state: "not_run", durationMs: null };
   if (!c?.connection) return { version: "0.3.0-beta.4", connectionBefore: "unavailable", connectionAfter: "unavailable", authentication: o, vehicles: o, trips: o, vehicleId: Gi(n) };
-  const h = Rs(c), u = await Vi(c, { type: "auth/current_user" }, So, r), m = await Vi(c, { type: "camper_travel_journal/list_vehicles" }, Eo, r), x = m.value?.vehicles?.filter((re) => typeof re.vehicle_id == "string") ?? [], p = x.length === 1 ? x[0].vehicle_id : void 0, P = await Vi(c, { type: "camper_travel_journal/list", vehicle_id: p ?? n }, Lo, r), { value: b, ...z } = u, { value: T, ...F } = m, { value: M, ...Wt } = P;
+  const h = Rs(c), u = await Vi(c, { type: "auth/current_user" }, So, r), m = await Vi(c, { type: "camper_travel_journal/list_vehicles" }, Eo, r), x = m.value?.vehicles?.filter((re) => typeof re.vehicle_id == "string") ?? [], p = x.length === 1 ? x[0].vehicle_id : void 0, P = await Vi(c, { type: "camper_travel_journal/list", vehicle_id: p ?? n }, Lo, r), { value: b, ...z } = u, { value: T, ...B } = m, { value: M, ...Wt } = P;
   return {
     version: "0.3.0-beta.4",
     connectionBefore: h,
     connectionAfter: Rs(c),
     authentication: z,
-    vehicles: F,
+    vehicles: B,
     trips: Wt,
     vehicleId: Gi(n),
     ...p ? { resolvedVehicleId: Gi(p) } : {}
@@ -1822,7 +1822,7 @@ function Ao() {
       function T(t) {
         return t.trim ? t.trim() : t.replace(/^\s+|\s+$/g, "");
       }
-      function F(t) {
+      function B(t) {
         return T(t).split(/\s+/);
       }
       function M(t, e) {
@@ -1890,7 +1890,7 @@ function Ao() {
         falseFn: b,
         formatNum: z,
         trim: T,
-        splitWords: F,
+        splitWords: B,
         setOptions: M,
         getParamString: Wt,
         template: ln,
@@ -1949,7 +1949,7 @@ function Ao() {
             for (var s in t)
               this._on(s, t[s], e);
           else {
-            t = F(t);
+            t = B(t);
             for (var a = 0, l = t.length; a < l; a++)
               this._on(t[a], e, i);
           }
@@ -1973,7 +1973,7 @@ function Ao() {
             for (var s in t)
               this._off(s, t[s], e);
           else {
-            t = F(t);
+            t = B(t);
             for (var a = arguments.length === 1, l = 0, d = t.length; l < d; l++)
               a ? this._off(t[l]) : this._off(t[l], e, i);
           }
@@ -2075,7 +2075,7 @@ function Ao() {
             for (var s in t)
               this._on(s, t[s], e, !0);
           else {
-            t = F(t);
+            t = B(t);
             for (var a = 0, l = t.length; a < l; a++)
               this._on(t[a], e, i, !0);
           }
@@ -2335,14 +2335,14 @@ function Ao() {
         // Extend the bounds to contain the given bounds
         extend: function(t) {
           var e = this._southWest, i = this._northEast, s, a;
-          if (t instanceof B)
+          if (t instanceof Z)
             s = t, a = t;
           else if (t instanceof nt) {
             if (s = t._southWest, a = t._northEast, !s || !a)
               return this;
           } else
             return t ? this.extend(O(t) || q(t)) : this;
-          return !e && !i ? (this._southWest = new B(s.lat, s.lng), this._northEast = new B(a.lat, a.lng)) : (e.lat = Math.min(s.lat, e.lat), e.lng = Math.min(s.lng, e.lng), i.lat = Math.max(a.lat, i.lat), i.lng = Math.max(a.lng, i.lng)), this;
+          return !e && !i ? (this._southWest = new Z(s.lat, s.lng), this._northEast = new Z(a.lat, a.lng)) : (e.lat = Math.min(s.lat, e.lat), e.lng = Math.min(s.lng, e.lng), i.lat = Math.max(a.lat, i.lat), i.lng = Math.max(a.lng, i.lng)), this;
         },
         // @method pad(bufferRatio: Number): LatLngBounds
         // Returns bounds created by extending or retracting the current bounds by a given ratio in each direction.
@@ -2351,14 +2351,14 @@ function Ao() {
         pad: function(t) {
           var e = this._southWest, i = this._northEast, s = Math.abs(e.lat - i.lat) * t, a = Math.abs(e.lng - i.lng) * t;
           return new nt(
-            new B(e.lat - s, e.lng - a),
-            new B(i.lat + s, i.lng + a)
+            new Z(e.lat - s, e.lng - a),
+            new Z(i.lat + s, i.lng + a)
           );
         },
         // @method getCenter(): LatLng
         // Returns the center point of the bounds.
         getCenter: function() {
-          return new B(
+          return new Z(
             (this._southWest.lat + this._northEast.lat) / 2,
             (this._southWest.lng + this._northEast.lng) / 2
           );
@@ -2376,12 +2376,12 @@ function Ao() {
         // @method getNorthWest(): LatLng
         // Returns the north-west point of the bounds.
         getNorthWest: function() {
-          return new B(this.getNorth(), this.getWest());
+          return new Z(this.getNorth(), this.getWest());
         },
         // @method getSouthEast(): LatLng
         // Returns the south-east point of the bounds.
         getSouthEast: function() {
-          return new B(this.getSouth(), this.getEast());
+          return new Z(this.getSouth(), this.getEast());
         },
         // @method getWest(): Number
         // Returns the west longitude of the bounds
@@ -2409,7 +2409,7 @@ function Ao() {
         // @method contains (latlng: LatLng): Boolean
         // Returns `true` if the rectangle contains the given point.
         contains: function(t) {
-          typeof t[0] == "number" || t instanceof B || "lat" in t ? t = O(t) : t = q(t);
+          typeof t[0] == "number" || t instanceof Z || "lat" in t ? t = O(t) : t = q(t);
           var e = this._southWest, i = this._northEast, s, a;
           return t instanceof nt ? (s = t.getSouthWest(), a = t.getNorthEast()) : s = a = t, s.lat >= e.lat && a.lat <= i.lat && s.lng >= e.lng && a.lng <= i.lng;
         },
@@ -2446,12 +2446,12 @@ function Ao() {
       function q(t, e) {
         return t instanceof nt ? t : new nt(t, e);
       }
-      function B(t, e, i) {
+      function Z(t, e, i) {
         if (isNaN(t) || isNaN(e))
           throw new Error("Invalid LatLng object: (" + t + ", " + e + ")");
         this.lat = +t, this.lng = +e, i !== void 0 && (this.alt = +i);
       }
-      B.prototype = {
+      Z.prototype = {
         // @method equals(otherLatLng: LatLng, maxMargin?: Number): Boolean
         // Returns `true` if the given `LatLng` point is at the same position (within a small margin of error). The margin of error can be overridden by setting `maxMargin` to a small number.
         equals: function(t, e) {
@@ -2489,11 +2489,11 @@ function Ao() {
           );
         },
         clone: function() {
-          return new B(this.lat, this.lng, this.alt);
+          return new Z(this.lat, this.lng, this.alt);
         }
       };
       function O(t, e, i) {
-        return t instanceof B ? t : ct(t) && typeof t[0] != "object" ? t.length === 3 ? new B(t[0], t[1], t[2]) : t.length === 2 ? new B(t[0], t[1]) : null : t == null ? t : typeof t == "object" && "lat" in t ? new B(t.lat, "lng" in t ? t.lng : t.lon, t.alt) : e === void 0 ? null : new B(t, e, i);
+        return t instanceof Z ? t : ct(t) && typeof t[0] != "object" ? t.length === 3 ? new Z(t[0], t[1], t[2]) : t.length === 2 ? new Z(t[0], t[1]) : null : t == null ? t : typeof t == "object" && "lat" in t ? new Z(t.lat, "lng" in t ? t.lng : t.lon, t.alt) : e === void 0 ? null : new Z(t, e, i);
       }
       var xt = {
         // @method latLngToPoint(latlng: LatLng, zoom: Number): Point
@@ -2564,7 +2564,7 @@ function Ao() {
         // CRS's `wrapLat` and `wrapLng` properties, if they are outside the CRS's bounds.
         wrapLatLng: function(t) {
           var e = this.wrapLng ? P(t.lng, this.wrapLng, !0) : t.lng, i = this.wrapLat ? P(t.lat, this.wrapLat, !0) : t.lat, s = t.alt;
-          return new B(i, e, s);
+          return new Z(i, e, s);
         },
         // @method wrapLatLngBounds(bounds: LatLngBounds): LatLngBounds
         // Returns a `LatLngBounds` with the same size as the given one, ensuring
@@ -2574,7 +2574,7 @@ function Ao() {
           var e = t.getCenter(), i = this.wrapLatLng(e), s = e.lat - i.lat, a = e.lng - i.lng;
           if (s === 0 && a === 0)
             return t;
-          var l = t.getSouthWest(), d = t.getNorthEast(), f = new B(l.lat - s, l.lng - a), g = new B(d.lat - s, d.lng - a);
+          var l = t.getSouthWest(), d = t.getNorthEast(), f = new Z(l.lat - s, l.lng - a), g = new Z(d.lat - s, d.lng - a);
           return new nt(f, g);
         }
       }, Et = h({}, xt, {
@@ -2600,7 +2600,7 @@ function Ao() {
         },
         unproject: function(t) {
           var e = 180 / Math.PI;
-          return new B(
+          return new Z(
             (2 * Math.atan(Math.exp(t.y / this.R)) - Math.PI / 2) * e,
             t.x * e / this.R
           );
@@ -2852,7 +2852,7 @@ function Ao() {
       }
       function A(t, e) {
         if (t.classList !== void 0)
-          for (var i = F(e), s = 0, a = i.length; s < a; s++)
+          for (var i = B(e), s = 0, a = i.length; s < a; s++)
             t.classList.add(i[s]);
         else if (!yi(t, e)) {
           var l = De(t);
@@ -2986,7 +2986,7 @@ function Ao() {
           for (var a in e)
             Li(t, a, e[a], i);
         else {
-          e = F(e);
+          e = B(e);
           for (var l = 0, d = e.length; l < d; l++)
             Li(t, e[l], i, s);
         }
@@ -2999,7 +2999,7 @@ function Ao() {
         else if (e && typeof e == "object")
           for (var a in e)
             ki(t, a, e[a], i);
-        else if (e = F(e), arguments.length === 2)
+        else if (e = B(e), arguments.length === 2)
           Rn(t, function(f) {
             return ai(e, f) !== -1;
           });
@@ -3492,7 +3492,7 @@ function Ao() {
         },
         _handleGeolocationResponse: function(t) {
           if (this._container._leaflet_id) {
-            var e = t.coords.latitude, i = t.coords.longitude, s = new B(e, i), a = s.toBounds(t.coords.accuracy * 2), l = this._locateOptions;
+            var e = t.coords.latitude, i = t.coords.longitude, s = new Z(e, i), a = s.toBounds(t.coords.accuracy * 2), l = this._locateOptions;
             if (l.setView) {
               var d = this.getBoundsZoom(a);
               this.setView(s, l.maxZoom ? Math.min(d, l.maxZoom) : d);
@@ -4673,7 +4673,7 @@ function Ao() {
           return new I(t.lng, t.lat);
         },
         unproject: function(t) {
-          return new B(t.y, t.x);
+          return new Z(t.y, t.x);
         },
         bounds: new H([-180, -90], [180, 90])
       }, Ni = {
@@ -4687,7 +4687,7 @@ function Ao() {
         unproject: function(t) {
           for (var e = 180 / Math.PI, i = this.R, s = this.R_MINOR / i, a = Math.sqrt(1 - s * s), l = Math.exp(-t.y / i), d = Math.PI / 2 - 2 * Math.atan(l), f = 0, g = 0.1, v; f < 15 && Math.abs(g) > 1e-7; f++)
             v = a * Math.sin(d), v = Math.pow((1 - v) / (1 + v), a / 2), g = Math.PI / 2 - 2 * Math.atan(l * v) - d, d += g;
-          return new B(d * e, t.x * e / i);
+          return new Z(d * e, t.x * e / i);
         }
       }, Yr = {
         __proto__: null,
@@ -5588,7 +5588,7 @@ function Ao() {
         },
         // recursively turns latlngs into a set of rings with projected coordinates
         _projectLatlngs: function(t, e, i) {
-          var s = t[0] instanceof B, a = t.length, l, d;
+          var s = t[0] instanceof Z, a = t.length, l, d;
           if (s) {
             for (d = [], l = 0; l < a; l++)
               d[l] = this._map.latLngToLayerPoint(t[l]), i.extend(d[l]);
@@ -5654,7 +5654,7 @@ function Ao() {
         },
         _convertLatLngs: function(t) {
           var e = wt.prototype._convertLatLngs.call(this, t), i = e.length;
-          return i >= 2 && e[0] instanceof B && e[0].equals(e[i - 1]) && e.pop(), e;
+          return i >= 2 && e[0] instanceof Z && e[0].equals(e[i - 1]) && e.pop(), e;
         },
         _setLatLngs: function(t) {
           wt.prototype._setLatLngs.call(this, t), lt(this._latlngs) && (this._latlngs = [this._latlngs]);
@@ -5816,7 +5816,7 @@ function Ao() {
         return t ? t(e, i) : new Re(i, s && s.markersInheritOptions && s);
       }
       function Bi(t) {
-        return new B(t[1], t[0], t[2]);
+        return new Z(t[1], t[0], t[2]);
       }
       function Fe(t, e, i) {
         for (var s = [], a = 0, l = t.length, d; a < l; a++)
@@ -6107,7 +6107,7 @@ function Ao() {
           content: ""
         },
         initialize: function(t, e) {
-          t && (t instanceof B || ct(t)) ? (this._latlng = O(t), M(this, e)) : (M(this, t), this._source = e), this.options.content && (this._content = this.options.content);
+          t && (t instanceof Z || ct(t)) ? (this._latlng = O(t), M(this, e)) : (M(this, t), this._source = e), this.options.content && (this._content = this.options.content);
         },
         // @method openOn(map: Map): this
         // Adds the overlay to the map.
@@ -8064,7 +8064,7 @@ function Ao() {
           this._zooming = !1, at(this._animRequest), U(document, "touchmove", this._onTouchMove, this), U(document, "touchend touchcancel", this._onTouchEnd, this), this._map.options.zoomAnimation ? this._map._animateZoom(this._center, this._map._limitZoom(this._zoom), !0, this._map.options.zoomSnap) : this._map._resetView(this._center, this._map._limitZoom(this._zoom));
         }
       });
-      N.addInitHook("addHandler", "touchZoom", ys), N.BoxZoom = ps, N.DoubleClickZoom = fs, N.Drag = ms, N.Keyboard = gs, N.ScrollWheelZoom = _s, N.TapHold = vs, N.TouchZoom = ys, r.Bounds = H, r.Browser = S, r.CRS = xt, r.Canvas = hs, r.Circle = Ri, r.CircleMarker = Be, r.Class = yt, r.Control = dt, r.DivIcon = as, r.DivOverlay = gt, r.DomEvent = Or, r.DomUtil = Mr, r.Draggable = Lt, r.Evented = ae, r.FeatureGroup = bt, r.GeoJSON = Tt, r.GridLayer = ve, r.Handler = mt, r.Icon = Yt, r.ImageOverlay = je, r.LatLng = B, r.LatLngBounds = nt, r.Layer = ut, r.LayerGroup = Kt, r.LineUtil = Kr, r.Map = N, r.Marker = Re, r.Mixin = Hr, r.Path = kt, r.Point = I, r.PolyUtil = jr, r.Polygon = Xt, r.Polyline = wt, r.Popup = We, r.PosAnimation = Un, r.Projection = Yr, r.Rectangle = us, r.Renderer = $t, r.SVG = xe, r.SVGOverlay = rs, r.TileLayer = Qt, r.Tooltip = qe, r.Transformation = ci, r.Util = ir, r.VideoOverlay = ss, r.bind = m, r.bounds = it, r.canvas = cs, r.circle = sa, r.circleMarker = na, r.control = me, r.divIcon = pa, r.extend = h, r.featureGroup = ta, r.geoJSON = ns, r.geoJson = oa, r.gridLayer = fa, r.icon = ea, r.imageOverlay = la, r.latLng = O, r.latLngBounds = q, r.layerGroup = Qr, r.map = Nr, r.marker = ia, r.point = k, r.polygon = aa, r.polyline = ra, r.popup = da, r.rectangle = _a, r.setOptions = M, r.stamp = p, r.svg = ds, r.svgOverlay = ca, r.tileLayer = os, r.tooltip = ua, r.transformation = oe, r.version = o, r.videoOverlay = ha;
+      N.addInitHook("addHandler", "touchZoom", ys), N.BoxZoom = ps, N.DoubleClickZoom = fs, N.Drag = ms, N.Keyboard = gs, N.ScrollWheelZoom = _s, N.TapHold = vs, N.TouchZoom = ys, r.Bounds = H, r.Browser = S, r.CRS = xt, r.Canvas = hs, r.Circle = Ri, r.CircleMarker = Be, r.Class = yt, r.Control = dt, r.DivIcon = as, r.DivOverlay = gt, r.DomEvent = Or, r.DomUtil = Mr, r.Draggable = Lt, r.Evented = ae, r.FeatureGroup = bt, r.GeoJSON = Tt, r.GridLayer = ve, r.Handler = mt, r.Icon = Yt, r.ImageOverlay = je, r.LatLng = Z, r.LatLngBounds = nt, r.Layer = ut, r.LayerGroup = Kt, r.LineUtil = Kr, r.Map = N, r.Marker = Re, r.Mixin = Hr, r.Path = kt, r.Point = I, r.PolyUtil = jr, r.Polygon = Xt, r.Polyline = wt, r.Popup = We, r.PosAnimation = Un, r.Projection = Yr, r.Rectangle = us, r.Renderer = $t, r.SVG = xe, r.SVGOverlay = rs, r.TileLayer = Qt, r.Tooltip = qe, r.Transformation = ci, r.Util = ir, r.VideoOverlay = ss, r.bind = m, r.bounds = it, r.canvas = cs, r.circle = sa, r.circleMarker = na, r.control = me, r.divIcon = pa, r.extend = h, r.featureGroup = ta, r.geoJSON = ns, r.geoJson = oa, r.gridLayer = fa, r.icon = ea, r.imageOverlay = la, r.latLng = O, r.latLngBounds = q, r.layerGroup = Qr, r.map = Nr, r.marker = ia, r.point = k, r.polygon = aa, r.polyline = ra, r.popup = da, r.rectangle = _a, r.setOptions = M, r.stamp = p, r.svg = ds, r.svgOverlay = ca, r.tileLayer = os, r.tooltip = ua, r.transformation = oe, r.version = o, r.videoOverlay = ha;
       var ya = window.L;
       r.noConflict = function() {
         return window.L = ya, this;
@@ -8169,8 +8169,8 @@ class tr extends zt {
       if (!y.length) continue;
       const P = this.drives.findIndex((M) => M.id === p.drive_id), b = this.driveColor(P >= 0 ? P : x), z = _t.polyline(y, { color: b, weight: 4, opacity: 0.85 }).addTo(this.map);
       this.layers.push(z), y.forEach((M) => u.extend(M));
-      const T = _t.circleMarker(y[0], { radius: 6, color: b, fillOpacity: 1 }).bindTooltip(m.mapStart).bindPopup(this.endpointPopup(m.mapStart, p.points[0])).addTo(this.map), F = _t.circleMarker(y[y.length - 1], { radius: 6, color: "#111", fillColor: b, fillOpacity: 1 }).bindTooltip(m.mapEnd).bindPopup(this.endpointPopup(m.mapEnd, p.points[p.points.length - 1])).addTo(this.map);
-      this.layers.push(T, F);
+      const T = _t.circleMarker(y[0], { radius: 6, color: b, fillOpacity: 1 }).bindTooltip(m.mapStart).bindPopup(this.endpointPopup(m.mapStart, p.points[0])).addTo(this.map), B = _t.circleMarker(y[y.length - 1], { radius: 6, color: "#111", fillColor: b, fillOpacity: 1 }).bindTooltip(m.mapEnd).bindPopup(this.endpointPopup(m.mapEnd, p.points[p.points.length - 1])).addTo(this.map);
+      this.layers.push(T, B);
       for (const M of p.gaps) {
         const Wt = y[Math.max(0, Math.floor(y.length / 2))], re = _t.circleMarker(Wt, { radius: 8, color: "#f57c00", fillOpacity: 0.9 }).bindTooltip(`${m.mapGap}: ${M.seconds}s`).addTo(this.map);
         this.layers.push(re);
@@ -8501,9 +8501,9 @@ class er extends zt {
     }}>${n.cancel}</button></div></form>` : ""}</section>`;
   }
   renderOpenTrip(n, r) {
-    const o = this.detail, h = (o?.stops ?? []).filter((T) => T.confirmed !== !1), u = h.filter((T) => Xi.has(T.place_kind || T.place_type || T.stop_type)), m = (o?.drives ?? []).reduce((T, F) => T + F.distance_m, 0) / 1e3, x = o?.expense_summary, p = x?.mixed_currency ? n.mixedCurrency : x?.total_minor !== void 0 && x.currency ? Pt(x.total_minor, x.currency, this.hass) : Pt(0, "EUR", this.hass), y = (T) => _`<camper-travel-journal-manager-card .hass=${this.hass} .config=${{ vehicle_id: this.vehicleId, trip_id: r.id, journal_section: T }}></camper-travel-journal-manager-card>`, P = _`<camper-travel-journal-map-card .hass=${this.hass} .config=${{ vehicle_id: this.vehicleId, trip_id: r.id }}></camper-travel-journal-map-card>`, b = o?.interruptions ?? [], z = (o?.drives ?? []).flatMap((T) => {
-      const F = b.find((M) => M.previous_drive_id === T.id);
-      return [_`<article class="drive-item"><strong>${n.drive ?? "Fahrt"}</strong><span>${K(T.started_at, this.hass)} → ${T.ended_at ? K(T.ended_at, this.hass) : n.notAvailable ?? "Nicht verfügbar"}</span><span>${(T.distance_m / 1e3).toFixed(1)} km · ${T.duration_seconds ? Ct(T.duration_seconds, this.hass) : "–"} · ${T.source === "gpx" ? n.sourceGpx ?? "GPX-importiert" : T.source === "manual" ? n.sourceManual : n.sourceGps}</span></article>`, ...F ? [_`<article class="interruption-item"><strong>${F.status === "pause" ? n.drivePause ?? "Fahrtpause" : F.status === "ignored" ? n.interruptionIgnored ?? "Ignoriert" : F.existing_place_id ? n.assignedStay ?? "Aufenthalt" : n.interruptionUnassigned ?? "Nicht zugeordnet"}</strong><span>${K(F.started_at, this.hass)} → ${K(F.ended_at, this.hass)} · ${Ct(F.duration_seconds, this.hass)}</span><button type="button" class="compact-action" @click=${() => this.openInterruptionDialog(F)}>${n.assignStay ?? "Aufenthalt zuordnen"}</button></article>`] : []];
+    const o = this.detail, h = (o?.stops ?? []).filter((T) => T.confirmed !== !1), u = h.filter((T) => Xi.has(T.place_kind || T.place_type || T.stop_type)), m = (o?.drives ?? []).reduce((T, B) => T + B.distance_m, 0) / 1e3, x = o?.expense_summary, p = x?.mixed_currency ? n.mixedCurrency : x?.total_minor !== void 0 && x.currency ? Pt(x.total_minor, x.currency, this.hass) : Pt(0, "EUR", this.hass), y = (T) => _`<camper-travel-journal-manager-card .hass=${this.hass} .config=${{ vehicle_id: this.vehicleId, trip_id: r.id, journal_section: T }}></camper-travel-journal-manager-card>`, P = _`<camper-travel-journal-map-card .hass=${this.hass} .config=${{ vehicle_id: this.vehicleId, trip_id: r.id }}></camper-travel-journal-map-card>`, b = o?.interruptions ?? [], z = [...o?.drives ?? []].sort((T, B) => T.started_at.localeCompare(B.started_at)).flatMap((T) => {
+      const B = b.find((M) => M.previous_drive_id === T.id);
+      return [_`<article class="drive-item"><strong>${n.drive ?? "Fahrt"}</strong><span>${K(T.started_at, this.hass)} → ${T.ended_at ? K(T.ended_at, this.hass) : n.notAvailable ?? "Nicht verfügbar"}</span><span>${(T.distance_m / 1e3).toFixed(1)} km · ${T.duration_seconds ? Ct(T.duration_seconds, this.hass) : "–"} · ${T.source === "gpx" ? n.sourceGpx ?? "GPX-importiert" : T.source === "manual" ? n.sourceManual : n.sourceGps}</span></article>`, ...B ? [_`<article class="interruption-item"><strong>${B.status === "pause" ? n.drivePause ?? "Fahrtpause" : B.status === "ignored" ? n.interruptionIgnored ?? "Ignoriert" : B.existing_place_id ? n.assignedStay ?? "Aufenthalt" : n.interruptionUnassigned ?? "Nicht zugeordnet"}</strong><span>${K(B.started_at, this.hass)} → ${K(B.ended_at, this.hass)} · ${Ct(B.duration_seconds, this.hass)}</span><button type="button" class="compact-action" @click=${() => this.openInterruptionDialog(B)}>${n.assignStay ?? "Aufenthalt zuordnen"}</button></article>`] : []];
     });
     return _`<header class="trip-header"><div><p class="eyebrow">${n.journalOpenTrip ?? "Geöffnete Reise"}</p><h2>${r.title}</h2><p class="muted">${r.destination || n.noDestination} · ${At(r, this.hass)} · ${se(r.status, this.hass)}${this.vehicleName ? ` · ${this.vehicleName}` : ""}</p></div><button type="button" class="secondary" @click=${() => this.closeTrip()}>${n.journalClose ?? "Reise schließen / wechseln"}</button></header>
       ${this.section(n.journalOverview ?? "Reiseübersicht", "▣", void 0, _`<div class="metric-grid"><div><span>${n.distance}</span><strong>${m.toFixed(1)} km</strong></div><div><span>${n.drives}</span><strong>${o?.drives.length ?? 0}</strong></div><div><span>${n.stops}</span><strong>${h.filter((T) => !Xi.has(T.place_kind || T.place_type || T.stop_type)).length}</strong></div><div><span>${n.overnights ?? "Übernachtungsplätze"}</span><strong>${u.length}</strong></div><div><span>${n.costs}</span><strong>${p}</strong></div></div>`, !0)}
