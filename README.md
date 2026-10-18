@@ -6,7 +6,7 @@
 
 <h1 align="center">Camper Travel Journal</h1>
 <p align="center">Dein digitales Wohnmobil-Reisetagebuch für Home Assistant</p>
-<p align="center"><strong>Aktuelle stabile Version: v0.2.0 · v0.3.0-beta.5 in Vorbereitung</strong></p>
+<p align="center"><strong>Aktuelle stabile Version: v0.2.0 · v0.3.0-beta.6 in Vorbereitung</strong></p>
 
 <p align="center">
   <a href="https://github.com/balronu/ha-camper-travel-journal/releases/latest"><img src="https://img.shields.io/github/v/release/balronu/ha-camper-travel-journal?label=Release" alt="Release"></a>

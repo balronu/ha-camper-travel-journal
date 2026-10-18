@@ -13,7 +13,7 @@ const bundle = resolve(root, "../custom_components/camper_travel_journal/fronten
 
 describe("frontend release contract", () => {
   it("keeps backend, npm metadata and beta bundle aligned", () => {
-    expect(manifest.version).toBe("0.3.0-beta.5");
+    expect(manifest.version).toBe("0.3.0-beta.6");
     expect(pkg.version).toBe(manifest.version);
     expect(existsSync(bundle)).toBe(true);
   });
@@ -24,7 +24,7 @@ describe("frontend release contract", () => {
     expect(source).toContain("camper-travel-journal-journal-card");
     expect(source).not.toContain('{ type: "camper-travel-journal-summary-card"');
     expect(source).not.toContain('{ type: "camper-travel-journal-manager-card"');
-    expect(source).not.toContain('{ type: "camper-travel-journal-diagnostics-card"');
+    expect(source).toContain('{ type: "camper-travel-journal-diagnostics-card"');
     expect(source).not.toContain('{ type: "camper-travel-journal-map-card"');
     expect(readFileSync(resolve(root, "src/base-card.ts"), "utf8")).toContain("migration-notice");
     expect(readFileSync(resolve(root, "src/map-card.ts"), "utf8")).toContain("TravelCard");
@@ -168,6 +168,8 @@ describe("frontend release contract", () => {
     expect(base).toContain("README.md#migration");
     expect(index).toContain('type: "camper-travel-journal-journal-card"');
     expect(index).not.toContain('type: "camper-travel-journal-manager-card"');
+    expect(index).toContain('type: "camper-travel-journal-diagnostics-card"');
+    expect(base).toContain("this.config.journal_section");
     expect(journal).toContain("onSectionToggle");
     expect(journal).toContain("details.open = false");
   });

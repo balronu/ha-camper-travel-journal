@@ -52,6 +52,7 @@ jobs:
           if (result.diagnosticCallsBefore !== 1) throw new Error(`diagnostic ran automatically: ${result.diagnosticCallsBefore}`);
           if (result.diagnosticCallsAfter !== 6) throw new Error(`expected diagnostic plus two summary calls, got ${result.diagnosticCallsAfter}`);
           if (!result.diagnosticReport) throw new Error('diagnostic report did not render');
+          if (!result.catalog) throw new Error('journal and diagnostic cards were not both discoverable in the card catalog');
           if (result.visibleTemplateLeak) throw new Error('frontend template source leaked into visible DOM');
           console.log(JSON.stringify(result));
           NODE
@@ -172,7 +173,7 @@ jobs:
           const match = html.match(/<pre id="result">([\s\S]*?)<\/pre>/);
           if (!match) throw new Error('journal harness returned no result');
           const result = JSON.parse(match[1]);
-          if (!result.closed || !result.opened || !result.closedAgain) throw new Error(`central journal lifecycle failed: ${JSON.stringify(result)}`);
+          if (!result.closed || !result.opened || !result.closedAgain || !result.interruption?.saved || !result.interruption?.overnightCount || !result.interruption?.dialogClosedAfterRefresh) throw new Error(`central journal interruption lifecycle failed: ${JSON.stringify(result)}`);
           if (result.visibleTemplateLeak) throw new Error('frontend template source leaked into visible DOM');
           console.log(JSON.stringify(result));
           NODE
