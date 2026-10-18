@@ -75,6 +75,7 @@ describe("read-only WebSocket diagnostics", () => {
     expect(manager).toContain("catch { this.fail(lang.expenseCreateError); }");
     expect(manager).toContain("editingCategory");
     expect(manager).toContain("parseAmountMinor");
-    expect(manager).toContain("await this.refresh();");
+    expect(manager).toContain("private async refreshAfterWrite");
+    expect(manager).toContain("if (await this.refresh())");
   });
 });

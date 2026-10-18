@@ -1,7 +1,7 @@
 import unittest
 
 try:
-    from custom_components.camper_travel_journal.pdf_report import _category_label, _date, _duration, _place_label, _time, render_trip_report
+    from custom_components.camper_travel_journal.pdf_report import _category_label, _date, _date_time, _duration, _place_label, _time, render_trip_report
 except ModuleNotFoundError as error:  # pragma: no cover - CI installs manifest dependency
     if error.name != "reportlab":
         raise
@@ -63,7 +63,8 @@ def test_report_uses_home_assistant_timezone_and_localized_categories():
     assert _category_label("other", "en") == "Other"
     assert _place_label("rv_site", "de") == "Wohnmobilstellplatz"
     assert _place_label("rv_site", "en") == "RV site"
-    assert _duration(630, "de") == "11 min"
+    assert [_duration(value, "de") for value in (629, 630, 659, 660)] == ["10 min", "11 min", "11 min", "11 min"]
+    assert _date_time("2026-10-13T12:30:00+00:00", "en") == "10/13/26 12:30 PM"
 
 
 def test_report_accepts_overnight_places_ratings_and_linked_expenses():

@@ -14,7 +14,7 @@ from reportlab.lib.enums import TA_CENTER, TA_RIGHT
 from reportlab.lib.pagesizes import A4
 from reportlab.lib.styles import ParagraphStyle, getSampleStyleSheet
 from reportlab.lib.units import mm
-from reportlab.platypus import BaseDocTemplate, Flowable, Frame, PageTemplate, Paragraph, Spacer, Table, TableStyle
+from reportlab.platypus import BaseDocTemplate, Flowable, Frame, KeepTogether, PageTemplate, Paragraph, Spacer, Table, TableStyle
 
 PLACE_LABELS = {
     "de": {"campsite": "Campingplatz", "rv_site": "Wohnmobilstellplatz", "wild_camp": "Freistehplatz", "overnight": "Übernachtungsplatz", "parking": "Parkplatz", "restaurant": "Restaurant", "fuel_stop": "Tankstelle", "fuel": "Kraftstoff", "attraction": "Sehenswürdigkeit", "ferry": "Fähre", "other": "Sonstiger Ort"},
@@ -66,6 +66,11 @@ def _time(value: str | None, language: str, time_zone: str = "UTC") -> str:
 
 
 def _date_time(value: str | None, language: str, time_zone: str = "UTC") -> str:
+    parsed = _localized_datetime(value, time_zone)
+    if language == "en" and parsed is not None:
+        # Keep English table cells readable on A4: the full year remains in
+        # the report header/period, while row timestamps use a compact form.
+        return parsed.strftime("%m/%d/%y %I:%M %p")
     date_value, time_value = _date(value, language, time_zone), _time(value, language, time_zone)
     return f"{date_value}, {time_value}" if date_value and time_value else date_value or time_value
 
@@ -172,7 +177,7 @@ def render_trip_report(report: dict[str, Any], *, language: str = "de", time_zon
         story.append(Paragraph(labels["drive_list"], heading)); rows = [[labels["start"], labels["end"], labels["distance_short"], labels["duration"], labels["source"], labels["route"]]]
         for drive in sorted(drives, key=lambda item: (item.get("started_at", ""), item.get("id", ""))):
             route = " → ".join(part for part in (_text(drive.get("start_label")), _text(drive.get("end_label"))) if part) or "–"; rows.append([_paragraph(_date_time(drive.get("started_at"), language, time_zone), date_style), _paragraph(_date_time(drive.get("ended_at"), language, time_zone), date_style), _paragraph(_km(drive.get("distance_m"), language), body), _paragraph(_duration(drive.get("duration_seconds"), language), body), _paragraph(_drive_source(drive.get("source"), language), small), _paragraph(route, small)])
-        story.append(_table(rows, [31 * mm, 31 * mm, 22 * mm, 21 * mm, 24 * mm, doc.width - 129 * mm]))
+        story.append(_table(rows, [35 * mm, 35 * mm, 22 * mm, 21 * mm, 24 * mm, doc.width - 137 * mm]))
     interruptions = report.get("interruptions") or []
     if interruptions:
         story.append(Paragraph(labels["interruptions"], heading)); rows = [[labels["period_short"], labels["duration"], labels["type"], labels["details"]]]
@@ -181,9 +186,9 @@ def render_trip_report(report: dict[str, Any], *, language: str = "de", time_zon
         story.append(_table(rows, [48 * mm, 24 * mm, 38 * mm, doc.width - 110 * mm]))
     by_category = summary.get("by_category") or {}
     if by_category:
-        story.append(Paragraph(labels["cost_summary"], heading)); rows = [[labels["category"], labels["amount"]]]
+        rows = [[labels["category"], labels["amount"]]]
         for category, amount in sorted(by_category.items()): rows.append([_paragraph(_category_label(category, language), body), Paragraph(_markup(_money(amount, currency, language)), right)])
-        story.append(_table(rows, [doc.width * 0.65, doc.width * 0.35]))
+        story.append(KeepTogether([Paragraph(labels["cost_summary"], heading), _table(rows, [doc.width * 0.65, doc.width * 0.35])]))
     expenses = report.get("expenses", [])
     if expenses:
         story.append(Paragraph(labels["expenses"], heading)); rows = [[labels["period_short"], labels["category"], labels["amount"], labels["description"]]]
@@ -192,8 +197,9 @@ def render_trip_report(report: dict[str, Any], *, language: str = "de", time_zon
         story.append(_table(rows, [31 * mm, 32 * mm, 29 * mm, doc.width - 92 * mm]))
     stops = report.get("stops", [])
     if stops:
-        story.append(Paragraph(labels["stops"], heading)); rows = [[labels["name"], labels["type"], labels["period_short"], labels["duration"], labels["rating"], labels["details"]]]
+        rows = [[labels["name"], labels["type"], labels["period_short"], labels["duration"], labels["rating"], labels["details"]]]
         for stop in sorted(stops, key=lambda item: (item.get("arrived_at") or item.get("occurred_at", ""), item.get("id", ""))):
             start, end = stop.get("arrived_at") or stop.get("occurred_at"), stop.get("departed_at"); period_value = f"{_date_time(start, language, time_zone)}\n{_date_time(end, language, time_zone)}" if end else _date_time(start, language, time_zone); rating = f"{stop['rating_overall']}/5" if stop.get("rating_overall") is not None else "–"; details = "\n".join(filter(None, [_text(stop.get("address")), _text(stop.get("description")), _text(stop.get("website_url"))])); rows.append([_paragraph(stop.get("name"), body), _paragraph(_place_label(stop.get("place_type") or stop.get("stop_type"), language), body), _paragraph(period_value, date_style), _paragraph(_duration(stop.get("duration_seconds"), language), body), _paragraph(rating, body), _paragraph(details, small)])
-        story.append(_table(rows, [35 * mm, 31 * mm, 42 * mm, 22 * mm, 19 * mm, doc.width - 149 * mm]))
+        stop_table = _table(rows, [35 * mm, 31 * mm, 42 * mm, 22 * mm, 19 * mm, doc.width - 149 * mm])
+        story.append(KeepTogether([Paragraph(labels["stops"], heading), stop_table]))
     doc.build(story); return stream.getvalue(), _safe_filename(_text(trip.get("title")), period)
