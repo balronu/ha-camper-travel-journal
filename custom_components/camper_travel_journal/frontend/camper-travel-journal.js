@@ -1541,10 +1541,10 @@ function ya(c) {
 }
 async function xa(c, n, o = fa) {
   const l = { state: "not_run", durationMs: null };
-  if (!c?.connection) return { version: "0.2.0", connectionBefore: "unavailable", connectionAfter: "unavailable", authentication: l, vehicles: l, trips: l, vehicleId: Ui(n) };
+  if (!c?.connection) return { version: "0.3.0-beta.1", connectionBefore: "unavailable", connectionAfter: "unavailable", authentication: l, vehicles: l, trips: l, vehicleId: Ui(n) };
   const h = As(c), u = await Hi(c, { type: "auth/current_user" }, ga, o), p = await Hi(c, { type: "camper_travel_journal/list_vehicles" }, va, o), y = p.value?.vehicles?.filter((Jt) => typeof Jt.vehicle_id == "string") ?? [], m = y.length === 1 ? y[0].vehicle_id : void 0, P = await Hi(c, { type: "camper_travel_journal/list", vehicle_id: m ?? n }, ya, o), { value: w, ...R } = u, { value: J, ...Y } = p, { value: I, ...Bt } = P;
   return {
-    version: "0.2.0",
+    version: "0.3.0-beta.1",
     connectionBefore: h,
     connectionAfter: As(c),
     authentication: R,
