@@ -11,5 +11,9 @@ lokal in einer eigenen SQLite-Datenbank.
 
 **Aktuelle stabile Version: v0.2.0**
 
+Für neue Dashboards wird ab beta.3 die zentrale Journal Card empfohlen. Der
+Ablauf lautet: Reise auswählen, öffnen, bearbeiten und wieder schließen. Die
+älteren Summary-, Manager- und Map-Karten bleiben kompatibel.
+
 Technische Hinweise zur versionierten Frontend-Auslieferung stehen in der
 [Frontend-Cache-Dokumentation](docs/frontend-cache.md).

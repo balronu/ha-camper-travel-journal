@@ -49,6 +49,9 @@ Installationen bleibt wichtig.
 - Kostenverwaltung mit stabilen Kategorien, Cent-Beträgen und
   Währungsprüfung.
 - Deutsche und englische Benutzeroberfläche.
+- Zentrale Journal Card für neue Dashboards: Reise auswählen, öffnen,
+  bearbeiten und wieder schließen; alle Reisebereiche verwenden denselben
+  Reisekontext.
 
 ## Installation über HACS
 
@@ -73,6 +76,19 @@ Intervall, Mindestbewegung, Stopperkennung, GPS-Lücke, plausible
 Maximalgeschwindigkeit und Aufbewahrung unzugeordneter Punkte sind Optionen.
 
 ## Dashboard-Karten
+
+Für neue Dashboards wird die zentrale Journal Card empfohlen:
+
+```yaml
+type: custom:camper-travel-journal-journal-card
+vehicle_id: <config-entry-id>
+```
+
+Der Ablauf lautet **Reise auswählen → Reise öffnen → Funktionen nutzen → Reise
+schließen**. Ohne geöffnete Reise erscheinen keine reisebezogenen Formulare,
+Karten, GPX- oder PDF-Aktionen. Die Diagnostics Card bleibt unabhängig. Die
+bisherigen Summary-, Manager- und Map-Karten bleiben als kompatible
+Bestandsvariante unterstützt.
 
 Füge die Karten über den visuellen Lovelace-Editor oder YAML hinzu:
 

@@ -10,7 +10,7 @@ import { ACTIVE_TRIP_CHANGED_EVENT, publishActiveTrip, readActiveTrip, type Trip
 const COLORS = ["#1976d2", "#d32f2f", "#388e3c", "#7b1fa2", "#f57c00", "#00796b"];
 const LEAFLET_CSS = leafletCss.replace(/\s+/g, " ").trim();
 
-export type MapCardConfig = { vehicle_id: string; tile_url?: string; tile_attribution?: string };
+export type MapCardConfig = { vehicle_id: string; trip_id?: string; tile_url?: string; tile_attribution?: string };
 
 export class MapCard extends TravelCard {
   private trips: Snapshot["trips"] = [];
@@ -85,12 +85,14 @@ export class MapCard extends TravelCard {
       const overview = await list(this.hass, this.vehicleId);
       this.mapConfig = overview.map_config;
       this.trips = overview.trips;
+      const embeddedTripId = (this.config as MapCardConfig).trip_id ?? "";
       const contextTripId = readActiveTrip(this.vehicleId);
-      if (contextTripId && this.trips.some((trip) => trip.id === contextTripId)) this.selectedTripId = contextTripId;
+      if (embeddedTripId && this.trips.some((trip) => trip.id === embeddedTripId)) this.selectedTripId = embeddedTripId;
+      else if (contextTripId && this.trips.some((trip) => trip.id === contextTripId)) this.selectedTripId = contextTripId;
       if (!this.selectedTripId || !this.trips.some((trip) => trip.id === this.selectedTripId)) {
         this.selectedTripId = this.trips.find((trip) => trip.status === "active")?.id ?? this.trips[0]?.id ?? "";
       }
-      if (this.selectedTripId) publishActiveTrip({ vehicleId: this.vehicleId, tripId: this.selectedTripId, source: "map" });
+      if (this.selectedTripId && !embeddedTripId) publishActiveTrip({ vehicleId: this.vehicleId, tripId: this.selectedTripId, source: "map" });
       const details = this.selectedTripId ? await list(this.hass, this.vehicleId, this.selectedTripId) : overview;
       this.mapConfig = details.map_config ?? this.mapConfig;
       this.drives = sortDrivesChronologically(details.drives);
@@ -313,7 +315,7 @@ export class MapCard extends TravelCard {
     return html`<ha-card>
       <header class="map-header">
         <div><h2>${lang.mapTitle}</h2><p class="vehicle-context">${this.vehicleName || lang.mapVehicle}</p></div>
-        ${this.trips.length ? html`<label class="trip-picker"><span>${lang.mapTrip}</span><select @change=${(event: Event) => void this.selectTrip(event)} .value=${this.selectedTripId}>${this.trips.map((trip) => html`<option value=${trip.id}>${trip.title}</option>`)}</select></label>` : ""}
+        ${this.trips.length && !(manualConfig.trip_id) ? html`<label class="trip-picker"><span>${lang.mapTrip}</span><select @change=${(event: Event) => void this.selectTrip(event)} .value=${this.selectedTripId}>${this.trips.map((trip) => html`<option value=${trip.id}>${trip.title}</option>`)}</select></label>` : ""}
       </header>
       ${selectedTrip ? html`<div class="metrics" aria-label=${lang.mapTrip}>
         <div class="metric"><span>${lang.mapTotalDistance}</span><strong>${totalDistance.toFixed(1)} km</strong></div>

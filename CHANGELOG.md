@@ -2,6 +2,18 @@
 
 🇩🇪 Deutsch | 🇬🇧 [English](README.en.md)
 
+## 0.3.0-beta.3 – zentrale Journal-Oberfläche
+
+- Neue zentrale `camper-travel-journal-journal-card` als empfohlener Einstieg
+  für neue Dashboards: Reise auswählen oder anlegen, Reise öffnen, Funktionen
+  nutzen und Reise wieder schließen.
+- Der geöffnete Reisekontext bindet Manager, Karte, Fahrten, Unterbrechungen,
+  Orte, Kosten, GPX-Import und PDF-Export an dieselbe Reise-ID.
+- Bestehende Summary-, Manager- und Map-Karten bleiben als kompatible
+  Bestandskonfigurationen erhalten; die Diagnostics Card bleibt unabhängig.
+- Die Bewertungsmaske verwendet eine mobile, tastaturbedienbare Auswahl von
+  ein bis fünf Sternen mit optionalen Einzelkriterien.
+
 ## 0.3.0-beta.2 – rückwirkative GPS-Aufenthalte und gemeinsamer Reisekontext
 
 - Retroaktive GPS-Stoppvorschläge werden bei gesetzter Reise strikt aus den

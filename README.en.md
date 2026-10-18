@@ -45,6 +45,8 @@ mobile browsers and Home Assistant setups is important.
   warnings and explicit target-trip selection.
 - Expense management with stable categories, integer cents and currency checks.
 - German and English user interfaces.
+- A central Journal Card for new dashboards: select, open, edit and close a
+  trip while all trip sections use the same trip context.
 
 ## HACS installation
 
@@ -69,6 +71,18 @@ detection, GPS gap, plausible maximum speed and unassigned-point retention are
 configurable options.
 
 ## Dashboard cards
+
+For new dashboards, use the central Journal Card:
+
+```yaml
+type: custom:camper-travel-journal-journal-card
+vehicle_id: <config-entry-id>
+```
+
+The workflow is **select trip → open trip → use its functions → close trip**.
+Without an open trip, trip forms, maps, GPX and PDF actions are hidden. The
+Diagnostics Card remains independent. Existing Summary, Manager and Map cards
+remain supported for compatibility.
 
 Add the cards through the Lovelace visual editor or YAML:
 
