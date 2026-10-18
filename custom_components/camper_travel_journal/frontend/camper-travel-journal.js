@@ -1849,19 +1849,19 @@ class Qe extends Ot {
   }
   renderExpenseEditorFields(i, s) {
     const o = s ? this.editingExpenseDate : this.expenseDate, h = s ? this.editingExpenseTime : this.expenseTime, d = s ? this.editingExpenseTimeEnabled : this.expenseTimeEnabled;
-    return g`<label>${i.expenseDate ?? "Tatsächliches Ausgabendatum"}<input type="date" ?required=${!s || !!o} .value=${o} @input=${(p) => {
+    return g`<label>${i.amount}<input required type="number" min="0" step="0.01" inputmode="decimal" .value=${s ? this.editingAmount : this.amount} @input=${(p) => {
+      s ? this.editingAmount = p.currentTarget.value : this.amount = p.currentTarget.value, this.markEditorDirty();
+    }}></label><label>${i.category}<select .value=${s ? this.editingCategory : this.category} @change=${(p) => {
+      const y = p.currentTarget.value;
+      s ? this.setEditingExpenseCategory(y) : this.setExpenseCategory(y), this.markEditorDirty();
+    }}>${this.categoryOptions(s ? this.editingCategory : this.category).map((p) => g`<option value=${p}>${Wi(p, this.hass)}</option>`)}</select></label><label>${i.expenseDate ?? "Tatsächliches Ausgabendatum"}<input type="date" ?required=${!s || !!o} .value=${o} @input=${(p) => {
       s ? this.editingExpenseDate = p.currentTarget.value : this.expenseDate = p.currentTarget.value, this.markEditorDirty();
     }}></label><label class="inline-check"><input type="checkbox" .checked=${d} @change=${(p) => {
       const y = p.currentTarget.checked;
       s ? this.editingExpenseTimeEnabled = y : this.expenseTimeEnabled = y, this.markEditorDirty();
     }}> ${i.expenseTime ?? "Uhrzeit erfassen"}</label>${d ? g`<label>${i.time ?? "Uhrzeit"}<input type="time" .value=${h} @input=${(p) => {
       s ? this.editingExpenseTime = p.currentTarget.value : this.expenseTime = p.currentTarget.value, this.markEditorDirty();
-    }}></label>` : ""}<label>${i.amount}<input required type="number" min="0" step="0.01" inputmode="decimal" .value=${s ? this.editingAmount : this.amount} @input=${(p) => {
-      s ? this.editingAmount = p.currentTarget.value : this.amount = p.currentTarget.value, this.markEditorDirty();
-    }}></label><label>${i.category}<select .value=${s ? this.editingCategory : this.category} @change=${(p) => {
-      const y = p.currentTarget.value;
-      s ? this.setEditingExpenseCategory(y) : this.setExpenseCategory(y), this.markEditorDirty();
-    }}>${this.categoryOptions(s ? this.editingCategory : this.category).map((p) => g`<option value=${p}>${Wi(p, this.hass)}</option>`)}</select></label>`;
+    }}></label>` : ""}`;
   }
   render() {
     const i = P(this.hass), s = this.snapshot?.trips ?? [];
