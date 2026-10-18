@@ -8,6 +8,13 @@
 - Diagnosekarte wieder im Home-Assistant-Kartenkatalog registriert.
 - Legacy-Migrationshinweis aus eingebetteten Karten der zentralen Journal-Karte entfernt.
 
+## 0.3.0-beta.7 – Aufenthaltsverwaltung
+
+- Unterbrechungen werden über den atomaren Interruption-API-Pfad als Aufenthalt gespeichert und idempotent mit bestehenden Orten verknüpft.
+- Orte & Aufenthalte werden kompakt nach Übernachtungsplätzen, Zwischenstopps und nicht zugeordneten Fahrtunterbrechungen gruppiert.
+- Interne Kategoriecodes werden in der Oberfläche durch übersetzte Bezeichnungen ersetzt.
+- Die produktive Ursache des VM-104-Speicherfehlers ist wegen fehlendem read-only Zugriff nicht bestätigt; der offene Praxistest bleibt dokumentiert.
+
 ## 0.3.0-beta.5 – zentrale Kartenmigration
 
 - Nur die zentrale Journal Card wird im Lovelace-Kartenkatalog für neue

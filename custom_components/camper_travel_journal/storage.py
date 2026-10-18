@@ -617,11 +617,13 @@ class SQLiteStore:
                 (following[0],),
             ).fetchone()
             existing = self.connection.execute(
-                "SELECT id FROM stops WHERE vehicle_id=? AND trip_id=? "
-                "AND arrived_at IS NOT NULL AND departed_at IS NOT NULL "
-                "AND arrived_at < ? AND departed_at > ? ORDER BY occurred_at LIMIT 1",
+                "SELECT s.id,s.name,s.place_type,s.stop_type,s.arrived_at,s.departed_at,od.place_kind "
+                "FROM stops s LEFT JOIN overnight_details od ON od.place_id=s.id "
+                "WHERE s.vehicle_id=? AND s.trip_id=? "
+                "AND s.arrived_at IS NOT NULL AND s.departed_at IS NOT NULL "
+                "AND s.arrived_at < ? AND s.departed_at > ? ORDER BY s.occurred_at",
                 (vehicle_id, trip_id, following[1], previous[2]),
-            ).fetchone()
+            ).fetchall()
             interruption_id = f"{previous[0]}:{following[0]}"
             link = self.connection.execute(
                 "SELECT status,stop_id FROM interruption_links WHERE trip_id=? AND interruption_id=?",
@@ -632,8 +634,23 @@ class SQLiteStore:
                 overnight = self.connection.execute(
                     "SELECT 1 FROM overnight_details WHERE place_id=?", (link[1],)
                 ).fetchone() is not None
-            status = link[0] if link else ("overnight" if overnight else "stop" if existing else "unassigned")
-            stop_id = link[1] if link else (existing[0] if existing else None)
+            # A matching time window is only a candidate.  It is not an
+            # explicit user decision and must never change the interruption
+            # status or hide the assignment action.
+            status = link[0] if link else "unassigned"
+            stop_id = link[1] if link else None
+            candidates = [
+                {
+                    "id": candidate[0],
+                    "name": candidate[1],
+                    "place_type": candidate[2],
+                    "stop_type": candidate[3],
+                    "arrived_at": candidate[4],
+                    "departed_at": candidate[5],
+                    "place_kind": candidate[6],
+                }
+                for candidate in existing
+            ] if not link else []
             result.append({
                 "id": interruption_id,
                 "status": status,
@@ -645,6 +662,7 @@ class SQLiteStore:
                 "previous_end_point": dict(last) if last else None,
                 "next_start_point": dict(first) if first else None,
                 "existing_place_id": stop_id,
+                "existing_places": candidates,
             })
         return result
 
@@ -696,9 +714,6 @@ class SQLiteStore:
     def create_stop_from_interruption(self, trip_id: str, interruption_id: str, now: datetime, *, name: str, place_type: str = "other", overnight: bool = False, address: str = "", description: str = "", website_url: str | None = None) -> str:
         """Create one place and its interruption link atomically and idempotently."""
         row = self._interruption_row(trip_id, interruption_id)
-        existing = self.connection.execute("SELECT stop_id,status FROM interruption_links WHERE trip_id=? AND interruption_id=?", (trip_id, interruption_id)).fetchone()
-        if existing and existing[0] and self.connection.execute("SELECT 1 FROM stops WHERE id=?", (existing[0],)).fetchone():
-            return existing[0]
         drives = self.connection.execute(
             "SELECT started_at,ended_at FROM drives WHERE id IN (?,?) ORDER BY started_at",
             (row[1], row[2]),
@@ -718,6 +733,17 @@ class SQLiteStore:
         })()
         status = "overnight" if overnight else "stop"
         with self.transaction() as connection:
+            # BEGIN IMMEDIATE serializes competing writers before the
+            # idempotency check. The losing request therefore reuses the
+            # committed link instead of racing into a second INSERT.
+            existing = connection.execute(
+                "SELECT stop_id FROM interruption_links WHERE trip_id=? AND interruption_id=?",
+                (trip_id, interruption_id),
+            ).fetchone()
+            if existing and existing[0] and connection.execute(
+                "SELECT 1 FROM stops WHERE id=?", (existing[0],)
+            ).fetchone():
+                return existing[0]
             stop_id = self._insert_stop(connection, stop, now)
             if overnight:
                 website = normalize_website_url(website_url)

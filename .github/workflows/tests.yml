@@ -177,6 +177,22 @@ jobs:
           if (result.visibleTemplateLeak) throw new Error('frontend template source leaked into visible DOM');
           console.log(JSON.stringify(result));
           NODE
+      - name: Run interruption stay manager regression
+        run: |
+          python3 -m http.server 8765 --bind 127.0.0.1 >/tmp/camper-travel-journal-stay-http.log 2>&1 &
+          server_pid=$!
+          trap 'kill "$server_pid"' EXIT
+          sleep 0.3
+          chromium --headless --no-sandbox --disable-gpu --virtual-time-budget=5000 --dump-dom http://127.0.0.1:8765/frontend/tests/browser/stay-manager.html >/tmp/camper-travel-journal-stay-dom.html
+          node - <<'NODE'
+          const fs = require('fs');
+          const html = fs.readFileSync('/tmp/camper-travel-journal-stay-dom.html', 'utf8');
+          const match = html.match(/<pre id="result">([\s\S]*?)<\/pre>/);
+          if (!match) throw new Error('stay harness returned no result');
+          const result = JSON.parse(match[1]);
+          for (const key of ['opened', 'savedThroughInterruptionApi', 'noRawCategoryCode', 'grouped']) if (!result[key]) throw new Error(`${key}=false`);
+          console.log(JSON.stringify(result));
+          NODE
       - name: Run shared modal editor interaction regression
         run: |
           python3 -m http.server 8765 --bind 127.0.0.1 >/tmp/camper-travel-journal-modal-http.log 2>&1 &
