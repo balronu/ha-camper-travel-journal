@@ -1605,10 +1605,11 @@ class Qe extends Ot {
     if (!this.hass || this.expenseSavingId) return;
     const s = P(this.hass), o = Or(this.amount);
     if (o === null) return this.fail(s.amountInvalid);
-    if (!/^\d{4}-\d{2}-\d{2}$/.test(this.expenseDate)) return this.fail(s.dateInvalid);
+    const h = this.expenseDate || this.todayLocalDate();
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(h)) return this.fail(s.dateInvalid);
     this.expenseSavingId = "__create__";
     try {
-      await ho(this.hass, this.vehicleId, i, { occurred_on: this.expenseDate, ...this.expenseTimeEnabled && this.expenseTime ? { occurred_time: this.expenseTime } : {}, category: this.category, amount_minor: o, currency: "EUR" }), this.actionError = "", this.amount = "", this.closeEditor(!0), await this.refreshAfterWrite(() => qi({ vehicleId: this.vehicleId, tripId: i }));
+      await ho(this.hass, this.vehicleId, i, { occurred_on: h, ...this.expenseTimeEnabled && this.expenseTime ? { occurred_time: this.expenseTime } : {}, category: this.category, amount_minor: o, currency: "EUR" }), this.actionError = "", this.amount = "", this.closeEditor(!0), await this.refreshAfterWrite(() => qi({ vehicleId: this.vehicleId, tripId: i }));
     } catch {
       this.fail(s.expenseCreateError);
     } finally {
