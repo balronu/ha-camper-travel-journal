@@ -2,6 +2,16 @@
 
 🇩🇪 Deutsch | 🇬🇧 [English](README.en.md)
 
+## 0.3.0-beta.2 – rückwirkative GPS-Aufenthalte und gemeinsamer Reisekontext
+
+- Retroaktive GPS-Stoppvorschläge werden bei gesetzter Reise strikt aus den
+  zugeordneten Fahrt-/GPS-Punkt-Beziehungen ermittelt; GPS-Lücken werden nicht
+  als Aufenthalte gespeichert.
+- Summary, Manager und Map synchronisieren den aktiven Reisekontext pro
+  Lovelace-Dashboard und Fahrzeug; der PDF-Export verwendet dieselbe Reise.
+- Ortsformulare sind auf iPhone-Breiten einspaltig und touch-freundlicher.
+- Produktive Reisen, Fahrten, GPS-Punkte und Kosten bleiben unverändert.
+
 ## 0.2.0 – Stable
 
 - Stable release of the four-card Lovelace experience: Summary, Manager, Map

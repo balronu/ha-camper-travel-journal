@@ -755,7 +755,26 @@ class SQLiteStore:
         if self.connection is None: raise RuntimeError("store is not open")
         if minimum_minutes < 1 or radius_m <= 0:
             raise ValueError("suggestion_parameters_invalid")
-        rows = self.connection.execute("SELECT recorded_at,latitude,longitude FROM gps_points WHERE vehicle_id=? ORDER BY recorded_at,id", (vehicle_id,)).fetchall()
+        if trip_id:
+            trip = self.connection.execute("SELECT vehicle_id FROM trips WHERE id=?", (trip_id,)).fetchone()
+            if trip is None:
+                raise ValueError("trip_not_found")
+            if trip["vehicle_id"] != vehicle_id:
+                raise ValueError("trip_vehicle_mismatch")
+            # A retrospective analysis must use the points actually assigned to
+            # this trip.  The vehicle-wide fallback below is retained for the
+            # existing maintenance/API use case where no trip is supplied.
+            rows = self.connection.execute(
+                "SELECT DISTINCT g.recorded_at,g.latitude,g.longitude,dgp.drive_id "
+                "FROM gps_points AS g "
+                "JOIN drive_gps_points AS dgp ON dgp.gps_point_id=g.id "
+                "JOIN trip_drives AS td ON td.drive_id=dgp.drive_id "
+                "WHERE g.vehicle_id=? AND td.trip_id=? "
+                "ORDER BY g.recorded_at,g.id",
+                (vehicle_id, trip_id),
+            ).fetchall()
+        else:
+            rows = self.connection.execute("SELECT recorded_at,latitude,longitude,NULL AS drive_id FROM gps_points WHERE vehicle_id=? ORDER BY recorded_at,id", (vehicle_id,)).fetchall()
         candidates: list[tuple] = []
         window: list = []
         max_gap = timedelta(minutes=max_gap_minutes)
@@ -767,7 +786,8 @@ class SQLiteStore:
                 if end - start >= minimum:
                     lat = sum(float(row[1]) for row in window) / len(window)
                     lon = sum(float(row[2]) for row in window) / len(window)
-                    candidates.append((start, end, lat, lon))
+                    drive_ids = {row[3] for row in window if row[3]}
+                    candidates.append((start, end, lat, lon, next(iter(drive_ids)) if len(drive_ids) == 1 else None))
             window = []
         for row in rows:
             current = datetime.fromisoformat(row[0])
@@ -780,15 +800,20 @@ class SQLiteStore:
         flush()
         created: list[dict] = []
         with self.transaction() as connection:
-            for start, end, lat, lon in candidates:
+            for start, end, lat, lon, drive_id in candidates:
                 overlap = connection.execute("SELECT 1 FROM stops WHERE vehicle_id=? AND confirmed=1 AND latitude IS NOT NULL AND longitude IS NOT NULL AND ((arrived_at IS NULL AND occurred_at BETWEEN ? AND ?) OR (arrived_at <= ? AND (departed_at IS NULL OR departed_at >= ?))) LIMIT 1", (vehicle_id, utc_iso(start), utc_iso(end), utc_iso(end), utc_iso(start))).fetchone()
                 if overlap:
                     continue
-                existing = connection.execute("SELECT 1 FROM stop_suggestions WHERE vehicle_id=? AND status IN ('pending','accepted') AND arrived_at=? AND abs(latitude-?) < 0.002 AND abs(longitude-?) < 0.002", (vehicle_id, utc_iso(start), lat, lon)).fetchone()
+                duplicate_query = "SELECT 1 FROM stop_suggestions WHERE vehicle_id=? AND status IN ('pending','accepted') AND arrived_at=? AND abs(latitude-?) < 0.002 AND abs(longitude-?) < 0.002"
+                duplicate_args: tuple = (vehicle_id, utc_iso(start), lat, lon)
+                if trip_id:
+                    duplicate_query += " AND (trip_id=? OR trip_id IS NULL)"
+                    duplicate_args += (trip_id,)
+                existing = connection.execute(duplicate_query, duplicate_args).fetchone()
                 if existing:
                     continue
                 suggestion_id = str(uuid.uuid4()); stamp = utc_iso(now)
-                connection.execute("INSERT INTO stop_suggestions(id,vehicle_id,trip_id,arrived_at,departed_at,latitude,longitude,created_at,updated_at) VALUES(?,?,?,?,?,?,?,?,?)", (suggestion_id, vehicle_id, trip_id, utc_iso(start), utc_iso(end), lat, lon, stamp, stamp))
+                connection.execute("INSERT INTO stop_suggestions(id,vehicle_id,trip_id,drive_id,arrived_at,departed_at,latitude,longitude,created_at,updated_at) VALUES(?,?,?,?,?,?,?,?,?,?)", (suggestion_id, vehicle_id, trip_id, drive_id, utc_iso(start), utc_iso(end), lat, lon, stamp, stamp))
                 created.append(dict(connection.execute("SELECT * FROM stop_suggestions WHERE id=?", (suggestion_id,)).fetchone()))
         return created
 

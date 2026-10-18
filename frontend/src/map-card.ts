@@ -5,6 +5,7 @@ import { formatCompactTripPeriod, formatDate, formatTime, messages } from "./i18
 import * as L from "leaflet";
 import leafletCss from "leaflet/dist/leaflet.css?inline";
 import { sortDrivesChronologically } from "./map-utils";
+import { ACTIVE_TRIP_CHANGED_EVENT, publishActiveTrip, readActiveTrip, type TripContextDetail } from "./trip-context";
 
 const COLORS = ["#1976d2", "#d32f2f", "#388e3c", "#7b1fa2", "#f57c00", "#00796b"];
 const LEAFLET_CSS = leafletCss.replace(/\s+/g, " ").trim();
@@ -31,9 +32,18 @@ export class MapCard extends TravelCard {
   private driveSectionsOpen = false;
   private fitMapPending = true;
   private showPlaces = true;
+  private readonly onActiveTripChanged = (event: Event) => {
+    const detail = (event as CustomEvent<TripContextDetail>).detail;
+    if (detail?.vehicleId !== this.vehicleId || detail.tripId === this.selectedTripId) return;
+    this.selectedTripId = detail.tripId;
+    this.selectedDriveIds = [];
+    this.driveSelectionInitialized = false;
+    void this.refresh(true);
+  };
 
   connectedCallback() {
     super.connectedCallback();
+    window.addEventListener(ACTIVE_TRIP_CHANGED_EVENT, this.onActiveTripChanged);
     this.driveSectionsOpen = typeof window !== "undefined" && window.matchMedia("(min-width: 700px)").matches;
     void this.refresh(true);
   }
@@ -42,6 +52,7 @@ export class MapCard extends TravelCard {
     this.map?.remove();
     this.map = undefined;
     this.tileLayer = undefined;
+    window.removeEventListener(ACTIVE_TRIP_CHANGED_EVENT, this.onActiveTripChanged);
     super.disconnectedCallback();
   }
 
@@ -67,9 +78,12 @@ export class MapCard extends TravelCard {
       const overview = await list(this.hass, this.vehicleId);
       this.mapConfig = overview.map_config;
       this.trips = overview.trips;
+      const contextTripId = readActiveTrip(this.vehicleId);
+      if (contextTripId && this.trips.some((trip) => trip.id === contextTripId)) this.selectedTripId = contextTripId;
       if (!this.selectedTripId || !this.trips.some((trip) => trip.id === this.selectedTripId)) {
         this.selectedTripId = this.trips.find((trip) => trip.status === "active")?.id ?? this.trips[0]?.id ?? "";
       }
+      if (this.selectedTripId) publishActiveTrip({ vehicleId: this.vehicleId, tripId: this.selectedTripId, source: "map" });
       const details = this.selectedTripId ? await list(this.hass, this.vehicleId, this.selectedTripId) : overview;
       this.mapConfig = details.map_config ?? this.mapConfig;
       this.drives = sortDrivesChronologically(details.drives);
@@ -170,6 +184,7 @@ export class MapCard extends TravelCard {
 
   private async selectTrip(event: Event) {
     this.selectedTripId = (event.currentTarget as HTMLSelectElement).value;
+    publishActiveTrip({ vehicleId: this.vehicleId, tripId: this.selectedTripId, source: "map" });
     this.selectedDriveIds = [];
     this.driveSelectionInitialized = false;
     await this.refresh(true);

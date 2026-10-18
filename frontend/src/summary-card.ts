@@ -3,6 +3,7 @@ import { TravelCard, defineOnce } from "./base-card";
 import { list, transition, type Snapshot } from "./api";
 import { formatMoneyMinor, formatTripPeriod, messages, statusLabel } from "./i18n";
 import { EXPENSES_CHANGED_EVENT, TRAVEL_DATA_CHANGED_EVENT, type ExpenseChangedDetail } from "./expense-events";
+import { ACTIVE_TRIP_CHANGED_EVENT, publishActiveTrip, readActiveTrip, type TripContextDetail } from "./trip-context";
 
 export class SummaryCard extends TravelCard {
   private snapshot?: Snapshot;
@@ -15,15 +16,23 @@ export class SummaryCard extends TravelCard {
     const detail = (event as CustomEvent<ExpenseChangedDetail>).detail;
     if (detail?.vehicleId === this.vehicleId) void this.refresh();
   };
+  private readonly onActiveTripChanged = (event: Event) => {
+    const detail = (event as CustomEvent<TripContextDetail>).detail;
+    if (detail?.vehicleId !== this.vehicleId || detail.tripId === this.selectedTripId) return;
+    this.selectedTripId = detail.tripId;
+    void this.refresh();
+  };
   connectedCallback() {
     super.connectedCallback();
     window.addEventListener(EXPENSES_CHANGED_EVENT, this.onDataChanged);
     window.addEventListener(TRAVEL_DATA_CHANGED_EVENT, this.onDataChanged);
+    window.addEventListener(ACTIVE_TRIP_CHANGED_EVENT, this.onActiveTripChanged);
     void this.refresh();
   }
   disconnectedCallback() {
     window.removeEventListener(EXPENSES_CHANGED_EVENT, this.onDataChanged);
     window.removeEventListener(TRAVEL_DATA_CHANGED_EVENT, this.onDataChanged);
+    window.removeEventListener(ACTIVE_TRIP_CHANGED_EVENT, this.onActiveTripChanged);
     super.disconnectedCallback();
   }
   protected onHassConnectionChanged() { void this.refresh(); }
@@ -42,9 +51,11 @@ export class SummaryCard extends TravelCard {
     try {
       const overview = await list(this.hass, this.vehicleId);
       this.trips = overview.trips;
-      const existing = overview.trips.find((trip) => trip.id === this.selectedTripId);
+      const contextTripId = readActiveTrip(this.vehicleId);
+      const existing = overview.trips.find((trip) => trip.id === (contextTripId || this.selectedTripId));
       const trip = existing ?? this.chooseDefaultTrip(overview.trips);
       this.selectedTripId = trip?.id ?? "";
+      if (trip) publishActiveTrip({ vehicleId: this.vehicleId, tripId: trip.id, source: "summary" });
       const details = trip ? await list(this.hass, this.vehicleId, trip.id) : overview;
       // The backend keeps the vehicle-wide trip list in a trip-specific
       // response while filtering drives/stops/expenses. Keep the selected
@@ -70,6 +81,7 @@ export class SummaryCard extends TravelCard {
   private async selectTrip(tripId: string) {
     if (!this.hass || this.loading || !this.trips.some((trip) => trip.id === tripId)) return;
     this.selectedTripId = tripId;
+    publishActiveTrip({ vehicleId: this.vehicleId, tripId, source: "summary" });
     await this.refresh();
   }
   render() {
