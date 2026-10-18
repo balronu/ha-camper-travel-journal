@@ -239,9 +239,10 @@ async def test_interruption_assignment_commands_are_authenticated_and_scoped():
     hass = FakeHass()
     connection = FakeConnection()
     await api.ws_assign_interruption.__wrapped__(hass, connection, {"id": 51, "vehicle_id": "v1", "trip_id": "t1", "interruption_id": "d1:d2", "status": "pause"})
-    await api.ws_create_stop_from_interruption.__wrapped__(hass, connection, {"id": 52, "vehicle_id": "v1", "trip_id": "t1", "interruption_id": "d1:d2", "name": "Raststätte", "place_type": "parking", "overnight": False})
+    await api.ws_create_stop_from_interruption.__wrapped__(hass, connection, {"id": 52, "vehicle_id": "v1", "trip_id": "t1", "interruption_id": "d1:d2", "name": "Raststätte", "place_type": "parking", "overnight": True, "website_url": "stellplatz-bremen.de"})
     assert connection.results == [(51, {"success": True}), (52, {"stop_id": None})]
     assert [method for method, _, _ in hass.worker.calls[-2:]] == ["assign_interruption", "create_stop_from_interruption"]
+    assert hass.worker.calls[-1][2]["website_url"] == "stellplatz-bremen.de"
 
 
 @pytest.mark.asyncio

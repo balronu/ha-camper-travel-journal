@@ -13,22 +13,22 @@ const bundle = resolve(root, "../custom_components/camper_travel_journal/fronten
 
 describe("frontend release contract", () => {
   it("keeps backend, npm metadata and beta bundle aligned", () => {
-    expect(manifest.version).toBe("0.3.0-beta.4");
+    expect(manifest.version).toBe("0.3.0-beta.5");
     expect(pkg.version).toBe(manifest.version);
     expect(existsSync(bundle)).toBe(true);
   });
-  it("registers both cards idempotently", () => {
+  it("registers the central card in the catalog while retaining legacy elements", () => {
     const source = readFileSync(resolve(root, "src/index.ts"), "utf8");
     expect(source).toContain("customCards.some");
     expect(readFileSync(resolve(root, "src/base-card.ts"), "utf8")).toContain("customElements.get");
-    expect(source).toContain("camper-travel-journal-summary-card");
-    expect(source).toContain("camper-travel-journal-manager-card");
-    expect(source).toContain("camper-travel-journal-diagnostics-card");
-    expect(source).toContain("camper-travel-journal-map-card");
     expect(source).toContain("camper-travel-journal-journal-card");
-    expect(source).toContain("Diagnose");
-    expect(source).toContain("Reiseübersicht");
-    expect(source).toContain("Reiseverwaltung");
+    expect(source).not.toContain('{ type: "camper-travel-journal-summary-card"');
+    expect(source).not.toContain('{ type: "camper-travel-journal-manager-card"');
+    expect(source).not.toContain('{ type: "camper-travel-journal-diagnostics-card"');
+    expect(source).not.toContain('{ type: "camper-travel-journal-map-card"');
+    expect(readFileSync(resolve(root, "src/base-card.ts"), "utf8")).toContain("migration-notice");
+    expect(readFileSync(resolve(root, "src/map-card.ts"), "utf8")).toContain("TravelCard");
+    expect(source).toContain("Camper Travel Journal – Journal");
     const init = readFileSync(resolve(root, "../custom_components/camper_travel_journal/__init__.py"), "utf8");
     expect(init).toContain("async_register_static_paths");
     expect(init).toContain("add_extra_js_url");
@@ -159,6 +159,39 @@ describe("frontend release contract", () => {
     expect(manager).toContain("starPicker");
     expect(manager).toContain('role="radio"');
     expect(map).toContain("embeddedTripId");
+  });
+  it("keeps legacy cards visible without advertising them as new cards", () => {
+    const base = readFileSync(resolve(root, "src/base-card.ts"), "utf8");
+    const index = readFileSync(resolve(root, "src/index.ts"), "utf8");
+    const journal = readFileSync(resolve(root, "src/journal-card.ts"), "utf8");
+    expect(base).toContain("migration-notice");
+    expect(base).toContain("README.md#migration");
+    expect(index).toContain('type: "camper-travel-journal-journal-card"');
+    expect(index).not.toContain('type: "camper-travel-journal-manager-card"');
+    expect(journal).toContain("onSectionToggle");
+    expect(journal).toContain("details.open = false");
+  });
+  it("uses one shared, accessible modal editor for every CRUD editor", () => {
+    const manager = readFileSync(resolve(root, "src/manager-card.ts"), "utf8");
+    expect(manager).toContain('dialog class="editor-dialog"');
+    expect(manager).toContain('dialog.showModal()');
+    expect(manager).toContain('event.preventDefault(); close();');
+    expect(manager).toContain("discardPrompt");
+    for (const kind of ["trip-create", "trip-edit", "drive-create", "drive-edit", "place-create", "place-edit", "expense-create", "expense-edit", "rating-edit"]) {
+      expect(manager).toContain(`openEditor(\"${kind}\"`);
+    }
+    expect(manager).toContain("max-height:calc(100dvh - 2rem)");
+    expect(manager).toContain('role="alert"');
+  });
+  it("keeps central trip creation on the shared modal path", () => {
+    const journal = readFileSync(resolve(root, "src/journal-card.ts"), "utf8");
+    const manager = readFileSync(resolve(root, "src/manager-card.ts"), "utf8");
+    expect(journal).not.toContain('class="new-trip');
+    expect(journal).toContain('journal_section: "trip-create"');
+    expect(journal).toContain("trip-created");
+    expect(manager).toContain('this.embeddedSection() === "trip-create"');
+    expect(manager).toContain("openTripCreate()");
+    expect(manager).toContain("tripSaving");
   });
   it("sorts map drive segments in ascending start-time order", () => {
     expect(sortDrivesChronologically([

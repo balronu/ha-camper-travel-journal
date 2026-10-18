@@ -393,13 +393,13 @@ if websocket_api is not None:
             connection.send_result(msg["id"], {"success": True})
         except Exception as err: _send_error(connection, msg, err)
 
-    @websocket_api.websocket_command({**_base("camper_travel_journal/create_stop_from_interruption"), vol.Required("trip_id"): str, vol.Required("interruption_id"): str, vol.Required("name"): str, vol.Optional("place_type", default="other"): str, vol.Optional("overnight", default=False): bool, vol.Optional("address", default=""): str, vol.Optional("description", default=""): str})
+    @websocket_api.websocket_command({**_base("camper_travel_journal/create_stop_from_interruption"), vol.Required("trip_id"): str, vol.Required("interruption_id"): str, vol.Required("name"): str, vol.Optional("place_type", default="other"): str, vol.Optional("overnight", default=False): bool, vol.Optional("address", default=""): str, vol.Optional("description", default=""): str, vol.Optional("website_url"): str})
     @websocket_api.async_response
     async def ws_create_stop_from_interruption(hass, connection, msg):
         try:
             if not msg["name"].strip():
                 raise ValueError("place_name_required")
-            stop_id = await _call(hass, msg, "create_stop_from_interruption", msg["trip_id"], msg["interruption_id"], _now(), name=msg["name"], place_type=msg.get("place_type", "other"), overnight=msg.get("overnight", False), address=msg.get("address", ""), description=msg.get("description", ""))
+            stop_id = await _call(hass, msg, "create_stop_from_interruption", msg["trip_id"], msg["interruption_id"], _now(), name=msg["name"], place_type=msg.get("place_type", "other"), overnight=msg.get("overnight", False), address=msg.get("address", ""), description=msg.get("description", ""), website_url=msg.get("website_url"))
             connection.send_result(msg["id"], {"stop_id": stop_id})
         except Exception as err: _send_error(connection, msg, err)
 

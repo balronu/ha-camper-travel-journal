@@ -2,6 +2,17 @@
 
 🇩🇪 Deutsch | 🇬🇧 [English](README.en.md)
 
+## 0.3.0-beta.5 – zentrale Kartenmigration
+
+- Nur die zentrale Journal Card wird im Lovelace-Kartenkatalog für neue
+  Dashboards angeboten; Legacy-Karten bleiben technisch kompatibel.
+- Legacy-Karten zeigen dauerhaft einen gut lesbaren Migrationshinweis mit Link
+  zur Anleitung. HACS besitzt keinen eigenen, unterstützten Warnbanner.
+- Die zentrale Timeline öffnet Bereiche standardmäßig geschlossen und lässt
+  immer nur einen Hauptbereich gleichzeitig offen.
+- Stable bleibt bis zum authentifizierten Test in einer isolierten
+  Home-Assistant-Instanz gesperrt.
+
 ## 0.3.0-beta.4 – verknüpfte Fahrtunterbrechungen
 
 - Fahrtunterbrechungen erscheinen chronologisch zwischen den zugehörigen Fahrten.

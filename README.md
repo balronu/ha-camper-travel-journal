@@ -6,7 +6,7 @@
 
 <h1 align="center">Camper Travel Journal</h1>
 <p align="center">Dein digitales Wohnmobil-Reisetagebuch für Home Assistant</p>
-<p align="center"><strong>Aktuelle stabile Version: v0.2.0</strong></p>
+<p align="center"><strong>Aktuelle stabile Version: v0.2.0 · v0.3.0-beta.5 in Vorbereitung</strong></p>
 
 <p align="center">
   <a href="https://github.com/balronu/ha-camper-travel-journal/releases/latest"><img src="https://img.shields.io/github/v/release/balronu/ha-camper-travel-journal?label=Release" alt="Release"></a>
@@ -77,6 +77,22 @@ Maximalgeschwindigkeit und Aufbewahrung unzugeordneter Punkte sind Optionen.
 
 ## Dashboard-Karten
 
+> **WICHTIG – LOVELACE-KARTEN GEÄNDERT!**
+>
+> Mit v0.3.0 wird die bisherige Kartenstruktur zusammengeführt. Für neue
+> Dashboards wird nur noch `Camper Travel Journal – Reisetagebuch` benötigt.
+> Summary-, Manager-, Map- und Diagnostics-Karten bleiben für bestehende
+> Dashboards funktionsfähig, werden aber nicht mehr für neue Dashboards
+> angeboten und zeigen einen Migrationshinweis. Bestehende Reisen, Fahrten,
+> GPS-Daten, Übernachtungen, Bewertungen und Kosten bleiben erhalten.
+
+### Migration {#migration}
+
+Nach dem Update bitte die bisherigen Einzelkarten im Dashboard manuell durch
+die zentrale Journal Card ersetzen. HACS unterstützt hierfür keinen eigenen
+Warnbanner; der Hinweis wird deshalb in jeder Legacy-Karte angezeigt und steht
+zusätzlich in diesen Release Notes und der README.
+
 Für neue Dashboards wird die zentrale Journal Card empfohlen:
 
 ```yaml
@@ -102,9 +118,9 @@ type: custom:camper-travel-journal-manager-card
 vehicle_id: <config-entry-id>
 ```
 
-Die Stable-Version bietet genau vier verfügbare Lovelace-Kartentypen: Summary
-Card, Manager Card, Map Card und die optionale Diagnostics Card. Die normale
-Nutzung benötigt die Diagnostics Card nicht. Die Map Card zeigt
+Die zentrale Journal Card ist der einzige neue Kartentyp im Lovelace-Katalog.
+Die bisherige Summary-, Manager-, Map- und Diagnostics Card bleibt per YAML
+und in bestehenden Dashboards funktionsfähig. Die Map Card zeigt
 gespeicherte GPS-Linien und Fahrtsegmente, berechnet keine Straßenroute und
 verwendet keine Geocoding- oder Routing-Dienste:
 
@@ -177,8 +193,9 @@ privaten Koordinaten, Tokens oder unredigierten Logs.
   konzentriert.
 - Historische Beta-Änderungen bleiben im Changelog dokumentiert; die aktuelle
   Karten- und PDF-Funktion gehört zur Stable-Version.
-- Zwischenstopps sind im Backend vorhanden, aber noch nicht vollständig über
-  Lovelace bedienbar.
+- Beta.5 finalisiert die zentrale Oberfläche und die Migration; vor Stable
+  wird zusätzlich ein authentifizierter Test in einer isolierten Home-
+  Assistant-Instanz benötigt.
 - Die Retention-Funktion berechnet Kandidaten, löscht in dieser Version aber
   nicht automatisch.
 - Mobile Safari/WebKit und produktive Installationen benötigen weiterhin

@@ -1,6 +1,6 @@
 import { css, html } from "lit";
 import { TravelCard, defineOnce } from "./base-card";
-import { assignInterruption, createStopFromInterruption, createTrip, list, listVehicles, type Snapshot, type Trip, type TripInterruption } from "./api";
+import { assignInterruption, createStopFromInterruption, list, listVehicles, type Snapshot, type Trip, type TripInterruption } from "./api";
 import { clearActiveTrip, publishActiveTrip, readActiveTrip, type TripContextDetail, ACTIVE_TRIP_CHANGED_EVENT } from "./trip-context";
 import { formatDateTime, formatDuration, formatMoneyMinor, formatTripPeriod, messages, statusLabel } from "./i18n";
 
@@ -17,14 +17,8 @@ export class JournalCard extends TravelCard {
   private detail?: Snapshot;
   private openTripId = "";
   private selectedTripId = "";
-  private showNewTrip = false;
-  private newTitle = "";
-  private newDestination = "";
-  private newStart = "";
-  private newEnd = "";
   private loading = false;
   private error = "";
-  private dirty = false;
   private readonly onActiveTripChanged = (event: Event) => {
     const detail = (event as CustomEvent<TripContextDetail>).detail;
     if (detail?.vehicleId !== this.vehicleId || !detail.tripId || detail.tripId === this.openTripId) return;
@@ -37,6 +31,7 @@ export class JournalCard extends TravelCard {
   private interruptionType = "other";
   private interruptionAddress = "";
   private interruptionDescription = "";
+  private interruptionWebsite = "";
   private interruptionSaving = false;
 
   connectedCallback() {
@@ -75,32 +70,24 @@ export class JournalCard extends TravelCard {
   }
   private async openTrip(tripId = this.selectedTripId) {
     if (!tripId || !this.overview?.trips.some((trip) => trip.id === tripId)) return;
-    if (this.dirty && !window.confirm(messages(this.hass).unsavedTripChange ?? "Ungespeicherte Änderungen verwerfen?")) return;
-    this.loading = true; this.error = ""; this.dirty = false; this.openTripId = tripId; this.selectedTripId = tripId;
+    this.loading = true; this.error = ""; this.openTripId = tripId; this.selectedTripId = tripId;
     try { await this.loadDetail(tripId); publishActiveTrip({ vehicleId: this.vehicleId, tripId, source: "journal" }); }
     catch { this.error = messages(this.hass).loadError; this.openTripId = ""; }
     finally { this.loading = false; this.requestUpdate(); }
   }
   private closeTrip(confirm = true) {
-    if (confirm && this.dirty && !window.confirm(messages(this.hass).unsavedTripChange ?? "Ungespeicherte Änderungen verwerfen?")) return;
-    this.openTripId = ""; this.detail = undefined; this.dirty = false; clearActiveTrip(this.vehicleId, "journal"); this.requestUpdate();
-  }
-  private async createAndOpenTrip() {
-    if (!this.hass || !this.newTitle.trim()) return;
-    if (this.newStart && this.newEnd && this.newEnd < this.newStart) { this.error = messages(this.hass).dateInvalid; return; }
-    this.loading = true; this.error = "";
-    try {
-      const title = this.newTitle.trim();
-      const result = await createTrip(this.hass, this.vehicleId, title, this.newStart, this.newEnd, this.newDestination.trim()) as { trip_id?: string };
-      this.showNewTrip = false; this.newTitle = ""; this.newDestination = ""; this.newStart = ""; this.newEnd = "";
-      this.overview = await list(this.hass, this.vehicleId);
-      const created = result.trip_id || this.overview.trips.find((trip) => trip.title === title)?.id || this.overview.trips[0]?.id;
-      if (created) await this.openTrip(created);
-    } catch { this.error = messages(this.hass).tripCreateError; }
-    finally { this.loading = false; this.requestUpdate(); }
+    this.openTripId = ""; this.detail = undefined; clearActiveTrip(this.vehicleId, "journal"); this.requestUpdate();
   }
   private trip() { return this.overview?.trips.find((trip) => trip.id === this.openTripId) ?? this.detail?.trips.find((trip) => trip.id === this.openTripId); }
-  private markDirty() { this.dirty = true; }
+  private async onTripCreated(event: Event) {
+    const tripId = (event as CustomEvent<{ tripId?: string }>).detail?.tripId;
+    await this.refreshOverview();
+    if (tripId) await this.openTrip(tripId);
+  }
+  private openTripCreateDialog() {
+    const editor = this.renderRoot.querySelector<HTMLElement & { openTripCreate?: () => void }>("camper-travel-journal-manager-card");
+    editor?.openTripCreate?.();
+  }
   private openInterruptionDialog(item: TripInterruption) {
     this.interruptionDialog = item;
     this.interruptionAction = item.status === "unassigned" ? "stop" : item.status === "overnight" ? "overnight" : item.status === "stop" ? "stop" : item.status;
@@ -109,6 +96,7 @@ export class JournalCard extends TravelCard {
     this.interruptionType = "other";
     this.interruptionAddress = "";
     this.interruptionDescription = "";
+    this.interruptionWebsite = "";
     this.requestUpdate();
   }
   private closeInterruptionDialog() { this.interruptionDialog = undefined; this.interruptionSaving = false; this.requestUpdate(); }
@@ -122,7 +110,7 @@ export class JournalCard extends TravelCard {
           await assignInterruption(this.hass, this.vehicleId, this.openTripId, item.id, this.interruptionAction, this.interruptionPlaceId);
         } else {
           if (!this.interruptionName.trim()) throw new Error("place_name_required");
-          await createStopFromInterruption(this.hass, this.vehicleId, this.openTripId, item.id, { name: this.interruptionName.trim(), place_type: this.interruptionType, overnight: this.interruptionAction === "overnight", address: this.interruptionAddress.trim(), description: this.interruptionDescription.trim() });
+          await createStopFromInterruption(this.hass, this.vehicleId, this.openTripId, item.id, { name: this.interruptionName.trim(), place_type: this.interruptionType, overnight: this.interruptionAction === "overnight", address: this.interruptionAddress.trim(), description: this.interruptionDescription.trim(), website_url: this.interruptionWebsite.trim() || undefined });
         }
       } else {
         await assignInterruption(this.hass, this.vehicleId, this.openTripId, item.id, this.interruptionAction);
@@ -135,11 +123,16 @@ export class JournalCard extends TravelCard {
     }
   }
   private section(title: string, icon: string, count: number | undefined, content: unknown, open = false) {
-    return html`<section class="journal-section"><details ?open=${open}><summary><span class="section-title"><span aria-hidden="true">${icon}</span><strong>${title}</strong></span>${count === undefined ? "" : html`<span class="count">${count}</span>`}</summary><div class="section-content">${content}</div></details></section>`;
+    return html`<section class="journal-section"><details ?open=${open} @toggle=${(event: Event) => this.onSectionToggle(event)}><summary><span class="section-title"><span aria-hidden="true">${icon}</span><strong>${title}</strong></span>${count === undefined ? "" : html`<span class="count">${count}</span>`}</summary><div class="section-content">${content}</div></details></section>`;
+  }
+  private onSectionToggle(event: Event) {
+    const current = event.currentTarget as HTMLDetailsElement;
+    if (!current.open) return;
+    this.shadowRoot?.querySelectorAll<HTMLDetailsElement>(".journal-section details").forEach((details) => { if (details !== current) details.open = false; });
   }
   private renderPicker(lang: ReturnType<typeof messages>) {
     const trips = this.overview?.trips ?? [];
-    return html`<section class="entry" aria-labelledby="journal-entry-title"><div class="entry-icon" aria-hidden="true">🚐</div><h2 id="journal-entry-title">${lang.journalEntry ?? "Reise auswählen oder neu anlegen"}</h2><p class="muted">${lang.journalEntryHint ?? "Öffne eine Reise, um ihre Fahrten, Orte, Karte und Exporte zu sehen."}</p>${trips.length ? html`<label class="picker-label">${lang.journalSelect ?? "Reise auswählen"}<select aria-label=${lang.journalSelect ?? "Reise auswählen"} .value=${this.selectedTripId} @change=${(event: Event) => { this.selectedTripId = (event.currentTarget as HTMLSelectElement).value; this.requestUpdate(); }}><option value="">${lang.journalChoose ?? "Bitte auswählen …"}</option>${trips.map((trip) => html`<option value=${trip.id}>${trip.title} · ${statusLabel(trip.status, this.hass)} · ${formatTripPeriod(trip, this.hass)}</option>`)}</select></label>` : html`<p class="muted">${lang.noTrip}</p>`}<div class="actions"><button type="button" @click=${() => void this.openTrip() } ?disabled=${!this.selectedTripId || this.loading}>${lang.journalOpen ?? "Reise öffnen"}</button><button type="button" class="secondary" @click=${() => { this.showNewTrip = !this.showNewTrip; this.requestUpdate(); }}>${lang.newTrip}</button></div>${this.showNewTrip ? html`<form class="new-trip form-grid" @submit=${(event: SubmitEvent) => { event.preventDefault(); void this.createAndOpenTrip(); }}><input aria-label=${lang.tripName} placeholder=${lang.tripName} .value=${this.newTitle} @input=${(event: InputEvent) => { this.newTitle = (event.currentTarget as HTMLInputElement).value; this.markDirty(); }} required><input aria-label=${lang.destination} placeholder=${lang.destination} .value=${this.newDestination} @input=${(event: InputEvent) => this.newDestination = (event.currentTarget as HTMLInputElement).value}><label>${lang.startDate}<input type="date" .value=${this.newStart} @input=${(event: InputEvent) => this.newStart = (event.currentTarget as HTMLInputElement).value}></label><label>${lang.endDate}<input type="date" .value=${this.newEnd} @input=${(event: InputEvent) => this.newEnd = (event.currentTarget as HTMLInputElement).value}></label><div class="actions"><button type="submit" ?disabled=${this.loading}>${lang.create}</button><button type="button" class="secondary" @click=${() => { this.showNewTrip = false; this.requestUpdate(); }}>${lang.cancel}</button></div></form>` : ""}</section>`;
+    return html`<section class="entry" aria-labelledby="journal-entry-title"><div class="entry-icon" aria-hidden="true">🚐</div><h2 id="journal-entry-title">${lang.journalEntry ?? "Reise auswählen oder neu anlegen"}</h2><p class="muted">${lang.journalEntryHint ?? "Öffne eine Reise, um ihre Fahrten, Orte, Karte und Exporte zu sehen."}</p>${trips.length ? html`<label class="picker-label">${lang.journalSelect ?? "Reise auswählen"}<select aria-label=${lang.journalSelect ?? "Reise auswählen"} .value=${this.selectedTripId} @change=${(event: Event) => { this.selectedTripId = (event.currentTarget as HTMLSelectElement).value; this.requestUpdate(); }}><option value="">${lang.journalChoose ?? "Bitte auswählen …"}</option>${trips.map((trip) => html`<option value=${trip.id}>${trip.title} · ${statusLabel(trip.status, this.hass)} · ${formatTripPeriod(trip, this.hass)}</option>`)}</select></label>` : html`<p class="muted">${lang.noTrip}</p>`}<div class="actions"><button type="button" @click=${() => void this.openTrip() } ?disabled=${!this.selectedTripId || this.loading}>${lang.journalOpen ?? "Reise öffnen"}</button><button type="button" class="secondary" @click=${() => this.openTripCreateDialog()}>${lang.newTrip}</button></div><camper-travel-journal-manager-card .hass=${this.hass} .config=${{ vehicle_id: this.vehicleId, journal_section: "trip-create" }} @trip-created=${(event: Event) => void this.onTripCreated(event)}></camper-travel-journal-manager-card></section>`;
   }
   private renderOpenTrip(lang: ReturnType<typeof messages>, trip: Trip) {
     const snapshot = this.detail;
@@ -156,7 +149,7 @@ export class JournalCard extends TravelCard {
       return [html`<article class="drive-item"><strong>${lang.drive ?? "Fahrt"}</strong><span>${formatDateTime(drive.started_at, this.hass)} → ${drive.ended_at ? formatDateTime(drive.ended_at, this.hass) : (lang.notAvailable ?? "Nicht verfügbar")}</span><span>${(drive.distance_m / 1000).toFixed(1)} km · ${drive.duration_seconds ? formatDuration(drive.duration_seconds, this.hass) : "–"} · ${drive.source === "gpx" ? (lang.sourceGpx ?? "GPX-importiert") : drive.source === "manual" ? lang.sourceManual : lang.sourceGps}</span></article>`, ...(following ? [html`<article class="interruption-item"><strong>${following.status === "pause" ? (lang.drivePause ?? "Fahrtpause") : following.status === "ignored" ? (lang.interruptionIgnored ?? "Ignoriert") : following.existing_place_id ? (lang.assignedStay ?? "Aufenthalt") : (lang.interruptionUnassigned ?? "Nicht zugeordnet")}</strong><span>${formatDateTime(following.started_at, this.hass)} → ${formatDateTime(following.ended_at, this.hass)} · ${formatDuration(following.duration_seconds, this.hass)}</span><button type="button" class="compact-action" @click=${() => this.openInterruptionDialog(following)}>${lang.assignStay ?? "Aufenthalt zuordnen"}</button></article>`] : [])];
     });
     return html`<header class="trip-header"><div><p class="eyebrow">${lang.journalOpenTrip ?? "Geöffnete Reise"}</p><h2>${trip.title}</h2><p class="muted">${trip.destination || lang.noDestination} · ${formatTripPeriod(trip, this.hass)} · ${statusLabel(trip.status, this.hass)}${this.vehicleName ? ` · ${this.vehicleName}` : ""}</p></div><button type="button" class="secondary" @click=${() => this.closeTrip()}>${lang.journalClose ?? "Reise schließen / wechseln"}</button></header>
-      ${this.section(lang.journalOverview ?? "Reiseübersicht", "▣", undefined, html`<div class="metric-grid"><div><span>${lang.distance}</span><strong>${km.toFixed(1)} km</strong></div><div><span>${lang.drives}</span><strong>${snapshot?.drives.length ?? 0}</strong></div><div><span>${lang.stops}</span><strong>${confirmed.filter((stop) => !overnightKinds.has(stop.place_kind || stop.place_type || stop.stop_type)).length}</strong></div><div><span>${lang.overnights ?? "Übernachtungsplätze"}</span><strong>${overnights.length}</strong></div><div><span>${lang.costs}</span><strong>${total}</strong></div></div>`, true)}
+      ${this.section(lang.journalOverview ?? "Reiseübersicht", "▣", undefined, html`<div class="metric-grid"><div><span>${lang.distance}</span><strong>${km.toFixed(1)} km</strong></div><div><span>${lang.drives}</span><strong>${snapshot?.drives.length ?? 0}</strong></div><div><span>${lang.stops}</span><strong>${confirmed.filter((stop) => !overnightKinds.has(stop.place_kind || stop.place_type || stop.stop_type)).length}</strong></div><div><span>${lang.overnights ?? "Übernachtungsplätze"}</span><strong>${overnights.length}</strong></div><div><span>${lang.costs}</span><strong>${total}</strong></div></div>`)}
       ${this.section(lang.journalDrives ?? "Fahrten und Unterbrechungen", "↔", (snapshot?.drives.length ?? 0) + interruptions.length, html`${timeline.length ? timeline : html`<p class="muted">${lang.noDrives ?? "Keine Fahrten erfasst."}</p>`}`)}
       ${this.section(lang.places ?? "Zwischenstopps", "●", confirmed.filter((stop) => !overnightKinds.has(stop.place_kind || stop.place_type || stop.stop_type)).length, html`<p class="muted">${lang.journalStopsHint ?? "Bestätigte Zwischenstopps dieser Reise."}</p>${manager("places")}`)}
       ${this.section(lang.overnights ?? "Übernachtungsplätze", "⌂", overnights.length, html`<p class="muted">${lang.journalOvernightHint ?? "Übernachtungsplätze und ihre Bewertungen werden im Ortsbereich verwaltet."}</p>`)}
@@ -165,7 +158,7 @@ export class JournalCard extends TravelCard {
       ${this.section(lang.gpxImport, "⇧", undefined, html`${manager("gpx")}`)}
       ${this.section(lang.pdfExportTitle, "▤", undefined, html`${manager("pdf")}`)}
       ${this.error ? html`<p class="error" role="alert">${this.error}</p>` : ""}${this.loading ? html`<p class="muted" role="status">${lang.loading}</p>` : ""}
-      <dialog class="interruption-dialog" @cancel=${(event: Event) => { event.preventDefault(); this.closeInterruptionDialog(); }}><form method="dialog" @submit=${(event: SubmitEvent) => { event.preventDefault(); void this.saveInterruption(); }}><h3>${lang.assignStay ?? "Aufenthalt zuordnen"}</h3><p class="muted">${this.interruptionDialog ? `${formatDateTime(this.interruptionDialog.started_at, this.hass)} → ${formatDateTime(this.interruptionDialog.ended_at, this.hass)}` : ""}</p><label>${lang.interruptionAction ?? "Aktion"}<select .value=${this.interruptionAction} @change=${(event: Event) => { this.interruptionAction = (event.currentTarget as HTMLSelectElement).value as typeof this.interruptionAction; this.requestUpdate(); }}><option value="stop">${lang.assignStop ?? "Zwischenstopp zuordnen"}</option><option value="overnight">${lang.assignOvernight ?? "Übernachtungsplatz zuordnen"}</option><option value="pause">${lang.drivePause ?? "Als Fahrtpause kennzeichnen"}</option><option value="ignored">${lang.interruptionIgnored ?? "Als nicht relevant markieren"}</option></select></label>${this.interruptionAction === "stop" || this.interruptionAction === "overnight" ? html`<label>${lang.existingPlace ?? "Bestehender Ort"}<select .value=${this.interruptionPlaceId} @change=${(event: Event) => { this.interruptionPlaceId = (event.currentTarget as HTMLSelectElement).value; this.requestUpdate(); }}><option value="">${lang.createNewPlace ?? "Neuen Eintrag erstellen …"}</option>${confirmed.map((place) => html`<option value=${place.id}>${place.name}</option>`)}</select></label>${!this.interruptionPlaceId ? html`<input aria-label=${lang.placeName} placeholder=${lang.placeName} .value=${this.interruptionName} @input=${(event: InputEvent) => this.interruptionName = (event.currentTarget as HTMLInputElement).value} required><select aria-label=${lang.placeCategory} .value=${this.interruptionType} @change=${(event: Event) => this.interruptionType = (event.currentTarget as HTMLSelectElement).value}><option value="other">${lang.placeOther}</option><option value="rv_site">${lang.placeRvSite}</option><option value="parking">${lang.placeParking ?? "Raststätte / Parkplatz"}</option></select><input aria-label=${lang.placeAddress} placeholder=${lang.placeAddress} .value=${this.interruptionAddress} @input=${(event: InputEvent) => this.interruptionAddress = (event.currentTarget as HTMLInputElement).value}><textarea aria-label=${lang.placeDescription} placeholder=${lang.placeDescription} .value=${this.interruptionDescription} @input=${(event: InputEvent) => this.interruptionDescription = (event.currentTarget as HTMLTextAreaElement).value}></textarea>` : ""}` : ""}<div class="dialog-actions"><button type="button" class="secondary" @click=${() => this.closeInterruptionDialog()}>${lang.cancel}</button><button type="submit" ?disabled=${this.interruptionSaving}>${this.interruptionSaving ? lang.saving : lang.save}</button></div></form></dialog>`;
+      <dialog class="interruption-dialog" @cancel=${(event: Event) => { event.preventDefault(); this.closeInterruptionDialog(); }}><form method="dialog" @submit=${(event: SubmitEvent) => { event.preventDefault(); void this.saveInterruption(); }}><h3>${lang.assignStay ?? "Aufenthalt zuordnen"}</h3><p class="muted">${this.interruptionDialog ? `${formatDateTime(this.interruptionDialog.started_at, this.hass)} → ${formatDateTime(this.interruptionDialog.ended_at, this.hass)}` : ""}</p><label>${lang.interruptionAction ?? "Aktion"}<select .value=${this.interruptionAction} @change=${(event: Event) => { this.interruptionAction = (event.currentTarget as HTMLSelectElement).value as typeof this.interruptionAction; this.requestUpdate(); }}><option value="stop">${lang.assignStop ?? "Zwischenstopp zuordnen"}</option><option value="overnight">${lang.assignOvernight ?? "Übernachtungsplatz zuordnen"}</option><option value="pause">${lang.drivePause ?? "Als Fahrtpause kennzeichnen"}</option><option value="ignored">${lang.interruptionIgnored ?? "Als nicht relevant markieren"}</option></select></label>${this.interruptionAction === "stop" || this.interruptionAction === "overnight" ? html`<label>${lang.existingPlace ?? "Bestehender Ort"}<select .value=${this.interruptionPlaceId} @change=${(event: Event) => { this.interruptionPlaceId = (event.currentTarget as HTMLSelectElement).value; this.requestUpdate(); }}><option value="">${lang.createNewPlace ?? "Neuen Eintrag erstellen …"}</option>${confirmed.map((place) => html`<option value=${place.id}>${place.name}</option>`)}</select></label>${!this.interruptionPlaceId ? html`<input aria-label=${lang.placeName} placeholder=${lang.placeName} .value=${this.interruptionName} @input=${(event: InputEvent) => this.interruptionName = (event.currentTarget as HTMLInputElement).value} required><select aria-label=${lang.placeCategory} .value=${this.interruptionType} @change=${(event: Event) => this.interruptionType = (event.currentTarget as HTMLSelectElement).value}><option value="other">${lang.placeOther}</option><option value="rv_site">${lang.placeRvSite}</option><option value="parking">${lang.placeParking ?? "Raststätte / Parkplatz"}</option></select><input aria-label=${lang.placeAddress} placeholder=${lang.placeAddress} .value=${this.interruptionAddress} @input=${(event: InputEvent) => this.interruptionAddress = (event.currentTarget as HTMLInputElement).value}><input aria-label=${lang.placeWebsite ?? "Webseite"} type="url" placeholder=${lang.placeWebsite ?? "Webseite (optional)"} .value=${this.interruptionWebsite} @input=${(event: InputEvent) => this.interruptionWebsite = (event.currentTarget as HTMLInputElement).value}><textarea aria-label=${lang.placeDescription} placeholder=${lang.placeDescription} .value=${this.interruptionDescription} @input=${(event: InputEvent) => this.interruptionDescription = (event.currentTarget as HTMLTextAreaElement).value}></textarea>` : ""}` : ""}<div class="dialog-actions"><button type="button" class="secondary" @click=${() => this.closeInterruptionDialog()}>${lang.cancel}</button><button type="submit" ?disabled=${this.interruptionSaving}>${this.interruptionSaving ? lang.saving : lang.save}</button></div></form></dialog>`;
   }
   private vehicleName = "";
   render() {
