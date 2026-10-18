@@ -34,5 +34,5 @@ await waitFor(() => !card.shadowRoot.querySelector("dialog.interruption-dialog")
 const interruption = { saved: overnightSaves === 1, overnightCount: card.shadowRoot.textContent.replace(/\s/g, "").includes("Übernachtungsplätze2"), dialogClosedAfterRefresh: !card.shadowRoot.querySelector("dialog.interruption-dialog")?.open };
 const close = [...card.shadowRoot.querySelectorAll("button")].find((button) => button.textContent.includes("Reise schließen")); close?.click();
 await waitFor(() => Boolean(card.shadowRoot.querySelector(".entry")));
-result.textContent = JSON.stringify({ closed: closed.title && closed.noMap && closed.noPdf, opened: opened.header && opened.drive && opened.interruption && opened.map, interruption, closedAgain: Boolean(card.shadowRoot.querySelector(".entry")), visibleTemplateLeak: /lit\$\d|=>\s*this\.|currentTarget\.value/.test(card.shadowRoot.textContent), }, null, 2);
+result.textContent = JSON.stringify({ closed: closed.title && closed.noMap && closed.noPdf, opened: opened.header && opened.drive && opened.interruption && opened.map && opened.noEmbeddedMigrationNotice, interruption, closedAgain: Boolean(card.shadowRoot.querySelector(".entry")), visibleTemplateLeak: /lit\$\d|=>\s*this\.|currentTarget\.value/.test(card.shadowRoot.textContent), }, null, 2);
 </script>
