@@ -1,6 +1,7 @@
 import unittest
 
 try:
+    from reportlab.platypus import Paragraph, Table
     from custom_components.camper_travel_journal.pdf_report import _category_label, _date, _date_time, _duration, _place_label, _time, render_trip_report
 except ModuleNotFoundError as error:  # pragma: no cover - CI installs manifest dependency
     if error.name != "reportlab":
@@ -90,3 +91,29 @@ def test_report_keeps_explicit_interruption_status_and_snapshot_unchanged():
     pdf, _ = render_trip_report(report, language="de")
     assert pdf.startswith(b"%PDF-")
     assert report == before
+
+
+def test_expense_heading_keeps_table_start_together_and_long_tables_split(monkeypatch):
+    import custom_components.camper_travel_journal.pdf_report as pdf_report
+
+    captured = {}
+
+    def capture_story(_document, story):
+        captured["story"] = story
+
+    monkeypatch.setattr(pdf_report._ReportDocTemplate, "build", capture_story)
+    pdf_report.render_trip_report(_report(expenses=2), language="de")
+    headings = [item for item in captured["story"] if isinstance(item, Paragraph) and item.getPlainText() == "Ausgaben"]
+    assert len(headings) == 1
+    assert headings[0].style.keepWithNext == 1
+    expense_index = captured["story"].index(headings[0])
+    assert isinstance(captured["story"][expense_index + 1], Table)
+    assert captured["story"][expense_index + 1].repeatRows == 1
+
+    monkeypatch.undo()
+    short_de, _ = pdf_report.render_trip_report(_report(expenses=2), language="de")
+    long_de, _ = pdf_report.render_trip_report(_report(expenses=90), language="de")
+    short_en, _ = pdf_report.render_trip_report(_report(expenses=2), language="en")
+    long_en, _ = pdf_report.render_trip_report(_report(expenses=90), language="en")
+    assert long_de.count(b"/Type /Page") > short_de.count(b"/Type /Page")
+    assert long_en.count(b"/Type /Page") > short_en.count(b"/Type /Page")
