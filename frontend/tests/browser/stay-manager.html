@@ -1,0 +1,30 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>Stay interruption manager regression</title>
+<div id="host"></div><pre id="result">starting</pre>
+<script type="module">
+const result = document.querySelector("#result");
+const trip = { id: "synthetic", title: "Synthetische Reise", description: "", destination: "Bremen", status: "active", started_at: "2026-10-13T06:00:00Z", ended_at: null };
+const snapshot = { trips: [trip], drives: [], stops: [], interruptions: [{ id: "drive-a:drive-b", status: "unassigned", previous_drive_id: "drive-a", next_drive_id: "drive-b", started_at: "2026-10-13T13:46:00Z", ended_at: "2026-10-14T08:43:00Z", duration_seconds: 68220 }], stop_suggestions: [], expenses: [], expense_summary: { total_minor: 0, currency: "EUR", mixed_currency: false } };
+let writes = 0;
+const connection = { async sendMessagePromise(message) {
+  if (message.type === "camper_travel_journal/list_vehicles") return { vehicles: [{ vehicle_id: "camper", name: "Testcamper", title: "Test" }] };
+  if (message.type === "camper_travel_journal/list") return snapshot;
+  if (message.type === "camper_travel_journal/create_stop_from_interruption") { writes += 1; snapshot.stops.push({ id: "stay-1", name: message.name, place_type: message.place_type, place_kind: message.place_type, stop_type: message.place_type, occurred_at: snapshot.interruptions[0].started_at, arrived_at: snapshot.interruptions[0].started_at, departed_at: snapshot.interruptions[0].ended_at, confirmed: true }); snapshot.interruptions[0].status = "overnight"; snapshot.interruptions[0].existing_place_id = "stay-1"; return { stop_id: "stay-1" }; }
+  throw new Error(`unexpected ${message.type}`);
+} };
+const hass = { connection, locale: { language: "de-DE" } };
+await import("/custom_components/camper_travel_journal/frontend/camper-travel-journal.js");
+await customElements.whenDefined("camper-travel-journal-manager-card");
+const card = document.createElement("camper-travel-journal-manager-card"); card.setConfig({ vehicle_id: "camper", trip_id: "synthetic", journal_section: "places" }); card.hass = hass; document.querySelector("#host").append(card);
+const waitFor = async (predicate) => { for (let i = 0; i < 200; i += 1) { if (predicate()) return; await new Promise((resolve) => setTimeout(resolve, 25)); } throw new Error(`timeout: ${card.shadowRoot?.innerHTML ?? "none"}`); };
+await waitFor(() => card.shadowRoot?.textContent.includes("Als Aufenthalt erfassen"));
+const open = [...card.shadowRoot.querySelectorAll("button")].find((button) => button.textContent.includes("Als Aufenthalt erfassen")); open.click();
+await waitFor(() => card.shadowRoot?.querySelector("dialog.editor-dialog"));
+const dialog = card.shadowRoot.querySelector("dialog.editor-dialog");
+const name = dialog.querySelector("input[required]"); name.value = "Synthetischer Stellplatz"; name.dispatchEvent(new Event("input", { bubbles: true }));
+dialog.querySelector("select").value = "rv_site"; dialog.querySelector("select").dispatchEvent(new Event("change", { bubbles: true }));
+dialog.querySelector("form").dispatchEvent(new SubmitEvent("submit", { bubbles: true, cancelable: true }));
+await waitFor(() => writes === 1 && card.shadowRoot.textContent.includes("Synthetischer Stellplatz"));
+result.textContent = JSON.stringify({ opened: true, savedThroughInterruptionApi: writes === 1, noRawCategoryCode: !card.shadowRoot.textContent.includes("rv_site"), grouped: card.shadowRoot.textContent.includes("Übernachtungsplätze") }, null, 2);
+</script>
