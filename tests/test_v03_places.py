@@ -45,6 +45,13 @@ class V03PlaceTests(unittest.TestCase):
         self.store.delete_place_rating(stop)
         self.assertIsNone(self.store.list_stops("v1", self.trip)[0]["rating_overall"])
 
+    def test_overnight_website_accepts_domains_and_rejects_unsafe_urls(self):
+        stop = self.store.create_stop(Stop("", "v1", "Stellplatz", self.now, trip_id=self.trip, automatic=False, place_type="rv_site"), self.now)
+        self.store.upsert_overnight_details(stop, self.now, place_kind="rv_site", website_url="stellplatz-bremen.de")
+        self.assertEqual(self.store.list_stops("v1", self.trip)[0]["website_url"], "https://stellplatz-bremen.de")
+        with self.assertRaisesRegex(ValueError, "website_url_invalid"):
+            self.store.upsert_overnight_details(stop, self.now, website_url="javascript:alert(1)")
+
     def test_invalid_rating_does_not_create_partial_record(self):
         stop = self.store.create_stop(Stop("", "v1", "Ort", self.now, trip_id=self.trip, automatic=False), self.now)
         with self.assertRaisesRegex(ValueError, "rating_overall_invalid"):
@@ -175,9 +182,12 @@ class V03PlaceTests(unittest.TestCase):
         with self.store.transaction() as connection:
             point = connection.execute("INSERT INTO gps_points(vehicle_id,recorded_at,latitude,longitude) VALUES(?,?,?,?)", ("v1", "2026-10-13T11:59:00+00:00", 53.08, 8.8))
             connection.execute("INSERT INTO drive_gps_points(drive_id,gps_point_id,ordinal,association_source) VALUES(?,?,?,?)", (first, point.lastrowid, 0, "test"))
-        stop = self.store.create_stop_from_interruption(self.trip, f"{first}:{second}", self.now, name="Kuhhirten", place_type="rv_site", overnight=True)
+        stop = self.store.create_stop_from_interruption(self.trip, f"{first}:{second}", self.now, name="Kuhhirten", place_type="rv_site", overnight=True, website_url="https://stellplatz-bremen.de/")
         saved = self.store.list_stops("v1", self.trip)[0]
         self.assertEqual((saved["id"], saved["arrived_at"], saved["departed_at"], saved["latitude"], saved["place_kind"]), (stop, "2026-10-13T11:00:00+00:00", "2026-10-13T13:00:00+00:00", 53.08, "rv_site"))
+        self.assertEqual(saved["website_url"], "https://stellplatz-bremen.de/")
+        self.assertEqual(self.store.create_stop_from_interruption(self.trip, f"{first}:{second}", self.now, name="Duplikat", place_type="rv_site", overnight=True), stop)
+        self.assertEqual(len(self.store.list_stops("v1", self.trip)), 1)
         self.assertEqual(self.store.list_trip_interruptions("v1", self.trip)[0]["status"], "overnight")
 
     def test_interruption_assignment_rejects_invalid_or_cross_trip_place(self):

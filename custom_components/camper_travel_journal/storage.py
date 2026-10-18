@@ -6,8 +6,10 @@ SQLite connection may be used directly from an event-loop callback.
 """
 
 import asyncio
+import re
 import sqlite3
 import uuid
+from urllib.parse import urlsplit, urlunsplit
 from math import asin, cos, radians, sin, sqrt
 from collections.abc import Iterator
 from contextlib import contextmanager
@@ -101,6 +103,26 @@ def utc_iso(value: datetime) -> str:
     if value.tzinfo is None or value.utcoffset() is None:
         raise ValueError("timestamps must be timezone-aware")
     return value.astimezone(timezone.utc).isoformat()
+
+
+def normalize_website_url(value: str | None) -> str | None:
+    """Normalize an optional place website and reject unsafe schemes."""
+    if value is None:
+        return None
+    text = str(value).strip()
+    if not text:
+        return None
+    if re.match(r"^[A-Za-z][A-Za-z0-9+.-]*:", text) and not re.match(r"^https?://", text, re.IGNORECASE):
+        raise ValueError("website_url_invalid")
+    candidate = text if "://" in text else f"https://{text}"
+    parsed = urlsplit(candidate)
+    try:
+        parsed.port
+    except ValueError:
+        raise ValueError("website_url_invalid") from None
+    if parsed.scheme.lower() not in {"http", "https"} or not parsed.hostname or any(char.isspace() for char in text):
+        raise ValueError("website_url_invalid")
+    return urlunsplit((parsed.scheme, parsed.netloc, parsed.path, parsed.query, parsed.fragment))
 
 
 class SQLiteStore:
@@ -671,9 +693,12 @@ class SQLiteStore:
                 (trip_id, interruption_id, row[1], row[2], status, stop_id, stamp, stamp),
             )
 
-    def create_stop_from_interruption(self, trip_id: str, interruption_id: str, now: datetime, *, name: str, place_type: str = "other", overnight: bool = False, address: str = "", description: str = "") -> str:
-        """Create one place from the derived gap, then persist its classification."""
+    def create_stop_from_interruption(self, trip_id: str, interruption_id: str, now: datetime, *, name: str, place_type: str = "other", overnight: bool = False, address: str = "", description: str = "", website_url: str | None = None) -> str:
+        """Create one place and its interruption link atomically and idempotently."""
         row = self._interruption_row(trip_id, interruption_id)
+        existing = self.connection.execute("SELECT stop_id,status FROM interruption_links WHERE trip_id=? AND interruption_id=?", (trip_id, interruption_id)).fetchone()
+        if existing and existing[0] and self.connection.execute("SELECT 1 FROM stops WHERE id=?", (existing[0],)).fetchone():
+            return existing[0]
         drives = self.connection.execute(
             "SELECT started_at,ended_at FROM drives WHERE id IN (?,?) ORDER BY started_at",
             (row[1], row[2]),
@@ -691,10 +716,18 @@ class SQLiteStore:
             "description": description, "stop_type": place_type, "place_type": place_type,
             "address": address, "source": "interruption", "automatic": False, "confirmed": True,
         })()
-        stop_id = self.create_stop(stop, now)
-        if overnight:
-            self.upsert_overnight_details(stop_id, now, place_kind=place_type)
-        self.assign_interruption(trip_id, interruption_id, now, status="overnight" if overnight else "stop", stop_id=stop_id)
+        status = "overnight" if overnight else "stop"
+        with self.transaction() as connection:
+            stop_id = self._insert_stop(connection, stop, now)
+            if overnight:
+                website = normalize_website_url(website_url)
+                stamp = utc_iso(now)
+                connection.execute("INSERT INTO overnight_details(place_id,place_kind,website_url,booking_note,large_rv_suitable,created_at,updated_at) VALUES(?,?,?,?,?,?,?)", (stop_id, place_type, website, None, None, stamp, stamp))
+            stamp = utc_iso(now)
+            connection.execute(
+                "INSERT INTO interruption_links(trip_id,interruption_id,previous_drive_id,next_drive_id,status,stop_id,created_at,updated_at) VALUES(?,?,?,?,?,?,?,?)",
+                (trip_id, interruption_id, row[1], row[2], status, stop_id, stamp, stamp),
+            )
         return stop_id
 
     def list_available_drives(self, vehicle_id: str) -> list[dict]:
@@ -768,30 +801,33 @@ class SQLiteStore:
             connection.execute("DELETE FROM trip_drives WHERE drive_id=?", (drive_id,))
             connection.execute("DELETE FROM drives WHERE id=?", (drive_id,))
 
-    def create_stop(self, stop, now: datetime) -> str:
+    def _insert_stop(self, connection, stop, now: datetime) -> str:
         stop_id = stop.id or str(uuid.uuid4())
-        with self.transaction() as connection:
-            vehicle = connection.execute("SELECT 1 FROM vehicles WHERE id=?", (stop.vehicle_id,)).fetchone()
-            if vehicle is None:
-                raise ValueError("vehicle_not_found")
-            if stop.trip_id is not None:
-                trip = connection.execute("SELECT vehicle_id FROM trips WHERE id=?", (stop.trip_id,)).fetchone()
-                if trip is None:
-                    raise ValueError("trip_not_found")
-                if trip[0] != stop.vehicle_id:
-                    raise ValueError("vehicle_mismatch")
-            if stop.drive_id is not None:
-                drive = connection.execute("SELECT vehicle_id FROM drives WHERE id=?", (stop.drive_id,)).fetchone()
-                if drive is None:
-                    raise ValueError("drive_not_found")
-                if drive[0] != stop.vehicle_id:
-                    raise ValueError("vehicle_mismatch")
-            if stop.arrived_at and stop.departed_at and stop.departed_at < stop.arrived_at:
-                raise ValueError("stop_time_range_invalid")
-            stamp = utc_iso(now)
-            place_type = stop.place_type or stop.stop_type
-            connection.execute("INSERT INTO stops(id,vehicle_id,trip_id,drive_id,name,occurred_at,arrived_at,departed_at,latitude,longitude,description,stop_type,place_type,address,source,automatic,confirmed,created_at,updated_at) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)", (stop_id, stop.vehicle_id, stop.trip_id, stop.drive_id, stop.name.strip(), utc_iso(stop.occurred_at), utc_iso(stop.arrived_at) if stop.arrived_at else None, utc_iso(stop.departed_at) if stop.departed_at else None, stop.latitude, stop.longitude, stop.description.strip(), place_type, place_type, (stop.address or "").strip(), stop.source, int(stop.automatic), int(stop.confirmed), stamp, stamp))
+        vehicle = connection.execute("SELECT 1 FROM vehicles WHERE id=?", (stop.vehicle_id,)).fetchone()
+        if vehicle is None:
+            raise ValueError("vehicle_not_found")
+        if stop.trip_id is not None:
+            trip = connection.execute("SELECT vehicle_id FROM trips WHERE id=?", (stop.trip_id,)).fetchone()
+            if trip is None:
+                raise ValueError("trip_not_found")
+            if trip[0] != stop.vehicle_id:
+                raise ValueError("vehicle_mismatch")
+        if stop.drive_id is not None:
+            drive = connection.execute("SELECT vehicle_id FROM drives WHERE id=?", (stop.drive_id,)).fetchone()
+            if drive is None:
+                raise ValueError("drive_not_found")
+            if drive[0] != stop.vehicle_id:
+                raise ValueError("vehicle_mismatch")
+        if stop.arrived_at and stop.departed_at and stop.departed_at < stop.arrived_at:
+            raise ValueError("stop_time_range_invalid")
+        stamp = utc_iso(now)
+        place_type = stop.place_type or stop.stop_type
+        connection.execute("INSERT INTO stops(id,vehicle_id,trip_id,drive_id,name,occurred_at,arrived_at,departed_at,latitude,longitude,description,stop_type,place_type,address,source,automatic,confirmed,created_at,updated_at) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)", (stop_id, stop.vehicle_id, stop.trip_id, stop.drive_id, stop.name.strip(), utc_iso(stop.occurred_at), utc_iso(stop.arrived_at) if stop.arrived_at else None, utc_iso(stop.departed_at) if stop.departed_at else None, stop.latitude, stop.longitude, stop.description.strip(), place_type, place_type, (stop.address or "").strip(), stop.source, int(stop.automatic), int(stop.confirmed), stamp, stamp))
         return stop_id
+
+    def create_stop(self, stop, now: datetime) -> str:
+        with self.transaction() as connection:
+            return self._insert_stop(connection, stop, now)
 
     def list_stops(self, vehicle_id: str, trip_id: str | None = None) -> list[dict]:
         if self.connection is None: raise RuntimeError("store is not open")
@@ -853,8 +889,8 @@ class SQLiteStore:
         changes = {key: value for key, value in fields.items() if key in allowed}
         if not changes:
             return
-        if "website_url" in changes and changes["website_url"] is not None:
-            changes["website_url"] = changes["website_url"].strip() or None
+        if "website_url" in changes:
+            changes["website_url"] = normalize_website_url(changes["website_url"])
         stamp = utc_iso(now)
         with self.transaction() as connection:
             if connection.execute("SELECT 1 FROM stops WHERE id=?", (place_id,)).fetchone() is None:
