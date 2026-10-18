@@ -70,6 +70,15 @@ class V03PlaceTests(unittest.TestCase):
         self.assertNotIn("description", payload["places"][0])
         self.assertNotIn("review_text", payload["places"][0])
 
+    def test_place_and_trip_validation_prevents_cross_vehicle_links(self):
+        self.store.insert_vehicle("v2", "Other", "device_tracker.other", self.now)
+        other_trip = self.store.create_trip("v2", "Other trip", self.now, self.now)
+        stop = self.store.create_stop(Stop("", "v1", "Ort", self.now, trip_id=self.trip, automatic=False), self.now)
+        with self.assertRaisesRegex(ValueError, "vehicle_mismatch"):
+            self.store.update_stop(stop, self.now, trip_id=other_trip)
+        with self.assertRaisesRegex(ValueError, "vehicle_mismatch"):
+            self.store.create_expense(Expense("", other_trip, self.now, "camping", 100, "EUR", place_id=stop), self.now)
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -19,6 +19,7 @@ def test_beta_contains_the_versioned_lovelace_bundle():
         "list", "create_trip", "update_trip", "delete_trip", "transition_trip",
         "link_drives", "unlink_drive", "create_manual_drive", "update_manual_drive", "delete_manual_drive", "create_stop", "update_stop", "delete_stop",
         "create_expense", "update_expense", "delete_expense", "export_pdf", "analyze_gpx", "import_gpx", "route",
+        "update_overnight", "update_rating", "delete_rating", "list_stop_suggestions", "generate_stop_suggestions", "accept_stop_suggestion", "dismiss_stop_suggestion",
     ):
         assert f'camper_travel_journal/{command}' in api
 

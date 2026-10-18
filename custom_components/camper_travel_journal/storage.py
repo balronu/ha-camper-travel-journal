@@ -664,6 +664,18 @@ class SQLiteStore:
         changes["updated_at"] = utc_iso(now)
         assignments = ",".join(f"{key}=?" for key in changes)
         with self.transaction() as connection:
+            current = connection.execute("SELECT vehicle_id FROM stops WHERE id=?", (stop_id,)).fetchone()
+            if current is None:
+                raise ValueError("stop_not_found")
+            vehicle_id = current[0]
+            if "trip_id" in changes and changes["trip_id"]:
+                trip = connection.execute("SELECT vehicle_id FROM trips WHERE id=?", (changes["trip_id"],)).fetchone()
+                if trip is None: raise ValueError("trip_not_found")
+                if trip[0] != vehicle_id: raise ValueError("vehicle_mismatch")
+            if "drive_id" in changes and changes["drive_id"]:
+                drive = connection.execute("SELECT vehicle_id FROM drives WHERE id=?", (changes["drive_id"],)).fetchone()
+                if drive is None: raise ValueError("drive_not_found")
+                if drive[0] != vehicle_id: raise ValueError("vehicle_mismatch")
             cursor = connection.execute(f"UPDATE stops SET {assignments} WHERE id=?", (*changes.values(), stop_id))
             if cursor.rowcount != 1: raise ValueError("stop_not_found")
 
@@ -804,9 +816,14 @@ class SQLiteStore:
         currency = validate_expense_currency(expense.currency)
         with self.transaction() as connection:
             stamp = utc_iso(now)
-            if connection.execute("SELECT 1 FROM trips WHERE id=?", (expense.trip_id,)).fetchone() is None:
+            trip = connection.execute("SELECT vehicle_id FROM trips WHERE id=?", (expense.trip_id,)).fetchone()
+            if trip is None:
                 raise ValueError("trip_not_found")
             place_id = expense.place_id or expense.stay_id
+            if place_id is not None:
+                place = connection.execute("SELECT vehicle_id,trip_id FROM stops WHERE id=?", (place_id,)).fetchone()
+                if place is None: raise ValueError("place_not_found")
+                if place[0] != trip[0] or place[1] not in (None, expense.trip_id): raise ValueError("vehicle_mismatch")
             connection.execute("INSERT INTO expenses(id,trip_id,occurred_at,category,amount_minor,currency,note,created_at,updated_at,odometer_km,stay_id,place_id) VALUES(?,?,?,?,?,?,?,?,?,?,?,?)", (expense_id, expense.trip_id, utc_iso(expense.occurred_at), category, amount_minor, currency, expense.note, stamp, stamp, expense.odometer_km, expense.stay_id, place_id))
         return expense_id
 
@@ -831,6 +848,11 @@ class SQLiteStore:
         changes["updated_at"] = utc_iso(now)
         assignments = ",".join(f"{key}=?" for key in changes)
         with self.transaction() as connection:
+            if "place_id" in changes and changes["place_id"]:
+                expense = connection.execute("SELECT trip_id FROM expenses WHERE id=?", (expense_id,)).fetchone()
+                if expense is None: raise ValueError("expense_not_found")
+                place = connection.execute("SELECT 1 FROM stops WHERE id=? AND (trip_id IS NULL OR trip_id=?)", (changes["place_id"], expense[0])).fetchone()
+                if place is None: raise ValueError("place_not_found")
             cursor = connection.execute(f"UPDATE expenses SET {assignments} WHERE id=?", (*changes.values(), expense_id))
             if cursor.rowcount != 1: raise ValueError("expense_not_found")
 

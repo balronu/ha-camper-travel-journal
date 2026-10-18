@@ -30,6 +30,7 @@ export class MapCard extends TravelCard {
   private vehicleName = "";
   private driveSectionsOpen = false;
   private fitMapPending = true;
+  private showPlaces = true;
 
   connectedCallback() {
     super.connectedCallback();
@@ -140,6 +141,7 @@ export class MapCard extends TravelCard {
       }
     }
     for (const place of this.places) {
+      if (!this.showPlaces) continue;
       if (place.latitude == null || place.longitude == null || place.confirmed === false) continue;
       const overnight = ["campsite", "rv_site", "wild_camp", "overnight"].includes(place.place_kind || place.place_type || place.stop_type);
       const marker = L.circleMarker([place.latitude, place.longitude], { radius: overnight ? 9 : 7, color: overnight ? "#7b1fa2" : "#455a64", fillColor: overnight ? "#ce93d8" : "#90a4ae", fillOpacity: 0.95, weight: 2 });
@@ -225,6 +227,7 @@ export class MapCard extends TravelCard {
         <div class="drive-actions"><button class="secondary" type="button" @click=${() => void this.selectAllDrives()}>${lang.mapSelectAll}</button><button class="secondary" type="button" @click=${() => void this.selectNoDrives()}>${lang.mapSelectNone}</button></div>
         <div class="drive-list">${this.drives.map((drive, index) => this.driveRow(drive, index))}</div>
       </details>` : ""}
+      <label class="place-filter"><input type="checkbox" .checked=${this.showPlaces} @change=${(event: Event) => { this.showPlaces = (event.currentTarget as HTMLInputElement).checked; this.queueMapRender(); this.requestUpdate(); }}> ${lang.mapPlaces ?? "Orte anzeigen"}</label>
       ${this.error ? html`<p class="error" role="alert">${this.error}</p>` : ""}
       ${this.tileError ? html`<p class="error" role="alert">${messages(this.hass).mapTilesUnavailable ?? (this.hass?.locale?.language?.toLowerCase().startsWith("de") ? "Die Hintergrundkarte konnte nicht geladen werden. Die GPS-Route bleibt sichtbar." : "The background map could not be loaded. The GPS route remains visible.")}</p>` : !manualConfig.tile_url && !this.mapConfig?.tile_url ? html`<p class="muted" role="status">${messages(this.hass).mapTilesNotConfigured ?? (this.hass?.locale?.language?.toLowerCase().startsWith("de") ? "Keine Hintergrundkarte konfiguriert. Die GPS-Route bleibt sichtbar." : "No background map is configured. The GPS route remains visible.")}</p>` : ""}
       ${this.data?.truncated ? html`<p class="muted">${lang.mapTruncated}: ${this.data.returned_points} / ${this.data.total_points}</p>` : ""}

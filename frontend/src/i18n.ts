@@ -6,6 +6,7 @@ export const EXPENSE_CATEGORY_IDS = ["camping", "fuel", "toll", "parking", "food
 export type ExpenseCategory = typeof EXPENSE_CATEGORY_IDS[number];
 export const EXPENSE_CATEGORIES = EXPENSE_CATEGORY_IDS;
 type Messages = {
+  [key: string]: unknown;
   title: string; noDestination: string; loading: string; noTrip: string; loadError: string; statusError: string; summaryTrip: string; summaryChooseTrip: string;
   distance: string; drives: string; stops: string; costs: string; start: string; resume: string; pause: string; complete: string;
   manager: string; newTrip: string; tripName: string; destination: string; create: string; trips: string;
@@ -23,7 +24,7 @@ type Messages = {
   gpxVehicle: string; gpxVehicleFixed: string; gpxTargetTrip: string; gpxNoTrip: string; gpxSelectTrip: string; gpxSummary: string; gpxSelectedDrives: string; gpxDistance: string; gpxPeriod: string; gpxPeriodWarning: string; gpxGapBoundary: string;
   mapTitle: string; mapVehicle?: string; mapTrip?: string; mapTotalDistance?: string; mapSelectedDrives?: string; mapTripPeriod?: string; mapDriveSegments: string; mapExpandSegments?: string; mapCollapseSegments?: string; mapSelectAll?: string; mapSelectNone?: string; mapStart: string; mapEnd: string; mapGap: string; mapTruncated: string; mapNoPoints: string; mapRouteImageAlt: string; mapAttribution: string; mapTilesNotConfigured?: string; mapTilesUnavailable?: string;
   pdfExportTitle: string; pdfExportTrip: string; pdfExport: string; pdfExporting: string; pdfExportError: string;
-  overnights?: string; gpsSuggestions?: string; generateSuggestions?: string; accept?: string; dismiss?: string; noSuggestions?: string;
+  overnights?: string; gpsSuggestions?: string; generateSuggestions?: string; accept?: string; dismiss?: string; noSuggestions?: string; places?: string; noPlaces?: string; placeName?: string; placeCategory?: string; placeArrived?: string; placeDeparted?: string; placeAddress?: string; placeDescription?: string; placeOther?: string; placeRestaurant?: string; placeFuel?: string; placeAttraction?: string; placeFerry?: string; placeCampsite?: string; placeRvSite?: string; placeWildCamp?: string; ratingAdd?: string; ratingEdit?: string; ratingOverall?: string; ratingAccess?: string; ratingSpace?: string; ratingFacilities?: string; ratingSurroundings?: string; ratingComment?: string; placeSaveError?: string; placeDeleteError?: string; ratingInvalid?: string; ratingSaveError?: string;
 };
 
 const de: Messages = {
@@ -45,12 +46,14 @@ const en: Messages = {
 const mapLabels: Record<"de" | "en", Partial<Messages>> = {
   de: {
     mapTitle: "Reisekarte", mapVehicle: "Fahrzeug", mapTrip: "Reise", mapTotalDistance: "Kilometer",
-    mapSelectedDrives: "Fahrtabschnitte", mapTripPeriod: "Reisezeitraum", mapExpandSegments: "Fahrtabschnitte aufklappen",
+    mapSelectedDrives: "Fahrtabschnitte", mapTripPeriod: "Reisezeitraum", mapPlaces: "Orte anzeigen", mapExpandSegments: "Fahrtabschnitte aufklappen",
+    overnights: "Übernachtungsplätze", gpsSuggestions: "GPS-Stoppvorschläge", generateSuggestions: "Vorschläge aktualisieren", accept: "Übernehmen", dismiss: "Verwerfen", noSuggestions: "Keine offenen Vorschläge.", places: "Orte und Zwischenstopps", noPlaces: "Keine Orte gespeichert.", placeName: "Name", placeCategory: "Kategorie", placeArrived: "Ankunft", placeDeparted: "Abfahrt", placeAddress: "Adresse", placeDescription: "Beschreibung und Notizen", placeOther: "Sonstiger Ort", placeRestaurant: "Restaurant", placeFuel: "Tankpause", placeAttraction: "Sehenswürdigkeit", placeFerry: "Fähre", placeCampsite: "Campingplatz", placeRvSite: "Wohnmobilstellplatz", placeWildCamp: "Freistehplatz", ratingAdd: "Bewerten", ratingEdit: "Bewertung bearbeiten", ratingOverall: "Gesamtbewertung", ratingAccess: "Anfahrt", ratingSpace: "Platzgröße", ratingFacilities: "Ausstattung", ratingSurroundings: "Umgebung", ratingComment: "Kommentar", placeSaveError: "Ort konnte nicht gespeichert werden.", placeDeleteError: "Ort konnte nicht gelöscht werden.", ratingInvalid: "Bewertung muss zwischen 1 und 5 liegen.", ratingSaveError: "Bewertung konnte nicht gespeichert werden.",
     mapCollapseSegments: "Fahrtabschnitte zuklappen", mapSelectAll: "Alle auswählen", mapSelectNone: "Alle abwählen",
   },
   en: {
     mapTitle: "Travel map", mapVehicle: "Camper", mapTrip: "Trip", mapTotalDistance: "Kilometers",
-    mapSelectedDrives: "Drive sections", mapTripPeriod: "Trip period", mapExpandSegments: "Expand drive sections",
+    mapSelectedDrives: "Drive sections", mapTripPeriod: "Trip period", mapPlaces: "Show places", mapExpandSegments: "Expand drive sections",
+    overnights: "Overnight places", gpsSuggestions: "GPS stop suggestions", generateSuggestions: "Refresh suggestions", accept: "Accept", dismiss: "Dismiss", noSuggestions: "No open suggestions.", places: "Places and stops", noPlaces: "No places saved.", placeName: "Name", placeCategory: "Category", placeArrived: "Arrival", placeDeparted: "Departure", placeAddress: "Address", placeDescription: "Description and notes", placeOther: "Other place", placeRestaurant: "Restaurant", placeFuel: "Fuel stop", placeAttraction: "Attraction", placeFerry: "Ferry", placeCampsite: "Campsite", placeRvSite: "RV site", placeWildCamp: "Wild camping", ratingAdd: "Rate", ratingEdit: "Edit rating", ratingOverall: "Overall rating", ratingAccess: "Access", ratingSpace: "Space", ratingFacilities: "Facilities", ratingSurroundings: "Surroundings", ratingComment: "Comment", placeSaveError: "Place could not be saved.", placeDeleteError: "Place could not be deleted.", ratingInvalid: "Rating must be between 1 and 5.", ratingSaveError: "Rating could not be saved.",
     mapCollapseSegments: "Collapse drive sections", mapSelectAll: "Select all", mapSelectNone: "Select none",
   },
 };
