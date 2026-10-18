@@ -83,6 +83,7 @@ class Expense:
     note: str | None = None
     odometer_km: float | None = None
     stay_id: str | None = None
+    place_id: str | None = None
 
 
 @dataclass(frozen=True, slots=True)
@@ -99,6 +100,11 @@ class Stop:
     stop_type: str = "other"
     automatic: bool = True
     trip_id: str | None = None
+    drive_id: str | None = None
+    place_type: str | None = None
+    address: str | None = None
+    source: str = "manual"
+    confirmed: bool = True
 
 
 @dataclass(frozen=True, slots=True)
