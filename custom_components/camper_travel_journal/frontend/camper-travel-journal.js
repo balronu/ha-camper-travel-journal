@@ -1887,10 +1887,10 @@ function Co(c) {
 }
 async function Io(c, i, s = Po) {
   const o = { state: "not_run", durationMs: null };
-  if (!c?.connection) return { version: "0.3.0-beta.8", connectionBefore: "unavailable", connectionAfter: "unavailable", authentication: o, vehicles: o, trips: o, vehicleId: Gi(i) };
+  if (!c?.connection) return { version: "0.3.0-beta.9", connectionBefore: "unavailable", connectionAfter: "unavailable", authentication: o, vehicles: o, trips: o, vehicleId: Gi(i) };
   const h = Rr(c), d = await Ki(c, { type: "auth/current_user" }, ko, s), f = await Ki(c, { type: "camper_travel_journal/list_vehicles" }, Lo, s), x = f.value?.vehicles?.filter((se) => typeof se.vehicle_id == "string") ?? [], p = x.length === 1 ? x[0].vehicle_id : void 0, $ = await Ki(c, { type: "camper_travel_journal/list", vehicle_id: p ?? i }, Co, s), { value: b, ...C } = d, { value: T, ...B } = f, { value: z, ...pt } = $;
   return {
-    version: "0.3.0-beta.8",
+    version: "0.3.0-beta.9",
     connectionBefore: h,
     connectionAfter: Rr(c),
     authentication: C,
@@ -8708,6 +8708,12 @@ class es extends Ot {
       this.closeInterruptionDialog();
     } catch (s) {
       const o = s instanceof Error ? s.message : "", h = {
+        invalid_input: "Die Eingaben sind ungültig.",
+        timestamp_invalid: "Bitte Datum und Uhrzeit prüfen.",
+        permission_denied: "Die Berechtigung zum Speichern fehlt.",
+        conflict: "Der Datensatz wurde zwischenzeitlich geändert. Bitte neu laden.",
+        database_error: "Der Server konnte die Änderung nicht speichern.",
+        request_failed: "Der Server konnte die Änderung nicht verarbeiten.",
         interruption_not_found: "Die Unterbrechung existiert nicht mehr.",
         interruption_place_required: "Bitte einen Ort auswählen.",
         trip_not_found: "Die Reise existiert nicht mehr.",

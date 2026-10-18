@@ -1,5 +1,12 @@
 # Änderungsprotokoll
 
+## 0.3.0-beta.9 – Druckfreundliche Reiseberichte
+
+- PDF-Berichte verwenden kompakte Start-/Ende-Spalten mit lokalisierten Datum-/Zeitwerten.
+- Ortskategorien, einschließlich `rv_site`, werden menschenlesbar ausgegeben; lange Namen und Notizen umbrechen an Wortgrenzen.
+- Aufenthaltsstatus, Bewertungen, Adressen, Webseiten und Kosten bleiben im mehrseitigen Export sichtbar.
+- Fehlerantworten verwenden stabile, nicht-sensitive Codes und getrennte Meldungen für Speichern und Aktualisieren.
+
 ## 0.3.0-beta.8 – WebSocket-Hotfix
 
 - Registriert die vorhandenen authentifizierten Befehle `assign_interruption`

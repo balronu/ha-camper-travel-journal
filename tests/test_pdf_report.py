@@ -1,7 +1,7 @@
 import unittest
 
 try:
-    from custom_components.camper_travel_journal.pdf_report import _category_label, _date, _time, render_trip_report
+    from custom_components.camper_travel_journal.pdf_report import _category_label, _date, _duration, _place_label, _time, render_trip_report
 except ModuleNotFoundError as error:  # pragma: no cover - CI installs manifest dependency
     if error.name != "reportlab":
         raise
@@ -61,6 +61,9 @@ def test_report_uses_home_assistant_timezone_and_localized_categories():
     assert _time("2026-01-01T23:30:00+00:00", "de", "Europe/Berlin") == "00:30"
     assert _category_label("fuel", "de") == "Kraftstoff"
     assert _category_label("other", "en") == "Other"
+    assert _place_label("rv_site", "de") == "Wohnmobilstellplatz"
+    assert _place_label("rv_site", "en") == "RV site"
+    assert _duration(630, "de") == "11 min"
 
 
 def test_report_accepts_overnight_places_ratings_and_linked_expenses():
@@ -73,3 +76,16 @@ def test_report_accepts_overnight_places_ratings_and_linked_expenses():
     english, _ = render_trip_report(report, language="en", time_zone="Europe/Berlin")
     assert german.startswith(b"%PDF-") and english.startswith(b"%PDF-")
     assert german.count(b"/Type /Page") >= 1 and english.count(b"/Type /Page") >= 1
+
+
+def test_report_keeps_explicit_interruption_status_and_snapshot_unchanged():
+    report = _report(drives=3, expenses=4, stops=1)
+    report["interruptions"] = [
+        {"id": "gap-1", "started_at": "2026-10-14T13:00:00+00:00", "ended_at": "2026-10-14T13:10:30+00:00", "duration_seconds": 630, "status": "pause"},
+        {"id": "gap-2", "started_at": "2026-10-14T14:00:00+00:00", "ended_at": "2026-10-14T15:00:00+00:00", "duration_seconds": 3600, "status": "unassigned"},
+    ]
+    import copy
+    before = copy.deepcopy(report)
+    pdf, _ = render_trip_report(report, language="de")
+    assert pdf.startswith(b"%PDF-")
+    assert report == before

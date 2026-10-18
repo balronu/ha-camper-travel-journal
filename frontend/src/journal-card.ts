@@ -133,6 +133,12 @@ export class JournalCard extends TravelCard {
     } catch (error) {
       const code = error instanceof Error ? error.message : "";
       const details: Record<string, string> = {
+        invalid_input: "Die Eingaben sind ungültig.",
+        timestamp_invalid: "Bitte Datum und Uhrzeit prüfen.",
+        permission_denied: "Die Berechtigung zum Speichern fehlt.",
+        conflict: "Der Datensatz wurde zwischenzeitlich geändert. Bitte neu laden.",
+        database_error: "Der Server konnte die Änderung nicht speichern.",
+        request_failed: "Der Server konnte die Änderung nicht verarbeiten.",
         interruption_not_found: "Die Unterbrechung existiert nicht mehr.",
         interruption_place_required: "Bitte einen Ort auswählen.",
         trip_not_found: "Die Reise existiert nicht mehr.",

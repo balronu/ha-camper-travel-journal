@@ -5,6 +5,14 @@ angezeigt. Gespeicherte UTC-Zeitstempel bleiben unverändert; nur die Anzeige
 wird lokalisiert, einschließlich Sommer- und Winterzeit. Kostenkategorien
 werden in die Sprache des Berichts übersetzt.
 
+Seit Beta.9 werden Start-/Ende-Zeitpunkte je Datensatz als kompakte,
+umbruchfähige Datum-/Zeit-Zellen ausgegeben. Ortskategorien werden zentral für
+den PDF-Export lokalisiert; beispielsweise wird `rv_site` als
+„Wohnmobilstellplatz“ (Deutsch) beziehungsweise „RV site“ (Englisch)
+dargestellt. Dauerwerte werden mit einer Half-up-Regel auf die nächste Minute
+gerundet, ohne die gespeicherten Sekunden zu verändern. Synthetische
+Beispielberichte liegen unter `docs/examples/pdf-beta9/`.
+
 ## Technische Entscheidung
 
 Beta 6 verwendet ReportLab 5.0.1 serverseitig über den authentifizierten Home-Assistant-WebSocket.
