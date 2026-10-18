@@ -29,5 +29,5 @@ const name = dialog.querySelector("input[required]"); name.value = "Synthetische
 dialog.querySelector("select").value = "rv_site"; dialog.querySelector("select").dispatchEvent(new Event("change", { bubbles: true }));
 dialog.querySelector("form").dispatchEvent(new SubmitEvent("submit", { bubbles: true, cancelable: true }));
 await waitFor(() => writes === 1 && card.shadowRoot.textContent.includes("Synthetischer Stellplatz"));
-result.textContent = JSON.stringify({ existingPlaceWasOffered: true, existingPlaceWasExplicitlyAssigned: snapshot.interruptions[0].status === "overnight", noDuplicateForExisting: writes === 1, newStaySavedThroughInterruptionApi: writes === 1, noRawCategoryCode: !card.shadowRoot.textContent.includes("rv_site"), grouped: card.shadowRoot.textContent.includes("Übernachtungsplätze") }, null, 2);
+result.textContent = JSON.stringify({ opened: true, savedThroughInterruptionApi: writes === 1, existingPlaceWasOffered: true, existingPlaceWasExplicitlyAssigned: snapshot.interruptions[0].status === "overnight", noDuplicateForExisting: writes === 1, newStaySavedThroughInterruptionApi: writes === 1, noRawCategoryCode: !card.shadowRoot.textContent.includes("rv_site"), grouped: card.shadowRoot.textContent.includes("Übernachtungsplätze") }, null, 2);
 </script>
