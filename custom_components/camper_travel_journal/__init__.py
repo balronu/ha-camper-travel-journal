@@ -83,4 +83,3 @@ async def async_unload_entry(hass, entry):
     return True
 
 DOMAIN = "camper_travel_journal"
-VERSION = "0.3.0-beta.4"

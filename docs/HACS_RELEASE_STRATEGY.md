@@ -76,10 +76,11 @@ verschoben werden.
 
 ### Stable
 
-`v0.3.0` ist als Stable veröffentlicht. Release-Notes, HACS-Versionsanzeige,
-Bundle-Version und der Tag sind konsistent. Die Beta-Tags bleiben
-als historische Rollback-Referenzen bestehen; ihre GitHub-Release-Objekte sind
-nicht mehr Teil der sichtbaren Release-Liste.
+Für die Stable-Veröffentlichung müssen `v0.3.0`, Release-Notes,
+HACS-Versionsanzeige, Bundle-Version und Tag konsistent sein. Nach der
+Veröffentlichung bleibt der Stable-Tag unverändert; die Beta-Tags bleiben als
+historische Rollback-Referenzen bestehen. Vor der Veröffentlichung ist der
+Status ausdrücklich als vorbereitet, nicht als veröffentlicht zu kennzeichnen.
 
 ### Rollback
 
