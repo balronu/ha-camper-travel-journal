@@ -214,8 +214,9 @@ class _RouteMap(Flowable):
         # Keep endpoint names on the map itself.  They are already resolved by
         # the read-only report snapshot (manual/home/stay label or coordinates),
         # so the PDF renderer never performs geocoding or network access.
-        endpoint_positions: list[tuple[float, float, str, str, str]] = []
-        for segment in self.segments:
+        endpoint_positions: list[tuple[int, int, float, float, str, str, str]] = []
+        last_segment_index = len(self.segments) - 1
+        for segment_index, segment in enumerate(self.segments):
             drive_id = _text(segment.get("drive_id"))
             labels = self.endpoint_labels.get(drive_id)
             if not labels:
@@ -237,7 +238,10 @@ class _RouteMap(Flowable):
                 runs.append(current)
             if not runs:
                 continue
-            endpoint_positions.extend([(runs[0][0][0], runs[0][0][1], labels[0], "#2e7d32", "S"), (runs[-1][-1][0], runs[-1][-1][1], labels[1], "#c62828", "Z")])
+            endpoint_positions.extend([
+                (0 if segment_index == 0 else 2, len(endpoint_positions), runs[0][0][0], runs[0][0][1], labels[0], "#2e7d32", "S"),
+                (0 if segment_index == last_segment_index else 2, len(endpoint_positions) + 1, runs[-1][-1][0], runs[-1][-1][1], labels[1], "#c62828", "Z"),
+            ])
         overnight_types = {"overnight", "campsite", "rv_site", "wild_camp"}
         for stop in self.stops:
             try:
@@ -249,7 +253,7 @@ class _RouteMap(Flowable):
             place_type = _text(stop.get("place_kind") or stop.get("place_type") or stop.get("stop_type"))
             if place_type not in overnight_types:
                 continue
-            endpoint_positions.append((longitude * scale + ox, latitude * scale + oy, _text(stop.get("name")), "#8e24aa", "Ü" if self.language == "de" else "O"))
+            endpoint_positions.append((1, len(endpoint_positions), longitude * scale + ox, latitude * scale + oy, _text(stop.get("name")), "#8e24aa", "Ü" if self.language == "de" else "O"))
         # Place labels in deterministic candidate slots.  This keeps labels
         # inside the map and avoids drawing endpoint/stay text on top of one
         # another without changing the stored coordinates.
@@ -260,7 +264,8 @@ class _RouteMap(Flowable):
         # ascent/descent explicit so the collision box matches the glyphs,
         # including the lower lines of a multiline label.
         font_ascent, font_descent = font_size * 0.8, font_size * 0.2
-        for x, y, label, color, _marker in endpoint_positions:
+        skipped_labels = 0
+        for _priority, _sequence, x, y, label, color, _marker in sorted(endpoint_positions, key=lambda item: (item[0], item[1])):
             label = _text(label)
             if not label or is_coordinate_label(label):
                 continue
@@ -269,6 +274,7 @@ class _RouteMap(Flowable):
             min_baseline = margin + (len(lines) - 1) * line_height + font_descent
             max_baseline = self.height - margin - font_ascent
             text_x = text_y = 0.0
+            placed = False
             for dx, dy in ((6, 5), (6, -10), (-text_width - 6, 5), (-text_width - 6, -10), (12, 16), (-text_width - 12, 16)):
                 candidate_x = min(max(x + dx, margin), self.width - text_width - margin)
                 candidate_y = min(max(y + dy, min_baseline), max_baseline)
@@ -279,6 +285,7 @@ class _RouteMap(Flowable):
                 if not any(box[0] < other[2] and box[2] > other[0] and box[1] < other[3] and box[3] > other[1] for other in occupied):
                     text_x, text_y = candidate_x, candidate_y
                     occupied.append(box)
+                    placed = True
                     break
             else:
                 # Deterministic grid fallback for crowded marker clusters.
@@ -292,12 +299,19 @@ class _RouteMap(Flowable):
                             text_x, text_y = grid_x, grid_y; occupied.append(box); placed = True; break
                     if placed:
                         break
+            if not placed:
+                skipped_labels += 1
+                continue
             canvas.setFillColor(colors.HexColor(color))
             for line_index, line in enumerate(lines):
                 canvas.drawString(text_x, text_y - line_index * line_height, line)
-        for x, y, _label, color, marker in endpoint_positions:
+        for _priority, _sequence, x, y, _label, color, marker in endpoint_positions:
             canvas.setFillColor(colors.HexColor(color)); canvas.circle(x, y, 4, stroke=0, fill=1); canvas.setFillColor(colors.white); canvas.setFont("Helvetica-Bold", 6); canvas.drawCentredString(x, y - 2, marker)
-        canvas.setFillColor(colors.HexColor("#667085")); canvas.setFont("Helvetica", 7); canvas.drawString(pad, 5, ("S = Start, Z = Ziel, Ü = Übernachtungsplatz" if self.language == "de" else "S = start, Z = destination, O = overnight place")); canvas.restoreState()
+        legend = "S = Start, Z = Ziel, Ü = Übernachtungsplatz" if self.language == "de" else "S = start, Z = destination, O = overnight place"
+        if skipped_labels:
+            hint = f"Weitere {skipped_labels} Ortsbeschriftungen nicht dargestellt." if self.language == "de" else f"{skipped_labels} additional location labels not shown."
+            legend += f"; {hint}"
+        canvas.setFillColor(colors.HexColor("#667085")); canvas.setFont("Helvetica", 7); canvas.drawString(pad, 5, legend); canvas.restoreState()
 
 
 def _paragraph(value: Any, style: ParagraphStyle, fallback: str = "–") -> Paragraph:

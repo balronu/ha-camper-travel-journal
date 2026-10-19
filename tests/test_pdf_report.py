@@ -186,6 +186,64 @@ def test_route_map_keeps_coordinate_fallback_labels_unrendered():
     assert "S = start, Z = destination, O = overnight place" in labels
 
 
+def test_route_map_drops_unplaceable_labels_without_origin_stack_and_is_deterministic():
+    from io import BytesIO
+    from reportlab.pdfgen.canvas import Canvas
+
+    def draw_labels(drive_count, language):
+        segments = []
+        endpoint_labels = {}
+        for index in range(drive_count):
+            drive_id = f"drive-{index}"
+            segments.append({"drive_id": drive_id, "points": [{"latitude": 53.0, "longitude": 8.0}, {"latitude": 53.0, "longitude": 8.0}]})
+            endpoint_labels[drive_id] = (f"Start {index} mit langem Ortsnamen", f"Ziel {index} mit langem Ortsnamen")
+        canvas = Canvas(BytesIO())
+        calls = []
+        original_draw_string = canvas.drawString
+        canvas.drawString = lambda x, y, value: (calls.append((x, y, value)), original_draw_string(x, y, value))[1]
+        route_map = _RouteMap(segments, width=200, height=120, language=language, endpoint_labels=endpoint_labels)
+        route_map.canv = canvas
+        route_map.draw()
+        return calls
+
+    for language, hint in (("de", "Ortsbeschriftungen nicht dargestellt."), ("en", "additional location labels not shown.")):
+        for drive_count in (20, 40):
+            first, second = draw_labels(drive_count, language), draw_labels(drive_count, language)
+            assert first == second
+            assert any(hint in value for _x, _y, value in first)
+            assert not any(x == 0 and y == 0 for x, y, value in first if hint not in value)
+            assert any(value == "Start 0 mit langem Ortsnamen" for _x, _y, value in first)
+
+
+def test_route_map_prioritizes_trip_endpoints_and_overnight_labels_when_crowded():
+    from io import BytesIO
+    from reportlab.pdfgen.canvas import Canvas
+
+    segments = []
+    endpoint_labels = {}
+    for index in range(20):
+        drive_id = f"drive-{index}"
+        segments.append({"drive_id": drive_id, "points": [{"latitude": 53.0, "longitude": 8.0}, {"latitude": 53.0, "longitude": 8.0}]})
+        endpoint_labels[drive_id] = (f"Start {index}", f"Ziel {index}")
+    canvas = Canvas(BytesIO())
+    labels = []
+    original_draw_string = canvas.drawString
+    canvas.drawString = lambda x, y, value: (labels.append(value), original_draw_string(x, y, value))[1]
+    route_map = _RouteMap(
+        segments,
+        width=200,
+        height=120,
+        language="de",
+        endpoint_labels=endpoint_labels,
+        stops=[{"name": "Übernachtungsplatz", "place_type": "rv_site", "latitude": 53.0, "longitude": 8.0}],
+    )
+    route_map.canv = canvas
+    route_map.draw()
+    assert "Start 0" in labels
+    assert "Ziel 19" in labels
+    assert "Übernachtungsplatz" in labels
+
+
 def test_report_skips_invalid_route_points_without_losing_valid_segments():
     report = _report(drives=1, expenses=0, stops=0)
     report["route_segments"] = [
