@@ -170,8 +170,10 @@ class V03PlaceTests(unittest.TestCase):
         gap_id = f"{first}:{second}"
         self.store.assign_interruption(self.trip, gap_id, self.now, status="stop", stop_id=stop)
         after = self.store.list_stops("v1", self.trip)[0]
-        self.assertEqual(self.store.list_trip_interruptions("v1", self.trip)[0]["status"], "stop")
-        self.assertEqual(self.store.list_trip_interruptions("v1", self.trip)[0]["existing_place_id"], stop)
+        interruption = self.store.list_trip_interruptions("v1", self.trip)[0]
+        self.assertEqual(interruption["status"], "stop")
+        self.assertEqual(interruption["existing_place_id"], stop)
+        self.assertEqual(interruption["existing_place_name"], "Kuhhirten")
         self.assertEqual((after["name"], after["address"], after["id"]), (before["name"], before["address"], stop))
         self.assertEqual(self.store.connection.execute("SELECT count(*) FROM stops WHERE id=?", (stop,)).fetchone()[0], 1)
 

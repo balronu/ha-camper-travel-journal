@@ -646,7 +646,7 @@ class SQLiteStore:
         query = "SELECT d.*, td.trip_id FROM drives d LEFT JOIN trip_drives td ON td.drive_id=d.id WHERE d.vehicle_id=?"
         args: list = [vehicle_id]
         if trip_id: query += " AND td.trip_id=?"; args.append(trip_id)
-        return [self._drive_dict(row) for row in self.connection.execute(query + " ORDER BY d.started_at DESC", args).fetchall()]
+        return self._with_saved_place_labels(vehicle_id, [self._drive_dict(row) for row in self.connection.execute(query + " ORDER BY d.started_at DESC", args).fetchall()])
 
     def list_trip_interruptions(self, vehicle_id: str, trip_id: str) -> list[dict]:
         """Derive gaps between consecutive assigned drives without persisting them.
@@ -714,6 +714,13 @@ class SQLiteStore:
             # status or hide the assignment action.
             status = link[0] if link else "unassigned"
             stop_id = link[1] if link else None
+            existing_place_name = None
+            if stop_id:
+                place = self.connection.execute(
+                    "SELECT name FROM stops WHERE id=? AND vehicle_id=? AND (trip_id=? OR trip_id IS NULL)",
+                    (stop_id, vehicle_id, trip_id),
+                ).fetchone()
+                existing_place_name = place[0] if place else None
             candidates = [
                 {
                     "id": candidate[0],
@@ -737,6 +744,7 @@ class SQLiteStore:
                 "previous_end_point": dict(last) if last else None,
                 "next_start_point": dict(first) if first else None,
                 "existing_place_id": stop_id,
+                "existing_place_name": existing_place_name,
                 "existing_places": candidates,
             })
         return result
@@ -833,7 +841,20 @@ class SQLiteStore:
 
     def list_available_drives(self, vehicle_id: str) -> list[dict]:
         if self.connection is None: raise RuntimeError("store is not open")
-        return [self._drive_dict(row) for row in self.connection.execute("SELECT d.*, NULL AS trip_id FROM drives d LEFT JOIN trip_drives td ON td.drive_id=d.id WHERE d.vehicle_id=? AND td.drive_id IS NULL ORDER BY d.started_at DESC", (vehicle_id,)).fetchall()]
+        return self._with_saved_place_labels(vehicle_id, [self._drive_dict(row) for row in self.connection.execute("SELECT d.*, NULL AS trip_id FROM drives d LEFT JOIN trip_drives td ON td.drive_id=d.id WHERE d.vehicle_id=? AND td.drive_id IS NULL ORDER BY d.started_at DESC", (vehicle_id,)).fetchall()])
+
+    def _with_saved_place_labels(self, vehicle_id: str, drives: list[dict]) -> list[dict]:
+        """Use explicitly saved place names for nearby GPX endpoints only."""
+        places = self.connection.execute("SELECT name,latitude,longitude FROM stops WHERE vehicle_id=? AND confirmed=1 AND latitude IS NOT NULL AND longitude IS NOT NULL", (vehicle_id,)).fetchall()
+        for drive in drives:
+            for prefix in ("start", "end"):
+                if drive.get(f"{prefix}_label") and "," not in drive[f"{prefix}_label"]: continue
+                lat, lon = drive.get(f"{prefix}_latitude"), drive.get(f"{prefix}_longitude")
+                if lat is None or lon is None: continue
+                nearest = min(places, key=lambda place: (float(place[1]) - lat) ** 2 + (float(place[2]) - lon) ** 2, default=None)
+                if nearest and (float(nearest[1]) - lat) ** 2 + (float(nearest[2]) - lon) ** 2 <= 0.01 ** 2:
+                    drive[f"{prefix}_label"] = nearest[0]
+        return drives
 
     @staticmethod
     def _drive_dict(row) -> dict:

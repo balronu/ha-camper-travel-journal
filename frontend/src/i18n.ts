@@ -122,6 +122,13 @@ export function formatCompactTripPeriod(trip: { start_date?: string | null; end_
 
 export function statusLabel(status: string, hass?: Hass): string { return messages(hass).statuses[status] ?? status; }
 export function categoryLabel(category: string, hass?: Hass): string { return messages(hass).categories[category] ?? category; }
+const LEGACY_EXPENSE_CATEGORY_IDS: Record<string, ExpenseCategory> = {
+  "Stellplatz/Campingplatz": "camping", "Campingplatz": "camping", camping: "camping",
+  Kraftstoff: "fuel", Fuel: "fuel", fuel: "fuel", Maut: "toll", Toll: "toll", toll: "toll",
+  Parkplatz: "parking", Parking: "parking", parking: "parking", Essen: "food", Food: "food", food: "food",
+  Aktivitäten: "activities", Activities: "activities", activities: "activities", Sonstiges: "other", Other: "other", other: "other",
+};
+export function normalizeExpenseCategory(value: string | undefined | null): string { const raw = (value ?? "").trim(); return LEGACY_EXPENSE_CATEGORY_IDS[raw] ?? raw; }
 export function placeCategoryLabel(category: string | undefined, hass?: Hass): string {
   const lang = messages(hass);
   const labels: Record<string, string | undefined> = {

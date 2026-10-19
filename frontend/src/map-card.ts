@@ -188,10 +188,18 @@ export class MapCard extends TravelCard {
       bounds.extend([this.draftPoint.latitude, this.draftPoint.longitude]);
     }
     if (this.fitMapPending && bounds.isValid()) {
-      this.map.fitBounds(bounds.pad(0.08));
-      this.fitMapPending = false;
+      const map = this.map;
+      setTimeout(() => {
+        if (!this.map || this.map !== map || !bounds.isValid()) return;
+        this.map.invalidateSize({ pan: false });
+        if (this.fitMapPending) {
+          this.map.fitBounds(bounds.pad(0.08), { animate: false, maxZoom: 15 });
+          this.fitMapPending = false;
+        }
+      }, 0);
+    } else {
+      setTimeout(() => this.map?.invalidateSize({ pan: false }), 0);
     }
-    setTimeout(() => this.map?.invalidateSize(), 0);
   }
 
   private readonly onMapClick = (event: L.LeafletMouseEvent) => {

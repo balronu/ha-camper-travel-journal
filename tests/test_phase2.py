@@ -115,6 +115,16 @@ class Phase2Tests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "expense_not_found"):
             self.store.delete_expense("missing")
 
+    def test_saved_place_names_are_used_for_gpx_drive_endpoints_without_changing_distance(self):
+        trip_id = self.store.create_trip("v1", "Ortsnamen", self.now, self.now)
+        self.store.create_stop(Stop("", "v1", "Sulzbach", self.now, trip_id=trip_id, automatic=False, latitude=49.29419, longitude=7.05182), self.now)
+        self.store.create_stop(Stop("", "v1", "Bremen", self.now, trip_id=trip_id, automatic=False, latitude=53.06452, longitude=8.82002), self.now)
+        with self.store.transaction() as connection:
+            connection.execute("INSERT INTO drives(id,vehicle_id,started_at,ended_at,distance_m,end_reason,source,start_latitude,start_longitude,end_latitude,end_longitude,created_at) VALUES(?,?,?,?,?,?,?,?,?,?,?,?)", ("named-drive", "v1", self.now.isoformat(), self.now.isoformat(), 1118700, "stop", "gpx", 49.29419, 7.05182, 53.06452, 8.82002, self.now.isoformat()))
+            connection.execute("INSERT INTO trip_drives(trip_id,drive_id,linked_at) VALUES(?,?,?)", (trip_id, "named-drive", self.now.isoformat()))
+        drive = self.store.list_drives("v1", trip_id=trip_id)[0]
+        self.assertEqual((drive["start_label"], drive["end_label"], drive["distance_m"]), ("Sulzbach", "Bremen", 1118700))
+
 
 if __name__ == "__main__":
     unittest.main()

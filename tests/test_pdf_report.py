@@ -2,7 +2,7 @@ import unittest
 
 try:
     from reportlab.platypus import KeepTogether, Paragraph, Table
-    from custom_components.camper_travel_journal.pdf_report import _category_label, _date, _date_time, _duration, _expense_time, _place_label, _time, render_trip_report
+    from custom_components.camper_travel_journal.pdf_report import _RouteMap, _category_label, _date, _date_time, _duration, _expense_time, _place_label, _time, render_trip_report
 except ModuleNotFoundError as error:  # pragma: no cover - CI installs manifest dependency
     if error.name != "reportlab":
         raise
@@ -45,6 +45,19 @@ def test_report_contains_pdf_structure_and_localized_content():
     assert b"/Type /Page" in pdf
     assert filename == "Camper-Travel-Journal_Bremen_Küste_Test_2026.pdf".encode("latin-1").decode("latin-1")
     assert b"49.0" not in pdf
+
+
+def test_report_includes_offline_route_map_from_real_track_points(monkeypatch):
+    import custom_components.camper_travel_journal.pdf_report as pdf_report
+    captured = {}
+    monkeypatch.setattr(pdf_report._ReportDocTemplate, "build", lambda _document, story: captured.setdefault("story", story))
+    report = _report(drives=1, expenses=0, stops=0)
+    report["route_segments"] = [{"drive_id": "drive-0", "points": [
+        {"latitude": 49.29419, "longitude": 7.05182},
+        {"latitude": 53.06452, "longitude": 8.82002},
+    ]}]
+    render_trip_report(report, language="de")
+    assert any(isinstance(item, KeepTogether) and any(isinstance(child, _RouteMap) for child in item._content) for item in captured["story"])
 
 
 def test_empty_report_is_valid_and_multi_page_report_grows():

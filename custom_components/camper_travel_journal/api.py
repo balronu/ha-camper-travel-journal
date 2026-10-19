@@ -196,6 +196,7 @@ if websocket_api is not None:
                 "vehicle_name": vehicle_name,
                 "trip": trip,
                 "drives": await _call(hass, msg, "list_drives", vehicle_id, trip_id=trip_id),
+                "route_segments": await _call(hass, msg, "route_segments", vehicle_id, trip_id),
                 "interruptions": await _call(hass, msg, "list_trip_interruptions", vehicle_id, trip_id),
                 "stops": await _call(hass, msg, "list_stops", vehicle_id, trip_id=trip_id),
                 "expenses": await _call(hass, msg, "list_expenses", trip_id),
