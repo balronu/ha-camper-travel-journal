@@ -179,19 +179,25 @@ class _RouteMap(Flowable):
         return min(self.width, avail_width), self.height
 
     def draw(self):
-        valid_segments = []
+        valid_runs = []
         for segment in self.segments:
-            valid_points = []
+            current_run = []
             for point in segment.get("points", []):
                 try:
                     latitude, longitude = float(point.get("latitude")), float(point.get("longitude"))
                 except (AttributeError, TypeError, ValueError):
+                    if current_run:
+                        valid_runs.append(current_run)
+                        current_run = []
                     continue
                 if isfinite(latitude) and isfinite(longitude) and -90 <= latitude <= 90 and -180 <= longitude <= 180:
-                    valid_points.append((longitude, latitude))
-            if valid_points:
-                valid_segments.append(valid_points)
-        points = [point for segment in valid_segments for point in segment]
+                    current_run.append((longitude, latitude))
+                elif current_run:
+                    valid_runs.append(current_run)
+                    current_run = []
+            if current_run:
+                valid_runs.append(current_run)
+        points = [point for run in valid_runs for point in run]
         canvas = self.canv; canvas.saveState(); canvas.setStrokeColor(colors.HexColor("#d8dee8")); canvas.setFillColor(colors.HexColor("#f8fafc")); canvas.roundRect(0, 0, self.width, self.height, 5, stroke=1, fill=1)
         if not points:
             canvas.setFillColor(colors.HexColor("#667085")); canvas.setFont("Helvetica", 10); canvas.drawCentredString(self.width / 2, self.height / 2, "Keine GPS-Strecke vorhanden" if self.language == "de" else "No GPS route available"); canvas.restoreState(); return
@@ -199,8 +205,8 @@ class _RouteMap(Flowable):
         scale = min((self.width - 2 * pad) / lon_span, (self.height - 2 * pad) / lat_span)
         ox = (self.width - lon_span * scale) / 2 - min_lon * scale; oy = (self.height - lat_span * scale) / 2 - min_lat * scale
         colors_list = ["#1976d2", "#d32f2f", "#388e3c", "#7b1fa2", "#f57c00", "#00796b"]
-        for index, segment in enumerate(valid_segments):
-            segment_points = [(longitude * scale + ox, latitude * scale + oy) for longitude, latitude in segment]
+        for index, run in enumerate(valid_runs):
+            segment_points = [(longitude * scale + ox, latitude * scale + oy) for longitude, latitude in run]
             if len(segment_points) < 2: continue
             path = canvas.beginPath(); path.moveTo(*segment_points[0]); [path.lineTo(*p) for p in segment_points[1:]]; canvas.setStrokeColor(colors.HexColor(colors_list[index % len(colors_list)])); canvas.setLineWidth(2.2); canvas.drawPath(path)
         start = points[0][0] * scale + ox, points[0][1] * scale + oy; end = points[-1][0] * scale + ox, points[-1][1] * scale + oy

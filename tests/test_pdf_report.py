@@ -76,6 +76,25 @@ def test_report_skips_invalid_route_points_without_losing_valid_segments():
     assert pdf.startswith(b"%PDF-")
 
 
+def test_route_map_does_not_connect_across_invalid_points():
+    from io import BytesIO
+    from reportlab.pdfgen.canvas import Canvas
+
+    route_map = _RouteMap([{"points": [
+        {"latitude": 50.0, "longitude": 7.0},
+        {"latitude": "NaN", "longitude": 8.0},
+        {"latitude": 51.0, "longitude": 8.0},
+        {"latitude": 52.0, "longitude": 9.0},
+    ]}], width=200, height=120, language="en")
+    canvas = Canvas(BytesIO())
+    drawn_paths = []
+    original_draw_path = canvas.drawPath
+    canvas.drawPath = lambda path, *args, **kwargs: (drawn_paths.append(path), original_draw_path(path, *args, **kwargs))[1]
+    route_map.canv = canvas
+    route_map.draw()
+    assert len(drawn_paths) == 1
+
+
 def test_empty_report_is_valid_and_multi_page_report_grows():
     empty, _ = render_trip_report(_report(drives=0, expenses=0, stops=0), language="en")
     large = _report(drives=70, expenses=90, stops=20)
