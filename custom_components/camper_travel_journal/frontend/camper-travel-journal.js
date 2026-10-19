@@ -780,6 +780,7 @@ const Yr = ["camping", "fuel", "toll", "parking", "food", "activities", "other"]
     mapPlaces: "Orte anzeigen",
     mapExpandSegments: "Fahrtabschnitte aufklappen",
     overnights: "Übernachtungen",
+    overnightPlaces: "Übernachtungsplätze",
     gpsSuggestions: "GPS-Stoppvorschläge",
     generateSuggestions: "Vorschläge aktualisieren",
     accept: "Übernehmen",
@@ -841,6 +842,7 @@ const Yr = ["camping", "fuel", "toll", "parking", "food", "activities", "other"]
     mapPlaces: "Show places",
     mapExpandSegments: "Expand drive sections",
     overnights: "Overnights",
+    overnightPlaces: "Overnight places",
     gpsSuggestions: "GPS stop suggestions",
     generateSuggestions: "Refresh suggestions",
     accept: "Accept",
@@ -1768,7 +1770,7 @@ class ti extends Rt {
     }}>${this.confirmingPlaceId === _.id ? i.confirmDelete : i.remove}</button><button type="button" class="link" @click=${() => this.startRating(_)}>${_.rating_overall ? i.ratingEdit ?? "Bewertung" : i.ratingAdd ?? "Bewerten"}</button></div></article>`, p = (_, P) => g`<details class="stay-group" open><summary><strong>${_}</strong><span>${P.length}</span></summary>${P.length ? g`<div class="place-list">${P.map(b)}</div>` : g`<p class="muted">${i.noPlaces ?? "Keine Orte gespeichert."}</p>`}</details>`;
     return g`<section class="place-section stay-management"><div class="actions compact-actions"><button type="button" @click=${() => {
       this.resetPlaceForm(), this.placeArrived = this.nowLocalDateTime(), this.openEditor("place-create", s);
-    }}>${i.create ?? "Hinzufügen"}</button></div>${p(i.overnights ?? "Übernachtungsplätze", d)}${p(i.places ?? "Zwischenstopps", f)}${this.renderInterruptions(i, s)}${this.renderSuggestions(i, s)}</section>`;
+    }}>${i.create ?? "Hinzufügen"}</button></div>${p(i.overnightPlaces ?? "Übernachtungsplätze", d)}${p(i.places ?? "Zwischenstopps", f)}${this.renderInterruptions(i, s)}${this.renderSuggestions(i, s)}</section>`;
   }
   renderRatingActions(i, s) {
     const o = (this.snapshot?.stops ?? []).filter((h) => h.rating_overall);
