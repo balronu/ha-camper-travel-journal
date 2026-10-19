@@ -60,6 +60,22 @@ def test_report_includes_offline_route_map_from_real_track_points(monkeypatch):
     assert any(isinstance(item, KeepTogether) and any(isinstance(child, _RouteMap) for child in item._content) for item in captured["story"])
 
 
+def test_report_skips_invalid_route_points_without_losing_valid_segments():
+    report = _report(drives=1, expenses=0, stops=0)
+    report["route_segments"] = [
+        {"drive_id": "drive-0", "points": [
+            {"latitude": 49.0, "longitude": 7.0},
+            {"latitude": "not-a-number", "longitude": 8.0},
+            {"latitude": 53.0, "longitude": 8.0},
+            {"latitude": 91.0, "longitude": 8.0},
+            {"latitude": 53.1, "longitude": 8.1},
+        ]},
+        {"drive_id": "bad", "points": [{"latitude": None, "longitude": 8.0}, {"latitude": 53.2, "longitude": float("inf")}]},
+    ]
+    pdf, _ = render_trip_report(report, language="de")
+    assert pdf.startswith(b"%PDF-")
+
+
 def test_empty_report_is_valid_and_multi_page_report_grows():
     empty, _ = render_trip_report(_report(drives=0, expenses=0, stops=0), language="en")
     large = _report(drives=70, expenses=90, stops=20)

@@ -177,6 +177,14 @@ class V03PlaceTests(unittest.TestCase):
         self.assertEqual((after["name"], after["address"], after["id"]), (before["name"], before["address"], stop))
         self.assertEqual(self.store.connection.execute("SELECT count(*) FROM stops WHERE id=?", (stop,)).fetchone()[0], 1)
 
+    def test_interruption_exposes_assigned_place_name_for_pdf_details(self):
+        first = self.store.create_manual_drive("v1", datetime(2026, 10, 13, 10, tzinfo=UTC), "A", "B", 1, 60, self.now, self.trip)
+        second = self.store.create_manual_drive("v1", datetime(2026, 10, 13, 13, tzinfo=UTC), "C", "D", 1, 60, self.now, self.trip)
+        stop = self.store.create_stop(Stop("", "v1", "Kuhhirten", datetime(2026, 10, 13, 11, tzinfo=UTC), arrived_at=datetime(2026, 10, 13, 11, tzinfo=UTC), departed_at=datetime(2026, 10, 13, 12, tzinfo=UTC), trip_id=self.trip, automatic=False), self.now)
+        self.store.assign_interruption(self.trip, f"{first}:{second}", self.now, status="overnight", stop_id=stop)
+        interruption = self.store.list_trip_interruptions("v1", self.trip)[0]
+        self.assertEqual((interruption["existing_place_id"], interruption["existing_place_name"]), (stop, "Kuhhirten"))
+
     def test_interruption_assignment_is_persistent_reversible_and_does_not_duplicate_place(self):
         first = self.store.create_manual_drive("v1", datetime(2026, 10, 13, 10, tzinfo=UTC), "A", "B", 1, 60, self.now, self.trip)
         second = self.store.create_manual_drive("v1", datetime(2026, 10, 13, 13, tzinfo=UTC), "C", "D", 1, 60, self.now, self.trip)

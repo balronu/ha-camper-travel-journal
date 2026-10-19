@@ -215,6 +215,10 @@ describe("frontend release contract", () => {
     expect(categoryLabel("fuel", german)).toBe("Kraftstoff");
     expect(categoryLabel("fuel", english)).toBe("Fuel");
     expect(normalizeExpenseCategory("Kraftstoff")).toBe("fuel");
+    expect(normalizeExpenseCategory("Parkgebühren")).toBe("parking");
+    expect(normalizeExpenseCategory("Verpflegung")).toBe("food");
+    expect(normalizeExpenseCategory("Camping site")).toBe("camping");
+    expect(normalizeExpenseCategory("Parking fees")).toBe("parking");
     expect(normalizeExpenseCategory("legacy-custom-category")).toBe("legacy-custom-category");
   });
   it("parses cent amounts exactly and formats the selected currency", () => {

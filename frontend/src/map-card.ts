@@ -10,6 +10,13 @@ import { ACTIVE_TRIP_CHANGED_EVENT, publishActiveTrip, readActiveTrip, type Trip
 const COLORS = ["#1976d2", "#d32f2f", "#388e3c", "#7b1fa2", "#f57c00", "#00796b"];
 const LEAFLET_CSS = leafletCss.replace(/\s+/g, " ").trim();
 
+function validRoutePoint(point: { latitude: number; longitude: number }): boolean {
+  return typeof point.latitude === "number" && typeof point.longitude === "number"
+    && Number.isFinite(point.latitude) && Number.isFinite(point.longitude)
+    && point.latitude >= -90 && point.latitude <= 90
+    && point.longitude >= -180 && point.longitude <= 180;
+}
+
 export type MapCardConfig = { vehicle_id: string; trip_id?: string; tile_url?: string; tile_attribution?: string };
 
 export class MapCard extends TravelCard {
@@ -149,18 +156,28 @@ export class MapCard extends TravelCard {
     const bounds = L.latLngBounds([]);
     const lang = messages(this.hass);
     for (const [index, segment] of (this.data?.segments ?? []).entries()) {
-      const points = segment.points.map((point) => L.latLng(point.latitude, point.longitude));
-      if (!points.length) continue;
+      const runs: typeof segment.points[] = [];
+      let currentRun: typeof segment.points = [];
+      for (const point of segment.points) {
+        if (validRoutePoint(point)) currentRun.push(point);
+        else if (currentRun.length) { runs.push(currentRun); currentRun = []; }
+      }
+      if (currentRun.length) runs.push(currentRun);
+      if (!runs.length) continue;
       const driveIndex = this.drives.findIndex((drive) => drive.id === segment.drive_id);
       const color = this.driveColor(driveIndex >= 0 ? driveIndex : index);
-      const line = L.polyline(points, { color, weight: 4, opacity: 0.85 }).addTo(this.map);
-      this.layers.push(line);
-      points.forEach((point) => bounds.extend(point));
-      const start = L.circleMarker(points[0], { radius: 6, color, fillOpacity: 1 }).bindTooltip(lang.mapStart).bindPopup(this.endpointPopup(lang.mapStart, segment.points[0])).addTo(this.map);
-      const end = L.circleMarker(points[points.length - 1], { radius: 6, color: "#111", fillColor: color, fillOpacity: 1 }).bindTooltip(lang.mapEnd).bindPopup(this.endpointPopup(lang.mapEnd, segment.points[segment.points.length - 1])).addTo(this.map);
-      this.layers.push(start, end);
+      for (const run of runs) {
+        const points = run.map((point) => L.latLng(point.latitude, point.longitude));
+        if (points.length > 1) this.layers.push(L.polyline(points, { color, weight: 4, opacity: 0.85 }).addTo(this.map));
+        points.forEach((point) => bounds.extend(point));
+        const start = L.circleMarker(points[0], { radius: 6, color, fillOpacity: 1 }).bindTooltip(lang.mapStart).bindPopup(this.endpointPopup(lang.mapStart, run[0])).addTo(this.map);
+        const end = L.circleMarker(points[points.length - 1], { radius: 6, color: "#111", fillColor: color, fillOpacity: 1 }).bindTooltip(lang.mapEnd).bindPopup(this.endpointPopup(lang.mapEnd, run[run.length - 1])).addTo(this.map);
+        this.layers.push(start, end);
+      }
       for (const gap of segment.gaps) {
-        const gapPoint = points[Math.max(0, Math.floor(points.length / 2))];
+        const markerRun = runs.find((run) => run.length);
+        if (!markerRun) continue;
+        const gapPoint = L.latLng(markerRun[Math.max(0, Math.floor(markerRun.length / 2))].latitude, markerRun[Math.max(0, Math.floor(markerRun.length / 2))].longitude);
         const marker = L.circleMarker(gapPoint, { radius: 8, color: "#f57c00", fillOpacity: 0.9 }).bindTooltip(`${lang.mapGap}: ${gap.seconds}s`).addTo(this.map);
         this.layers.push(marker);
       }
