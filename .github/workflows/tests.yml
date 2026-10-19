@@ -111,14 +111,14 @@ jobs:
             chromium --headless --no-sandbox --disable-gpu --window-size="${width},900" --virtual-time-budget=5000 \
               --dump-dom http://127.0.0.1:8765/frontend/tests/browser/journal-responsive-beta12.html >/tmp/camper-travel-journal-responsive-dom.html
             node - <<'NODE'
-            const fs = require('fs');
-            const html = fs.readFileSync('/tmp/camper-travel-journal-responsive-dom.html', 'utf8');
-            const match = html.match(/<pre id="result">([\s\S]*?)<\/pre>/);
-            if (!match) throw new Error('responsive harness returned no result');
-            const result = JSON.parse(match[1]);
-            if (result.metricCount !== 5 || !result.labelsInsideCards || !result.noHorizontalOverflow || !result.overnightVisible || result.visibleTemplateLeak) throw new Error(`responsive metrics failed: ${JSON.stringify(result)}`);
-            console.log(JSON.stringify(result));
-            NODE
+          const fs = require('fs');
+          const html = fs.readFileSync('/tmp/camper-travel-journal-responsive-dom.html', 'utf8');
+          const match = html.match(/<pre id="result">([\s\S]*?)<\/pre>/);
+          if (!match) throw new Error('responsive harness returned no result');
+          const result = JSON.parse(match[1]);
+          if (result.metricCount !== 5 || !result.labelsInsideCards || !result.noHorizontalOverflow || !result.overnightVisible || result.visibleTemplateLeak) throw new Error(`responsive metrics failed: ${JSON.stringify(result)}`);
+          console.log(JSON.stringify(result));
+          NODE
           done
       - name: Run date formatting regression
         run: |
