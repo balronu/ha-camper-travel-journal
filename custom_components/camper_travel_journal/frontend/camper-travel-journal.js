@@ -1975,10 +1975,10 @@ function Mo(c) {
 }
 async function zo(c, i, s = Ao) {
   const o = { state: "not_run", durationMs: null };
-  if (!c?.connection) return { version: "0.3.0-beta.13", connectionBefore: "unavailable", connectionAfter: "unavailable", authentication: o, vehicles: o, trips: o, vehicleId: Gi(i) };
+  if (!c?.connection) return { version: "0.3.0", connectionBefore: "unavailable", connectionAfter: "unavailable", authentication: o, vehicles: o, trips: o, vehicleId: Gi(i) };
   const h = Nr(c), d = await Ki(c, { type: "auth/current_user" }, Do, s), f = await Ki(c, { type: "camper_travel_journal/list_vehicles" }, Io, s), b = f.value?.vehicles?.filter((mt) => typeof mt.vehicle_id == "string") ?? [], p = b.length === 1 ? b[0].vehicle_id : void 0, P = await Ki(c, { type: "camper_travel_journal/list", vehicle_id: p ?? i }, Mo, s), { value: y, ...k } = d, { value: w, ...A } = f, { value: N, ...at } = P;
   return {
-    version: "0.3.0-beta.13",
+    version: "0.3.0",
     connectionBefore: h,
     connectionAfter: Nr(c),
     authentication: k,
