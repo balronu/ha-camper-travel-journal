@@ -30,7 +30,7 @@ result.textContent = JSON.stringify({
   values: metrics.map((metric) => metric.querySelector("strong")?.textContent?.trim()),
   labelsInsideCards: labels.every((item) => item.rect && item.card && item.rect.left >= item.card.left - 1 && item.rect.right <= item.card.right + 1),
   noHorizontalOverflow: Boolean(grid && grid.scrollWidth <= grid.clientWidth + 1 && hostRect && hostRect.width <= window.innerWidth + 1),
-  overnightVisible: labels.some((item) => item.text === "Übernachtungsplätze"),
+  overnightVisible: labels.some((item) => item.text === "Übernachtungen"),
   visibleTemplateLeak: /lit\$\d|=>\s*this\.|currentTarget\.value/.test(card.shadowRoot?.textContent ?? ""),
 }, null, 2);
 </script>

@@ -1,5 +1,11 @@
 # Änderungsprotokoll
 
+## 0.3.0-beta.13 – Korrigierte Kosten- und Kartenanzeige
+
+- Die Statistik-Kachel verwendet auf Deutsch und Englisch die kompakte Bezeichnung „Übernachtungen“ beziehungsweise „Overnights“, ohne die zugrunde liegende Kennzahl zu ändern.
+- Die zentrale Kostenansicht besitzt nur noch eine sichtbare Aufklappebene; Anzahl, Anlegen-Button, Liste und Gesamtsumme bleiben darin direkt bedienbar.
+- Die PDF-Reisekarte gruppiert gleiche geografische Darstellungsorte deterministisch, damit Zuhause und bekannte Übernachtungsplätze nicht mehrfach beschriftet werden; unterschiedliche nahe Orte bleiben getrennt.
+
 ## 0.3.0-beta.12 – Kostenanzeige, Heimatzone und Ortsbeschriftungen
 
 - Bearbeitungsdialoge wählen die tatsächlich gespeicherte Kostenkategorie auch beim Wechsel zwischen Ausgaben zuverlässig aus; unbekannte historische Werte bleiben unverändert speicherbar.

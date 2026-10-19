@@ -112,6 +112,31 @@ def test_route_map_draws_valid_overnight_marker_and_skips_invalid_marker():
     assert "S = Start, Z = Ziel, Ü = Übernachtungsplatz" in labels
 
 
+def test_route_map_groups_duplicate_labels_at_the_same_rendered_location():
+    from io import BytesIO
+    from reportlab.pdfgen.canvas import Canvas
+
+    route_map = _RouteMap(
+        [
+            {"drive_id": "d1", "points": [{"latitude": 53.0, "longitude": 8.0}, {"latitude": 53.1, "longitude": 8.1}]},
+            {"drive_id": "d2", "points": [{"latitude": 53.1, "longitude": 8.1}, {"latitude": 53.0, "longitude": 8.0}]},
+        ],
+        width=200, height=120, language="de",
+        endpoint_labels={"d1": ("Zuhause", "Reisemobilstellplatz am Kuhhirten"), "d2": ("Reisemobilstellplatz am Kuhhirten", "Zuhause")},
+        stops=[{"name": "Reisemobilstellplatz am Kuhhirten", "place_type": "rv_site", "latitude": 53.1, "longitude": 8.1}],
+    )
+    canvas = Canvas(BytesIO())
+    labels = []
+    original_draw_string = canvas.drawString
+    canvas.drawString = lambda x, y, value: (labels.append(value), original_draw_string(x, y, value))[1]
+    route_map.canv = canvas
+    route_map.draw()
+    joined = "\n".join(labels)
+    assert joined.count("Zuhause") == 1
+    assert joined.count("Reisemobilstellplatz am") == 1
+    assert joined.count("Kuhhirten") == 1
+
+
 def test_route_map_multiline_label_geometry_stays_inside_map_and_does_not_overlap():
     from io import BytesIO
     from reportlab.pdfgen.canvas import Canvas
@@ -207,7 +232,7 @@ def test_route_map_drops_unplaceable_labels_without_origin_stack_and_is_determin
         return calls
 
     for language, hint in (("de", "Ortsbeschriftungen nicht dargestellt."), ("en", "additional location labels not shown.")):
-        for drive_count in (20, 40):
+        for drive_count in (20, 40, 80):
             first, second = draw_labels(drive_count, language), draw_labels(drive_count, language)
             assert first == second
             assert any(hint in value for _x, _y, value in first)
