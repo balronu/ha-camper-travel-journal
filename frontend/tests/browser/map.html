@@ -30,6 +30,10 @@ for (let attempt = 0; attempt < 120; attempt += 1) {
   if (routeCalls && card.shadowRoot?.querySelector(".leaflet-container")) break;
   await new Promise((resolve) => setTimeout(resolve, 25));
 }
+for (let attempt = 0; attempt < 80; attempt += 1) {
+  if ((card.shadowRoot?.textContent ?? "").includes("background map could not be loaded")) break;
+  await new Promise((resolve) => setTimeout(resolve, 25));
+}
 const text = card.shadowRoot?.textContent ?? "";
 const details = card.shadowRoot?.querySelector("details");
 if (details) { details.open = true; details.dispatchEvent(new Event("toggle")); }
