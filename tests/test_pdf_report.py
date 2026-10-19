@@ -213,6 +213,7 @@ def test_route_map_drops_unplaceable_labels_without_origin_stack_and_is_determin
             assert any(hint in value for _x, _y, value in first)
             assert not any(x == 0 and y == 0 for x, y, value in first if hint not in value)
             assert any(value == "Start 0 mit langem Ortsnamen" for _x, _y, value in first)
+            assert all(y >= 18 for _x, y, value in first if hint not in value)
 
 
 def test_route_map_prioritizes_trip_endpoints_and_overnight_labels_when_crowded():

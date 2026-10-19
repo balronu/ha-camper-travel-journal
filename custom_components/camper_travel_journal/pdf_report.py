@@ -260,6 +260,7 @@ class _RouteMap(Flowable):
         canvas.setFont("Helvetica", 6.5)
         occupied: list[tuple[float, float, float, float]] = []
         font_size, line_height, margin = 6.5, 7.0, 3.0
+        label_bottom = 18.0  # reserve the lower strip for the legend/hint
         # Helvetica's text is drawn from the baseline.  Keep the measured
         # ascent/descent explicit so the collision box matches the glyphs,
         # including the lower lines of a multiline label.
@@ -271,7 +272,7 @@ class _RouteMap(Flowable):
                 continue
             lines = textwrap.wrap(label, width=30, break_long_words=True, break_on_hyphens=False) or [label]
             text_width = max(canvas.stringWidth(line, "Helvetica", 6.5) for line in lines)
-            min_baseline = margin + (len(lines) - 1) * line_height + font_descent
+            min_baseline = label_bottom + (len(lines) - 1) * line_height + font_descent
             max_baseline = self.height - margin - font_ascent
             text_x = text_y = 0.0
             placed = False
