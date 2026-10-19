@@ -6,7 +6,7 @@
 
 <h1 align="center">Camper Travel Journal</h1>
 <p align="center">Dein digitales Wohnmobil-Reisetagebuch für Home Assistant</p>
-<p align="center"><strong>Aktuelle stabile Version: v0.2.0 · v0.3.0-beta.13 in Entwicklung</strong></p>
+<p align="center"><strong>Aktuelle stabile Version: v0.3.0</strong></p>
 
 <p align="center">
   <a href="https://github.com/balronu/ha-camper-travel-journal/releases/latest"><img src="https://img.shields.io/github/v/release/balronu/ha-camper-travel-journal?label=Release" alt="Release"></a>
@@ -58,7 +58,7 @@ Installationen bleibt wichtig.
 1. Öffne **HACS → Integrationen → Benutzerdefinierte Repositories**.
 2. Füge `https://github.com/balronu/ha-camper-travel-journal` als Repository
    vom Typ **Integration** hinzu.
-3. Installiere die stabile Version `v0.2.0`.
+3. Installiere die stabile Version `v0.3.0`.
 4. Starte Home Assistant manuell neu.
 5. Füge die Integration unter **Einstellungen → Geräte & Dienste** hinzu.
 
@@ -179,6 +179,30 @@ werden; manuelle Fahrten sind separat möglich. Kosten werden als ganzzahlige
 Cent-Beträge pro Reise summiert. Unterschiedliche Währungen werden nicht
 stillschweigend addiert.
 
+## Orte, Zuhause und Reverse Geocoding
+
+Fahrtendpunkte können mit manuellen Ortsnamen, der Home-Assistant-Zone
+`zone.home`, eindeutig zugeordneten Aufenthalten oder einem optionalen
+Reverse-Geocoding-Ergebnis beschriftet werden. Manuelle Namen bleiben erhalten;
+ohne eindeutige Information werden Koordinaten angezeigt. Die Zuhause-
+Erkennung verwendet den konfigurierten Radius und legt keinen Aufenthalt
+automatisch an.
+
+Reverse Geocoding ist standardmäßig deaktiviert. Bei ausdrücklicher Aktivierung
+werden nur relevante Fahrtendpunkte an Nominatim übertragen. Timeout, Cache und
+der Offline-Koordinatenfallback bleiben aktiv. Details stehen in der
+[Lovelace- und Datenschutzdokumentation](docs/lovelace.md).
+
+## PDF-Reisebericht
+
+Der authentifizierte Export erzeugt eine deutsche oder englische PDF-Datei im
+Speicher. Sie enthält Übersicht, Fahrten, Aufenthalte, Orte, Bewertungen,
+Ausgaben und eine geografisch korrekte Offline-Reisekarte auf neutralem
+Hintergrund. Start, Ziel und bestätigte Übernachtungsplätze werden markiert;
+identische Ortsbeschriftungen werden gruppiert. Lange Tabellen umbrechen mit
+wiederholten Tabellenköpfen; HTTPS-Webseiten werden als klickbare Links
+ausgegeben.
+
 ## Datenschutz und lokale Datenspeicherung
 
 Die Integration speichert ihre Daten in `camper_travel_journal.db` im
@@ -191,11 +215,7 @@ privaten Koordinaten, Tokens oder unredigierten Logs.
 
 - Der Funktionsumfang ist auf Reisetagebuch, Fahrten, Kosten und den GPX-Import
   konzentriert.
-- Historische Beta-Änderungen bleiben im Changelog dokumentiert; die aktuelle
-  Karten- und PDF-Funktion gehört zur Stable-Version.
-- Beta.5 finalisiert die zentrale Oberfläche und die Migration; vor Stable
-  wird zusätzlich ein authentifizierter Test in einer isolierten Home-
-  Assistant-Instanz benötigt.
+- Historische Beta-Änderungen bleiben im Changelog dokumentiert.
 - Die Retention-Funktion berechnet Kandidaten, löscht in dieser Version aber
   nicht automatisch.
 - Mobile Safari/WebKit und produktive Installationen benötigen weiterhin
@@ -209,9 +229,9 @@ Projektversion steht oben bei den Release-Badges.
 
 Die statusgetrennte Roadmap steht in [docs/ROADMAP.md](docs/ROADMAP.md).
 Weiter geplant sind unter anderem erweiterte Statistiken, Exporte und
-vollständige Lovelace-Verwaltung von Zwischenstopps. Die read-only-
-Kartenansicht und der authentifizierte PDF-Reisebericht sind im aktuellen
-Beta-Zweig bereits vorhanden.
+vollständige Lovelace-Verwaltung von Zwischenstopps. Die Kartenansicht, die
+zentrale Journal Card und der authentifizierte PDF-Reisebericht sind Bestandteil
+von v0.3.0.
 
 ## Support und Mitwirkung
 
@@ -219,7 +239,8 @@ Beta-Zweig bereits vorhanden.
 - [Feature vorschlagen](https://github.com/balronu/ha-camper-travel-journal/issues/new?template=feature_request.yml)
 - [Issues und Pull Requests](https://github.com/balronu/ha-camper-travel-journal/issues)
 - [Releases](https://github.com/balronu/ha-camper-travel-journal/releases)
-- [Architektur](docs/architecture.md) · [Testplan](docs/test-plan.md)
+- [Feature-Matrix](docs/v0.3.0-feature-matrix.md) · [Lovelace-Karten](docs/lovelace.md)
+- [Upgrade](docs/upgrade-v0.3.0.md) · [Architektur](docs/architecture.md) · [Testplan](docs/test-plan.md)
 
 Beiträge mit synthetischen Testdaten, klarer Fehlerbeschreibung und passenden
 Regressionstests sind besonders willkommen. Änderungen an GPS-, Reise- oder
@@ -229,18 +250,3 @@ bewahren.
 ## Lizenz
 
 Camper Travel Journal steht unter der [MIT-Lizenz](LICENSE).
-# v0.3.0-beta.2 development status
-
-The `feature/v0.3.0-beta.2` branch builds on schema v8 without changing the
-v0.2.0 stable installation. It adds authenticated place/overnight/rating APIs,
-explicit GPS stop suggestions, derived read-only gaps between consecutive
-drives, linked expense context, extended PDF sections, confirmed map markers,
-and an explicit map mode for manually adding a place. A gap between drives is
-not a proven stay and is never stored automatically; only a user-confirmed
-place is shown as a place in the manager, map, and PDF. The release also
-contains a provider-neutral public export contract.
-
-GPS suggestions remain pending until a user accepts them. Coordinates,
-descriptions, notes, and expenses are excluded from the public export unless
-explicitly enabled by the caller. No WordPress connection or publication is
-implemented.

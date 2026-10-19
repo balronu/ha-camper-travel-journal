@@ -8,7 +8,8 @@ aktiv. Die versionierte URL bleibt für Browser-Cache-Busting erhalten.
 
 ## Aktueller Stand
 
-Der veröffentlichte Stand `v0.1.0` enthält die Phase-3-Lovelace-Karten
+Der veröffentlichte Stand `v0.3.0` enthält die zentrale Journal Card, die
+Phase-3-Lovelace-Karten
 und die GPX-Importvorschau,
 die optionale read-only-Diagnosekarte und registriert das Bundle
 über den öffentlichen HA-Mechanismus. Der vorherige historische Stand
@@ -24,7 +25,7 @@ Resource-URL folgt dann
 diesem Muster:
 
 ```text
-/camper_travel_journal/camper-travel-journal.js?v=0.1.0
+ /camper_travel_journal/camper-travel-journal.js?v=0.3.0
 ```
 
 `<VERSION>` wird bei jeder Bundle-Änderung erhöht, auch zwischen stabilen

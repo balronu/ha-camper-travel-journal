@@ -1,5 +1,15 @@
 # Änderungsprotokoll
 
+## 0.3.0 – Stable
+
+Stable-Release der vollständigen v0.3.0-Funktionsserie. Enthält zentrale
+Journal- und Kostenverwaltung, GPX-Import und -Backfill, bestätigte Orte und
+Bewertungen, Zuhause-Erkennung, optionales Reverse Geocoding, interaktive und
+offlinefähige PDF-Reisekarten sowie die beta.10–beta.13-Qualitätskorrekturen.
+Siehe [Release Notes](docs/releases/RELEASE_NOTES_v0.3.0.md),
+[Feature-Matrix](docs/v0.3.0-feature-matrix.md) und
+[Upgrade-Hinweise](docs/upgrade-v0.3.0.md).
+
 ## 0.3.0-beta.13 – Korrigierte Kosten- und Kartenanzeige
 
 - Die Statistik-Kachel verwendet auf Deutsch und Englisch die kompakte Bezeichnung „Übernachtungen“ beziehungsweise „Overnights“, ohne die zugrunde liegende Kennzahl zu ändern.

@@ -76,8 +76,8 @@ verschoben werden.
 
 ### Stable
 
-`v0.1.0` ist als Stable veröffentlicht. Release-Notes, HACS-Versionsanzeige,
-Bundle-Version und der annotierte Tag sind konsistent. Die Beta-Tags bleiben
+`v0.3.0` ist als Stable veröffentlicht. Release-Notes, HACS-Versionsanzeige,
+Bundle-Version und der Tag sind konsistent. Die Beta-Tags bleiben
 als historische Rollback-Referenzen bestehen; ihre GitHub-Release-Objekte sind
 nicht mehr Teil der sichtbaren Release-Liste.
 

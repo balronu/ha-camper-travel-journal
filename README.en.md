@@ -6,7 +6,7 @@
 
 <h1 align="center">Camper Travel Journal</h1>
 <p align="center">Your digital camper travel journal for Home Assistant</p>
-<p align="center"><strong>Current stable version: v0.2.0 · v0.3.0-beta.13 in development</strong></p>
+<p align="center"><strong>Current stable version: v0.3.0</strong></p>
 
 <p align="center">
   <a href="https://github.com/balronu/ha-camper-travel-journal/releases/latest"><img src="https://img.shields.io/github/v/release/balronu/ha-camper-travel-journal?label=Release" alt="Release"></a>
@@ -53,7 +53,7 @@ mobile browsers and Home Assistant setups is important.
 1. Open **HACS → Integrations → Custom repositories**.
 2. Add `https://github.com/balronu/ha-camper-travel-journal` as an
    **Integration** repository.
-3. Install the stable `v0.2.0` release.
+3. Install the stable `v0.3.0` release.
 4. Restart Home Assistant manually.
 5. Add the integration under **Settings → Devices & services**.
 
@@ -168,6 +168,28 @@ be linked to or unlinked from a trip, and manual drives can be stored separately
 Expenses are summed per trip as integer cents. Mixed currencies are never added
 silently.
 
+## Places, Home and reverse geocoding
+
+Drive endpoints can be labelled from manual place names, the Home Assistant
+`zone.home`, an unambiguous stay on the same trip, or optional reverse
+geocoding. Manual names are preserved; coordinates remain the fallback when no
+unambiguous information exists. Home detection uses the configured radius and
+never creates a stay automatically.
+
+Reverse geocoding is disabled by default. When explicitly enabled, only
+relevant drive endpoints are sent to Nominatim. Timeout, caching and the
+offline coordinate fallback remain active. See the
+[Lovelace and privacy documentation](docs/lovelace.md).
+
+## PDF travel report
+
+The authenticated export creates a German or English PDF in memory. It
+contains the summary, drives, stays, places, ratings, expenses and a
+geographically correct offline travel map on a neutral background. Start,
+destination and confirmed overnight places are marked; identical labels are
+grouped. Long tables split with repeated headers, and HTTPS websites are
+emitted as clickable links.
+
 ## Privacy and local storage
 
 The integration stores its data in `camper_travel_journal.db` in the Home
@@ -179,10 +201,7 @@ issues or tests.
 ## Known limitations
 
 - The scope is focused on the travel journal, drives, expenses and GPX import.
-- Historical beta changes remain documented in the changelog; the current map
-  and PDF features are part of the stable release.
-- Before Stable, beta.5 additionally requires an authenticated test in an
-  isolated Home Assistant instance.
+- Historical beta changes remain documented in the changelog.
 - Retention calculates candidates but does not automatically delete in this
   version.
 - Mobile Safari/WebKit and productive installations still need practical
@@ -196,8 +215,8 @@ version is shown by the release badges above.
 
 See the status-separated [docs/ROADMAP.md](docs/ROADMAP.md). Planned work
 includes expanded statistics, exports and complete Lovelace stop management.
-The read-only map view and authenticated PDF travel reports are already
-available in the current stable release.
+The map view, central Journal Card and authenticated PDF travel reports are
+part of v0.3.0.
 
 ## Support and contributing
 
@@ -205,7 +224,8 @@ available in the current stable release.
 - [Request a feature](https://github.com/balronu/ha-camper-travel-journal/issues/new?template=feature_request.yml)
 - [Issues and pull requests](https://github.com/balronu/ha-camper-travel-journal/issues)
 - [Releases](https://github.com/balronu/ha-camper-travel-journal/releases)
-- [Architecture](docs/architecture.md) · [Test plan](docs/test-plan.md)
+- [Feature matrix](docs/v0.3.0-feature-matrix.md) · [Lovelace cards](docs/lovelace.md)
+- [Upgrade](docs/upgrade-v0.3.0.md) · [Architecture](docs/architecture.md) · [Test plan](docs/test-plan.md)
 
 Contributions with synthetic test data, a clear problem statement and focused
 regression tests are especially welcome. Changes to GPS, trip or expense logic

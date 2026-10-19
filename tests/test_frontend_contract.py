@@ -12,7 +12,7 @@ def test_beta_contains_the_versioned_lovelace_bundle():
     assert "Lovelace-Karte" in text
     assert "async_register_static_paths" in text
     assert "customElements.get" in text
-    assert "0.1.0" in text
+    assert "0.3.0" in text
     api = (ROOT / "custom_components" / "camper_travel_journal" / "api.py").read_text(encoding="utf-8")
     assert "camper_travel_journal/list_vehicles" in api
     assert "ws_list_vehicles" in api
@@ -33,18 +33,18 @@ def test_frontend_contract_is_linked_from_both_primary_readmes():
 
 
 def test_release_version_is_aligned_across_project_and_readmes():
-    assert 'version = "0.3.0-beta.13"' in (ROOT / "pyproject.toml").read_text(encoding="utf-8")
+    assert 'version = "0.3.0"' in (ROOT / "pyproject.toml").read_text(encoding="utf-8")
     for name in ("README.md", "README.de.md", "README.en.md"):
         text = (ROOT / name).read_text(encoding="utf-8")
-        assert "v0.2.0" in text
+        assert "v0.3.0" in text
         assert "v0.1.0" not in text
 
 
-def test_integration_version_contract_is_beta12():
+def test_integration_version_contract_is_stable():
     init = (ROOT / "custom_components/camper_travel_journal/__init__.py").read_text(encoding="utf-8")
     manifest = json.loads((ROOT / "custom_components/camper_travel_journal/manifest.json").read_text(encoding="utf-8"))
-    assert manifest["version"] == "0.3.0-beta.13"
-    assert 'VERSION = "0.3.0-beta.13"' in init
+    assert manifest["version"] == "0.3.0"
+    assert 'VERSION = "0.3.0"' in init
 
 
 def test_local_home_assistant_brand_asset_is_present():

@@ -1,7 +1,7 @@
 # Camper Travel Journal – Roadmap
 
 This roadmap separates implemented work, current limitations and planned
-features. It is based on the released `v0.1.0` source tree and tests.
+features. It is based on the released `v0.3.0` source tree and tests.
 A database
 table or WebSocket method is not treated as a finished user feature
 without a corresponding UI and test path.
@@ -21,14 +21,13 @@ without a corresponding UI and test path.
 - Expense CRUD, integer-cent totals, mixed-currency protection, inline editing
   and canonical category IDs, including the `camping` round-trip.
 
-## Current stable baseline: `v0.2.0`
+## Current stable baseline: `v0.3.0`
 
 The stable baseline includes deterministic active-trip selection, persistent
-Summary Card trip selection and the documented GPX import workflow. CI covers the
-pinned Home Assistant environment and synthetic/isolated data. Beta 12 adds
-trip periods, visible and assignable drives, manual-drive CRUD and atomic
-schema migration. Existing rows remain untouched until a user explicitly
-edits them.
+Summary Card trip selection, the central Journal Card, GPX import, place and
+rating management, offline PDF maps and the documented privacy boundaries. CI
+covers the pinned Home Assistant environment and synthetic/isolated data.
+Existing rows remain untouched until a user explicitly edits them.
 
 ## Beta 12 – travel periods and drives (published)
 
@@ -79,17 +78,13 @@ remain outside the repository and CI artifacts.
 
 ## Next development phase
 
-- `v0.2.0-beta.3` provides the map/route detail view with explicit GPS
-  point-to-drive membership and neutral handling of ambiguous historical data.
-- `v0.2.0-beta.3` adds optional CARTO Basemaps configuration through the
-  integration Options Flow with secret-safe editing.
 - Continue map hardening with richer drive filtering, point pagination and
-  mobile acceptance before a stable map release.
+  mobile acceptance.
 - Add richer drive filtering and date-range selection without mixing vehicles.
 - Add complete stop creation, editing and deletion to Lovelace.
 - Add acceptance tests for reload, empty data, failures and mobile layout.
 
-## `v0.2.x` – planned travel views
+## `v0.4.x` – planned travel views
 
 - Map view and trip route history.
 - Drive, distance and stop statistics.
