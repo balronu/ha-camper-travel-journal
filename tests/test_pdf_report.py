@@ -72,6 +72,46 @@ def test_report_passes_drive_endpoint_labels_to_offline_route_map(monkeypatch):
     assert route_map.endpoint_labels == {"drive-0": ("Bremen", "Küste")}
 
 
+def test_report_passes_only_overnight_stops_to_route_map(monkeypatch):
+    import custom_components.camper_travel_journal.pdf_report as pdf_report
+
+    captured = {}
+    monkeypatch.setattr(pdf_report._ReportDocTemplate, "build", lambda _document, story: captured.setdefault("story", story))
+    report = _report(drives=1, expenses=0, stops=0)
+    report["route_segments"] = [{"drive_id": "drive-0", "points": [{"latitude": 53.0, "longitude": 8.0}, {"latitude": 53.1, "longitude": 8.1}]}]
+    report["stops"] = [
+        {"name": "Reisemobilstellplatz am Kuhhirten", "place_type": "rv_site", "latitude": 53.05, "longitude": 8.81},
+        {"name": "Restaurant", "place_type": "restaurant", "latitude": 53.04, "longitude": 8.80},
+        {"name": "Ungültig", "place_type": "campsite", "latitude": 91, "longitude": 8},
+    ]
+    pdf_report.render_trip_report(report, language="de")
+    route_map = next(child for item in captured["story"] if isinstance(item, KeepTogether) for child in item._content if isinstance(child, _RouteMap))
+    assert [stop["name"] for stop in route_map.stops if stop.get("place_type") == "rv_site"] == ["Reisemobilstellplatz am Kuhhirten"]
+
+
+def test_route_map_draws_valid_overnight_marker_and_skips_invalid_marker():
+    from io import BytesIO
+    from reportlab.pdfgen.canvas import Canvas
+
+    route_map = _RouteMap(
+        [{"drive_id": "d1", "points": [{"latitude": 53.0, "longitude": 8.0}, {"latitude": 53.1, "longitude": 8.1}]}],
+        width=200, height=120, language="de", endpoint_labels={"d1": ("Bremen", "Ziel")},
+        stops=[
+            {"name": "Reisemobilstellplatz am Kuhhirten", "place_type": "rv_site", "latitude": 53.05, "longitude": 8.05},
+            {"name": "Ungültig", "place_type": "rv_site", "latitude": 91, "longitude": 8},
+        ],
+    )
+    canvas = Canvas(BytesIO())
+    labels = []
+    original_draw_string = canvas.drawString
+    canvas.drawString = lambda x, y, value: (labels.append(value), original_draw_string(x, y, value))[1]
+    route_map.canv = canvas
+    route_map.draw()
+    assert "Reisemobilstellplatz am Kuhhirten" == " ".join(labels[2:4])
+    assert "Ungültig" not in labels
+    assert "S = Start, Z = Ziel, Ü = Übernachtungsplatz" in labels
+
+
 def test_report_skips_invalid_route_points_without_losing_valid_segments():
     report = _report(drives=1, expenses=0, stops=0)
     report["route_segments"] = [

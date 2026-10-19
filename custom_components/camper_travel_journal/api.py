@@ -6,7 +6,6 @@ from datetime import date, datetime, timezone
 import base64
 import asyncio
 from math import cos, hypot, radians
-import re
 import time
 from typing import Any
 
@@ -23,13 +22,13 @@ except ImportError:  # pragma: no cover - offline domain tests
 from .models import Expense, Stop
 from .gpx_import import MAX_FILE_BYTES, analyze_gpx
 from .travel import validate_amount, validate_expense_category, validate_expense_currency, validate_transition
+from .validation import is_coordinate_label
 from .const import (
     CARTO_TILE_ATTRIBUTION, CARTO_TILE_URL, CONF_CARTO_API_KEY,
     CONF_HOME_RADIUS, CONF_MAP_PROVIDER, CONF_REVERSE_GEOCODING_ENABLED,
     DEFAULT_HOME_RADIUS_M, DEFAULT_MAX_GPS_GAP, MAP_PROVIDER_CARTO,
 )
 
-_COORDINATE_LABEL_RE = re.compile(r"^\s*[+-]?(?:\d+(?:\.\d+)?|\.\d+)\s*,\s*[+-]?(?:\d+(?:\.\d+)?|\.\d+)\s*$")
 _NOMINATIM_URL = "https://nominatim.openstreetmap.org/reverse"
 
 
@@ -52,7 +51,7 @@ def _language(hass: HomeAssistant) -> str:
 
 
 def _coordinate_label(value: object) -> bool:
-    return isinstance(value, str) and bool(_COORDINATE_LABEL_RE.fullmatch(value))
+    return is_coordinate_label(value)
 
 
 def _address_label(address: object, language: str) -> str | None:

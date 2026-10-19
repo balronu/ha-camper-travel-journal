@@ -2,12 +2,28 @@
 
 from dataclasses import dataclass
 from datetime import datetime, timezone
-from math import asin, cos, radians, sin, sqrt
+from math import asin, cos, isfinite, radians, sin, sqrt
+import re
 
 from .models import GPSPoint
 
 EARTH_RADIUS_M = 6_371_008.8
 DEFAULT_MAX_ACCURACY_M = 1_000.0
+_COORDINATE_LABEL_RE = re.compile(r"^\s*([+-]?(?:\d+(?:\.\d+)?|\.\d+))\s*,\s*([+-]?(?:\d+(?:\.\d+)?|\.\d+))\s*$")
+
+
+def is_coordinate_label(value: object) -> bool:
+    """Return whether a label is an actual, finite lat/lon fallback."""
+    if not isinstance(value, str):
+        return False
+    match = _COORDINATE_LABEL_RE.fullmatch(value)
+    if not match:
+        return False
+    try:
+        latitude, longitude = float(match.group(1)), float(match.group(2))
+    except ValueError:
+        return False
+    return isfinite(latitude) and isfinite(longitude) and -90 <= latitude <= 90 and -180 <= longitude <= 180
 
 
 @dataclass(frozen=True, slots=True)

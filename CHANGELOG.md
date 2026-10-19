@@ -6,7 +6,7 @@
 - Kostenliste und Reiseübersicht formatieren Kalenderdaten lokalisiert und bleiben bei langen deutschen Bezeichnungen responsiv.
 - `zone.home` kann Fahrtendpunkte innerhalb eines konfigurierbaren Radius als „Zuhause“ beschriften, ohne Aufenthalte oder GPX-Daten anzulegen oder zu verändern.
 - Optionales Reverse Geocoding ist standardmäßig deaktiviert; falls ausdrücklich aktiviert, werden nur gerundete relevante Endpunkte mit Cache, Rate Limit und Timeout abgefragt. Ohne Dienst bleibt der Koordinaten-Fallback erhalten.
-- Die offlinefähige PDF-Reisekarte erhält sichere Start-/Zielbeschriftungen und eine verständlichere Legende; Kartentiles und externe Geocoding-Aufrufe sind keine Voraussetzung.
+- Die offlinefähige PDF-Reisekarte erhält sichere Start-/Zielbeschriftungen, validierte Übernachtungsmarker, mehrzeilige kollisionsarme Labels und eine verständlichere Legende; Kartentiles und externe Geocoding-Aufrufe sind keine Voraussetzung.
 
 
 ## 0.3.0-beta.10 – Tatsächliche Ausgabendaten und GPX-Endpunkte

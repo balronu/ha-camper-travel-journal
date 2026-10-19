@@ -103,6 +103,12 @@ def test_endpoint_coordinate_validation_rejects_implicit_values_but_accepts_zero
     for value in (None, "", "not-a-number", float("nan"), float("inf"), 91):
         assert not api._valid_coordinate_pair(value, 8.8)
     assert not api._valid_coordinate_pair(53.0, 181)
+    assert not api._coordinate_label("123, 456")
+    assert not api._coordinate_label("91, 8")
+    assert not api._coordinate_label("49, 181")
+    assert not api._coordinate_label("NaN, 8")
+    assert api._coordinate_label("49.29419, 7.05182")
+    assert api._coordinate_label("0, 0")
 
 
 def test_location_labels_are_conservative_and_localized():
@@ -124,6 +130,9 @@ async def test_home_label_is_display_only_and_manual_label_wins():
     resolved = await api._resolve_drive_labels(hass, {"vehicle_id": "v1"}, drives)
     assert resolved[0]["start_label"] == "Zuhause"
     assert resolved[0]["end_label"] == "Paris, France"
+
+    numeric_manual = [{"start_label": "123, 456", "start_latitude": 53.06452, "start_longitude": 8.82002}]
+    assert (await api._resolve_drive_labels(hass, {"vehicle_id": "v1"}, numeric_manual))[0]["start_label"] == "123, 456"
 
 
 def test_websocket_errors_are_stable_and_do_not_leak_exception_details():
