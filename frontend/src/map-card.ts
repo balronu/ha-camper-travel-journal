@@ -10,11 +10,15 @@ import { ACTIVE_TRIP_CHANGED_EVENT, publishActiveTrip, readActiveTrip, type Trip
 const COLORS = ["#1976d2", "#d32f2f", "#388e3c", "#7b1fa2", "#f57c00", "#00796b"];
 const LEAFLET_CSS = leafletCss.replace(/\s+/g, " ").trim();
 
-function validRoutePoint(point: { latitude: number; longitude: number }): boolean {
-  return typeof point.latitude === "number" && typeof point.longitude === "number"
-    && Number.isFinite(point.latitude) && Number.isFinite(point.longitude)
-    && point.latitude >= -90 && point.latitude <= 90
-    && point.longitude >= -180 && point.longitude <= 180;
+function validCoordinatePair(latitude: unknown, longitude: unknown): boolean {
+  return typeof latitude === "number" && typeof longitude === "number"
+    && Number.isFinite(latitude) && Number.isFinite(longitude)
+    && latitude >= -90 && latitude <= 90
+    && longitude >= -180 && longitude <= 180;
+}
+
+function validRoutePoint(point: { latitude?: unknown; longitude?: unknown } | null | undefined): boolean {
+  return validCoordinatePair(point?.latitude, point?.longitude);
 }
 
 export type MapCardConfig = { vehicle_id: string; trip_id?: string; tile_url?: string; tile_attribution?: string };
@@ -184,9 +188,11 @@ export class MapCard extends TravelCard {
     }
     for (const place of this.places) {
       if (!this.showPlaces) continue;
-      if (place.latitude == null || place.longitude == null || place.confirmed === false) continue;
+      if (place.confirmed === false || !validCoordinatePair(place.latitude, place.longitude)) continue;
+      const latitude = place.latitude as number;
+      const longitude = place.longitude as number;
       const overnight = ["campsite", "rv_site", "wild_camp", "overnight"].includes(place.place_kind || place.place_type || place.stop_type);
-      const marker = L.circleMarker([place.latitude, place.longitude], { radius: overnight ? 9 : 7, color: overnight ? "#7b1fa2" : "#455a64", fillColor: overnight ? "#ce93d8" : "#90a4ae", fillOpacity: 0.95, weight: 2 });
+      const marker = L.circleMarker([latitude, longitude], { radius: overnight ? 9 : 7, color: overnight ? "#7b1fa2" : "#455a64", fillColor: overnight ? "#ce93d8" : "#90a4ae", fillOpacity: 0.95, weight: 2 });
       const rating = place.rating_overall ? ` · ${place.rating_overall}/5` : "";
       const popup = document.createElement("div");
       const title = document.createElement("strong");
@@ -197,12 +203,14 @@ export class MapCard extends TravelCard {
       marker.bindPopup(popup);
       marker.addTo(this.map);
       this.layers.push(marker);
-      bounds.extend([place.latitude, place.longitude]);
+      bounds.extend([latitude, longitude]);
     }
-    if (this.draftPoint) {
-      const preview = L.circleMarker([this.draftPoint.latitude, this.draftPoint.longitude], { radius: 10, color: "#f57c00", fillColor: "#ffcc80", fillOpacity: 0.9, weight: 3 }).bindTooltip(lang.mapAddPlace ?? "Ort hinzufügen").addTo(this.map);
+    if (this.draftPoint && validCoordinatePair(this.draftPoint.latitude, this.draftPoint.longitude)) {
+      const latitude = this.draftPoint.latitude as number;
+      const longitude = this.draftPoint.longitude as number;
+      const preview = L.circleMarker([latitude, longitude], { radius: 10, color: "#f57c00", fillColor: "#ffcc80", fillOpacity: 0.9, weight: 3 }).bindTooltip(lang.mapAddPlace ?? "Ort hinzufügen").addTo(this.map);
       this.layers.push(preview);
-      bounds.extend([this.draftPoint.latitude, this.draftPoint.longitude]);
+      bounds.extend([latitude, longitude]);
     }
     if (this.fitMapPending && bounds.isValid()) {
       const map = this.map;
@@ -245,7 +253,7 @@ export class MapCard extends TravelCard {
   }
 
   private nearestRoutePoint(latitude: number, longitude: number) {
-    const points = (this.data?.segments ?? []).flatMap((segment) => segment.points);
+    const points = (this.data?.segments ?? []).flatMap((segment) => segment.points).filter(validRoutePoint);
     return points.reduce<typeof points[number] | undefined>((nearest, point) => {
       if (!nearest) return point;
       const distance = (point.latitude - latitude) ** 2 + (point.longitude - longitude) ** 2;
@@ -337,6 +345,8 @@ export class MapCard extends TravelCard {
     const selectedDrives = this.selectedDrives();
     const totalDistance = selectedDrives.reduce((sum, drive) => sum + drive.distance_m, 0) / 1000;
     const tileAttribution = manualConfig.tile_attribution ?? this.mapConfig?.tile_attribution ?? undefined;
+    const hasValidRoutePoints = (this.data?.segments ?? []).some((segment) => segment.points.some(validRoutePoint));
+    const hasValidPlaces = this.showPlaces && this.places.some((place) => place.confirmed !== false && validCoordinatePair(place.latitude, place.longitude));
     return html`<ha-card>
       <header class="map-header">
         <div><h2>${lang.mapTitle}</h2><p class="vehicle-context">${this.vehicleName || lang.mapVehicle}</p></div>
@@ -357,7 +367,7 @@ export class MapCard extends TravelCard {
       ${this.error ? html`<p class="error" role="alert">${this.error}</p>` : ""}
       ${this.tileError ? html`<p class="error" role="alert">${messages(this.hass).mapTilesUnavailable ?? (this.hass?.locale?.language?.toLowerCase().startsWith("de") ? "Die Hintergrundkarte konnte nicht geladen werden. Die GPS-Route bleibt sichtbar." : "The background map could not be loaded. The GPS route remains visible.")}</p>` : !manualConfig.tile_url && !this.mapConfig?.tile_url ? html`<p class="muted" role="status">${messages(this.hass).mapTilesNotConfigured ?? (this.hass?.locale?.language?.toLowerCase().startsWith("de") ? "Keine Hintergrundkarte konfiguriert. Die GPS-Route bleibt sichtbar." : "No background map is configured. The GPS route remains visible.")}</p>` : ""}
       ${this.data?.truncated ? html`<p class="muted">${lang.mapTruncated}: ${this.data.returned_points} / ${this.data.total_points}</p>` : ""}
-      ${!this.loading && !this.data?.segments.length ? html`<p class="muted">${lang.mapNoPoints}</p>` : ""}
+      ${!this.loading && !hasValidRoutePoints ? html`<p class="muted" role="status">${hasValidPlaces ? (lang.mapNoRouteWithPlaces ?? "No valid GPS route is available; saved places are shown.") : (lang.mapNoValidPoints ?? "No valid GPS points are available for this trip.")}</p>` : ""}
       <div class="map" role="img" aria-label=${lang.mapRouteImageAlt}></div>
       ${tileAttribution ? html`<p class="attribution">${tileAttribution}</p>` : ""}
       ${this.loading ? html`<p class="muted">${lang.loading}</p>` : ""}
