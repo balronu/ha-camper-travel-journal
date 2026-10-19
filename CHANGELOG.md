@@ -317,3 +317,8 @@
 - Extended the ReportLab report with place type, stay duration, ratings and linked expense context while preserving timezone-aware output.
 - Added a provider-neutral public export contract with coordinates, descriptions, notes and expenses opt-in only.
 - Extended the map bundle with confirmed place markers and typed place API helpers. No fifth card was added.
+## 0.3.0-beta.11
+
+- Correct expense category editing for canonical and legacy values; improve responsive expense actions and the optional time checkbox.
+- Add responsive overnight-place metrics, robust route-map fitting, saved-place endpoint labels, and an offline GPX route map in PDF reports.
+- Preserve GPX data, distances, manual labels, and existing migration semantics; no external geocoding is required.

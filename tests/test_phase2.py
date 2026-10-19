@@ -115,6 +115,54 @@ class Phase2Tests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "expense_not_found"):
             self.store.delete_expense("missing")
 
+    def test_saved_place_names_are_used_for_gpx_drive_endpoints_without_changing_distance(self):
+        trip_id = self.store.create_trip("v1", "Ortsnamen", self.now, self.now)
+        self.store.create_stop(Stop("", "v1", "Sulzbach", self.now, trip_id=trip_id, automatic=False, latitude=49.29419, longitude=7.05182), self.now)
+        self.store.create_stop(Stop("", "v1", "Bremen", self.now, trip_id=trip_id, automatic=False, latitude=53.06452, longitude=8.82002), self.now)
+        with self.store.transaction() as connection:
+            connection.execute("INSERT INTO drives(id,vehicle_id,started_at,ended_at,distance_m,end_reason,source,start_latitude,start_longitude,end_latitude,end_longitude,created_at) VALUES(?,?,?,?,?,?,?,?,?,?,?,?)", ("named-drive", "v1", self.now.isoformat(), self.now.isoformat(), 1118700, "stop", "gpx", 49.29419, 7.05182, 53.06452, 8.82002, self.now.isoformat()))
+            connection.execute("INSERT INTO trip_drives(trip_id,drive_id,linked_at) VALUES(?,?,?)", (trip_id, "named-drive", self.now.isoformat()))
+        drive = self.store.list_drives("v1", trip_id=trip_id)[0]
+        self.assertEqual((drive["start_label"], drive["end_label"], drive["distance_m"]), ("Sulzbach", "Bremen", 1118700))
+
+    def test_unknown_legacy_expense_category_only_survives_an_unchanged_update(self):
+        trip_id = self.store.create_trip("v1", "Legacy-Kategorie", self.now, self.now)
+        with self.store.transaction() as connection:
+            connection.execute(
+                "INSERT INTO expenses(id,trip_id,occurred_at,category,amount_minor,currency,created_at,updated_at,occurred_on,occurred_time) VALUES(?,?,?,?,?,?,?,?,?,?)",
+                ("legacy-expense", trip_id, self.now.isoformat(), "HistorischeSonderkategorie", 10504, "EUR", self.now.isoformat(), self.now.isoformat(), "2026-10-01", "12:34"),
+            )
+        self.store.update_expense("legacy-expense", self.now, amount_minor=10504, category="HistorischeSonderkategorie", occurred_on="2026-10-01", occurred_time="12:34")
+        row = self.store.list_expenses(trip_id)[0]
+        self.assertEqual((row["category"], row["amount_minor"], row["occurred_on"], row["occurred_time"]), ("HistorischeSonderkategorie", 10504, "2026-10-01", "12:34"))
+        self.store.update_expense("legacy-expense", self.now, category="fuel")
+        self.assertEqual(self.store.list_expenses(trip_id)[0]["category"], "fuel")
+        with self.assertRaisesRegex(ValueError, "expense_category_invalid"):
+            self.store.update_expense("legacy-expense", self.now, category="new-manipulated-category")
+
+    def test_saved_place_resolution_preserves_manual_labels_and_requires_unique_same_trip_match(self):
+        trip_id = self.store.create_trip("v1", "Ortsauflösung", self.now, self.now)
+        other_trip = self.store.create_trip("v1", "Andere Reise", self.now, self.now)
+        self.store.create_stop(Stop("", "v1", "Bremen", self.now, trip_id=trip_id, automatic=False, latitude=53.06452, longitude=8.82002), self.now)
+        self.store.create_stop(Stop("", "v1", "Bremen doppelt", self.now, trip_id=trip_id, automatic=False, latitude=53.06452, longitude=8.82002), self.now)
+        self.store.create_stop(Stop("", "v1", "Fremde Reise", self.now, trip_id=other_trip, automatic=False, latitude=49.29419, longitude=7.05182), self.now)
+
+        def insert_drive(drive_id, start_lat, start_lon, start_label=None):
+            with self.store.transaction() as connection:
+                connection.execute(
+                    "INSERT INTO drives(id,vehicle_id,started_at,ended_at,distance_m,end_reason,source,start_label,start_latitude,start_longitude,end_latitude,end_longitude,created_at) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?)",
+                    (drive_id, "v1", self.now.isoformat(), self.now.isoformat(), 100, "stop", "gpx", start_label, start_lat, start_lon, None, None, self.now.isoformat()),
+                )
+                connection.execute("INSERT INTO trip_drives(trip_id,drive_id,linked_at) VALUES(?,?,?)", (trip_id, drive_id, self.now.isoformat()))
+
+        insert_drive("manual-comma", 53.06452, 8.82002, "Paris, France")
+        insert_drive("ambiguous", 53.06452, 8.82002)
+        insert_drive("foreign-trip", 49.29419, 7.05182)
+        rows = {row["id"]: row for row in self.store.list_drives("v1", trip_id=trip_id)}
+        self.assertEqual(rows["manual-comma"]["start_label"], "Paris, France")
+        self.assertEqual(rows["ambiguous"]["start_label"], "53.06452, 8.82002")
+        self.assertEqual(rows["foreign-trip"]["start_label"], "49.29419, 7.05182")
+
 
 if __name__ == "__main__":
     unittest.main()

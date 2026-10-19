@@ -1,0 +1,49 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>Camper Travel Journal map edge cases</title>
+<div id="map-host"></div>
+<pre id="result">starting</pre>
+<script type="module">
+const output = document.querySelector("#result");
+const trips = [{ id: "trip-1", title: "Synthetic trip", description: "", destination: "Bremen", status: "active", started_at: "2026-10-13T12:00:00Z" }];
+const drives = [{ id: "drive-1", started_at: "2026-10-13T08:00:00Z", ended_at: "2026-10-13T10:00:00Z", distance_m: 1200, trip_id: "trip-1", assignment_status: "assigned" }];
+let scenario = "";
+let routeCalls = 0;
+const scenarios = {
+  empty: { segments: [], stops: [] },
+  invalid: { segments: [{ drive_id: "drive-1", points: [{ latitude: "not-a-number", longitude: 8 }, { latitude: NaN, longitude: 8 }, { latitude: 91, longitude: 8 }, { latitude: 53, longitude: 181 }, { latitude: null, longitude: null }], gaps: [] }], stops: [] },
+  mixed: { segments: [{ drive_id: "drive-1", points: [{ latitude: 53.1, longitude: 8.8 }, { latitude: "not-a-number", longitude: 8.85 }, { latitude: 53.2, longitude: 8.9 }], gaps: [] }], stops: [] },
+  markerOnly: { segments: [], stops: [{ id: "valid-zero", name: "Nullpunkt", latitude: 0, longitude: 0, confirmed: true, place_type: "other" }] },
+  invalidMarkers: { segments: [{ drive_id: "drive-1", points: [{ latitude: 53.1, longitude: 8.8 }, { latitude: 53.2, longitude: 8.9 }], gaps: [] }], stops: [{ id: "bad-1", name: "Bad", latitude: "", longitude: 8, confirmed: true, place_type: "other" }, { id: "bad-2", name: "Bad", latitude: Infinity, longitude: 8, confirmed: true, place_type: "other" }, { id: "bad-3", name: "Bad", latitude: 91, longitude: 8, confirmed: true, place_type: "other" }] },
+  zero: { segments: [{ drive_id: "drive-1", points: [{ latitude: 0, longitude: 0 }, { latitude: 0.1, longitude: 0.1 }], gaps: [] }], stops: [] },
+};
+const connection = {
+  async sendMessagePromise(message) {
+    if (message.type === "camper_travel_journal/list_vehicles") return { vehicles: [{ vehicle_id: "entry-wohnmobil", name: "Wohnmobil", title: "Camper Travel Journal" }] };
+    if (message.type === "camper_travel_journal/list") return { trips, drives, stops: scenarios[scenario].stops, expenses: [], expense_summary: { total_minor: 0, currency: "EUR", mixed_currency: false } };
+    if (message.type === "camper_travel_journal/route") { routeCalls += 1; return { vehicle_id: "entry-wohnmobil", trip_id: "trip-1", segments: scenarios[scenario].segments, total_points: 3, returned_points: 3, bounds: null, gaps: [], truncated: false }; }
+    throw new Error(`unexpected command ${message.type}`);
+  },
+};
+const hass = { connection, locale: { language: "en-US" } };
+await import("/custom_components/camper_travel_journal/frontend/camper-travel-journal.js");
+await customElements.whenDefined("camper-travel-journal-map-card");
+const results = {};
+for (scenario of Object.keys(scenarios)) {
+  const callsBefore = routeCalls;
+  const card = document.createElement("camper-travel-journal-map-card");
+  card.setConfig({ vehicle_id: "entry-wohnmobil" });
+  document.querySelector("#map-host").append(card);
+  card.hass = hass;
+  for (let attempt = 0; attempt < 120; attempt += 1) {
+    if (routeCalls > callsBefore && card.shadowRoot?.querySelector(".leaflet-container")) break;
+    await new Promise((resolve) => setTimeout(resolve, 25));
+  }
+  await new Promise((resolve) => setTimeout(resolve, 50));
+  const text = card.shadowRoot?.textContent ?? "";
+  const paths = card.shadowRoot?.querySelectorAll(".leaflet-overlay-pane path").length ?? 0;
+  results[scenario] = { hasNoValidMessage: text.includes("No valid GPS"), hasRoute: Boolean(card.shadowRoot?.querySelector(".leaflet-overlay-pane path")), overlayPaths: paths };
+  card.remove();
+}
+output.textContent = JSON.stringify({ routeCalls, results, visibleTemplateLeak: /lit\$\d|=>\s*this\.|currentTarget\.value/.test(output.textContent ?? "") }, null, 2);
+</script>

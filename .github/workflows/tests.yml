@@ -159,6 +159,30 @@ jobs:
           if (result.visibleTemplateLeak) throw new Error('frontend template source leaked into visible DOM');
           console.log(JSON.stringify(result));
           NODE
+      - name: Run map coordinate edge regression
+        run: |
+          python3 -m http.server 8765 --bind 127.0.0.1 >/tmp/camper-travel-journal-map-edge-http.log 2>&1 &
+          server_pid=$!
+          trap 'kill "$server_pid"' EXIT
+          sleep 0.3
+          chromium --headless --no-sandbox --disable-gpu --virtual-time-budget=15000 \
+            --dump-dom http://127.0.0.1:8765/frontend/tests/browser/map-edge.html >/tmp/camper-travel-journal-map-edge-dom.html
+          node - <<'NODE'
+          const fs = require('fs');
+          const html = fs.readFileSync('/tmp/camper-travel-journal-map-edge-dom.html', 'utf8');
+          const match = html.match(/<pre id="result">([\s\S]*?)<\/pre>/);
+          if (!match) throw new Error('map edge harness returned no result');
+          const result = JSON.parse(match[1]);
+          const edge = result.results;
+          if (!edge.empty.hasNoValidMessage || edge.empty.hasRoute) throw new Error(`empty case failed: ${JSON.stringify(edge.empty)}`);
+          if (!edge.invalid.hasNoValidMessage || edge.invalid.hasRoute) throw new Error(`invalid route case failed: ${JSON.stringify(edge.invalid)}`);
+          if (!edge.mixed.hasRoute || edge.mixed.hasNoValidMessage) throw new Error(`mixed route case failed: ${JSON.stringify(edge.mixed)}`);
+          if (!edge.markerOnly.hasNoValidMessage || !edge.markerOnly.overlayPaths) throw new Error(`marker-only case failed: ${JSON.stringify(edge.markerOnly)}`);
+          if (!edge.invalidMarkers.hasRoute) throw new Error(`invalid marker case failed: ${JSON.stringify(edge.invalidMarkers)}`);
+          if (!edge.zero.hasRoute || edge.zero.hasNoValidMessage) throw new Error(`zero coordinate case failed: ${JSON.stringify(edge.zero)}`);
+          if (result.visibleTemplateLeak) throw new Error('frontend template source leaked into visible DOM');
+          console.log(JSON.stringify(result));
+          NODE
       - name: Run central journal entry regression
         run: |
           python3 -m http.server 8765 --bind 127.0.0.1 >/tmp/camper-travel-journal-journal-http.log 2>&1 &

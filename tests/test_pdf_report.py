@@ -2,7 +2,7 @@ import unittest
 
 try:
     from reportlab.platypus import KeepTogether, Paragraph, Table
-    from custom_components.camper_travel_journal.pdf_report import _category_label, _date, _date_time, _duration, _expense_time, _place_label, _time, render_trip_report
+    from custom_components.camper_travel_journal.pdf_report import _RouteMap, _category_label, _date, _date_time, _duration, _expense_time, _place_label, _time, render_trip_report
 except ModuleNotFoundError as error:  # pragma: no cover - CI installs manifest dependency
     if error.name != "reportlab":
         raise
@@ -45,6 +45,54 @@ def test_report_contains_pdf_structure_and_localized_content():
     assert b"/Type /Page" in pdf
     assert filename == "Camper-Travel-Journal_Bremen_Küste_Test_2026.pdf".encode("latin-1").decode("latin-1")
     assert b"49.0" not in pdf
+
+
+def test_report_includes_offline_route_map_from_real_track_points(monkeypatch):
+    import custom_components.camper_travel_journal.pdf_report as pdf_report
+    captured = {}
+    monkeypatch.setattr(pdf_report._ReportDocTemplate, "build", lambda _document, story: captured.setdefault("story", story))
+    report = _report(drives=1, expenses=0, stops=0)
+    report["route_segments"] = [{"drive_id": "drive-0", "points": [
+        {"latitude": 49.29419, "longitude": 7.05182},
+        {"latitude": 53.06452, "longitude": 8.82002},
+    ]}]
+    render_trip_report(report, language="de")
+    assert any(isinstance(item, KeepTogether) and any(isinstance(child, _RouteMap) for child in item._content) for item in captured["story"])
+
+
+def test_report_skips_invalid_route_points_without_losing_valid_segments():
+    report = _report(drives=1, expenses=0, stops=0)
+    report["route_segments"] = [
+        {"drive_id": "drive-0", "points": [
+            {"latitude": 49.0, "longitude": 7.0},
+            {"latitude": "not-a-number", "longitude": 8.0},
+            {"latitude": 53.0, "longitude": 8.0},
+            {"latitude": 91.0, "longitude": 8.0},
+            {"latitude": 53.1, "longitude": 8.1},
+        ]},
+        {"drive_id": "bad", "points": [{"latitude": None, "longitude": 8.0}, {"latitude": 53.2, "longitude": float("inf")}]},
+    ]
+    pdf, _ = render_trip_report(report, language="de")
+    assert pdf.startswith(b"%PDF-")
+
+
+def test_route_map_does_not_connect_across_invalid_points():
+    from io import BytesIO
+    from reportlab.pdfgen.canvas import Canvas
+
+    route_map = _RouteMap([{"points": [
+        {"latitude": 50.0, "longitude": 7.0},
+        {"latitude": "NaN", "longitude": 8.0},
+        {"latitude": 51.0, "longitude": 8.0},
+        {"latitude": 52.0, "longitude": 9.0},
+    ]}], width=200, height=120, language="en")
+    canvas = Canvas(BytesIO())
+    drawn_paths = []
+    original_draw_path = canvas.drawPath
+    canvas.drawPath = lambda path, *args, **kwargs: (drawn_paths.append(path), original_draw_path(path, *args, **kwargs))[1]
+    route_map.canv = canvas
+    route_map.draw()
+    assert len(drawn_paths) == 1
 
 
 def test_empty_report_is_valid_and_multi_page_report_grows():

@@ -1,7 +1,7 @@
 import { existsSync, readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { describe, expect, it } from "vitest";
-import { categoryLabel, EXPENSE_CATEGORIES, EXPENSE_CATEGORY_IDS, formatDate, formatMoneyMinor, formatTripPeriod, isExpenseCategory, messages, parseAmountMinor, statusLabel } from "../src/i18n";
+import { categoryLabel, EXPENSE_CATEGORIES, EXPENSE_CATEGORY_IDS, formatDate, formatMoneyMinor, formatTripPeriod, isExpenseCategory, messages, normalizeExpenseCategory, parseAmountMinor, statusLabel } from "../src/i18n";
 import { autoSelectVehicle, sameCardConfig } from "../src/card-editor";
 import { listVehicles } from "../src/api";
 import { sortDrivesChronologically } from "../src/map-utils";
@@ -13,10 +13,10 @@ const bundle = resolve(root, "../custom_components/camper_travel_journal/fronten
 
 describe("frontend release contract", () => {
   it("keeps backend, npm metadata and beta bundle aligned", () => {
-    expect(manifest.version).toBe("0.3.0-beta.10");
+    expect(manifest.version).toBe("0.3.0-beta.11");
     expect(pkg.version).toBe(manifest.version);
     expect(existsSync(bundle)).toBe(true);
-    expect(readFileSync(bundle, "utf8")).toContain("0.3.0-beta.10");
+    expect(readFileSync(resolve(root, "../custom_components/camper_travel_journal/const.py"), "utf8")).toContain('FRONTEND_VERSION = "0.3.0-beta.11"');
   });
   it("registers the central card in the catalog while retaining legacy elements", () => {
     const source = readFileSync(resolve(root, "src/index.ts"), "utf8");
@@ -145,6 +145,8 @@ describe("frontend release contract", () => {
     expect(map).toContain('height: clamp(');
     expect(map).toContain('focus-visible');
     expect(map).toContain('tile_attribution');
+    expect(map).toContain('invalidateSize({ pan: false })');
+    expect(map).toContain('maxZoom: 15');
   });
   it("keeps the central journal entry gated and trip-scoped", () => {
     const journal = readFileSync(resolve(root, "src/journal-card.ts"), "utf8");
@@ -212,6 +214,12 @@ describe("frontend release contract", () => {
     expect(statusLabel("paused", english)).toBe("paused");
     expect(categoryLabel("fuel", german)).toBe("Kraftstoff");
     expect(categoryLabel("fuel", english)).toBe("Fuel");
+    expect(normalizeExpenseCategory("Kraftstoff")).toBe("fuel");
+    expect(normalizeExpenseCategory("Parkgebühren")).toBe("parking");
+    expect(normalizeExpenseCategory("Verpflegung")).toBe("food");
+    expect(normalizeExpenseCategory("Camping site")).toBe("camping");
+    expect(normalizeExpenseCategory("Parking fees")).toBe("parking");
+    expect(normalizeExpenseCategory("legacy-custom-category")).toBe("legacy-custom-category");
   });
   it("parses cent amounts exactly and formats the selected currency", () => {
     expect(parseAmountMinor("23.00")).toBe(2300);
@@ -250,6 +258,9 @@ describe("frontend release contract", () => {
     expect(manager).toContain("toggleTripDetails");
     expect(manager).toContain("lang.close");
     expect(summary).toContain("EXPENSES_CHANGED_EVENT");
+    expect(manager).toContain("expense-info");
+    expect(manager).toContain("inline-check");
+    expect(summary).toContain("overnightCount");
   });
   it("exposes beta 12 trip dates, drive management and cross-card refresh contracts", () => {
     const api = readFileSync(resolve(root, "src/api.ts"), "utf8");

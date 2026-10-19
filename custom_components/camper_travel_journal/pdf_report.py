@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from datetime import datetime
 from io import BytesIO
+from math import isfinite
 import re
 from typing import Any
 from urllib.parse import urlsplit
@@ -15,7 +16,7 @@ from reportlab.lib.enums import TA_CENTER, TA_RIGHT
 from reportlab.lib.pagesizes import A4
 from reportlab.lib.styles import ParagraphStyle, getSampleStyleSheet
 from reportlab.lib.units import mm
-from reportlab.platypus import BaseDocTemplate, Flowable, Frame, KeepTogether, PageTemplate, Paragraph, Spacer, Table, TableStyle
+from reportlab.platypus import BaseDocTemplate, Flowable, Frame, KeepTogether, PageBreak, PageTemplate, Paragraph, Spacer, Table, TableStyle
 
 PLACE_LABELS = {
     "de": {"campsite": "Campingplatz", "rv_site": "Wohnmobilstellplatz", "wild_camp": "Freistehplatz", "overnight": "Übernachtungsplatz", "parking": "Parkplatz", "restaurant": "Restaurant", "fuel_stop": "Tankstelle", "fuel": "Kraftstoff", "attraction": "Sehenswürdigkeit", "ferry": "Fähre", "other": "Sonstiger Ort"},
@@ -169,6 +170,51 @@ class _ReportDocTemplate(BaseDocTemplate):
         canvas.drawRightString(A4[0] - self.rightMargin, 8 * mm, f"{'Seite' if self.language == 'de' else 'Page'} {document.page}"); canvas.restoreState()
 
 
+class _RouteMap(Flowable):
+    """Draw a deterministic, offline route overview from persisted GPX points."""
+    def __init__(self, segments: list[dict[str, Any]], *, width: float, height: float, language: str):
+        super().__init__(); self.segments = segments; self.width = width; self.height = height; self.language = language
+
+    def wrap(self, avail_width: float, avail_height: float) -> tuple[float, float]:
+        return min(self.width, avail_width), self.height
+
+    def draw(self):
+        valid_runs = []
+        for segment in self.segments:
+            current_run = []
+            for point in segment.get("points", []):
+                try:
+                    latitude, longitude = float(point.get("latitude")), float(point.get("longitude"))
+                except (AttributeError, TypeError, ValueError):
+                    if current_run:
+                        valid_runs.append(current_run)
+                        current_run = []
+                    continue
+                if isfinite(latitude) and isfinite(longitude) and -90 <= latitude <= 90 and -180 <= longitude <= 180:
+                    current_run.append((longitude, latitude))
+                elif current_run:
+                    valid_runs.append(current_run)
+                    current_run = []
+            if current_run:
+                valid_runs.append(current_run)
+        points = [point for run in valid_runs for point in run]
+        canvas = self.canv; canvas.saveState(); canvas.setStrokeColor(colors.HexColor("#d8dee8")); canvas.setFillColor(colors.HexColor("#f8fafc")); canvas.roundRect(0, 0, self.width, self.height, 5, stroke=1, fill=1)
+        if not points:
+            canvas.setFillColor(colors.HexColor("#667085")); canvas.setFont("Helvetica", 10); canvas.drawCentredString(self.width / 2, self.height / 2, "Keine GPS-Strecke vorhanden" if self.language == "de" else "No GPS route available"); canvas.restoreState(); return
+        min_lon, max_lon = min(p[0] for p in points), max(p[0] for p in points); min_lat, max_lat = min(p[1] for p in points), max(p[1] for p in points); lon_span = max(max_lon - min_lon, 1e-6); lat_span = max(max_lat - min_lat, 1e-6); pad = 14
+        scale = min((self.width - 2 * pad) / lon_span, (self.height - 2 * pad) / lat_span)
+        ox = (self.width - lon_span * scale) / 2 - min_lon * scale; oy = (self.height - lat_span * scale) / 2 - min_lat * scale
+        colors_list = ["#1976d2", "#d32f2f", "#388e3c", "#7b1fa2", "#f57c00", "#00796b"]
+        for index, run in enumerate(valid_runs):
+            segment_points = [(longitude * scale + ox, latitude * scale + oy) for longitude, latitude in run]
+            if len(segment_points) < 2: continue
+            path = canvas.beginPath(); path.moveTo(*segment_points[0]); [path.lineTo(*p) for p in segment_points[1:]]; canvas.setStrokeColor(colors.HexColor(colors_list[index % len(colors_list)])); canvas.setLineWidth(2.2); canvas.drawPath(path)
+        start = points[0][0] * scale + ox, points[0][1] * scale + oy; end = points[-1][0] * scale + ox, points[-1][1] * scale + oy
+        for x, y, label, color in ((start[0], start[1], "S", "#2e7d32"), (end[0], end[1], "Z", "#c62828")):
+            canvas.setFillColor(colors.HexColor(color)); canvas.circle(x, y, 4, stroke=0, fill=1); canvas.setFillColor(colors.white); canvas.setFont("Helvetica-Bold", 6); canvas.drawCentredString(x, y - 2, label)
+        canvas.setFillColor(colors.HexColor("#667085")); canvas.setFont("Helvetica", 7); canvas.drawString(pad, 5, "S = Start, Z = Ziel" if self.language == "de" else "S = start, Z = destination"); canvas.restoreState()
+
+
 def _paragraph(value: Any, style: ParagraphStyle, fallback: str = "–") -> Paragraph:
     return Paragraph(_markup(value) or fallback, style)
 
@@ -186,8 +232,8 @@ def render_trip_report(report: dict[str, Any], *, language: str = "de", time_zon
     """Render a validated, read-only trip snapshot as a printable A4 report."""
     language = "en" if language.lower().startswith("en") else "de"
     labels = {
-        "de": {"report": "Reisebericht", "vehicle": "Fahrzeug", "period": "Reisezeitraum", "destination": "Reiseziel", "distance": "Gesamtkilometer", "drives": "Fahrten", "costs": "Gesamtkosten", "drive_list": "Fahrten", "interruptions": "Aufenthalte und Fahrtunterbrechungen", "start": "Start", "end": "Ende", "distance_short": "Entfernung", "duration": "Dauer", "source": "Herkunft", "route": "Strecke", "cost_summary": "Kosten nach Kategorien", "category": "Kategorie", "amount": "Betrag", "expenses": "Ausgaben", "description": "Beschreibung", "stops": "Orte und Bewertungen", "notes": "Reisenotizen", "name": "Name", "period_short": "Zeitraum", "type": "Kategorie", "rating": "Bewertung", "details": "Details", "unknown_date": "Ausgabendatum unbekannt", "time": "Uhrzeit"},
-        "en": {"report": "Travel report", "vehicle": "Vehicle", "period": "Travel period", "destination": "Destination", "distance": "Total distance", "drives": "Drives", "costs": "Total costs", "drive_list": "Drives", "interruptions": "Stays and drive interruptions", "start": "Start", "end": "End", "distance_short": "Distance", "duration": "Duration", "source": "Source", "route": "Route", "cost_summary": "Costs by category", "category": "Category", "amount": "Amount", "expenses": "Expenses", "description": "Description", "stops": "Places and ratings", "notes": "Trip notes", "name": "Name", "period_short": "Period", "type": "Category", "rating": "Rating", "details": "Details", "unknown_date": "Expense date unknown", "time": "Time"},
+        "de": {"report": "Reisebericht", "vehicle": "Fahrzeug", "period": "Reisezeitraum", "destination": "Reiseziel", "distance": "Gesamtkilometer", "drives": "Fahrten", "costs": "Gesamtkosten", "drive_list": "Fahrten", "interruptions": "Aufenthalte und Fahrtunterbrechungen", "start": "Start", "end": "Ende", "distance_short": "Entfernung", "duration": "Dauer", "source": "Herkunft", "route": "Strecke", "cost_summary": "Kosten nach Kategorien", "category": "Kategorie", "amount": "Betrag", "expenses": "Ausgaben", "description": "Beschreibung", "stops": "Orte und Bewertungen", "notes": "Reisenotizen", "name": "Name", "period_short": "Zeitraum", "type": "Kategorie", "rating": "Bewertung", "details": "Details", "unknown_date": "Ausgabendatum unbekannt", "time": "Uhrzeit", "map": "Reisekarte"},
+        "en": {"report": "Travel report", "vehicle": "Vehicle", "period": "Travel period", "destination": "Destination", "distance": "Total distance", "drives": "Drives", "costs": "Total costs", "drive_list": "Drives", "interruptions": "Stays and drive interruptions", "start": "Start", "end": "End", "distance_short": "Distance", "duration": "Duration", "source": "Source", "route": "Route", "cost_summary": "Costs by category", "category": "Category", "amount": "Amount", "expenses": "Expenses", "description": "Description", "stops": "Places and ratings", "notes": "Trip notes", "name": "Name", "period_short": "Period", "type": "Category", "rating": "Rating", "details": "Details", "unknown_date": "Expense date unknown", "time": "Time", "map": "Travel map"},
     }[language]
     styles = getSampleStyleSheet(); body = ParagraphStyle("ReportBody", parent=styles["BodyText"], fontName="Helvetica", fontSize=8.5, leading=10.5, spaceAfter=2); small = ParagraphStyle("ReportSmall", parent=body, fontSize=7.5, leading=9); date_style = ParagraphStyle("ReportDate", parent=body, leading=10); right = ParagraphStyle("ReportRight", parent=body, alignment=TA_RIGHT); heading = ParagraphStyle("ReportHeading", parent=styles["Heading2"], fontName="Helvetica-Bold", fontSize=13, leading=16, textColor=colors.HexColor("#17324d"), spaceBefore=12, spaceAfter=7, keepWithNext=1); title = ParagraphStyle("ReportTitle", parent=styles["Title"], fontName="Helvetica-Bold", fontSize=23, leading=27, textColor=colors.HexColor("#17324d"), alignment=TA_CENTER, spaceAfter=8)
     trip = report["trip"]; period = _period(trip, language, time_zone); now = datetime.now(_local_zone(time_zone)).strftime("%d.%m.%Y %H:%M" if language == "de" else "%m/%d/%Y %I:%M %p"); stream = BytesIO(); doc = _ReportDocTemplate(stream, created=now, language=language)
@@ -196,6 +242,9 @@ def render_trip_report(report: dict[str, Any], *, language: str = "de", time_zon
     if _text(trip.get("description")): story += [Paragraph(labels["notes"], heading), Paragraph(_markup(trip.get("description")), body)]
     summary = report.get("expense_summary") or {}; currency = summary.get("currency") or "EUR"; distance = sum(float(item.get("distance_m") or 0) for item in report.get("drives", [])); total = ("Mehrere Währungen" if language == "de" else "Multiple currencies") if summary.get("mixed_currency") else _money(summary.get("total_minor"), currency, language)
     story += [_table([[labels["distance"], labels["drives"], labels["costs"]], [_km(distance, language), str(len(report.get("drives", []))), total]], [doc.width / 3] * 3), Spacer(1, 5)]
+    route_segments = [segment for segment in (report.get("route_segments") or []) if segment.get("points")]
+    story.append(PageBreak())
+    story.append(KeepTogether([Paragraph(labels["map"], heading), _RouteMap(route_segments, width=doc.width, height=105 * mm, language=language)]))
     drives = report.get("drives", [])
     if drives:
         rows = [[labels["start"], labels["end"], labels["distance_short"], labels["duration"], labels["source"], labels["route"]]]

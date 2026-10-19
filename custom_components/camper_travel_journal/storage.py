@@ -10,7 +10,7 @@ import re
 import sqlite3
 import uuid
 from urllib.parse import urlsplit, urlunsplit
-from math import asin, cos, radians, sin, sqrt
+from math import asin, cos, isfinite, radians, sin, sqrt
 from collections.abc import Iterator
 from contextlib import contextmanager
 from datetime import datetime, timedelta, timezone
@@ -20,6 +20,22 @@ from .travel import validate_amount, validate_expense_category, validate_expense
 
 SCHEMA_VERSION = 10
 V10_GPX_BACKFILL_MARKER = "v10_gpx_backfill"
+_COORDINATE_LABEL_RE = re.compile(r"^\s*([+-]?(?:\d+(?:\.\d+)?|\.\d+))\s*,\s*([+-]?(?:\d+(?:\.\d+)?|\.\d+))\s*$")
+
+
+def _valid_coordinates(latitude, longitude) -> bool:
+    try:
+        latitude, longitude = float(latitude), float(longitude)
+    except (TypeError, ValueError):
+        return False
+    return isfinite(latitude) and isfinite(longitude) and -90 <= latitude <= 90 and -180 <= longitude <= 180
+
+
+def _is_coordinate_label(value: str | None) -> bool:
+    if not isinstance(value, str):
+        return False
+    match = _COORDINATE_LABEL_RE.fullmatch(value)
+    return bool(match and _valid_coordinates(match.group(1), match.group(2)))
 SCHEMA_SQL = """
 PRAGMA foreign_keys = ON;
 CREATE TABLE IF NOT EXISTS schema_meta (key TEXT PRIMARY KEY, value TEXT NOT NULL);
@@ -646,7 +662,7 @@ class SQLiteStore:
         query = "SELECT d.*, td.trip_id FROM drives d LEFT JOIN trip_drives td ON td.drive_id=d.id WHERE d.vehicle_id=?"
         args: list = [vehicle_id]
         if trip_id: query += " AND td.trip_id=?"; args.append(trip_id)
-        return [self._drive_dict(row) for row in self.connection.execute(query + " ORDER BY d.started_at DESC", args).fetchall()]
+        return self._with_saved_place_labels(vehicle_id, trip_id, [self._drive_dict(row) for row in self.connection.execute(query + " ORDER BY d.started_at DESC", args).fetchall()])
 
     def list_trip_interruptions(self, vehicle_id: str, trip_id: str) -> list[dict]:
         """Derive gaps between consecutive assigned drives without persisting them.
@@ -714,6 +730,13 @@ class SQLiteStore:
             # status or hide the assignment action.
             status = link[0] if link else "unassigned"
             stop_id = link[1] if link else None
+            existing_place_name = None
+            if stop_id:
+                place = self.connection.execute(
+                    "SELECT name FROM stops WHERE id=? AND vehicle_id=? AND (trip_id=? OR trip_id IS NULL)",
+                    (stop_id, vehicle_id, trip_id),
+                ).fetchone()
+                existing_place_name = place[0] if place else None
             candidates = [
                 {
                     "id": candidate[0],
@@ -737,6 +760,7 @@ class SQLiteStore:
                 "previous_end_point": dict(last) if last else None,
                 "next_start_point": dict(first) if first else None,
                 "existing_place_id": stop_id,
+                "existing_place_name": existing_place_name,
                 "existing_places": candidates,
             })
         return result
@@ -833,7 +857,44 @@ class SQLiteStore:
 
     def list_available_drives(self, vehicle_id: str) -> list[dict]:
         if self.connection is None: raise RuntimeError("store is not open")
-        return [self._drive_dict(row) for row in self.connection.execute("SELECT d.*, NULL AS trip_id FROM drives d LEFT JOIN trip_drives td ON td.drive_id=d.id WHERE d.vehicle_id=? AND td.drive_id IS NULL ORDER BY d.started_at DESC", (vehicle_id,)).fetchall()]
+        return self._with_saved_place_labels(vehicle_id, None, [self._drive_dict(row) for row in self.connection.execute("SELECT d.*, NULL AS trip_id FROM drives d LEFT JOIN trip_drives td ON td.drive_id=d.id WHERE d.vehicle_id=? AND td.drive_id IS NULL ORDER BY d.started_at DESC", (vehicle_id,)).fetchall()])
+
+    def _with_saved_place_labels(self, vehicle_id: str, trip_id: str | None, drives: list[dict]) -> list[dict]:
+        """Use one unambiguous, same-trip saved place for a coordinate label."""
+        if not trip_id:
+            return drives
+        places = self.connection.execute(
+            "SELECT name,latitude,longitude,occurred_at,arrived_at,departed_at FROM stops "
+            "WHERE vehicle_id=? AND trip_id=? AND confirmed=1 AND latitude IS NOT NULL AND longitude IS NOT NULL",
+            (vehicle_id, trip_id),
+        ).fetchall()
+        for drive in drives:
+            for prefix in ("start", "end"):
+                label = drive.get(f"{prefix}_label")
+                if label and not _is_coordinate_label(label):
+                    continue
+                lat, lon = drive.get(f"{prefix}_latitude"), drive.get(f"{prefix}_longitude")
+                if not _valid_coordinates(lat, lon):
+                    continue
+                try:
+                    endpoint_time = datetime.fromisoformat(drive[f"{'started' if prefix == 'start' else 'ended'}_at"])
+                except (KeyError, TypeError, ValueError):
+                    continue
+                candidates = []
+                for place in places:
+                    distance = (float(place[1]) - float(lat)) ** 2 + (float(place[2]) - float(lon)) ** 2
+                    if distance > 0.01 ** 2:
+                        continue
+                    try:
+                        place_start = datetime.fromisoformat(place[4] or place[3])
+                        place_end = datetime.fromisoformat(place[5] or place[3])
+                    except (TypeError, ValueError):
+                        continue
+                    if place_start - timedelta(hours=24) <= endpoint_time <= place_end + timedelta(hours=24):
+                        candidates.append(place)
+                if len(candidates) == 1:
+                    drive[f"{prefix}_label"] = candidates[0][0]
+        return drives
 
     @staticmethod
     def _drive_dict(row) -> dict:
@@ -846,9 +907,9 @@ class SQLiteStore:
             result["duration_seconds"] = 0
         result["assignment_status"] = "assigned" if result.get("trip_id") else "unassigned"
         result.setdefault("source", "gps")
-        if not result.get("start_label") and result.get("start_latitude") is not None:
+        if not result.get("start_label") and _valid_coordinates(result.get("start_latitude"), result.get("start_longitude")):
             result["start_label"] = f"{result['start_latitude']:.5f}, {result['start_longitude']:.5f}"
-        if not result.get("end_label") and result.get("end_latitude") is not None:
+        if not result.get("end_label") and _valid_coordinates(result.get("end_latitude"), result.get("end_longitude")):
             result["end_label"] = f"{result['end_latitude']:.5f}, {result['end_longitude']:.5f}"
         return result
 
@@ -1183,7 +1244,16 @@ class SQLiteStore:
             if key in allowed and (value is not None or key in nullable_fields)
         }
         if "amount_minor" in changes: changes["amount_minor"] = validate_amount(changes["amount_minor"])
-        if "category" in changes: changes["category"] = validate_expense_category(changes["category"])
+        if "category" in changes:
+            try:
+                changes["category"] = validate_expense_category(changes["category"])
+            except ValueError:
+                current = self.connection.execute("SELECT category FROM expenses WHERE id=?", (expense_id,)).fetchone()
+                if current is None or changes["category"] != current[0]:
+                    raise
+                # Preserve an unknown historical value only when the submitted
+                # value is byte-for-byte identical to the stored value.
+                changes["category"] = current[0]
         if isinstance(changes.get("occurred_at"), datetime): changes["occurred_at"] = utc_iso(changes["occurred_at"])
         if "occurred_time" in changes and changes["occurred_time"] is not None and not re.fullmatch(r"(?:[01]\d|2[0-3]):[0-5]\d", changes["occurred_time"]):
             raise ValueError("expense_time_invalid")
