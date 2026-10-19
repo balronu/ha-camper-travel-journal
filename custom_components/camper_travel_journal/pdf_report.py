@@ -201,11 +201,40 @@ class _RouteMap(Flowable):
                 valid_runs.append(current_run)
         points = [point for run in valid_runs for point in run]
         canvas = self.canv; canvas.saveState(); canvas.setStrokeColor(colors.HexColor("#d8dee8")); canvas.setFillColor(colors.HexColor("#f8fafc")); canvas.roundRect(0, 0, self.width, self.height, 5, stroke=1, fill=1)
+        pad = 14
+        legend_font_size, legend_line_height = 7.0, 8.5
+        legend_ascent, legend_descent = legend_font_size * 0.8, legend_font_size * 0.2
+        legend_left, legend_right = pad, self.width - pad
+        legend_width = max(1.0, legend_right - legend_left)
+        base_legend = "S = Start, Z = Ziel, Ü = Übernachtungsplatz" if self.language == "de" else "S = start, Z = destination, O = overnight place"
+
+        def wrap_legend(value: str) -> list[str]:
+            words = value.split()
+            lines: list[str] = []
+            current = ""
+            for word in words:
+                candidate = f"{current} {word}".strip()
+                if current and canvas.stringWidth(candidate, "Helvetica", legend_font_size) > legend_width:
+                    lines.append(current)
+                    current = word
+                else:
+                    current = candidate
+            if current:
+                lines.append(current)
+            return lines or [""]
+
+        endpoint_count = sum(2 for segment in self.segments if self.endpoint_labels.get(_text(segment.get("drive_id"))))
+        endpoint_count += sum(1 for stop in self.stops if _text(stop.get("place_kind") or stop.get("place_type") or stop.get("stop_type")) in {"overnight", "campsite", "rv_site", "wild_camp"})
+        reserved_hint = f"{max(1, endpoint_count)} additional location labels not shown." if self.language == "en" else f"Weitere {max(1, endpoint_count)} Ortsbeschriftungen nicht dargestellt."
+        reserved_legend_lines = wrap_legend(base_legend) + (wrap_legend(reserved_hint) if endpoint_count else [])
+        legend_bottom = 5.0
+        label_bottom = legend_bottom + legend_descent + (len(reserved_legend_lines) - 1) * legend_line_height + legend_ascent + 4.0
+        map_height = max(2 * pad + 1.0, self.height - label_bottom)
         if not points:
             canvas.setFillColor(colors.HexColor("#667085")); canvas.setFont("Helvetica", 10); canvas.drawCentredString(self.width / 2, self.height / 2, "Keine GPS-Strecke vorhanden" if self.language == "de" else "No GPS route available"); canvas.restoreState(); return
-        min_lon, max_lon = min(p[0] for p in points), max(p[0] for p in points); min_lat, max_lat = min(p[1] for p in points), max(p[1] for p in points); lon_span = max(max_lon - min_lon, 1e-6); lat_span = max(max_lat - min_lat, 1e-6); pad = 14
-        scale = min((self.width - 2 * pad) / lon_span, (self.height - 2 * pad) / lat_span)
-        ox = (self.width - lon_span * scale) / 2 - min_lon * scale; oy = (self.height - lat_span * scale) / 2 - min_lat * scale
+        min_lon, max_lon = min(p[0] for p in points), max(p[0] for p in points); min_lat, max_lat = min(p[1] for p in points), max(p[1] for p in points); lon_span = max(max_lon - min_lon, 1e-6); lat_span = max(max_lat - min_lat, 1e-6)
+        scale = min((self.width - 2 * pad) / lon_span, (map_height - 2 * pad) / lat_span)
+        ox = (self.width - lon_span * scale) / 2 - min_lon * scale; oy = label_bottom + (map_height - lat_span * scale) / 2 - min_lat * scale
         colors_list = ["#1976d2", "#d32f2f", "#388e3c", "#7b1fa2", "#f57c00", "#00796b"]
         for index, run in enumerate(valid_runs):
             segment_points = [(longitude * scale + ox, latitude * scale + oy) for longitude, latitude in run]
@@ -260,7 +289,6 @@ class _RouteMap(Flowable):
         canvas.setFont("Helvetica", 6.5)
         occupied: list[tuple[float, float, float, float]] = []
         font_size, line_height, margin = 6.5, 7.0, 3.0
-        label_bottom = 18.0  # reserve the lower strip for the legend/hint
         # Helvetica's text is drawn from the baseline.  Keep the measured
         # ascent/descent explicit so the collision box matches the glyphs,
         # including the lower lines of a multiline label.
@@ -308,11 +336,13 @@ class _RouteMap(Flowable):
                 canvas.drawString(text_x, text_y - line_index * line_height, line)
         for _priority, _sequence, x, y, _label, color, marker in endpoint_positions:
             canvas.setFillColor(colors.HexColor(color)); canvas.circle(x, y, 4, stroke=0, fill=1); canvas.setFillColor(colors.white); canvas.setFont("Helvetica-Bold", 6); canvas.drawCentredString(x, y - 2, marker)
-        legend = "S = Start, Z = Ziel, Ü = Übernachtungsplatz" if self.language == "de" else "S = start, Z = destination, O = overnight place"
-        if skipped_labels:
-            hint = f"Weitere {skipped_labels} Ortsbeschriftungen nicht dargestellt." if self.language == "de" else f"{skipped_labels} additional location labels not shown."
-            legend += f"; {hint}"
-        canvas.setFillColor(colors.HexColor("#667085")); canvas.setFont("Helvetica", 7); canvas.drawString(pad, 5, legend); canvas.restoreState()
+        hint = f"Weitere {skipped_labels} Ortsbeschriftungen nicht dargestellt." if self.language == "de" else f"{skipped_labels} additional location labels not shown."
+        legend_lines = wrap_legend(base_legend) + (wrap_legend(hint) if skipped_labels else [])
+        canvas.setFillColor(colors.HexColor("#667085")); canvas.setFont("Helvetica", legend_font_size)
+        legend_first_baseline = legend_bottom + legend_descent + (len(legend_lines) - 1) * legend_line_height
+        for line_index, line in enumerate(legend_lines):
+            canvas.drawString(legend_left, legend_first_baseline - line_index * legend_line_height, line)
+        canvas.restoreState()
 
 
 def _paragraph(value: Any, style: ParagraphStyle, fallback: str = "–") -> Paragraph:

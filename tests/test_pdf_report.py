@@ -213,7 +213,7 @@ def test_route_map_drops_unplaceable_labels_without_origin_stack_and_is_determin
             assert any(hint in value for _x, _y, value in first)
             assert not any(x == 0 and y == 0 for x, y, value in first if hint not in value)
             assert any(value == "Start 0 mit langem Ortsnamen" for _x, _y, value in first)
-            assert all(y >= 18 for _x, y, value in first if hint not in value)
+            assert all(y >= 18 for _x, y, value in first if value.startswith(("Start ", "Ziel ")))
 
 
 def test_route_map_prioritizes_trip_endpoints_and_overnight_labels_when_crowded():
@@ -243,6 +243,36 @@ def test_route_map_prioritizes_trip_endpoints_and_overnight_labels_when_crowded(
     assert "Start 0" in labels
     assert "Ziel 19" in labels
     assert "Übernachtungsplatz" in labels
+
+
+def test_route_map_wraps_legend_and_hint_inside_narrow_map():
+    from io import BytesIO
+    from reportlab.pdfgen.canvas import Canvas
+
+    for language, hint in (("de", "Ortsbeschriftungen nicht dargestellt."), ("en", "additional location labels not shown.")):
+        segments = []
+        endpoint_labels = {}
+        for index in range(40):
+            drive_id = f"drive-{index}"
+            segments.append({"drive_id": drive_id, "points": [{"latitude": 53.0, "longitude": 8.0}, {"latitude": 53.0, "longitude": 8.0}]})
+            endpoint_labels[drive_id] = (f"Start {index} mit langem Ortsnamen", f"Ziel {index} mit langem Ortsnamen")
+        canvas = Canvas(BytesIO())
+        calls = []
+        original_draw_string = canvas.drawString
+        canvas.drawString = lambda x, y, value: (calls.append((x, y, value)), original_draw_string(x, y, value))[1]
+        route_map = _RouteMap(segments, width=200, height=120, language=language, endpoint_labels=endpoint_labels)
+        route_map.canv = canvas
+        route_map.draw()
+
+        hint_calls = [(x, y, value) for x, y, value in calls if hint in value]
+        assert hint_calls
+        for x, y, value in calls:
+            if value == "S = Start, Z = Ziel, Ü = Übernachtungsplatz" or value == "S = start, Z = destination, O = overnight place" or hint in value:
+                assert 14 <= x <= 186
+                assert x + canvas.stringWidth(value, "Helvetica", 7) <= 186
+                assert y - 1.4 >= 5
+                assert y + 5.6 <= 120
+                assert 5 <= y <= 115
 
 
 def test_report_skips_invalid_route_points_without_losing_valid_segments():
