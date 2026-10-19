@@ -198,16 +198,16 @@ def render_trip_report(report: dict[str, Any], *, language: str = "de", time_zon
     story += [_table([[labels["distance"], labels["drives"], labels["costs"]], [_km(distance, language), str(len(report.get("drives", []))), total]], [doc.width / 3] * 3), Spacer(1, 5)]
     drives = report.get("drives", [])
     if drives:
-        story.append(Paragraph(labels["drive_list"], heading)); rows = [[labels["start"], labels["end"], labels["distance_short"], labels["duration"], labels["source"], labels["route"]]]
+        rows = [[labels["start"], labels["end"], labels["distance_short"], labels["duration"], labels["source"], labels["route"]]]
         for drive in sorted(drives, key=lambda item: (item.get("started_at", ""), item.get("id", ""))):
             route = " → ".join(part for part in (_text(drive.get("start_label")), _text(drive.get("end_label"))) if part) or "–"; rows.append([_paragraph(_date_time(drive.get("started_at"), language, time_zone), date_style), _paragraph(_date_time(drive.get("ended_at"), language, time_zone), date_style), _paragraph(_km(drive.get("distance_m"), language), body), _paragraph(_duration(drive.get("duration_seconds"), language), body), _paragraph(_drive_source(drive.get("source"), language), small), _paragraph(route, small)])
-        story.append(_table(rows, [35 * mm, 35 * mm, 22 * mm, 21 * mm, 24 * mm, doc.width - 137 * mm]))
+        story.append(KeepTogether([Paragraph(labels["drive_list"], heading), _table(rows, [35 * mm, 35 * mm, 22 * mm, 21 * mm, 24 * mm, doc.width - 137 * mm])]))
     interruptions = report.get("interruptions") or []
     if interruptions:
-        story.append(Paragraph(labels["interruptions"], heading)); rows = [[labels["period_short"], labels["duration"], labels["type"], labels["details"]]]
+        rows = [[labels["period_short"], labels["duration"], labels["type"], labels["details"]]]
         for item in sorted(interruptions, key=lambda value: (value.get("started_at", ""), value.get("id", ""))):
             status = _text(item.get("status")); place = _text(item.get("existing_place_name")) or _text(item.get("place_name")); rows.append([_paragraph(f"{_date_time(item.get('started_at'), language, time_zone)}\n{_date_time(item.get('ended_at'), language, time_zone)}", date_style), _paragraph(_duration(item.get("duration_seconds"), language), body), _paragraph(STATUS_LABELS[language].get(status, status or "–"), body), _paragraph(place, small)])
-        story.append(_table(rows, [48 * mm, 24 * mm, 38 * mm, doc.width - 110 * mm]))
+        story.append(KeepTogether([Paragraph(labels["interruptions"], heading), _table(rows, [48 * mm, 24 * mm, 38 * mm, doc.width - 110 * mm])]))
     by_category = summary.get("by_category") or {}
     if by_category:
         rows = [[labels["category"], labels["amount"]]]
@@ -215,14 +215,14 @@ def render_trip_report(report: dict[str, Any], *, language: str = "de", time_zon
         story.append(KeepTogether([Paragraph(labels["cost_summary"], heading), _table(rows, [doc.width * 0.65, doc.width * 0.35])]))
     expenses = report.get("expenses", [])
     if expenses:
-        story.append(Paragraph(labels["expenses"], heading)); rows = [[labels["period_short"], labels["category"], labels["amount"], labels["description"]]]
+        rows = [[labels["period_short"], labels["category"], labels["amount"], labels["description"]]]
         for expense in sorted(expenses, key=lambda item: (item.get("occurred_on") or item.get("created_at") or "", item.get("id", ""))):
             note, place = _text(expense.get("note")), _text(expense.get("place_name")); note = f"{note} · {place}" if note and place else note or place
             actual_date = _date(expense.get("occurred_on"), language, time_zone) if expense.get("occurred_on") else labels["unknown_date"]
             actual_time = _expense_time(expense.get("occurred_time"), language)
             date_text = f"{actual_date}, {actual_time}" if actual_time else actual_date
             rows.append([_paragraph(date_text, date_style), _paragraph(_category_label(expense.get("category"), language), body), _paragraph(_money(expense.get("amount_minor"), expense.get("currency"), language), body), _paragraph(note, small)])
-        story.append(_table(rows, [31 * mm, 32 * mm, 29 * mm, doc.width - 92 * mm]))
+        story.append(KeepTogether([Paragraph(labels["expenses"], heading), _table(rows, [31 * mm, 32 * mm, 29 * mm, doc.width - 92 * mm])]))
     stops = report.get("stops", [])
     if stops:
         rows = [[labels["name"], labels["type"], labels["period_short"], labels["duration"], labels["rating"], labels["details"]]]
