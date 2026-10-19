@@ -3,7 +3,7 @@
 from datetime import timedelta
 
 DOMAIN = "camper_travel_journal"
-FRONTEND_VERSION = "0.3.0-beta.11"
+FRONTEND_VERSION = "0.3.0-beta.12"
 FRONTEND_URL = f"/{DOMAIN}/camper-travel-journal.js?v={FRONTEND_VERSION}"
 # HA keeps extra module URLs in memory until they are explicitly removed.  A
 # HACS update/reload can therefore leave any previous beta bundle registered
@@ -32,6 +32,8 @@ CONF_MAX_SPEED = "max_speed"
 CONF_MAP_PROVIDER = "map_provider"
 CONF_CARTO_API_KEY = "carto_api_key"
 CONF_REMOVE_CARTO_API_KEY = "remove_carto_api_key"
+CONF_HOME_RADIUS = "home_radius_m"
+CONF_REVERSE_GEOCODING_ENABLED = "reverse_geocoding_enabled"
 
 MAP_PROVIDER_NONE = "none"
 MAP_PROVIDER_CARTO = "carto"
@@ -43,6 +45,9 @@ DEFAULT_MIN_INTERVAL_SECONDS = 30
 DEFAULT_STOP_AFTER_MINUTES = 10
 DEFAULT_MAX_GAP_MINUTES = 10
 DEFAULT_MAX_SPEED_KMH = 200.0
+DEFAULT_HOME_RADIUS_M = 150.0
+MIN_HOME_RADIUS_M = 25.0
+MAX_HOME_RADIUS_M = 2000.0
 MIN_INTERVAL_SECONDS = 5
 MAX_INTERVAL_SECONDS = 300
 MIN_MOVEMENT_METERS = 1.0

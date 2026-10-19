@@ -17,10 +17,10 @@ from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 from .travel import validate_amount, validate_expense_category, validate_expense_currency
+from .validation import is_coordinate_label
 
 SCHEMA_VERSION = 10
 V10_GPX_BACKFILL_MARKER = "v10_gpx_backfill"
-_COORDINATE_LABEL_RE = re.compile(r"^\s*([+-]?(?:\d+(?:\.\d+)?|\.\d+))\s*,\s*([+-]?(?:\d+(?:\.\d+)?|\.\d+))\s*$")
 
 
 def _valid_coordinates(latitude, longitude) -> bool:
@@ -32,10 +32,7 @@ def _valid_coordinates(latitude, longitude) -> bool:
 
 
 def _is_coordinate_label(value: str | None) -> bool:
-    if not isinstance(value, str):
-        return False
-    match = _COORDINATE_LABEL_RE.fullmatch(value)
-    return bool(match and _valid_coordinates(match.group(1), match.group(2)))
+    return is_coordinate_label(value)
 SCHEMA_SQL = """
 PRAGMA foreign_keys = ON;
 CREATE TABLE IF NOT EXISTS schema_meta (key TEXT PRIMARY KEY, value TEXT NOT NULL);

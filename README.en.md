@@ -6,7 +6,7 @@
 
 <h1 align="center">Camper Travel Journal</h1>
 <p align="center">Your digital camper travel journal for Home Assistant</p>
-<p align="center"><strong>Current stable version: v0.2.0 · v0.3.0-beta.11 in development</strong></p>
+<p align="center"><strong>Current stable version: v0.2.0 · v0.3.0-beta.12 in development</strong></p>
 
 <p align="center">
   <a href="https://github.com/balronu/ha-camper-travel-journal/releases/latest"><img src="https://img.shields.io/github/v/release/balronu/ha-camper-travel-journal?label=Release" alt="Release"></a>

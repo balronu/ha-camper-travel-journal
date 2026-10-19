@@ -60,6 +60,221 @@ def test_report_includes_offline_route_map_from_real_track_points(monkeypatch):
     assert any(isinstance(item, KeepTogether) and any(isinstance(child, _RouteMap) for child in item._content) for item in captured["story"])
 
 
+def test_report_passes_drive_endpoint_labels_to_offline_route_map(monkeypatch):
+    import custom_components.camper_travel_journal.pdf_report as pdf_report
+
+    captured = {}
+    monkeypatch.setattr(pdf_report._ReportDocTemplate, "build", lambda _document, story: captured.setdefault("story", story))
+    report = _report(drives=1, expenses=0, stops=0)
+    report["route_segments"] = [{"drive_id": "drive-0", "points": [{"latitude": 53.0, "longitude": 8.0}, {"latitude": 53.1, "longitude": 8.1}]}]
+    pdf_report.render_trip_report(report, language="de")
+    route_map = next(child for item in captured["story"] if isinstance(item, KeepTogether) for child in item._content if isinstance(child, _RouteMap))
+    assert route_map.endpoint_labels == {"drive-0": ("Bremen", "Küste")}
+
+
+def test_report_passes_only_overnight_stops_to_route_map(monkeypatch):
+    import custom_components.camper_travel_journal.pdf_report as pdf_report
+
+    captured = {}
+    monkeypatch.setattr(pdf_report._ReportDocTemplate, "build", lambda _document, story: captured.setdefault("story", story))
+    report = _report(drives=1, expenses=0, stops=0)
+    report["route_segments"] = [{"drive_id": "drive-0", "points": [{"latitude": 53.0, "longitude": 8.0}, {"latitude": 53.1, "longitude": 8.1}]}]
+    report["stops"] = [
+        {"name": "Reisemobilstellplatz am Kuhhirten", "place_type": "rv_site", "latitude": 53.05, "longitude": 8.81},
+        {"name": "Restaurant", "place_type": "restaurant", "latitude": 53.04, "longitude": 8.80},
+        {"name": "Ungültig", "place_type": "campsite", "latitude": 91, "longitude": 8},
+    ]
+    pdf_report.render_trip_report(report, language="de")
+    route_map = next(child for item in captured["story"] if isinstance(item, KeepTogether) for child in item._content if isinstance(child, _RouteMap))
+    assert [stop["name"] for stop in route_map.stops if stop.get("place_type") == "rv_site"] == ["Reisemobilstellplatz am Kuhhirten"]
+
+
+def test_route_map_draws_valid_overnight_marker_and_skips_invalid_marker():
+    from io import BytesIO
+    from reportlab.pdfgen.canvas import Canvas
+
+    route_map = _RouteMap(
+        [{"drive_id": "d1", "points": [{"latitude": 53.0, "longitude": 8.0}, {"latitude": 53.1, "longitude": 8.1}]}],
+        width=200, height=120, language="de", endpoint_labels={"d1": ("Bremen", "Ziel")},
+        stops=[
+            {"name": "Reisemobilstellplatz am Kuhhirten", "place_type": "rv_site", "latitude": 53.05, "longitude": 8.05},
+            {"name": "Ungültig", "place_type": "rv_site", "latitude": 91, "longitude": 8},
+        ],
+    )
+    canvas = Canvas(BytesIO())
+    labels = []
+    original_draw_string = canvas.drawString
+    canvas.drawString = lambda x, y, value: (labels.append(value), original_draw_string(x, y, value))[1]
+    route_map.canv = canvas
+    route_map.draw()
+    assert "Reisemobilstellplatz am Kuhhirten" == " ".join(labels[2:4])
+    assert "Ungültig" not in labels
+    assert "S = Start, Z = Ziel, Ü = Übernachtungsplatz" in labels
+
+
+def test_route_map_multiline_label_geometry_stays_inside_map_and_does_not_overlap():
+    from io import BytesIO
+    from reportlab.pdfgen.canvas import Canvas
+    import textwrap
+
+    route_map = _RouteMap(
+        [{"drive_id": "d1", "points": [
+            {"latitude": 53.0, "longitude": 8.0},
+            {"latitude": 53.1, "longitude": 8.1},
+        ]}],
+        width=200,
+        height=120,
+        language="de",
+        endpoint_labels={"d1": ("Sehr langer Startort mit einer mehrzeiligen Ortsbezeichnung", "Sehr langer Zielort mit einer mehrzeiligen Ortsbezeichnung")},
+        stops=[
+            {"name": "Reisemobilstellplatz am Kuhhirten in Bremen mit langem Namen", "place_type": "rv_site", "latitude": 53.05, "longitude": 8.05},
+        ],
+    )
+    canvas = Canvas(BytesIO())
+    drawn = []
+    original_draw_string = canvas.drawString
+    canvas.drawString = lambda x, y, value: (drawn.append((x, y, value)), original_draw_string(x, y, value))[1]
+    route_map.canv = canvas
+    route_map.draw()
+
+    label_texts = {
+        "Sehr langer Startort mit einer mehrzeiligen Ortsbezeichnung",
+        "Sehr langer Zielort mit einer mehrzeiligen Ortsbezeichnung",
+        "Reisemobilstellplatz am Kuhhirten in Bremen mit langem Namen",
+    }
+    wrapped = [
+        line
+        for text in label_texts
+        for line in textwrap.wrap(text, width=30, break_long_words=True, break_on_hyphens=False)
+    ]
+    label_calls = [call for call in drawn if call[2] in wrapped]
+    assert label_calls
+    ascent, descent, line_height = 6.5 * 0.8, 6.5 * 0.2, 7.0
+    boxes = []
+    for x, y, text in label_calls:
+        box = (x, y - descent, x + canvas.stringWidth(text, "Helvetica", 6.5), y + ascent)
+        assert 0 <= box[0] <= box[2] <= route_map.width
+        assert 0 <= box[1] <= box[3] <= route_map.height
+        boxes.append(box)
+    for index, left in enumerate(boxes):
+        for right in boxes[index + 1:]:
+            assert not (left[0] < right[2] and left[2] > right[0] and left[1] < right[3] and left[3] > right[1])
+
+
+def test_route_map_keeps_coordinate_fallback_labels_unrendered():
+    from io import BytesIO
+    from reportlab.pdfgen.canvas import Canvas
+
+    route_map = _RouteMap(
+        [{"drive_id": "d1", "points": [
+            {"latitude": 49.0, "longitude": 7.0},
+            {"latitude": 53.0, "longitude": 8.0},
+        ]}],
+        width=200,
+        height=120,
+        language="en",
+        endpoint_labels={"d1": ("49.00000, 7.00000", "53.00000, 8.00000")},
+    )
+    canvas = Canvas(BytesIO())
+    labels = []
+    original_draw_string = canvas.drawString
+    canvas.drawString = lambda x, y, value: (labels.append(value), original_draw_string(x, y, value))[1]
+    route_map.canv = canvas
+    route_map.draw()
+    assert "49.00000, 7.00000" not in labels
+    assert "53.00000, 8.00000" not in labels
+    assert "S = start, Z = destination, O = overnight place" in labels
+
+
+def test_route_map_drops_unplaceable_labels_without_origin_stack_and_is_deterministic():
+    from io import BytesIO
+    from reportlab.pdfgen.canvas import Canvas
+
+    def draw_labels(drive_count, language):
+        segments = []
+        endpoint_labels = {}
+        for index in range(drive_count):
+            drive_id = f"drive-{index}"
+            segments.append({"drive_id": drive_id, "points": [{"latitude": 53.0, "longitude": 8.0}, {"latitude": 53.0, "longitude": 8.0}]})
+            endpoint_labels[drive_id] = (f"Start {index} mit langem Ortsnamen", f"Ziel {index} mit langem Ortsnamen")
+        canvas = Canvas(BytesIO())
+        calls = []
+        original_draw_string = canvas.drawString
+        canvas.drawString = lambda x, y, value: (calls.append((x, y, value)), original_draw_string(x, y, value))[1]
+        route_map = _RouteMap(segments, width=200, height=120, language=language, endpoint_labels=endpoint_labels)
+        route_map.canv = canvas
+        route_map.draw()
+        return calls
+
+    for language, hint in (("de", "Ortsbeschriftungen nicht dargestellt."), ("en", "additional location labels not shown.")):
+        for drive_count in (20, 40):
+            first, second = draw_labels(drive_count, language), draw_labels(drive_count, language)
+            assert first == second
+            assert any(hint in value for _x, _y, value in first)
+            assert not any(x == 0 and y == 0 for x, y, value in first if hint not in value)
+            assert any(value == "Start 0 mit langem Ortsnamen" for _x, _y, value in first)
+            assert all(y >= 18 for _x, y, value in first if value.startswith(("Start ", "Ziel ")))
+
+
+def test_route_map_prioritizes_trip_endpoints_and_overnight_labels_when_crowded():
+    from io import BytesIO
+    from reportlab.pdfgen.canvas import Canvas
+
+    segments = []
+    endpoint_labels = {}
+    for index in range(20):
+        drive_id = f"drive-{index}"
+        segments.append({"drive_id": drive_id, "points": [{"latitude": 53.0, "longitude": 8.0}, {"latitude": 53.0, "longitude": 8.0}]})
+        endpoint_labels[drive_id] = (f"Start {index}", f"Ziel {index}")
+    canvas = Canvas(BytesIO())
+    labels = []
+    original_draw_string = canvas.drawString
+    canvas.drawString = lambda x, y, value: (labels.append(value), original_draw_string(x, y, value))[1]
+    route_map = _RouteMap(
+        segments,
+        width=200,
+        height=120,
+        language="de",
+        endpoint_labels=endpoint_labels,
+        stops=[{"name": "Übernachtungsplatz", "place_type": "rv_site", "latitude": 53.0, "longitude": 8.0}],
+    )
+    route_map.canv = canvas
+    route_map.draw()
+    assert "Start 0" in labels
+    assert "Ziel 19" in labels
+    assert "Übernachtungsplatz" in labels
+
+
+def test_route_map_wraps_legend_and_hint_inside_narrow_map():
+    from io import BytesIO
+    from reportlab.pdfgen.canvas import Canvas
+
+    for language, hint in (("de", "Ortsbeschriftungen nicht dargestellt."), ("en", "additional location labels not shown.")):
+        segments = []
+        endpoint_labels = {}
+        for index in range(40):
+            drive_id = f"drive-{index}"
+            segments.append({"drive_id": drive_id, "points": [{"latitude": 53.0, "longitude": 8.0}, {"latitude": 53.0, "longitude": 8.0}]})
+            endpoint_labels[drive_id] = (f"Start {index} mit langem Ortsnamen", f"Ziel {index} mit langem Ortsnamen")
+        canvas = Canvas(BytesIO())
+        calls = []
+        original_draw_string = canvas.drawString
+        canvas.drawString = lambda x, y, value: (calls.append((x, y, value)), original_draw_string(x, y, value))[1]
+        route_map = _RouteMap(segments, width=200, height=120, language=language, endpoint_labels=endpoint_labels)
+        route_map.canv = canvas
+        route_map.draw()
+
+        hint_calls = [(x, y, value) for x, y, value in calls if hint in value]
+        assert hint_calls
+        for x, y, value in calls:
+            if value == "S = Start, Z = Ziel, Ü = Übernachtungsplatz" or value == "S = start, Z = destination, O = overnight place" or hint in value:
+                assert 14 <= x <= 186
+                assert x + canvas.stringWidth(value, "Helvetica", 7) <= 186
+                assert y - 1.4 >= 5
+                assert y + 5.6 <= 120
+                assert 5 <= y <= 115
+
+
 def test_report_skips_invalid_route_points_without_losing_valid_segments():
     report = _report(drives=1, expenses=0, stops=0)
     report["route_segments"] = [

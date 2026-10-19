@@ -6,6 +6,7 @@ from datetime import datetime
 from io import BytesIO
 from math import isfinite
 import re
+import textwrap
 from typing import Any
 from urllib.parse import urlsplit
 from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
@@ -17,6 +18,7 @@ from reportlab.lib.pagesizes import A4
 from reportlab.lib.styles import ParagraphStyle, getSampleStyleSheet
 from reportlab.lib.units import mm
 from reportlab.platypus import BaseDocTemplate, Flowable, Frame, KeepTogether, PageBreak, PageTemplate, Paragraph, Spacer, Table, TableStyle
+from .validation import is_coordinate_label
 
 PLACE_LABELS = {
     "de": {"campsite": "Campingplatz", "rv_site": "Wohnmobilstellplatz", "wild_camp": "Freistehplatz", "overnight": "Übernachtungsplatz", "parking": "Parkplatz", "restaurant": "Restaurant", "fuel_stop": "Tankstelle", "fuel": "Kraftstoff", "attraction": "Sehenswürdigkeit", "ferry": "Fähre", "other": "Sonstiger Ort"},
@@ -172,8 +174,8 @@ class _ReportDocTemplate(BaseDocTemplate):
 
 class _RouteMap(Flowable):
     """Draw a deterministic, offline route overview from persisted GPX points."""
-    def __init__(self, segments: list[dict[str, Any]], *, width: float, height: float, language: str):
-        super().__init__(); self.segments = segments; self.width = width; self.height = height; self.language = language
+    def __init__(self, segments: list[dict[str, Any]], *, width: float, height: float, language: str, endpoint_labels: dict[str, tuple[str, str]] | None = None, stops: list[dict[str, Any]] | None = None):
+        super().__init__(); self.segments = segments; self.width = width; self.height = height; self.language = language; self.endpoint_labels = endpoint_labels or {}; self.stops = stops or []
 
     def wrap(self, avail_width: float, avail_height: float) -> tuple[float, float]:
         return min(self.width, avail_width), self.height
@@ -199,20 +201,148 @@ class _RouteMap(Flowable):
                 valid_runs.append(current_run)
         points = [point for run in valid_runs for point in run]
         canvas = self.canv; canvas.saveState(); canvas.setStrokeColor(colors.HexColor("#d8dee8")); canvas.setFillColor(colors.HexColor("#f8fafc")); canvas.roundRect(0, 0, self.width, self.height, 5, stroke=1, fill=1)
+        pad = 14
+        legend_font_size, legend_line_height = 7.0, 8.5
+        legend_ascent, legend_descent = legend_font_size * 0.8, legend_font_size * 0.2
+        legend_left, legend_right = pad, self.width - pad
+        legend_width = max(1.0, legend_right - legend_left)
+        base_legend = "S = Start, Z = Ziel, Ü = Übernachtungsplatz" if self.language == "de" else "S = start, Z = destination, O = overnight place"
+
+        def wrap_legend(value: str) -> list[str]:
+            words = value.split()
+            lines: list[str] = []
+            current = ""
+            for word in words:
+                candidate = f"{current} {word}".strip()
+                if current and canvas.stringWidth(candidate, "Helvetica", legend_font_size) > legend_width:
+                    lines.append(current)
+                    current = word
+                else:
+                    current = candidate
+            if current:
+                lines.append(current)
+            return lines or [""]
+
+        endpoint_count = sum(2 for segment in self.segments if self.endpoint_labels.get(_text(segment.get("drive_id"))))
+        endpoint_count += sum(1 for stop in self.stops if _text(stop.get("place_kind") or stop.get("place_type") or stop.get("stop_type")) in {"overnight", "campsite", "rv_site", "wild_camp"})
+        reserved_hint = f"{max(1, endpoint_count)} additional location labels not shown." if self.language == "en" else f"Weitere {max(1, endpoint_count)} Ortsbeschriftungen nicht dargestellt."
+        reserved_legend_lines = wrap_legend(base_legend) + (wrap_legend(reserved_hint) if endpoint_count else [])
+        legend_bottom = 5.0
+        label_bottom = legend_bottom + legend_descent + (len(reserved_legend_lines) - 1) * legend_line_height + legend_ascent + 4.0
+        map_height = max(2 * pad + 1.0, self.height - label_bottom)
         if not points:
             canvas.setFillColor(colors.HexColor("#667085")); canvas.setFont("Helvetica", 10); canvas.drawCentredString(self.width / 2, self.height / 2, "Keine GPS-Strecke vorhanden" if self.language == "de" else "No GPS route available"); canvas.restoreState(); return
-        min_lon, max_lon = min(p[0] for p in points), max(p[0] for p in points); min_lat, max_lat = min(p[1] for p in points), max(p[1] for p in points); lon_span = max(max_lon - min_lon, 1e-6); lat_span = max(max_lat - min_lat, 1e-6); pad = 14
-        scale = min((self.width - 2 * pad) / lon_span, (self.height - 2 * pad) / lat_span)
-        ox = (self.width - lon_span * scale) / 2 - min_lon * scale; oy = (self.height - lat_span * scale) / 2 - min_lat * scale
+        min_lon, max_lon = min(p[0] for p in points), max(p[0] for p in points); min_lat, max_lat = min(p[1] for p in points), max(p[1] for p in points); lon_span = max(max_lon - min_lon, 1e-6); lat_span = max(max_lat - min_lat, 1e-6)
+        scale = min((self.width - 2 * pad) / lon_span, (map_height - 2 * pad) / lat_span)
+        ox = (self.width - lon_span * scale) / 2 - min_lon * scale; oy = label_bottom + (map_height - lat_span * scale) / 2 - min_lat * scale
         colors_list = ["#1976d2", "#d32f2f", "#388e3c", "#7b1fa2", "#f57c00", "#00796b"]
         for index, run in enumerate(valid_runs):
             segment_points = [(longitude * scale + ox, latitude * scale + oy) for longitude, latitude in run]
             if len(segment_points) < 2: continue
             path = canvas.beginPath(); path.moveTo(*segment_points[0]); [path.lineTo(*p) for p in segment_points[1:]]; canvas.setStrokeColor(colors.HexColor(colors_list[index % len(colors_list)])); canvas.setLineWidth(2.2); canvas.drawPath(path)
-        start = points[0][0] * scale + ox, points[0][1] * scale + oy; end = points[-1][0] * scale + ox, points[-1][1] * scale + oy
-        for x, y, label, color in ((start[0], start[1], "S", "#2e7d32"), (end[0], end[1], "Z", "#c62828")):
-            canvas.setFillColor(colors.HexColor(color)); canvas.circle(x, y, 4, stroke=0, fill=1); canvas.setFillColor(colors.white); canvas.setFont("Helvetica-Bold", 6); canvas.drawCentredString(x, y - 2, label)
-        canvas.setFillColor(colors.HexColor("#667085")); canvas.setFont("Helvetica", 7); canvas.drawString(pad, 5, "S = Start, Z = Ziel" if self.language == "de" else "S = start, Z = destination"); canvas.restoreState()
+        # Keep endpoint names on the map itself.  They are already resolved by
+        # the read-only report snapshot (manual/home/stay label or coordinates),
+        # so the PDF renderer never performs geocoding or network access.
+        endpoint_positions: list[tuple[int, int, float, float, str, str, str]] = []
+        last_segment_index = len(self.segments) - 1
+        for segment_index, segment in enumerate(self.segments):
+            drive_id = _text(segment.get("drive_id"))
+            labels = self.endpoint_labels.get(drive_id)
+            if not labels:
+                continue
+            runs = []
+            current = []
+            for point in segment.get("points", []):
+                try:
+                    latitude, longitude = float(point.get("latitude")), float(point.get("longitude"))
+                except (AttributeError, TypeError, ValueError):
+                    if current:
+                        runs.append(current); current = []
+                    continue
+                if isfinite(latitude) and isfinite(longitude) and -90 <= latitude <= 90 and -180 <= longitude <= 180:
+                    current.append((longitude * scale + ox, latitude * scale + oy))
+                elif current:
+                    runs.append(current); current = []
+            if current:
+                runs.append(current)
+            if not runs:
+                continue
+            endpoint_positions.extend([
+                (0 if segment_index == 0 else 2, len(endpoint_positions), runs[0][0][0], runs[0][0][1], labels[0], "#2e7d32", "S"),
+                (0 if segment_index == last_segment_index else 2, len(endpoint_positions) + 1, runs[-1][-1][0], runs[-1][-1][1], labels[1], "#c62828", "Z"),
+            ])
+        overnight_types = {"overnight", "campsite", "rv_site", "wild_camp"}
+        for stop in self.stops:
+            try:
+                latitude, longitude = float(stop.get("latitude")), float(stop.get("longitude"))
+            except (AttributeError, TypeError, ValueError):
+                continue
+            if not (isfinite(latitude) and isfinite(longitude) and -90 <= latitude <= 90 and -180 <= longitude <= 180):
+                continue
+            place_type = _text(stop.get("place_kind") or stop.get("place_type") or stop.get("stop_type"))
+            if place_type not in overnight_types:
+                continue
+            endpoint_positions.append((1, len(endpoint_positions), longitude * scale + ox, latitude * scale + oy, _text(stop.get("name")), "#8e24aa", "Ü" if self.language == "de" else "O"))
+        # Place labels in deterministic candidate slots.  This keeps labels
+        # inside the map and avoids drawing endpoint/stay text on top of one
+        # another without changing the stored coordinates.
+        canvas.setFont("Helvetica", 6.5)
+        occupied: list[tuple[float, float, float, float]] = []
+        font_size, line_height, margin = 6.5, 7.0, 3.0
+        # Helvetica's text is drawn from the baseline.  Keep the measured
+        # ascent/descent explicit so the collision box matches the glyphs,
+        # including the lower lines of a multiline label.
+        font_ascent, font_descent = font_size * 0.8, font_size * 0.2
+        skipped_labels = 0
+        for _priority, _sequence, x, y, label, color, _marker in sorted(endpoint_positions, key=lambda item: (item[0], item[1])):
+            label = _text(label)
+            if not label or is_coordinate_label(label):
+                continue
+            lines = textwrap.wrap(label, width=30, break_long_words=True, break_on_hyphens=False) or [label]
+            text_width = max(canvas.stringWidth(line, "Helvetica", 6.5) for line in lines)
+            min_baseline = label_bottom + (len(lines) - 1) * line_height + font_descent
+            max_baseline = self.height - margin - font_ascent
+            text_x = text_y = 0.0
+            placed = False
+            for dx, dy in ((6, 5), (6, -10), (-text_width - 6, 5), (-text_width - 6, -10), (12, 16), (-text_width - 12, 16)):
+                candidate_x = min(max(x + dx, margin), self.width - text_width - margin)
+                candidate_y = min(max(y + dy, min_baseline), max_baseline)
+                # ReportLab baselines advance downwards here.  The box is the
+                # actual visual extent of those baselines, not a box above
+                # the first baseline.
+                box = (candidate_x, candidate_y - (len(lines) - 1) * line_height - font_descent, candidate_x + text_width, candidate_y + font_ascent)
+                if not any(box[0] < other[2] and box[2] > other[0] and box[1] < other[3] and box[3] > other[1] for other in occupied):
+                    text_x, text_y = candidate_x, candidate_y
+                    occupied.append(box)
+                    placed = True
+                    break
+            else:
+                # Deterministic grid fallback for crowded marker clusters.
+                # It still uses the same measured box and never leaves the
+                # map when a wrapped label fits on the page.
+                placed = False
+                for grid_y in range(int(max_baseline), int(min_baseline) - 1, -8):
+                    for grid_x in range(int(margin), max(int(self.width - text_width - margin), int(margin)) + 1, 8):
+                        box = (grid_x, grid_y - (len(lines) - 1) * line_height - font_descent, grid_x + text_width, grid_y + font_ascent)
+                        if not any(box[0] < other[2] and box[2] > other[0] and box[1] < other[3] and box[3] > other[1] for other in occupied):
+                            text_x, text_y = grid_x, grid_y; occupied.append(box); placed = True; break
+                    if placed:
+                        break
+            if not placed:
+                skipped_labels += 1
+                continue
+            canvas.setFillColor(colors.HexColor(color))
+            for line_index, line in enumerate(lines):
+                canvas.drawString(text_x, text_y - line_index * line_height, line)
+        for _priority, _sequence, x, y, _label, color, marker in endpoint_positions:
+            canvas.setFillColor(colors.HexColor(color)); canvas.circle(x, y, 4, stroke=0, fill=1); canvas.setFillColor(colors.white); canvas.setFont("Helvetica-Bold", 6); canvas.drawCentredString(x, y - 2, marker)
+        hint = f"Weitere {skipped_labels} Ortsbeschriftungen nicht dargestellt." if self.language == "de" else f"{skipped_labels} additional location labels not shown."
+        legend_lines = wrap_legend(base_legend) + (wrap_legend(hint) if skipped_labels else [])
+        canvas.setFillColor(colors.HexColor("#667085")); canvas.setFont("Helvetica", legend_font_size)
+        legend_first_baseline = legend_bottom + legend_descent + (len(legend_lines) - 1) * legend_line_height
+        for line_index, line in enumerate(legend_lines):
+            canvas.drawString(legend_left, legend_first_baseline - line_index * legend_line_height, line)
+        canvas.restoreState()
 
 
 def _paragraph(value: Any, style: ParagraphStyle, fallback: str = "–") -> Paragraph:
@@ -242,10 +372,15 @@ def render_trip_report(report: dict[str, Any], *, language: str = "de", time_zon
     if _text(trip.get("description")): story += [Paragraph(labels["notes"], heading), Paragraph(_markup(trip.get("description")), body)]
     summary = report.get("expense_summary") or {}; currency = summary.get("currency") or "EUR"; distance = sum(float(item.get("distance_m") or 0) for item in report.get("drives", [])); total = ("Mehrere Währungen" if language == "de" else "Multiple currencies") if summary.get("mixed_currency") else _money(summary.get("total_minor"), currency, language)
     story += [_table([[labels["distance"], labels["drives"], labels["costs"]], [_km(distance, language), str(len(report.get("drives", []))), total]], [doc.width / 3] * 3), Spacer(1, 5)]
+    drives = report.get("drives", [])
+    endpoint_labels = {
+        _text(drive.get("id")): (_text(drive.get("start_label")), _text(drive.get("end_label")))
+        for drive in drives
+        if _text(drive.get("id"))
+    }
     route_segments = [segment for segment in (report.get("route_segments") or []) if segment.get("points")]
     story.append(PageBreak())
-    story.append(KeepTogether([Paragraph(labels["map"], heading), _RouteMap(route_segments, width=doc.width, height=105 * mm, language=language)]))
-    drives = report.get("drives", [])
+    story.append(KeepTogether([Paragraph(labels["map"], heading), _RouteMap(route_segments, width=doc.width, height=105 * mm, language=language, endpoint_labels=endpoint_labels, stops=report.get("stops") or [])]))
     if drives:
         rows = [[labels["start"], labels["end"], labels["distance_short"], labels["duration"], labels["source"], labels["route"]]]
         for drive in sorted(drives, key=lambda item: (item.get("started_at", ""), item.get("id", ""))):
