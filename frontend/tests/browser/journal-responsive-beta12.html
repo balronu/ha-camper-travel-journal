@@ -1,0 +1,36 @@
+<!doctype html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Camper Travel Journal beta.12 responsive journal metrics</title>
+<div id="host"></div>
+<pre id="result">starting</pre>
+<script type="module">
+const result = document.querySelector("#result");
+const trip = { id: "trip-1", title: "Länderspiel Deutschland – Japan", description: "", destination: "Bremen", status: "active", started_at: "2026-10-13T12:00:00Z", start_date: "2026-10-13", end_date: "2026-10-14" };
+const snapshot = { trips: [trip], drives: [{ id: "d1", started_at: "2026-10-13T08:00:00Z", ended_at: "2026-10-13T10:00:00Z", distance_m: 1118700, trip_id: trip.id, assignment_status: "assigned" }, { id: "d2", started_at: "2026-10-13T11:00:00Z", ended_at: "2026-10-13T12:00:00Z", distance_m: 0, trip_id: trip.id, assignment_status: "assigned" }, { id: "d3", started_at: "2026-10-14T08:00:00Z", ended_at: "2026-10-14T10:00:00Z", distance_m: 0, trip_id: trip.id, assignment_status: "assigned" }], stops: [{ id: "overnight", name: "Reisemobilstellplatz am Kuhhirten", occurred_at: "2026-10-13T20:00:00Z", arrived_at: "2026-10-13T20:00:00Z", place_type: "rv_site", place_kind: "rv_site", stop_type: "rv_site", confirmed: true }], expenses: [], expense_summary: { total_minor: 24892, currency: "EUR", mixed_currency: false } };
+const connection = { async sendMessagePromise(message) { if (message.type !== "camper_travel_journal/list") throw new Error(`unexpected ${message.type}`); return message.trip_id ? snapshot : { ...snapshot, drives: [], stops: [] }; } };
+const hass = { connection, locale: { language: "de-DE" } };
+await import("/custom_components/camper_travel_journal/frontend/camper-travel-journal.js");
+await customElements.whenDefined("camper-travel-journal-journal-card");
+const card = document.createElement("camper-travel-journal-journal-card");
+card.setConfig({ vehicle_id: "entry-wohnmobil" });
+document.querySelector("#host").append(card);
+card.hass = hass;
+const waitFor = async (predicate) => { for (let i = 0; i < 160; i += 1) { if (predicate()) return; await new Promise((resolve) => setTimeout(resolve, 25)); } throw new Error("journal responsive harness timed out"); };
+await waitFor(() => card.shadowRoot?.querySelector("select"));
+card.shadowRoot.querySelector("button:not(.secondary)")?.click();
+await waitFor(() => card.shadowRoot?.querySelector(".metric-grid > div"));
+const grid = card.shadowRoot.querySelector(".metric-grid");
+const metrics = [...card.shadowRoot.querySelectorAll(".metric-grid > div")];
+const hostRect = card.shadowRoot.querySelector("ha-card")?.getBoundingClientRect();
+const labels = metrics.map((metric) => ({ text: metric.querySelector("span")?.textContent?.trim(), rect: metric.querySelector("span")?.getBoundingClientRect(), card: metric.getBoundingClientRect() }));
+result.textContent = JSON.stringify({
+  viewport: window.innerWidth,
+  metricCount: metrics.length,
+  values: metrics.map((metric) => metric.querySelector("strong")?.textContent?.trim()),
+  labelsInsideCards: labels.every((item) => item.rect && item.card && item.rect.left >= item.card.left - 1 && item.rect.right <= item.card.right + 1),
+  noHorizontalOverflow: Boolean(grid && grid.scrollWidth <= grid.clientWidth + 1 && hostRect && hostRect.width <= window.innerWidth + 1),
+  overnightVisible: labels.some((item) => item.text === "Übernachtungsplätze"),
+  visibleTemplateLeak: /lit\$\d|=>\s*this\.|currentTarget\.value/.test(card.shadowRoot?.textContent ?? ""),
+}, null, 2);
+</script>

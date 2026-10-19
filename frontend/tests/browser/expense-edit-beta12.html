@@ -1,0 +1,50 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>Camper Travel Journal beta.12 expense edit regression</title>
+<div id="host"></div>
+<pre id="result">starting</pre>
+<script type="module">
+const result = document.querySelector("#result");
+const updates = [];
+const trip = { id: "trip-1", title: "Länderspiel Deutschland – Japan", description: "", destination: "Bremen", status: "active", started_at: "2026-10-13T12:00:00Z" };
+const expenses = [
+  { id: "other-440", trip_id: trip.id, category: "other", amount_minor: 440, currency: "EUR", occurred_on: "2026-10-13", occurred_time: null, occurred_at: "2026-10-13T10:00:00Z" },
+  { id: "fuel-10504", trip_id: trip.id, category: "fuel", amount_minor: 10504, currency: "EUR", occurred_on: "2026-10-13", occurred_time: "09:15", occurred_at: "2026-10-13T09:15:00Z" },
+];
+const connection = {
+  async sendMessagePromise(message) {
+    if (message.type === "camper_travel_journal/list") return { trips: [trip], drives: [], stops: [], expenses, expense_summary: { total_minor: 10944, currency: "EUR", mixed_currency: false } };
+    if (message.type === "camper_travel_journal/update_expense") { updates.push({ ...message }); return { success: true }; }
+    if (message.type === "camper_travel_journal/list_vehicles") return { vehicles: [{ vehicle_id: "entry-wohnmobil", name: "Wohnmobil" }] };
+    throw new Error(`unexpected command ${message.type}`);
+  },
+};
+const hass = { connection, locale: { language: "de-DE" } };
+await import("/custom_components/camper_travel_journal/frontend/camper-travel-journal.js");
+await customElements.whenDefined("camper-travel-journal-manager-card");
+const manager = document.createElement("camper-travel-journal-manager-card");
+manager.setConfig({ vehicle_id: "entry-wohnmobil", trip_id: trip.id, journal_section: "expenses" });
+document.querySelector("#host").append(manager);
+manager.hass = hass;
+const waitFor = async (predicate) => { for (let i = 0; i < 120; i += 1) { if (predicate()) return; await new Promise((resolve) => setTimeout(resolve, 25)); } throw new Error(`timeout: ${manager.shadowRoot?.innerHTML ?? ""}`); };
+await waitFor(() => manager.shadowRoot.querySelectorAll(".expense-row").length === 2);
+const editButtons = () => [...manager.shadowRoot.querySelectorAll(".expense-row button")].filter((button) => button.textContent.trim() === "Bearbeiten");
+const openAndRead = async (index) => { editButtons()[index].click(); await waitFor(() => manager.shadowRoot.querySelector("dialog.editor-dialog")?.open); await manager.updateComplete; return manager.shadowRoot.querySelector("dialog.editor-dialog select")?.value; };
+const otherValue = await openAndRead(0);
+manager.shadowRoot.querySelector("dialog.editor-dialog button.secondary")?.click();
+await waitFor(() => !manager.shadowRoot.querySelector("dialog.editor-dialog")?.open);
+const fuelValue = await openAndRead(1);
+const dialog = manager.shadowRoot.querySelector("dialog.editor-dialog");
+dialog.querySelector("button[type=submit]").click();
+await new Promise((resolve) => setTimeout(resolve, 100));
+result.textContent = JSON.stringify({
+  otherValue,
+  fuelValue,
+  unchangedSaveCategory: updates.at(-1)?.category,
+  unchangedSaveAmount: updates.at(-1)?.amount_minor,
+  unchangedSaveDate: updates.at(-1)?.occurred_on,
+  unchangedSaveTime: updates.at(-1)?.occurred_time,
+  localizedDate: manager.shadowRoot.querySelector(".expense-date")?.textContent === "13.10.2026",
+  noTemplateLeak: !/lit\$\d|=>\s*this\.|currentTarget\.value/.test(manager.shadowRoot?.textContent ?? ""),
+}, null, 2);
+</script>

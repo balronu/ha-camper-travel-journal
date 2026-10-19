@@ -4,7 +4,10 @@ from __future__ import annotations
 
 from datetime import date, datetime, timezone
 import base64
+import asyncio
 from math import cos, hypot, radians
+import re
+import time
 from typing import Any
 
 try:
@@ -22,8 +25,108 @@ from .gpx_import import MAX_FILE_BYTES, analyze_gpx
 from .travel import validate_amount, validate_expense_category, validate_expense_currency, validate_transition
 from .const import (
     CARTO_TILE_ATTRIBUTION, CARTO_TILE_URL, CONF_CARTO_API_KEY,
-    CONF_MAP_PROVIDER, DEFAULT_MAX_GPS_GAP, MAP_PROVIDER_CARTO,
+    CONF_HOME_RADIUS, CONF_MAP_PROVIDER, CONF_REVERSE_GEOCODING_ENABLED,
+    DEFAULT_HOME_RADIUS_M, DEFAULT_MAX_GPS_GAP, MAP_PROVIDER_CARTO,
 )
+
+_COORDINATE_LABEL_RE = re.compile(r"^\s*[+-]?(?:\d+(?:\.\d+)?|\.\d+)\s*,\s*[+-]?(?:\d+(?:\.\d+)?|\.\d+)\s*$")
+_NOMINATIM_URL = "https://nominatim.openstreetmap.org/reverse"
+
+
+def _valid_coordinate(value: object, minimum: float, maximum: float) -> bool:
+    return isinstance(value, (int, float)) and not isinstance(value, bool) and value == value and abs(value) != float("inf") and minimum <= value <= maximum
+
+
+def _valid_coordinate_pair(latitude: object, longitude: object) -> bool:
+    return _valid_coordinate(latitude, -90, 90) and _valid_coordinate(longitude, -180, 180)
+
+
+def _distance_m(latitude: float, longitude: float, other_latitude: float, other_longitude: float) -> float:
+    lat_scale = 111_320.0
+    lon_scale = lat_scale * max(0.1, abs(cos(radians(latitude))))
+    return hypot((longitude - other_longitude) * lon_scale, (latitude - other_latitude) * lat_scale)
+
+
+def _language(hass: HomeAssistant) -> str:
+    return "de" if str(getattr(getattr(hass, "config", None), "language", "de") or "de").lower().startswith("de") else "en"
+
+
+def _coordinate_label(value: object) -> bool:
+    return isinstance(value, str) and bool(_COORDINATE_LABEL_RE.fullmatch(value))
+
+
+def _address_label(address: object, language: str) -> str | None:
+    if not isinstance(address, dict):
+        return None
+    for key in (("city", "town", "village", "municipality", "county") if language == "de" else ("city", "town", "village", "municipality", "county")):
+        value = address.get(key)
+        if isinstance(value, str) and value.strip():
+            return value.strip()
+    return None
+
+
+async def _reverse_geocode(hass: HomeAssistant, runtime, latitude: float, longitude: float) -> str | None:
+    """Optionally resolve one rounded endpoint; disabled by default and never required."""
+    if not runtime.values.get(CONF_REVERSE_GEOCODING_ENABLED, False):
+        return None
+    language = _language(hass)
+    key = (language, round(latitude, 3), round(longitude, 3))
+    cache = getattr(runtime, "location_cache", None)
+    if cache is None:
+        cache = runtime.location_cache = {}
+    if key in cache:
+        return cache[key]
+    last_request = getattr(runtime, "location_last_request", 0.0)
+    wait = 1.0 - (time.monotonic() - last_request)
+    if wait > 0:
+        await asyncio.sleep(wait)
+    runtime.location_last_request = time.monotonic()
+    try:
+        from homeassistant.helpers.aiohttp_client import async_get_clientsession
+        session = async_get_clientsession(hass)
+        async with session.get(
+            _NOMINATIM_URL,
+            params={"lat": f"{round(latitude, 3):.3f}", "lon": f"{round(longitude, 3):.3f}", "format": "jsonv2", "zoom": "10", "addressdetails": "1"},
+            headers={"User-Agent": "Camper Travel Journal/0.3.0-beta.12"},
+            timeout=5,
+        ) as response:
+            if response.status != 200:
+                cache[key] = None
+                return None
+            label = _address_label(await response.json(), language)
+    except Exception:
+        label = None
+    cache[key] = label
+    return label
+
+
+async def _resolve_drive_labels(hass: HomeAssistant, msg: dict, drives: list[dict]) -> list[dict]:
+    """Resolve display-only labels without overwriting manual or saved names."""
+    runtime = _runtime(hass, msg["vehicle_id"])
+    zone = hass.states.get("zone.home") if getattr(hass, "states", None) else None
+    zone_latitude = zone_longitude = None
+    if zone is not None:
+        zone_latitude, zone_longitude = zone.attributes.get("latitude"), zone.attributes.get("longitude")
+        if not _valid_coordinate_pair(zone_latitude, zone_longitude):
+            zone_latitude = zone_longitude = None
+    radius = float(runtime.values.get(CONF_HOME_RADIUS, DEFAULT_HOME_RADIUS_M) or DEFAULT_HOME_RADIUS_M)
+    home_label = "Zuhause" if _language(hass) == "de" else "Home"
+    for drive in drives:
+        for prefix in ("start", "end"):
+            label_key = f"{prefix}_label"
+            label = drive.get(label_key)
+            if label and not _coordinate_label(label):
+                continue
+            latitude, longitude = drive.get(f"{prefix}_latitude"), drive.get(f"{prefix}_longitude")
+            if not _valid_coordinate_pair(latitude, longitude):
+                continue
+            if zone_latitude is not None and _distance_m(latitude, longitude, zone_latitude, zone_longitude) <= radius:
+                drive[label_key] = home_label
+                continue
+            resolved = await _reverse_geocode(hass, runtime, latitude, longitude)
+            if resolved:
+                drive[label_key] = resolved
+    return drives
 
 
 def _map_config(values: dict[str, Any]) -> dict[str, Any]:
@@ -192,10 +295,11 @@ if websocket_api is not None:
             if trip is None:
                 raise ValueError("trip_not_found")
             vehicle_name = _runtime(hass, vehicle_id).values.get("vehicle_name", "Wohnmobil")
+            drives = await _call(hass, msg, "list_drives", vehicle_id, trip_id=trip_id)
             report = {
                 "vehicle_name": vehicle_name,
                 "trip": trip,
-                "drives": await _call(hass, msg, "list_drives", vehicle_id, trip_id=trip_id),
+                "drives": await _resolve_drive_labels(hass, msg, drives),
                 "route_segments": await _call(hass, msg, "route_segments", vehicle_id, trip_id),
                 "interruptions": await _call(hass, msg, "list_trip_interruptions", vehicle_id, trip_id),
                 "stops": await _call(hass, msg, "list_stops", vehicle_id, trip_id=trip_id),
@@ -219,9 +323,10 @@ if websocket_api is not None:
     async def ws_list(hass: HomeAssistant, connection, msg: dict) -> None:
         try:
             trip_id = msg.get("trip_id")
+            drives = await _call(hass, msg, "list_drives", msg["vehicle_id"], trip_id=trip_id) if trip_id else await _call(hass, msg, "list_drives", msg["vehicle_id"])
             result = {
                 "trips": await _call(hass, msg, "list_trips", msg["vehicle_id"]),
-                "drives": await _call(hass, msg, "list_drives", msg["vehicle_id"], trip_id=trip_id) if trip_id else await _call(hass, msg, "list_drives", msg["vehicle_id"]),
+                "drives": await _resolve_drive_labels(hass, msg, drives),
                 "stops": await _call(hass, msg, "list_stops", msg["vehicle_id"], trip_id=trip_id),
                 "stop_suggestions": await _call(hass, msg, "list_stop_suggestions", msg["vehicle_id"], trip_id=trip_id) if trip_id else await _call(hass, msg, "list_stop_suggestions", msg["vehicle_id"]),
             }

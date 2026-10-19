@@ -13,7 +13,9 @@ from .const import (
     DEFAULT_UNASSIGNED_RETENTION, MAX_INTERVAL_SECONDS, MAX_MOVEMENT_METERS,
     MAX_RETENTION_DAYS, MIN_INTERVAL_SECONDS, MIN_MOVEMENT_METERS,
     MIN_RETENTION_DAYS,
-    CONF_CARTO_API_KEY, CONF_MAP_PROVIDER,
+    CONF_CARTO_API_KEY, CONF_MAP_PROVIDER, CONF_HOME_RADIUS,
+    CONF_REVERSE_GEOCODING_ENABLED, DEFAULT_HOME_RADIUS_M,
+    MIN_HOME_RADIUS_M, MAX_HOME_RADIUS_M,
     CONF_REMOVE_CARTO_API_KEY, MAP_PROVIDER_CARTO, MAP_PROVIDER_NONE,
 )
 
@@ -48,6 +50,8 @@ def defaults(source: dict[str, Any] | None = None) -> dict[str, Any]:
         CONF_MAX_GAP: int(source.get(CONF_MAX_GAP, DEFAULT_MAX_GAP_MINUTES)),
         CONF_MAX_SPEED: float(source.get(CONF_MAX_SPEED, DEFAULT_MAX_SPEED_KMH)),
         CONF_MAP_PROVIDER: source.get(CONF_MAP_PROVIDER, MAP_PROVIDER_NONE),
+        CONF_HOME_RADIUS: float(source.get(CONF_HOME_RADIUS, DEFAULT_HOME_RADIUS_M)),
+        CONF_REVERSE_GEOCODING_ENABLED: bool(source.get(CONF_REVERSE_GEOCODING_ENABLED, False)),
     }
 
 
@@ -115,6 +119,10 @@ def _schema(value: dict[str, Any] | None = None) -> dict[str, Any]:
             selector.TextSelectorConfig(type=selector.TextSelectorType.PASSWORD)
         ),
         vol.Optional(CONF_REMOVE_CARTO_API_KEY, default=False): bool,
+        vol.Required(CONF_HOME_RADIUS, default=current[CONF_HOME_RADIUS]): selector.NumberSelector(
+            selector.NumberSelectorConfig(min=MIN_HOME_RADIUS_M, max=MAX_HOME_RADIUS_M, step=25, mode=selector.NumberSelectorMode.BOX)
+        ),
+        vol.Required(CONF_REVERSE_GEOCODING_ENABLED, default=current[CONF_REVERSE_GEOCODING_ENABLED]): bool,
     }
 
 

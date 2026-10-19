@@ -1,5 +1,14 @@
 # Änderungsprotokoll
 
+## 0.3.0-beta.12 – Kostenanzeige, Heimatzone und Ortsbeschriftungen
+
+- Bearbeitungsdialoge wählen die tatsächlich gespeicherte Kostenkategorie auch beim Wechsel zwischen Ausgaben zuverlässig aus; unbekannte historische Werte bleiben unverändert speicherbar.
+- Kostenliste und Reiseübersicht formatieren Kalenderdaten lokalisiert und bleiben bei langen deutschen Bezeichnungen responsiv.
+- `zone.home` kann Fahrtendpunkte innerhalb eines konfigurierbaren Radius als „Zuhause“ beschriften, ohne Aufenthalte oder GPX-Daten anzulegen oder zu verändern.
+- Optionales Reverse Geocoding ist standardmäßig deaktiviert; falls ausdrücklich aktiviert, werden nur gerundete relevante Endpunkte mit Cache, Rate Limit und Timeout abgefragt. Ohne Dienst bleibt der Koordinaten-Fallback erhalten.
+- Die offlinefähige PDF-Reisekarte erhält sichere Start-/Zielbeschriftungen und eine verständlichere Legende; Kartentiles und externe Geocoding-Aufrufe sind keine Voraussetzung.
+
+
 ## 0.3.0-beta.10 – Tatsächliche Ausgabendaten und GPX-Endpunkte
 
 - Ausgaben speichern das tatsächliche Datum verpflichtend und die Uhrzeit nur bei ausdrücklicher Erfassung; der automatische Erfassungszeitpunkt bleibt unverändert.

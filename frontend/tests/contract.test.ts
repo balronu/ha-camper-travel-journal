@@ -13,10 +13,10 @@ const bundle = resolve(root, "../custom_components/camper_travel_journal/fronten
 
 describe("frontend release contract", () => {
   it("keeps backend, npm metadata and beta bundle aligned", () => {
-    expect(manifest.version).toBe("0.3.0-beta.11");
+    expect(manifest.version).toBe("0.3.0-beta.12");
     expect(pkg.version).toBe(manifest.version);
     expect(existsSync(bundle)).toBe(true);
-    expect(readFileSync(resolve(root, "../custom_components/camper_travel_journal/const.py"), "utf8")).toContain('FRONTEND_VERSION = "0.3.0-beta.11"');
+    expect(readFileSync(resolve(root, "../custom_components/camper_travel_journal/const.py"), "utf8")).toContain('FRONTEND_VERSION = "0.3.0-beta.12"');
   });
   it("registers the central card in the catalog while retaining legacy elements", () => {
     const source = readFileSync(resolve(root, "src/index.ts"), "utf8");
@@ -73,6 +73,10 @@ describe("frontend release contract", () => {
     expect(messages({ locale: { language: "en-US" } } as any).summaryChooseTrip).toBe("Select trip");
     expect(messages({ locale: { language: "de-DE" } } as any).start).toBe("Reise starten");
     expect(messages({ locale: { language: "en-US" } } as any).start).toBe("Start trip");
+  });
+  it("formats expense calendar dates without timezone conversion", () => {
+    expect(formatDate("2026-10-13", { locale: { language: "de-DE" } } as any)).toBe("13.10.2026");
+    expect(formatDate("2026-10-13", { locale: { language: "en-US" } } as any)).toBe("10/13/2026");
   });
   it("translates the explicit GPX target controls", () => {
     expect(messages({ locale: { language: "de-DE" } } as any).gpxTargetTrip).toBe("Zielreise");

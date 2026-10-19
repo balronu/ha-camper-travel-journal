@@ -97,6 +97,35 @@ def test_timestamp_and_amount_validation():
         api._runtime(type("Hass", (), {"data": {}})(), "missing")
 
 
+def test_endpoint_coordinate_validation_rejects_implicit_values_but_accepts_zero():
+    assert api._valid_coordinate_pair(0, 0)
+    assert api._valid_coordinate_pair(53.06452, 8.82002)
+    for value in (None, "", "not-a-number", float("nan"), float("inf"), 91):
+        assert not api._valid_coordinate_pair(value, 8.8)
+    assert not api._valid_coordinate_pair(53.0, 181)
+
+
+def test_location_labels_are_conservative_and_localized():
+    assert api._address_label({"city": "Bremen", "county": "Landkreis"}, "de") == "Bremen"
+    assert api._address_label({"town": "Cologne"}, "en") == "Cologne"
+    assert api._address_label({"road": "Private road"}, "de") is None
+    assert api._address_label(None, "de") is None
+
+
+@pytest.mark.asyncio
+async def test_home_label_is_display_only_and_manual_label_wins():
+    hass = FakeHass()
+    hass.config = type("Config", (), {"language": "de"})()
+    hass.states = type("States", (), {"get": lambda _self, entity: type("State", (), {"attributes": {"latitude": 53.06452, "longitude": 8.82002}})() if entity == "zone.home" else None})()
+    hass.data["camper_travel_journal"]["v1"].values.update({"home_radius_m": 200, "reverse_geocoding_enabled": False})
+    drives = [
+        {"start_label": "53.06452, 8.82002", "start_latitude": 53.06452, "start_longitude": 8.82002, "end_label": "Paris, France", "end_latitude": 48.8566, "end_longitude": 2.3522},
+    ]
+    resolved = await api._resolve_drive_labels(hass, {"vehicle_id": "v1"}, drives)
+    assert resolved[0]["start_label"] == "Zuhause"
+    assert resolved[0]["end_label"] == "Paris, France"
+
+
 def test_websocket_errors_are_stable_and_do_not_leak_exception_details():
     connection = FakeConnection()
     api._send_error(connection, {"id": 99}, ValueError("database path=/private/trip.sqlite"))
