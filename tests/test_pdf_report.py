@@ -112,6 +112,80 @@ def test_route_map_draws_valid_overnight_marker_and_skips_invalid_marker():
     assert "S = Start, Z = Ziel, Ü = Übernachtungsplatz" in labels
 
 
+def test_route_map_multiline_label_geometry_stays_inside_map_and_does_not_overlap():
+    from io import BytesIO
+    from reportlab.pdfgen.canvas import Canvas
+    import textwrap
+
+    route_map = _RouteMap(
+        [{"drive_id": "d1", "points": [
+            {"latitude": 53.0, "longitude": 8.0},
+            {"latitude": 53.1, "longitude": 8.1},
+        ]}],
+        width=200,
+        height=120,
+        language="de",
+        endpoint_labels={"d1": ("Sehr langer Startort mit einer mehrzeiligen Ortsbezeichnung", "Sehr langer Zielort mit einer mehrzeiligen Ortsbezeichnung")},
+        stops=[
+            {"name": "Reisemobilstellplatz am Kuhhirten in Bremen mit langem Namen", "place_type": "rv_site", "latitude": 53.05, "longitude": 8.05},
+        ],
+    )
+    canvas = Canvas(BytesIO())
+    drawn = []
+    original_draw_string = canvas.drawString
+    canvas.drawString = lambda x, y, value: (drawn.append((x, y, value)), original_draw_string(x, y, value))[1]
+    route_map.canv = canvas
+    route_map.draw()
+
+    label_texts = {
+        "Sehr langer Startort mit einer mehrzeiligen Ortsbezeichnung",
+        "Sehr langer Zielort mit einer mehrzeiligen Ortsbezeichnung",
+        "Reisemobilstellplatz am Kuhhirten in Bremen mit langem Namen",
+    }
+    wrapped = [
+        line
+        for text in label_texts
+        for line in textwrap.wrap(text, width=30, break_long_words=True, break_on_hyphens=False)
+    ]
+    label_calls = [call for call in drawn if call[2] in wrapped]
+    assert label_calls
+    ascent, descent, line_height = 6.5 * 0.8, 6.5 * 0.2, 7.0
+    boxes = []
+    for x, y, text in label_calls:
+        box = (x, y - descent, x + canvas.stringWidth(text, "Helvetica", 6.5), y + ascent)
+        assert 0 <= box[0] <= box[2] <= route_map.width
+        assert 0 <= box[1] <= box[3] <= route_map.height
+        boxes.append(box)
+    for index, left in enumerate(boxes):
+        for right in boxes[index + 1:]:
+            assert not (left[0] < right[2] and left[2] > right[0] and left[1] < right[3] and left[3] > right[1])
+
+
+def test_route_map_keeps_coordinate_fallback_labels_unrendered():
+    from io import BytesIO
+    from reportlab.pdfgen.canvas import Canvas
+
+    route_map = _RouteMap(
+        [{"drive_id": "d1", "points": [
+            {"latitude": 49.0, "longitude": 7.0},
+            {"latitude": 53.0, "longitude": 8.0},
+        ]}],
+        width=200,
+        height=120,
+        language="en",
+        endpoint_labels={"d1": ("49.00000, 7.00000", "53.00000, 8.00000")},
+    )
+    canvas = Canvas(BytesIO())
+    labels = []
+    original_draw_string = canvas.drawString
+    canvas.drawString = lambda x, y, value: (labels.append(value), original_draw_string(x, y, value))[1]
+    route_map.canv = canvas
+    route_map.draw()
+    assert "49.00000, 7.00000" not in labels
+    assert "53.00000, 8.00000" not in labels
+    assert "S = start, Z = destination, O = overnight place" in labels
+
+
 def test_report_skips_invalid_route_points_without_losing_valid_segments():
     report = _report(drives=1, expenses=0, stops=0)
     report["route_segments"] = [

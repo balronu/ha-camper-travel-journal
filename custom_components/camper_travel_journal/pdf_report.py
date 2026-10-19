@@ -255,23 +255,43 @@ class _RouteMap(Flowable):
         # another without changing the stored coordinates.
         canvas.setFont("Helvetica", 6.5)
         occupied: list[tuple[float, float, float, float]] = []
+        font_size, line_height, margin = 6.5, 7.0, 3.0
+        # Helvetica's text is drawn from the baseline.  Keep the measured
+        # ascent/descent explicit so the collision box matches the glyphs,
+        # including the lower lines of a multiline label.
+        font_ascent, font_descent = font_size * 0.8, font_size * 0.2
         for x, y, label, color, _marker in endpoint_positions:
             label = _text(label)
             if not label or is_coordinate_label(label):
                 continue
             lines = textwrap.wrap(label, width=30, break_long_words=True, break_on_hyphens=False) or [label]
             text_width = max(canvas.stringWidth(line, "Helvetica", 6.5) for line in lines)
-            line_height = 7
-            label_height = line_height * len(lines)
+            min_baseline = margin + (len(lines) - 1) * line_height + font_descent
+            max_baseline = self.height - margin - font_ascent
             text_x = text_y = 0.0
             for dx, dy in ((6, 5), (6, -10), (-text_width - 6, 5), (-text_width - 6, -10), (12, 16), (-text_width - 12, 16)):
-                candidate_x = min(max(x + dx, 2), self.width - text_width - 2)
-                candidate_y = min(max(y + dy, label_height + 4), self.height - 12)
-                box = (candidate_x, candidate_y, candidate_x + text_width, candidate_y + label_height)
+                candidate_x = min(max(x + dx, margin), self.width - text_width - margin)
+                candidate_y = min(max(y + dy, min_baseline), max_baseline)
+                # ReportLab baselines advance downwards here.  The box is the
+                # actual visual extent of those baselines, not a box above
+                # the first baseline.
+                box = (candidate_x, candidate_y - (len(lines) - 1) * line_height - font_descent, candidate_x + text_width, candidate_y + font_ascent)
                 if not any(box[0] < other[2] and box[2] > other[0] and box[1] < other[3] and box[3] > other[1] for other in occupied):
                     text_x, text_y = candidate_x, candidate_y
                     occupied.append(box)
                     break
+            else:
+                # Deterministic grid fallback for crowded marker clusters.
+                # It still uses the same measured box and never leaves the
+                # map when a wrapped label fits on the page.
+                placed = False
+                for grid_y in range(int(max_baseline), int(min_baseline) - 1, -8):
+                    for grid_x in range(int(margin), max(int(self.width - text_width - margin), int(margin)) + 1, 8):
+                        box = (grid_x, grid_y - (len(lines) - 1) * line_height - font_descent, grid_x + text_width, grid_y + font_ascent)
+                        if not any(box[0] < other[2] and box[2] > other[0] and box[1] < other[3] and box[3] > other[1] for other in occupied):
+                            text_x, text_y = grid_x, grid_y; occupied.append(box); placed = True; break
+                    if placed:
+                        break
             canvas.setFillColor(colors.HexColor(color))
             for line_index, line in enumerate(lines):
                 canvas.drawString(text_x, text_y - line_index * line_height, line)
