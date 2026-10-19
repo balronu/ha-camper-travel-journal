@@ -283,6 +283,36 @@ class _RouteMap(Flowable):
             if place_type not in overnight_types:
                 continue
             endpoint_positions.append((1, len(endpoint_positions), longitude * scale + ox, latitude * scale + oy, _text(stop.get("name")), "#8e24aa", "Ü" if self.language == "de" else "O"))
+        # Collapse roles that describe the same rendered location before label
+        # placement.  The comparison is deliberately in rendered points: it
+        # is bounded, deterministic, and avoids merging distinct nearby places
+        # merely because their names happen to match.
+        grouped_positions: list[dict[str, Any]] = []
+        for priority, sequence, x, y, label, color, marker in sorted(endpoint_positions, key=lambda item: (item[0], item[1])):
+            label = _text(label)
+            if is_coordinate_label(label):
+                label = ""
+            match = next((group for group in grouped_positions if label and group["labels"] == [label] and (group["x"] - x) ** 2 + (group["y"] - y) ** 2 <= 1.5 ** 2), None)
+            if match is None:
+                grouped_positions.append({"priority": priority, "sequence": sequence, "x": x, "y": y, "labels": [label] if label else [], "color": color, "markers": [marker]})
+                continue
+            if label and label not in match["labels"]:
+                match["labels"].append(label)
+            if marker not in match["markers"]:
+                match["markers"].append(marker)
+            match["priority"] = min(match["priority"], priority)
+        endpoint_positions = [
+            (
+                int(group["priority"]),
+                int(group["sequence"]),
+                float(group["x"]),
+                float(group["y"]),
+                " / ".join(group["labels"]),
+                str(group["color"]),
+                "/".join(group["markers"]),
+            )
+            for group in grouped_positions
+        ]
         # Place labels in deterministic candidate slots.  This keeps labels
         # inside the map and avoids drawing endpoint/stay text on top of one
         # another without changing the stored coordinates.

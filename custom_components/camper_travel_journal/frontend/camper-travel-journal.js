@@ -779,7 +779,7 @@ const Yr = ["camping", "fuel", "toll", "parking", "food", "activities", "other"]
     mapTripPeriod: "Reisezeitraum",
     mapPlaces: "Orte anzeigen",
     mapExpandSegments: "Fahrtabschnitte aufklappen",
-    overnights: "Übernachtungsplätze",
+    overnights: "Übernachtungen",
     gpsSuggestions: "GPS-Stoppvorschläge",
     generateSuggestions: "Vorschläge aktualisieren",
     accept: "Übernehmen",
@@ -840,7 +840,7 @@ const Yr = ["camping", "fuel", "toll", "parking", "food", "activities", "other"]
     mapTripPeriod: "Trip period",
     mapPlaces: "Show places",
     mapExpandSegments: "Expand drive sections",
-    overnights: "Overnight places",
+    overnights: "Overnights",
     gpsSuggestions: "GPS stop suggestions",
     generateSuggestions: "Refresh suggestions",
     accept: "Accept",
@@ -1905,7 +1905,7 @@ class ti extends Rt {
   }
   renderEmbeddedExpenses(i) {
     const s = this.snapshot?.expenses ?? [], o = this.snapshot?.expense_summary?.total_minor !== void 0 && this.snapshot.expense_summary.currency ? bt(this.snapshot.expense_summary.total_minor, this.snapshot.expense_summary.currency, this.hass) : bt(0, "EUR", this.hass);
-    return g`<section class="place-section"><details><summary><strong>${i.expenses}</strong><span>${s.length}</span></summary><div class="actions compact-actions"><button type="button" @click=${() => this.startExpenseCreate(this.embeddedTripId())}>${i.create ?? "Hinzufügen"}</button></div>${s.map((h) => this.renderExpense(h, i))}<p class="total"><strong>${i.total}: ${o}</strong></p></details></section>`;
+    return g`<div class="embedded-expenses"><div class="actions compact-actions"><button type="button" @click=${() => this.startExpenseCreate(this.embeddedTripId())}>${i.create ?? "Hinzufügen"}</button></div>${s.map((h) => this.renderExpense(h, i))}<p class="total"><strong>${i.total}: ${o}</strong></p></div>`;
   }
   renderLegacySource() {
     const i = $(this.hass), s = this.snapshot?.trips ?? [], o = this.snapshot?.expenses ?? [], h = this.snapshot?.expense_summary, d = h?.mixed_currency ? i.mixedCurrency : h?.total_minor !== void 0 && h.currency ? bt(h.total_minor, h.currency, this.hass) : bt(0, "EUR", this.hass), f = this.actionError || this.loadError, b = this.gpxPreview;
@@ -1973,10 +1973,10 @@ function Mo(c) {
 }
 async function zo(c, i, s = Ao) {
   const o = { state: "not_run", durationMs: null };
-  if (!c?.connection) return { version: "0.3.0-beta.12", connectionBefore: "unavailable", connectionAfter: "unavailable", authentication: o, vehicles: o, trips: o, vehicleId: Gi(i) };
+  if (!c?.connection) return { version: "0.3.0-beta.13", connectionBefore: "unavailable", connectionAfter: "unavailable", authentication: o, vehicles: o, trips: o, vehicleId: Gi(i) };
   const h = Nr(c), d = await Ki(c, { type: "auth/current_user" }, Do, s), f = await Ki(c, { type: "camper_travel_journal/list_vehicles" }, Io, s), b = f.value?.vehicles?.filter((mt) => typeof mt.vehicle_id == "string") ?? [], p = b.length === 1 ? b[0].vehicle_id : void 0, P = await Ki(c, { type: "camper_travel_journal/list", vehicle_id: p ?? i }, Mo, s), { value: y, ...k } = d, { value: w, ...A } = f, { value: N, ...at } = P;
   return {
-    version: "0.3.0-beta.12",
+    version: "0.3.0-beta.13",
     connectionBefore: h,
     connectionAfter: Nr(c),
     authentication: k,
