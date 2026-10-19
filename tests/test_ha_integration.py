@@ -294,8 +294,11 @@ else:
             database = hass.config.path("camper_travel_journal.db")
 
             def read() -> list[tuple]:
-                with sqlite3.connect(f"file:{database}?mode=ro", uri=True) as connection:
+                connection = sqlite3.connect(f"file:{database}?mode=ro", uri=True)
+                try:
                     return connection.execute(query, parameters).fetchall()
+                finally:
+                    connection.close()
 
             return await hass.async_add_executor_job(read)
 

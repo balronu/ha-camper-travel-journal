@@ -18,7 +18,8 @@ from pathlib import Path
 
 from .travel import validate_amount, validate_expense_category, validate_expense_currency
 
-SCHEMA_VERSION = 9
+SCHEMA_VERSION = 10
+V10_GPX_BACKFILL_MARKER = "v10_gpx_backfill"
 SCHEMA_SQL = """
 PRAGMA foreign_keys = ON;
 CREATE TABLE IF NOT EXISTS schema_meta (key TEXT PRIMARY KEY, value TEXT NOT NULL);
@@ -37,6 +38,7 @@ CREATE TABLE IF NOT EXISTS drives (
   id TEXT PRIMARY KEY, vehicle_id TEXT NOT NULL REFERENCES vehicles(id), started_at TEXT NOT NULL,
   ended_at TEXT NOT NULL, distance_m REAL NOT NULL, end_reason TEXT NOT NULL,
   manual_distance_km REAL, source TEXT NOT NULL DEFAULT 'gps', start_label TEXT, end_label TEXT,
+  start_latitude REAL, start_longitude REAL, end_latitude REAL, end_longitude REAL,
   created_at TEXT NOT NULL
 );
 CREATE INDEX IF NOT EXISTS idx_drives_vehicle_time ON drives(vehicle_id, started_at, ended_at);
@@ -58,7 +60,8 @@ CREATE TABLE IF NOT EXISTS trip_drives (
 CREATE TABLE IF NOT EXISTS expenses (
   id TEXT PRIMARY KEY, trip_id TEXT REFERENCES trips(id) ON DELETE SET NULL, occurred_at TEXT NOT NULL,
   category TEXT NOT NULL, amount_minor INTEGER NOT NULL, currency TEXT NOT NULL,
-  note TEXT, created_at TEXT NOT NULL, updated_at TEXT NOT NULL, odometer_km REAL, stay_id TEXT REFERENCES stops(id) ON DELETE SET NULL
+  note TEXT, created_at TEXT NOT NULL, updated_at TEXT NOT NULL, odometer_km REAL, stay_id TEXT REFERENCES stops(id) ON DELETE SET NULL,
+  occurred_on TEXT, occurred_time TEXT
 );
 CREATE INDEX IF NOT EXISTS idx_expenses_trip_time ON expenses(trip_id, occurred_at);
 CREATE TABLE IF NOT EXISTS stops (
@@ -162,7 +165,17 @@ class SQLiteStore:
                     self._migrate_v8()
                 if previous < 9:
                     self._migrate_v9()
+                if previous < 10:
+                    self._migrate_v10()
+                if self.connection.execute(
+                    "SELECT 1 FROM schema_meta WHERE key=?", (V10_GPX_BACKFILL_MARKER,)
+                ).fetchone() is None:
+                    self._backfill_v10_gpx_endpoints()
                 connection.execute("INSERT OR REPLACE INTO schema_meta(key, value) VALUES('version', ?)", (str(SCHEMA_VERSION),))
+                connection.execute(
+                    "INSERT OR REPLACE INTO schema_meta(key, value) VALUES(?, '1')",
+                    (V10_GPX_BACKFILL_MARKER,),
+                )
         except Exception:
             self.close()
             raise
@@ -360,6 +373,48 @@ class SQLiteStore:
         CREATE INDEX IF NOT EXISTS idx_interruption_links_stop ON interruption_links(stop_id);
         """)
 
+    def _migrate_v10(self) -> None:
+        """Add actual expense date/time and persisted drive endpoints additively.
+
+        Existing expense rows deliberately remain unknown: ``created_at`` is
+        the capture timestamp, not proof of when the expense occurred.
+        """
+        if self.connection is None:
+            raise RuntimeError("store is not open")
+        expense_columns = {row[1] for row in self.connection.execute("PRAGMA table_info(expenses)")}
+        for name, definition in (("occurred_on", "TEXT"), ("occurred_time", "TEXT")):
+            if name not in expense_columns:
+                self.connection.execute(f"ALTER TABLE expenses ADD COLUMN {name} {definition}")
+        drive_columns = {row[1] for row in self.connection.execute("PRAGMA table_info(drives)")}
+        for name in ("start_latitude", "start_longitude", "end_latitude", "end_longitude"):
+            if name not in drive_columns:
+                self.connection.execute(f"ALTER TABLE drives ADD COLUMN {name} REAL")
+
+    def _backfill_v10_gpx_endpoints(self) -> None:
+        """Reconstruct safe legacy memberships once, then persist endpoints.
+
+        The marker makes this safe for already-opened v10 databases without
+        repeating a potentially expensive full interval scan on every startup.
+        """
+        if self.connection is None:
+            raise RuntimeError("store is not open")
+        self._reconstruct_drive_point_membership(self.connection)
+        drives = self.connection.execute("SELECT id FROM drives").fetchall()
+        for (drive_id,) in drives:
+            points = self.connection.execute(
+                "SELECT p.latitude,p.longitude FROM drive_gps_points dgp "
+                "JOIN gps_points p ON p.id=dgp.gps_point_id "
+                "WHERE dgp.drive_id=? ORDER BY dgp.ordinal",
+                (drive_id,),
+            ).fetchall()
+            if points:
+                self.connection.execute(
+                    "UPDATE drives SET start_latitude=?,start_longitude=?,"
+                    "end_latitude=?,end_longitude=? "
+                    "WHERE id=? AND start_latitude IS NULL",
+                    (points[0][0], points[0][1], points[-1][0], points[-1][1], drive_id),
+                )
+
     def close(self) -> None:
         if self.connection is not None:
             self.connection.close()
@@ -417,7 +472,7 @@ class SQLiteStore:
     def insert_drive(self, drive) -> None:
         with self.transaction() as connection:
             stamp = utc_iso(drive.ended_at)
-            connection.execute("INSERT OR IGNORE INTO drives(id,vehicle_id,started_at,ended_at,distance_m,end_reason,manual_distance_km,source,start_label,end_label,created_at) VALUES(?,?,?,?,?,?,?,?,?,?,?)", (drive.id, drive.vehicle_id, utc_iso(drive.started_at), utc_iso(drive.ended_at), drive.distance_m, drive.end_reason, drive.manual_distance_km, drive.source, drive.start_label, drive.end_label, stamp))
+            connection.execute("INSERT OR IGNORE INTO drives(id,vehicle_id,started_at,ended_at,distance_m,end_reason,manual_distance_km,source,start_label,end_label,start_latitude,start_longitude,end_latitude,end_longitude,created_at) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)", (drive.id, drive.vehicle_id, utc_iso(drive.started_at), utc_iso(drive.ended_at), drive.distance_m, drive.end_reason, drive.manual_distance_km, drive.source, drive.start_label, drive.end_label, drive.start_latitude, drive.start_longitude, drive.end_latitude, drive.end_longitude, stamp))
 
     def associate_drive_points(self, drive_id: str, vehicle_id: str, started_at: datetime, ended_at: datetime, association_source: str) -> int:
         """Associate existing points in a drive interval, without rewriting points."""
@@ -442,28 +497,48 @@ class SQLiteStore:
         if self.connection is None:
             raise RuntimeError("store is not open")
         with self.transaction() as connection:
-            drives = connection.execute("SELECT id, started_at, ended_at FROM drives WHERE vehicle_id=? ORDER BY started_at, id", (vehicle_id,)).fetchall()
-            assigned = 0
-            ambiguous = 0
-            for drive_id, started_at, ended_at in drives:
-                overlaps = connection.execute(
-                    "SELECT count(*) FROM drives WHERE vehicle_id=? AND id<>? AND started_at < ? AND ended_at > ?",
-                    (vehicle_id, drive_id, ended_at, started_at),
-                ).fetchone()[0]
-                if overlaps:
-                    ambiguous += 1
-                    continue
-                rows = connection.execute(
-                    "SELECT id FROM gps_points WHERE vehicle_id=? AND recorded_at>=? AND recorded_at<=? ORDER BY recorded_at, id",
-                    (vehicle_id, started_at, ended_at),
-                ).fetchall()
-                for ordinal, row in enumerate(rows):
-                    connection.execute(
-                        "INSERT OR IGNORE INTO drive_gps_points(drive_id,gps_point_id,ordinal,association_source) VALUES(?,?,?,?)",
-                        (drive_id, row[0], ordinal, "interval_reconstructed"),
-                    )
-                assigned += len(rows)
-            return {"assigned": assigned, "ambiguous_drives": ambiguous}
+            return self._reconstruct_drive_point_membership(connection, vehicle_id)
+
+    @staticmethod
+    def _reconstruct_drive_point_membership(connection, vehicle_id: str | None = None) -> dict[str, int]:
+        query = "SELECT id, vehicle_id, started_at, ended_at FROM drives"
+        args: tuple = ()
+        if vehicle_id is not None:
+            query += " WHERE vehicle_id=?"
+            args = (vehicle_id,)
+        query += " ORDER BY started_at, id"
+        drives = connection.execute(query, args).fetchall()
+        assigned = 0
+        ambiguous = 0
+        skipped_existing = 0
+        for drive_id, drive_vehicle_id, started_at, ended_at in drives:
+            if connection.execute(
+                "SELECT 1 FROM drive_gps_points WHERE drive_id=? LIMIT 1", (drive_id,)
+            ).fetchone():
+                skipped_existing += 1
+                continue
+            overlaps = connection.execute(
+                "SELECT count(*) FROM drives WHERE vehicle_id=? AND id<>? "
+                "AND started_at < ? AND ended_at > ?",
+                (drive_vehicle_id, drive_id, ended_at, started_at),
+            ).fetchone()[0]
+            if overlaps:
+                ambiguous += 1
+                continue
+            rows = connection.execute(
+                "SELECT id FROM gps_points WHERE vehicle_id=? AND recorded_at>=? "
+                "AND recorded_at<=? ORDER BY recorded_at, id",
+                (drive_vehicle_id, started_at, ended_at),
+            ).fetchall()
+            for ordinal, row in enumerate(rows):
+                connection.execute(
+                    "INSERT OR IGNORE INTO drive_gps_points "
+                    "(drive_id,gps_point_id,ordinal,association_source) "
+                    "VALUES(?,?,?,?)",
+                    (drive_id, row[0], ordinal, "interval_reconstructed"),
+                )
+            assigned += len(rows)
+        return {"assigned": assigned, "ambiguous_drives": ambiguous, "skipped_existing": skipped_existing}
 
     def route_segments(self, vehicle_id: str, trip_id: str | None = None, drive_ids: list[str] | None = None) -> list[dict]:
         """Return persisted route segments; never infer a route silently."""
@@ -771,6 +846,10 @@ class SQLiteStore:
             result["duration_seconds"] = 0
         result["assignment_status"] = "assigned" if result.get("trip_id") else "unassigned"
         result.setdefault("source", "gps")
+        if not result.get("start_label") and result.get("start_latitude") is not None:
+            result["start_label"] = f"{result['start_latitude']:.5f}, {result['start_longitude']:.5f}"
+        if not result.get("end_label") and result.get("end_latitude") is not None:
+            result["end_label"] = f"{result['end_latitude']:.5f}, {result['end_longitude']:.5f}"
         return result
 
     def create_manual_drive(self, vehicle_id: str, started_at: datetime, start_label: str, end_label: str, distance_km: float, duration_minutes: int | None, now: datetime, trip_id: str | None = None) -> str:
@@ -1069,6 +1148,10 @@ class SQLiteStore:
         amount_minor = validate_amount(expense.amount_minor)
         category = validate_expense_category(expense.category)
         currency = validate_expense_currency(expense.currency)
+        occurred_on = expense.occurred_on or expense.occurred_at.astimezone(timezone.utc).date().isoformat()
+        occurred_time = expense.occurred_time
+        if occurred_time is not None and not re.fullmatch(r"(?:[01]\d|2[0-3]):[0-5]\d", occurred_time):
+            raise ValueError("expense_time_invalid")
         with self.transaction() as connection:
             stamp = utc_iso(now)
             trip = connection.execute("SELECT vehicle_id FROM trips WHERE id=?", (expense.trip_id,)).fetchone()
@@ -1079,7 +1162,7 @@ class SQLiteStore:
                 place = connection.execute("SELECT vehicle_id,trip_id FROM stops WHERE id=?", (place_id,)).fetchone()
                 if place is None: raise ValueError("place_not_found")
                 if place[0] != trip[0] or place[1] not in (None, expense.trip_id): raise ValueError("vehicle_mismatch")
-            connection.execute("INSERT INTO expenses(id,trip_id,occurred_at,category,amount_minor,currency,note,created_at,updated_at,odometer_km,stay_id,place_id) VALUES(?,?,?,?,?,?,?,?,?,?,?,?)", (expense_id, expense.trip_id, utc_iso(expense.occurred_at), category, amount_minor, currency, expense.note, stamp, stamp, expense.odometer_km, expense.stay_id, place_id))
+            connection.execute("INSERT INTO expenses(id,trip_id,occurred_at,category,amount_minor,currency,note,created_at,updated_at,odometer_km,stay_id,place_id,occurred_on,occurred_time) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?)", (expense_id, expense.trip_id, utc_iso(expense.occurred_at), category, amount_minor, currency, expense.note, stamp, stamp, expense.odometer_km, expense.stay_id, place_id, occurred_on, occurred_time))
         return expense_id
 
     def list_expenses(self, trip_id: str) -> list[dict]:
@@ -1093,11 +1176,17 @@ class SQLiteStore:
                 raise ValueError("expense_not_found")
 
     def update_expense(self, expense_id: str, now: datetime, **fields) -> None:
-        allowed = {"trip_id", "occurred_at", "category", "amount_minor", "currency", "note", "odometer_km", "stay_id", "place_id"}
-        changes = {key: value for key, value in fields.items() if key in allowed and value is not None}
+        allowed = {"trip_id", "occurred_at", "occurred_on", "occurred_time", "category", "amount_minor", "currency", "note", "odometer_km", "stay_id", "place_id"}
+        nullable_fields = {"occurred_on", "occurred_time"}
+        changes = {
+            key: value for key, value in fields.items()
+            if key in allowed and (value is not None or key in nullable_fields)
+        }
         if "amount_minor" in changes: changes["amount_minor"] = validate_amount(changes["amount_minor"])
         if "category" in changes: changes["category"] = validate_expense_category(changes["category"])
         if isinstance(changes.get("occurred_at"), datetime): changes["occurred_at"] = utc_iso(changes["occurred_at"])
+        if "occurred_time" in changes and changes["occurred_time"] is not None and not re.fullmatch(r"(?:[01]\d|2[0-3]):[0-5]\d", changes["occurred_time"]):
+            raise ValueError("expense_time_invalid")
         if "currency" in changes: changes["currency"] = validate_expense_currency(changes["currency"])
         if not changes: return
         changes["updated_at"] = utc_iso(now)
@@ -1173,7 +1262,9 @@ class SQLiteStore:
             for item in selected_drives:
                 drive_id = str(uuid5(NAMESPACE_URL, f"camper-travel-journal:gpx:{preview.file_hash}:{item.key}"))
                 drive = type("ImportedDrive", (), {"id": drive_id, "vehicle_id": vehicle_id, "started_at": item.started_at, "ended_at": item.ended_at, "distance_m": item.distance_m, "end_reason": item.reason, "manual_distance_km": None, "source": "gpx", "start_label": None, "end_label": None})()
-                connection.execute("INSERT INTO drives(id,vehicle_id,started_at,ended_at,distance_m,end_reason,manual_distance_km,source,start_label,end_label,created_at) VALUES(?,?,?,?,?,?,?,?,?,?,?)", (drive.id, vehicle_id, utc_iso(drive.started_at), utc_iso(drive.ended_at), drive.distance_m, drive.end_reason, None, "gpx", None, None, stamp))
+                first_point = next((p for p in preview.points if p.key == item.point_keys[0]), None) if item.point_keys else None
+                last_point = next((p for p in reversed(preview.points) if p.key == item.point_keys[-1]), None) if item.point_keys else None
+                connection.execute("INSERT INTO drives(id,vehicle_id,started_at,ended_at,distance_m,end_reason,manual_distance_km,source,start_label,end_label,start_latitude,start_longitude,end_latitude,end_longitude,created_at) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)", (drive.id, vehicle_id, utc_iso(drive.started_at), utc_iso(drive.ended_at), drive.distance_m, drive.end_reason, None, "gpx", None, None, first_point.point.latitude if first_point else None, first_point.point.longitude if first_point else None, last_point.point.latitude if last_point else None, last_point.point.longitude if last_point else None, stamp))
                 connection.execute("INSERT INTO gpx_import_drives(drive_key,file_hash,drive_id) VALUES(?,?,?)", (item.key, preview.file_hash, drive_id))
                 if trip_id is not None:
                     connection.execute("INSERT INTO trip_drives(trip_id,drive_id,linked_at) VALUES(?,?,?)", (trip_id, drive_id, stamp))

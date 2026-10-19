@@ -1,5 +1,13 @@
 # Änderungsprotokoll
 
+## 0.3.0-beta.10 – Tatsächliche Ausgabendaten und GPX-Endpunkte
+
+- Ausgaben speichern das tatsächliche Datum verpflichtend und die Uhrzeit nur bei ausdrücklicher Erfassung; der automatische Erfassungszeitpunkt bleibt unverändert.
+- Bestehende Ausgaben werden additiv migriert und ohne belegtes Ausgabendatum als unbekannt behandelt, ohne Summen oder Datensätze zu verlieren.
+- GPX-Fahrten erhalten Start-/Zielkoordinaten aus den ersten/letzten gültigen Trackpunkten; vorhandene Fahrten werden nur aus gespeicherten Zuordnungen ergänzt.
+- Streckenfallbacks zeigen Koordinaten, manuelle Ortsnamen behalten Vorrang; es gibt keine ungefragte externe Ortsauflösung.
+- PDF-Ausgaben zeigen das tatsächliche Datum, optionale Uhrzeit und sichere Hinweise für unbekannte Altbestände.
+
 ## 0.3.0-beta.9 – Druckfreundliche Reiseberichte
 
 - PDF-Berichte verwenden kompakte Start-/Ende-Spalten mit lokalisierten Datum-/Zeitwerten.

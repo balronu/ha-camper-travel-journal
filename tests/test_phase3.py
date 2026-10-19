@@ -34,7 +34,75 @@ class Phase3Tests(unittest.TestCase):
         self.assertEqual(row["name"], "Camping")
         self.assertEqual(row["description"], "Nacht")
         self.assertEqual(self.store.list_expenses(trip)[0]["amount_minor"], 2345)
-        self.assertEqual(self.store.connection.execute("SELECT value FROM schema_meta WHERE key='version'").fetchone()[0], "9")
+        self.assertEqual(self.store.connection.execute("SELECT value FROM schema_meta WHERE key='version'").fetchone()[0], "10")
+
+    def test_actual_expense_date_time_and_capture_timestamp_are_distinct(self):
+        trip = self.store.create_trip("v1", "Datum", self.now, self.now)
+        self.store.create_expense(Expense("", trip, self.now, "fuel", 100, "EUR", occurred_on="2026-01-02", occurred_time="07:15"), self.now)
+        row = self.store.list_expenses(trip)[0]
+        self.assertEqual(row["occurred_on"], "2026-01-02")
+        self.assertEqual(row["occurred_time"], "07:15")
+        self.assertEqual(row["created_at"], self.now.isoformat())
+
+    def test_expense_time_update_distinguishes_omit_from_explicit_null(self):
+        trip = self.store.create_trip("v1", "Uhrzeit", self.now, self.now)
+        expense = self.store.create_expense(
+            Expense("", trip, self.now, "fuel", 100, "EUR", occurred_time="12:00"), self.now
+        )
+        self.store.update_expense(expense, self.now, note="beibehalten")
+        self.assertEqual(self.store.list_expenses(trip)[0]["occurred_time"], "12:00")
+        self.store.update_expense(expense, self.now, occurred_time="13:15")
+        self.assertEqual(self.store.list_expenses(trip)[0]["occurred_time"], "13:15")
+        self.store.update_expense(expense, self.now, occurred_time=None)
+        self.assertIsNone(self.store.list_expenses(trip)[0]["occurred_time"])
+        self.store.update_expense(expense, self.now, occurred_time=None)
+        self.assertIsNone(self.store.list_expenses(trip)[0]["occurred_time"])
+
+    def test_existing_v10_database_backfills_raw_points_once(self):
+        trip = self.store.create_trip("v1", "Backfill", self.now, self.now)
+        with self.store.transaction() as connection:
+            for index in range(3):
+                connection.execute(
+                    "INSERT INTO gps_points(vehicle_id,recorded_at,latitude,longitude) VALUES(?,?,?,?)",
+                    ("v1", (self.now + timedelta(minutes=index)).isoformat(), 53.0 + index, 8.0 + index),
+                )
+            connection.execute(
+                "INSERT INTO drives(id,vehicle_id,started_at,ended_at,distance_m,end_reason,source,created_at) VALUES(?,?,?,?,?,?,?,?)",
+                ("raw-drive", "v1", self.now.isoformat(), (self.now + timedelta(minutes=2)).isoformat(), 1234, "stop", "gpx", self.now.isoformat()),
+            )
+            connection.execute("UPDATE schema_meta SET value='10' WHERE key='version'")
+            connection.execute("DELETE FROM schema_meta WHERE key='v10_gpx_backfill'")
+        self.store.close()
+        self.store.open()
+        drive = self.store.list_drives("v1")[0]
+        self.assertEqual((drive["start_latitude"], drive["end_longitude"]), (53.0, 10.0))
+        self.assertEqual(self.store.connection.execute("SELECT count(*) FROM drive_gps_points WHERE drive_id='raw-drive'").fetchone()[0], 3)
+        self.assertEqual(self.store.connection.execute("SELECT count(*) FROM schema_meta WHERE key='v10_gpx_backfill'").fetchone()[0], 1)
+        self.store.close()
+        self.store.open()
+        self.assertEqual(self.store.connection.execute("SELECT count(*) FROM drive_gps_points WHERE drive_id='raw-drive'").fetchone()[0], 3)
+        self.assertEqual(self.store.list_drives("v1")[0]["distance_m"], 1234)
+
+    def test_v10_backfill_preserves_explicit_membership_and_skips_overlaps(self):
+        with self.store.transaction() as connection:
+            for drive_id, start, end in (("explicit", self.now, self.now + timedelta(minutes=2)), ("overlap", self.now + timedelta(minutes=1), self.now + timedelta(minutes=3))):
+                connection.execute(
+                    "INSERT INTO drives(id,vehicle_id,started_at,ended_at,distance_m,end_reason,source,created_at) VALUES(?,?,?,?,?,?,?,?)",
+                    (drive_id, "v1", start.isoformat(), end.isoformat(), 50, "stop", "gpx", self.now.isoformat()),
+                )
+            point = connection.execute(
+                "INSERT INTO gps_points(vehicle_id,recorded_at,latitude,longitude) VALUES(?,?,?,?)",
+                ("v1", self.now.isoformat(), 53.0, 8.0),
+            )
+            connection.execute(
+                "INSERT INTO drive_gps_points(drive_id,gps_point_id,ordinal,association_source) VALUES(?,?,?,?)",
+                ("explicit", point.lastrowid, 0, "gpx_exact"),
+            )
+            connection.execute("DELETE FROM schema_meta WHERE key='v10_gpx_backfill'")
+        self.store.close()
+        self.store.open()
+        self.assertEqual(self.store.connection.execute("SELECT count(*) FROM drive_gps_points WHERE drive_id='explicit'").fetchone()[0], 1)
+        self.assertEqual(self.store.connection.execute("SELECT count(*) FROM drive_gps_points WHERE drive_id='overlap'").fetchone()[0], 0)
 
     def test_deleting_trip_preserves_drive_and_unassigns_it(self):
         trip = self.store.create_trip("v1", "Alpen", self.now, self.now)
@@ -115,7 +183,7 @@ class Phase3Tests(unittest.TestCase):
             connection.execute("ALTER TABLE drives DROP COLUMN end_label")
         self.store.close()
         self.store.open()
-        self.assertEqual(self.store.connection.execute("SELECT value FROM schema_meta WHERE key='version'").fetchone()[0], "9")
+        self.assertEqual(self.store.connection.execute("SELECT value FROM schema_meta WHERE key='version'").fetchone()[0], "10")
         self.assertEqual(self.store.list_trips("v1")[0]["id"], trip)
         legacy = self.store.list_drives("v1")[0]
         self.assertEqual((legacy["id"], legacy["source"]), ("legacy", "gps"))
@@ -142,7 +210,7 @@ class Phase3Tests(unittest.TestCase):
         self.store.open()
         columns = {row[1] for row in self.store.connection.execute("PRAGMA table_info(trips)")}
         self.assertNotIn("interrupted", columns)
-        self.assertEqual(self.store.connection.execute("SELECT value FROM schema_meta WHERE key='version'").fetchone()[0], "9")
+        self.assertEqual(self.store.connection.execute("SELECT value FROM schema_meta WHERE key='version'").fetchone()[0], "10")
 
 
 if __name__ == "__main__":

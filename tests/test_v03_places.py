@@ -30,7 +30,7 @@ class V03PlaceTests(unittest.TestCase):
         stop = self.store.create_stop(Stop("", "v1", "Stellplatz", self.now, trip_id=self.trip, automatic=False), self.now)
         expense = self.store.create_expense(Expense("", self.trip, self.now, "camping", 2400, "EUR", stay_id=stop), self.now)
         tables = self.store.table_names()
-        self.assertEqual(self.store.connection.execute("SELECT value FROM schema_meta WHERE key='version'").fetchone()[0], "9")
+        self.assertEqual(self.store.connection.execute("SELECT value FROM schema_meta WHERE key='version'").fetchone()[0], "10")
         self.assertTrue({"overnight_details", "place_ratings", "stop_suggestions", "interruption_links"}.issubset(tables))
         row = self.store.list_expenses(self.trip)[0]
         self.assertEqual((row["stay_id"], row["place_id"]), (stop, stop))
@@ -240,6 +240,13 @@ class V03PlaceTests(unittest.TestCase):
         self.assertNotIn("location", payload["places"][0])
         self.assertNotIn("description", payload["places"][0])
         self.assertNotIn("review_text", payload["places"][0])
+
+    def test_public_export_expense_flag_is_reserved_until_expense_contract_exists(self):
+        payload = build_public_trip_export(
+            {"id": self.trip, "title": "Reise"}, [], include_expenses=True
+        )
+        self.assertEqual(payload["expenses"], [])
+        self.assertTrue(payload["privacy"]["expenses"])
 
     def test_place_and_trip_validation_prevents_cross_vehicle_links(self):
         self.store.insert_vehicle("v2", "Other", "device_tracker.other", self.now)

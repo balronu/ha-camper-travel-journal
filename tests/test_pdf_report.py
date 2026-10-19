@@ -1,8 +1,8 @@
 import unittest
 
 try:
-    from reportlab.platypus import Paragraph, Table
-    from custom_components.camper_travel_journal.pdf_report import _category_label, _date, _date_time, _duration, _place_label, _time, render_trip_report
+    from reportlab.platypus import KeepTogether, Paragraph, Table
+    from custom_components.camper_travel_journal.pdf_report import _category_label, _date, _date_time, _duration, _expense_time, _place_label, _time, render_trip_report
 except ModuleNotFoundError as error:  # pragma: no cover - CI installs manifest dependency
     if error.name != "reportlab":
         raise
@@ -68,6 +68,13 @@ def test_report_uses_home_assistant_timezone_and_localized_categories():
     assert _date_time("2026-10-13T12:30:00+00:00", "en") == "10/13/26 12:30 PM"
 
 
+def test_expense_wall_clock_time_never_shifts_with_home_assistant_timezone():
+    assert _expense_time("12:00", "de") == "12:00"
+    assert _expense_time("12:00", "de") == _expense_time("12:00", "de")
+    assert _expense_time("23:30", "en") == "11:30 PM"
+    assert _expense_time(None, "de") == ""
+
+
 def test_report_accepts_overnight_places_ratings_and_linked_expenses():
     report = _report(drives=1, expenses=3, stops=8)
     for index, stop in enumerate(report["stops"]):
@@ -103,12 +110,14 @@ def test_expense_heading_keeps_table_start_together_and_long_tables_split(monkey
 
     monkeypatch.setattr(pdf_report._ReportDocTemplate, "build", capture_story)
     pdf_report.render_trip_report(_report(expenses=2), language="de")
-    headings = [item for item in captured["story"] if isinstance(item, Paragraph) and item.getPlainText() == "Ausgaben"]
-    assert len(headings) == 1
-    assert headings[0].style.keepWithNext == 1
-    expense_index = captured["story"].index(headings[0])
-    assert isinstance(captured["story"][expense_index + 1], Table)
-    assert captured["story"][expense_index + 1].repeatRows == 1
+    sections = [
+        item for item in captured["story"]
+        if isinstance(item, KeepTogether)
+        and any(isinstance(child, Paragraph) and child.getPlainText() == "Ausgaben" for child in item._content)
+    ]
+    assert len(sections) == 1
+    expense_table = next(child for child in sections[0]._content if isinstance(child, Table))
+    assert expense_table.repeatRows == 1
 
     monkeypatch.undo()
     short_de, _ = pdf_report.render_trip_report(_report(expenses=2), language="de")
@@ -117,3 +126,81 @@ def test_expense_heading_keeps_table_start_together_and_long_tables_split(monkey
     long_en, _ = pdf_report.render_trip_report(_report(expenses=90), language="en")
     assert long_de.count(b"/Type /Page") > short_de.count(b"/Type /Page")
     assert long_en.count(b"/Type /Page") > short_en.count(b"/Type /Page")
+
+
+def test_expense_heading_is_part_of_rendered_layout_for_short_and_long_tables():
+    """The rendered heading shares a page with its table, including a tight break."""
+    import custom_components.camper_travel_journal.pdf_report as pdf_report
+
+    events = []
+    original_paragraph, original_table, original_doc = pdf_report.Paragraph, pdf_report.Table, pdf_report._ReportDocTemplate
+
+    class TrackingParagraph(original_paragraph):
+        def drawOn(self, canvas, x, y, _sW=0):
+            if self.getPlainText() in {"Ausgaben", "Expenses"}:
+                events.append(("heading", self.getPlainText(), canvas.getPageNumber()))
+            return super().drawOn(canvas, x, y, _sW)
+
+    class TrackingTable(original_table):
+        def drawOn(self, canvas, x, y, _sW=0):
+            header = tuple(str(value) for value in self._cellvalues[0]) if self._cellvalues else ()
+            if header in {
+                ("Zeitraum", "Kategorie", "Betrag", "Beschreibung"),
+                ("Period", "Category", "Amount", "Description"),
+            }:
+                events.append(("table", header[0], canvas.getPageNumber()))
+            return super().drawOn(canvas, x, y, _sW)
+
+    class TrackingDoc(original_doc):
+        def build(self, story):
+            from reportlab.pdfgen.canvas import Canvas
+            return super().build(story, canvasmaker=Canvas)
+
+    pdf_report.Paragraph, pdf_report.Table, pdf_report._ReportDocTemplate = TrackingParagraph, TrackingTable, TrackingDoc
+    try:
+        render_trip_report(_report(drives=2, expenses=2, stops=1), language="de")
+    finally:
+        pdf_report.Paragraph, pdf_report.Table, pdf_report._ReportDocTemplate = original_paragraph, original_table, original_doc
+    heading_pages = [page for kind, _label, page in events if kind == "heading"]
+    table_pages = [page for kind, _label, page in events if kind == "table"]
+    assert heading_pages and table_pages
+    assert heading_pages[0] == table_pages[0]
+
+    short_de, _ = render_trip_report(_report(drives=2, expenses=2, stops=1), language="de")
+    long_de, _ = render_trip_report(_report(drives=2, expenses=90, stops=1), language="de")
+    short_en, _ = render_trip_report(_report(drives=2, expenses=2, stops=1), language="en")
+    long_en, _ = render_trip_report(_report(drives=2, expenses=90, stops=1), language="en")
+    assert short_de.count(b"/Type /Page") >= 2
+    assert short_en.count(b"/Type /Page") >= 2
+    assert long_de.count(b"/Type /Page") > short_de.count(b"/Type /Page")
+    assert long_en.count(b"/Type /Page") > short_en.count(b"/Type /Page")
+
+
+def test_report_uses_actual_expense_date_and_marks_legacy_date_unknown():
+    import custom_components.camper_travel_journal.pdf_report as pdf_report
+
+    report = _report(drives=0, expenses=2, stops=0)
+    report["expenses"][0].update(occurred_on="2026-01-02", occurred_time="07:15")
+    report["expenses"][1].pop("occurred_at", None)
+    captured = {}
+    original = pdf_report._ReportDocTemplate.build
+    pdf_report._ReportDocTemplate.build = lambda _document, story: captured.setdefault("story", story)
+    try:
+        pdf_report.render_trip_report(report, language="de", time_zone="Europe/Berlin")
+    finally:
+        pdf_report._ReportDocTemplate.build = original
+    texts = []
+    def collect(items):
+        for item in items:
+            if isinstance(item, KeepTogether):
+                yield from collect(item._content)
+            else:
+                yield item
+
+    for item in collect(captured["story"]):
+        if hasattr(item, "getPlainText"):
+            texts.append(item.getPlainText())
+        if isinstance(item, Table):
+            texts.extend(cell.getPlainText() for row in item._cellvalues for cell in row if hasattr(cell, "getPlainText"))
+    assert "02.01.2026, 07:15" in texts
+    assert "Ausgabendatum unbekannt" in texts
