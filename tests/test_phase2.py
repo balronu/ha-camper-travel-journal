@@ -30,6 +30,9 @@ class Phase2Tests(unittest.TestCase):
         validate_transition("planned", "active")
         self.store.update_trip(trip_id, self.now, status="active")
         self.store.update_trip(trip_id, self.now, status="paused")
+        self.store.update_trip(trip_id, self.now, status="completed", ended_at=self.now + timedelta(hours=2))
+        self.store.update_trip(trip_id, self.now, status="active")
+        self.store.update_trip(trip_id, self.now, status="paused")
         self.store.update_trip(trip_id, self.now, status="active")
         self.store.update_trip(trip_id, self.now, status="completed", ended_at=self.now + timedelta(hours=2))
         with self.assertRaises(ValueError):

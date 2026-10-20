@@ -6,7 +6,7 @@
 
 <h1 align="center">Camper Travel Journal</h1>
 <p align="center">Dein digitales Wohnmobil-Reisetagebuch für Home Assistant</p>
-<p align="center"><strong>Für den Stable-Release vorbereitet: v0.3.0</strong></p>
+<p align="center"><strong>Stable: v0.3.1</strong></p>
 
 <p align="center">
   <a href="https://github.com/balronu/ha-camper-travel-journal/releases/latest"><img src="https://img.shields.io/github/v/release/balronu/ha-camper-travel-journal?label=Release" alt="Release"></a>
@@ -50,15 +50,15 @@ Installationen bleibt wichtig.
   Währungsprüfung.
 - Deutsche und englische Benutzeroberfläche.
 - Zentrale Journal Card für neue Dashboards: Reise auswählen, öffnen,
-  bearbeiten und wieder schließen; alle Reisebereiche verwenden denselben
-  Reisekontext.
+  bearbeiten, fortsetzen, pausieren, beenden, löschen oder wechseln; alle
+  Reisebereiche verwenden denselben Reisekontext.
 
 ## Installation über HACS
 
 1. Öffne **HACS → Integrationen → Benutzerdefinierte Repositories**.
 2. Füge `https://github.com/balronu/ha-camper-travel-journal` als Repository
    vom Typ **Integration** hinzu.
-3. Installiere nach der Veröffentlichung die stabile Version `v0.3.0`.
+3. Installiere die stabile Version `v0.3.1`.
 4. Starte Home Assistant manuell neu.
 5. Füge die Integration unter **Einstellungen → Geräte & Dienste** hinzu.
 
@@ -100,8 +100,9 @@ type: custom:camper-travel-journal-journal-card
 vehicle_id: <config-entry-id>
 ```
 
-Der Ablauf lautet **Reise auswählen → Reise öffnen → Funktionen nutzen → Reise
-schließen**. Ohne geöffnete Reise erscheinen keine reisebezogenen Formulare,
+Der Ablauf lautet **Reise auswählen → Reise öffnen → Reiseaktionen nutzen → Reise
+wechseln**. Statusaktionen verändern nur die geöffnete Reise; „Reise wechseln“
+öffnet die Auswahl ohne Statusänderung. Ohne geöffnete Reise erscheinen keine reisebezogenen Formulare,
 Karten, GPX- oder PDF-Aktionen. Die Diagnostics Card bleibt unabhängig. Die
 bisherigen Summary-, Manager- und Map-Karten bleiben als kompatible
 Bestandsvariante unterstützt.

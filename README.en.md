@@ -6,7 +6,7 @@
 
 <h1 align="center">Camper Travel Journal</h1>
 <p align="center">Your digital camper travel journal for Home Assistant</p>
-<p align="center"><strong>Prepared for stable release: v0.3.0</strong></p>
+<p align="center"><strong>Stable: v0.3.1</strong></p>
 
 <p align="center">
   <a href="https://github.com/balronu/ha-camper-travel-journal/releases/latest"><img src="https://img.shields.io/github/v/release/balronu/ha-camper-travel-journal?label=Release" alt="Release"></a>
@@ -45,15 +45,16 @@ mobile browsers and Home Assistant setups is important.
   warnings and explicit target-trip selection.
 - Expense management with stable categories, integer cents and currency checks.
 - German and English user interfaces.
-- A central Journal Card for new dashboards: select, open, edit and close a
-  trip while all trip sections use the same trip context.
+- A central Journal Card for new dashboards: select, open, edit, resume,
+  pause, complete, delete or switch a trip while all trip sections use the
+  same trip context.
 
 ## HACS installation
 
 1. Open **HACS → Integrations → Custom repositories**.
 2. Add `https://github.com/balronu/ha-camper-travel-journal` as an
    **Integration** repository.
-3. After publication, install the stable `v0.3.0` release.
+3. Install the stable `v0.3.1` release.
 4. Restart Home Assistant manually.
 5. Add the integration under **Settings → Devices & services**.
 
@@ -94,7 +95,9 @@ type: custom:camper-travel-journal-journal-card
 vehicle_id: <config-entry-id>
 ```
 
-The workflow is **select trip → open trip → use its functions → close trip**.
+The workflow is **select trip → open trip → use trip actions → switch trip**.
+Status actions affect only the open trip; “Switch trip” does not change its
+status.
 Without an open trip, trip forms, maps, GPX and PDF actions are hidden. The
 Diagnostics Card remains independent. Existing Summary, Manager and Map cards
 remain supported for compatibility.

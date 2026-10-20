@@ -1,0 +1,58 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>Camper Travel Journal trip actions regression</title>
+<div id="host"></div><pre id="result">starting</pre>
+<script type="module">
+const result = document.querySelector("#result");
+window.addEventListener("error", (event) => { result.textContent = JSON.stringify({ harnessError: event.error?.stack || event.message }); });
+window.addEventListener("unhandledrejection", (event) => { result.textContent = JSON.stringify({ harnessError: String(event.reason?.stack || event.reason) }); });
+const trip = { id: "hoffenheim", title: "Ligaspiel Hoffenheim – Mainz", description: "", destination: "Sinsheim", status: "paused", started_at: "2026-10-23T08:00:00Z", ended_at: null, start_date: "2026-10-23", end_date: "2026-10-25" };
+const trips = [trip];
+const baseSnapshot = () => ({ trips, drives: [], stops: [], interruptions: [], expenses: [], expense_summary: { total_minor: 0, currency: "EUR", mixed_currency: false } });
+const calls = [];
+const connection = { async sendMessagePromise(message) {
+  calls.push(message);
+  if (message.type === "camper_travel_journal/list_vehicles") return { vehicles: [{ vehicle_id: "camper", name: "Wohnmobil", title: "Camper" }] };
+  if (message.type === "camper_travel_journal/route") return { vehicle_id: "camper", trip_id: message.trip_id, segments: [], total_points: 0, returned_points: 0, truncated: false, bounds: null, simplify_tolerance_m: 0, association_semantics: "synthetic" };
+  if (message.type === "camper_travel_journal/list") return message.trip_id ? baseSnapshot() : { ...baseSnapshot(), trips };
+  if (message.type === "camper_travel_journal/transition_trip") { trip.status = message.status; trip.ended_at = message.status === "completed" ? "2026-10-25T18:00:00Z" : null; return { trip_id: trip.id, status: trip.status }; }
+  if (message.type === "camper_travel_journal/update_trip") { trip.title = message.title; trip.destination = message.destination; trip.start_date = message.start_date; trip.end_date = message.end_date; return { trip_id: trip.id }; }
+  if (message.type === "camper_travel_journal/delete_trip") { trips.splice(0, 1); return { trip_id: trip.id }; }
+  throw new Error(`unexpected ${message.type}`);
+} };
+const hass = { connection, locale: { language: "de-DE" } };
+await import("/custom_components/camper_travel_journal/frontend/camper-travel-journal.js");
+await customElements.whenDefined("camper-travel-journal-journal-card");
+const card = document.createElement("camper-travel-journal-journal-card"); card.setConfig({ vehicle_id: "camper" }); card.hass = hass; document.querySelector("#host").append(card);
+const waitFor = async (predicate) => { for (let i = 0; i < 240; i += 1) { if (predicate()) return; await new Promise((resolve) => setTimeout(resolve, 25)); } const child = card.shadowRoot?.querySelector(".trip-management camper-travel-journal-manager-card"); throw new Error(`actions harness timed out config=${JSON.stringify(child?.config)} calls=${JSON.stringify(calls)} shadow=${child?.shadowRoot?.innerHTML ?? "none"}`); };
+const embeddedManager = () => card.shadowRoot.querySelector(".trip-management camper-travel-journal-manager-card");
+const actionButton = (label) => [...(embeddedManager()?.shadowRoot?.querySelectorAll("button") ?? [])].find((button) => button.textContent.trim() === label);
+await waitFor(() => card.shadowRoot?.querySelector("select"));
+const select = card.shadowRoot.querySelector("select"); select.value = trip.id; select.dispatchEvent(new Event("change", { bubbles: true }));
+card.shadowRoot.querySelector(".entry button:not(.secondary)")?.click();
+await waitFor(() => card.shadowRoot?.querySelector(".trip-header") && embeddedManager()?.shadowRoot?.querySelector(".trip-actions"));
+const initial = { pausedResume: Boolean(actionButton("Reise fortsetzen")), pausedComplete: Boolean(actionButton("Abschließen")), edit: Boolean(actionButton("Bearbeiten")), delete: Boolean(actionButton("Löschen")) };
+actionButton("Abschließen")?.click(); await waitFor(() => trip.status === "completed" && Boolean(actionButton("Reise wieder aktivieren")));
+actionButton("Reise wieder aktivieren")?.click(); await waitFor(() => trip.status === "active" && Boolean(actionButton("Pausieren")));
+actionButton("Pausieren")?.click(); await waitFor(() => trip.status === "paused" && Boolean(actionButton("Reise fortsetzen")));
+actionButton("Reise fortsetzen")?.click(); await waitFor(() => trip.status === "active");
+const transitionStatuses = calls.filter((call) => call.type === "camper_travel_journal/transition_trip").map((call) => call.status);
+actionButton("Bearbeiten")?.click();
+await waitFor(() => Boolean(embeddedManager()?.shadowRoot?.querySelector("dialog.editor-dialog")?.open));
+const titleInput = embeddedManager().shadowRoot.querySelector("dialog.editor-dialog input"); titleInput.value = "Ligaspiel Hoffenheim – Mainz (aktualisiert)"; titleInput.dispatchEvent(new Event("input", { bubbles: true }));
+embeddedManager().shadowRoot.querySelector("dialog.editor-dialog form")?.dispatchEvent(new SubmitEvent("submit", { bubbles: true, cancelable: true }));
+await waitFor(() => trip.title.includes("aktualisiert") && card.shadowRoot.textContent.includes("aktualisiert"));
+const beforeSwitch = calls.filter((call) => call.type === "camper_travel_journal/transition_trip").length;
+card.shadowRoot.querySelector("button.switch-trip")?.click(); await waitFor(() => Boolean(card.shadowRoot.querySelector(".entry")));
+const switchNeutral = calls.filter((call) => call.type === "camper_travel_journal/transition_trip").length === beforeSwitch;
+card.shadowRoot.querySelector("select").value = trip.id; card.shadowRoot.querySelector("select").dispatchEvent(new Event("change", { bubbles: true })); card.shadowRoot.querySelector(".entry button:not(.secondary)")?.click();
+await waitFor(() => embeddedManager()?.shadowRoot?.querySelector(".trip-actions"));
+actionButton("Löschen")?.click(); await waitFor(() => Boolean(embeddedManager()?.shadowRoot?.querySelector("dialog.trip-delete-dialog")?.open));
+const dialog = embeddedManager().shadowRoot.querySelector("dialog.trip-delete-dialog");
+const dialogExplainsData = dialog.textContent.includes("Fahrten") && dialog.textContent.includes("Kosten") && dialog.textContent.includes("Orte");
+dialog.querySelector("button.secondary")?.click(); await waitFor(() => !embeddedManager()?.shadowRoot?.querySelector("dialog.trip-delete-dialog"));
+const cancelPreservedTrip = trips.length === 1 && !calls.some((call) => call.type === "camper_travel_journal/delete_trip");
+actionButton("Löschen")?.click(); await waitFor(() => Boolean(embeddedManager()?.shadowRoot?.querySelector("dialog.trip-delete-dialog")?.open));
+embeddedManager().shadowRoot.querySelector("dialog.trip-delete-dialog button[type='submit']")?.click(); await waitFor(() => trips.length === 0 && Boolean(card.shadowRoot.querySelector(".entry")));
+result.textContent = JSON.stringify({ initial, transitionStatuses, edited: trip.title.includes("aktualisiert"), switchNeutral, dialogExplainsData, cancelPreservedTrip, deleted: calls.some((call) => call.type === "camper_travel_journal/delete_trip"), visibleTemplateLeak: /lit\$\d|=>\s*this\.|currentTarget\.value/.test(card.shadowRoot.textContent) }, null, 2);
+</script>

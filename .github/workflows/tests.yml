@@ -241,6 +241,26 @@ jobs:
           if (result.visibleTemplateLeak) throw new Error('frontend template source leaked into visible DOM');
           console.log(JSON.stringify(result));
           NODE
+      - name: Run central journal trip actions regression
+        run: |
+          python3 -m http.server 8765 --bind 127.0.0.1 >/tmp/camper-travel-journal-actions-http.log 2>&1 &
+          server_pid=$!
+          trap 'kill "$server_pid"' EXIT
+          sleep 0.3
+          chromium --headless --no-sandbox --disable-gpu --virtual-time-budget=10000 \
+            --dump-dom http://127.0.0.1:8765/frontend/tests/browser/journal-trip-actions.html >/tmp/camper-travel-journal-actions-dom.html
+          node - <<'NODE'
+          const fs = require('fs');
+          const html = fs.readFileSync('/tmp/camper-travel-journal-actions-dom.html', 'utf8');
+          const match = html.match(/<pre id="result">([\s\S]*?)<\/pre>/);
+          if (!match) throw new Error('actions harness returned no result');
+          const result = JSON.parse(match[1]);
+          if (!result.initial?.pausedResume || !result.initial?.pausedComplete || !result.initial?.edit || !result.initial?.delete) throw new Error(`paused actions missing: ${JSON.stringify(result)}`);
+          if (JSON.stringify(result.transitionStatuses) !== JSON.stringify(['completed', 'active', 'paused', 'active'])) throw new Error(`status transitions failed: ${JSON.stringify(result)}`);
+          for (const key of ['edited', 'switchNeutral', 'dialogExplainsData', 'cancelPreservedTrip', 'deleted']) if (!result[key]) throw new Error(`${key}=false: ${JSON.stringify(result)}`);
+          if (result.visibleTemplateLeak) throw new Error('frontend template source leaked into visible DOM');
+          console.log(JSON.stringify(result));
+          NODE
       - name: Run interruption stay manager regression
         run: |
           python3 -m http.server 8765 --bind 127.0.0.1 >/tmp/camper-travel-journal-stay-http.log 2>&1 &

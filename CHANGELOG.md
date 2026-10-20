@@ -1,5 +1,16 @@
 # Änderungsprotokoll
 
+## 0.3.1 – Stable Hotfix
+
+- Stellt die vollständige Reiseverwaltung direkt im geöffneten Kontext der
+  zentralen Journal Card wieder her.
+- Ergänzt statusabhängige Aktionen zum Starten, Fortsetzen, Pausieren,
+  Beenden, Reaktivieren, Bearbeiten und Löschen.
+- Trennt „Reise wechseln“ vom Backend-Statuswechsel und schützt das Löschen
+  durch einen Dialog mit klarer Datenfolgen-Erklärung.
+- Aktualisiert die Journal-Ansicht nach Bearbeitungen und Statuswechseln ohne
+  Browser-Neustart und prüft die mobile Darstellung.
+
 ## 0.3.0 – Stable
 
 Stable-Release der vollständigen v0.3.0-Funktionsserie. Enthält zentrale
