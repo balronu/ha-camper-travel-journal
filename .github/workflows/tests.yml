@@ -247,19 +247,30 @@ jobs:
           server_pid=$!
           trap 'kill "$server_pid"' EXIT
           sleep 0.3
-          chromium --headless --no-sandbox --disable-gpu --virtual-time-budget=10000 \
+          chromium --headless --no-sandbox --disable-gpu --window-size=1280,900 --virtual-time-budget=10000 \
             --dump-dom http://127.0.0.1:8765/frontend/tests/browser/journal-trip-actions.html >/tmp/camper-travel-journal-actions-dom.html
+          chromium --headless --no-sandbox --disable-gpu --window-size=390,844 --virtual-time-budget=10000 \
+            --dump-dom http://127.0.0.1:8765/frontend/tests/browser/journal-trip-actions.html >/tmp/camper-travel-journal-actions-mobile-dom.html
           node - <<'NODE'
           const fs = require('fs');
-          const html = fs.readFileSync('/tmp/camper-travel-journal-actions-dom.html', 'utf8');
-          const match = html.match(/<pre id="result">([\s\S]*?)<\/pre>/);
-          if (!match) throw new Error('actions harness returned no result');
-          const result = JSON.parse(match[1]);
-          if (!result.initial?.pausedResume || !result.initial?.pausedComplete || !result.initial?.edit || !result.initial?.delete) throw new Error(`paused actions missing: ${JSON.stringify(result)}`);
-          if (JSON.stringify(result.transitionStatuses) !== JSON.stringify(['completed', 'active', 'paused', 'active'])) throw new Error(`status transitions failed: ${JSON.stringify(result)}`);
-          for (const key of ['edited', 'switchNeutral', 'dialogExplainsData', 'cancelPreservedTrip', 'deleted']) if (!result[key]) throw new Error(`${key}=false: ${JSON.stringify(result)}`);
-          if (result.visibleTemplateLeak) throw new Error('frontend template source leaked into visible DOM');
-          console.log(JSON.stringify(result));
+          function read(path) {
+            const html = fs.readFileSync(path, 'utf8');
+            const match = html.match(/<pre id="result">([\s\S]*?)<\/pre>/);
+            if (!match) throw new Error(`actions harness returned no result: ${path}`);
+            return JSON.parse(match[1]);
+          }
+          const desktop = read('/tmp/camper-travel-journal-actions-dom.html');
+          const mobile = read('/tmp/camper-travel-journal-actions-mobile-dom.html');
+          for (const [name, result] of Object.entries({ desktop, mobile })) {
+            if (!result.initial?.pausedResume || !result.initial?.pausedComplete || !result.initial?.edit || !result.initial?.switchTrip || !result.initial?.delete || !result.initial?.normalGrid || !result.initial?.deleteSeparated) throw new Error(`${name} actions missing: ${JSON.stringify(result)}`);
+            if (JSON.stringify(result.initial.order) !== JSON.stringify(['Reise fortsetzen', 'Abschließen', 'Bearbeiten', 'Reise wechseln'])) throw new Error(`${name} action order failed: ${JSON.stringify(result)}`);
+            if (JSON.stringify(result.transitionStatuses) !== JSON.stringify(['completed', 'active', 'paused', 'active'])) throw new Error(`${name} status transitions failed: ${JSON.stringify(result)}`);
+            for (const key of ['edited', 'switchNeutral', 'dialogExplainsData', 'cancelPreservedTrip', 'deleted']) if (!result[key]) throw new Error(`${name} ${key}=false: ${JSON.stringify(result)}`);
+            if (result.visibleTemplateLeak || !result.layout.overflowFree) throw new Error(`${name} layout failed: ${JSON.stringify(result)}`);
+          }
+          if (mobile.viewport > 600 || !mobile.layout.columns || mobile.layout.columns.split(' ').length !== 2) throw new Error(`mobile layout is not responsive two-column: ${JSON.stringify(mobile)}`);
+          if (!desktop.layout.columns || desktop.layout.columns.split(' ').length !== 2) throw new Error(`desktop layout is not two-column: ${JSON.stringify(desktop)}`);
+          console.log(JSON.stringify({ desktop, mobile }));
           NODE
       - name: Run interruption stay manager regression
         run: |

@@ -13,10 +13,10 @@ const bundle = resolve(root, "../custom_components/camper_travel_journal/fronten
 
 describe("frontend release contract", () => {
   it("keeps backend, npm metadata and beta bundle aligned", () => {
-    expect(manifest.version).toBe("0.3.1");
+    expect(manifest.version).toBe("0.3.2");
     expect(pkg.version).toBe(manifest.version);
     expect(existsSync(bundle)).toBe(true);
-    expect(readFileSync(resolve(root, "../custom_components/camper_travel_journal/const.py"), "utf8")).toContain('FRONTEND_VERSION = "0.3.1"');
+    expect(readFileSync(resolve(root, "../custom_components/camper_travel_journal/const.py"), "utf8")).toContain('FRONTEND_VERSION = "0.3.2"');
   });
   it("registers the central card in the catalog while retaining legacy elements", () => {
     const source = readFileSync(resolve(root, "src/index.ts"), "utf8");
@@ -160,12 +160,15 @@ describe("frontend release contract", () => {
     expect(journal).toContain("camper-travel-journal-manager-card");
     expect(journal).toContain("camper-travel-journal-map-card");
     expect(journal).toContain("clearActiveTrip");
-    expect(journal).toContain("journalClose");
     expect(journal).toContain('manager("trip-actions")');
     expect(journal).toContain("TRAVEL_DATA_CHANGED_EVENT");
     expect(journal).toContain("trip_id: trip.id");
     expect(manager).toContain("embeddedSection");
     expect(manager).toContain("trip-delete-dialog");
+    expect(manager).toContain("trip-switch");
+    expect(manager).toContain("journalClose");
+    expect(manager).toContain("trip-actions-grid");
+    expect(manager).toContain("@media(max-width:420px)");
     expect(manager).toContain('trip.status === "planned"');
     expect(manager).toContain('trip.status === "paused"');
     expect(manager).toContain('trip.status === "completed"');
