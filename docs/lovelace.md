@@ -1,4 +1,4 @@
-# Lovelace-Karten in v0.3.0
+# Lovelace-Karten in v0.3.2
 
 Camper Travel Journal liefert ein versioniertes Frontend-Bundle mit mehreren
 Custom Elements. Die zentrale Journal Card ist für neue Dashboards empfohlen;
@@ -73,6 +73,11 @@ keinen Geocoding-Dienst.
 3. Eine Karte über den visuellen Editor oder YAML hinzufügen.
 4. Bei mehreren Fahrzeugen die jeweilige `vehicle_id` auswählen.
 5. Eine Reise öffnen, bevor reisebezogene Aktionen verwendet werden.
+
+Ein Reise-Startdatum aktiviert den Status nicht automatisch. GPS-Aufzeichnung
+und Reisestatus sind unabhängig; erkannte Fahrten werden nur bei genau einer
+aktiven Reise automatisch zugeordnet. Bei keiner oder mehreren aktiven Reisen
+bleiben sie unzugeordnet und können später manuell verknüpft werden.
 
 Der Options-Flow unterstützt unter anderem Mindestintervall, Mindestbewegung,
 Stopperkennung, GPS-Lücke, Maximalgeschwindigkeit, Aufbewahrung,

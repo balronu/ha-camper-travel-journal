@@ -1,4 +1,9 @@
-# Upgrade auf v0.3.0
+# Upgrade auf v0.3.2
+
+Dieses Dokument beschreibt den Upgradepfad von v0.3.0 und v0.3.1 auf den
+aktuellen Stable-Stand v0.3.2. Die v0.3.2 ist eine UI-/Dokumentationspflege
+auf Basis von v0.3.1; sie verschiebt den bestehenden Tag nicht und ändert
+weder Datenmodell noch GPS-/Statuslogik.
 
 ## Unterstützter Upgrade-Pfad
 
@@ -23,7 +28,7 @@ MariaDB-/PostgreSQL-Adapter. Die Datenbank ist daher separat zu sichern.
 ## Vorgehen
 
 1. Home-Assistant-Backup einschließlich der Integrationsdatei erstellen.
-2. In HACS **Camper Travel Journal** auf `v0.3.0` aktualisieren.
+2. In HACS **Camper Travel Journal** auf `v0.3.2` aktualisieren.
 3. Home Assistant nach dem HACS-Update manuell neu starten.
 4. Config Entry und Options prüfen; insbesondere `device_tracker`, Zuhause-
    Radius, Kartenanbieter und Reverse Geocoding.
@@ -41,7 +46,7 @@ Migration während des laufenden Betriebs verwechselt werden.
 
 ## Daten- und Funktionsgrenzen
 
-Die v0.3.0 ändert keine bestehenden GPX-Rohpunkte, Fahrten, Kilometer,
+Die v0.3.2 ändert keine bestehenden GPX-Rohpunkte, Fahrten, Kilometer,
 Aufenthalte oder Ausgaben durch reine Anzeigeänderungen. Reverse Geocoding ist
 aus; eine Aktivierung ist eine bewusste Datenschutzentscheidung. Eine vollständige
 Online-Straßenkarte ist nicht Bestandteil des Upgrades.

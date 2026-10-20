@@ -1,4 +1,4 @@
-# Architecture – implemented v0.2.0-beta.2 boundary
+# Architecture – implemented v0.3.2 boundary
 
 This document describes the current implementation, not a proposal for
 features that are only planned.
@@ -35,9 +35,11 @@ state on startup, and closes both listeners and the worker on unload.
 4. **WebSocket API** registers authenticated commands during both domain and
    config-entry setup. Exact literal command schemas are used. Read commands
    return trip, drive, stop and (for a selected trip) expense data.
-5. **Lovelace cards** include Summary, Manager, diagnostics and the read-only
-   Leaflet Map Card. The Map Card obtains route geometry only through the
-   authenticated route command and never performs routing or geocoding.
+5. **Lovelace cards** include the central Journal Card plus compatible Summary,
+   Manager, diagnostics and Leaflet Map Cards. The Map Card obtains route
+   geometry only through the authenticated route command and never performs
+   routing or geocoding. The Manager Card also supports manual drives, places,
+   stays, ratings, expenses and GPX import.
 6. **Collector diagnostics** are available through the authenticated,
    read-only `camper_travel_journal/diagnostics` command. They expose counters,
    timestamps, filter reasons, detector state and aggregate database counts,
@@ -45,9 +47,9 @@ state on startup, and closes both listeners and the worker on unload.
 
 ## Deliberate boundaries
 
-- Statistics and export paths are not implemented. The Map Card is limited to
-  stored GPS geometry and does not calculate road routes.
-- There is no manual drive creation form; drives originate in GPS detection.
+- The Map Card is limited to stored GPS geometry and does not calculate road
+  routes. The PDF travel report is generated in memory; it is not a hosted
+  document store.
 - Retention only computes candidates. It does not delete data automatically in
   this release.
 - The integration-owned SQLite file is separate from HA Recorder/MariaDB.

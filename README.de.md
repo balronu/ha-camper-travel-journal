@@ -16,5 +16,9 @@ Reisekontext stehen Bearbeiten, Fortsetzen, Pausieren, Beenden, Löschen und
 Reise wechseln zur Verfügung; der Wechsel verändert den Status nicht. Die
 älteren Summary-, Manager- und Map-Karten bleiben kompatibel.
 
+Start- und Enddaten aktivieren Reisen nicht automatisch. Die GPS-Aufzeichnung
+läuft unabhängig vom Reisestatus, wenn sie aktiviert ist; die automatische
+Fahrtzuordnung erfolgt nur bei genau einer aktiven Reise des Fahrzeugs.
+
 Technische Hinweise zur versionierten Frontend-Auslieferung stehen in der
 [Frontend-Cache-Dokumentation](docs/frontend-cache.md).

@@ -4,6 +4,16 @@ Dieses Dokument beschreibt die unterstützte Beta-/Stable-Veröffentlichung und
 die Grenzen der HACS-Versionsanzeige. Es gilt für das Repository
 `balronu/ha-camper-travel-journal`.
 
+## Aktueller Stable-Stand
+
+`v0.3.2` ist der veröffentlichte Stable-Release auf Main-Commit
+`11a98f966110d2e70aeb5181b66bc4d97c373623`. Der unveränderliche Tag bleibt
+bestehen; v0.3.0 und v0.3.1 bleiben als historische Stable-Releases erhalten.
+Das Repository ist für HACS als benutzerdefiniertes Repository vorgesehen und
+behauptet keine Aufnahme in den offiziellen HACS-Standardkatalog. Für Updates
+von v0.3.0 oder v0.3.1 gelten die Hinweise in
+[upgrade-v0.3.0.md](upgrade-v0.3.0.md).
+
 ## Befund für Beta 9
 
 Am 15.10.2026 wurden HACS `2.0.5`, Home Assistant Core `2026.10.1` und der
@@ -76,7 +86,7 @@ verschoben werden.
 
 ### Stable
 
-Für die Stable-Veröffentlichung müssen `v0.3.0`, Release-Notes,
+Für die Stable-Veröffentlichung müssen `v0.3.2`, Release-Notes,
 HACS-Versionsanzeige, Bundle-Version und Tag konsistent sein. Nach der
 Veröffentlichung bleibt der Stable-Tag unverändert; die Beta-Tags bleiben als
 historische Rollback-Referenzen bestehen. Vor der Veröffentlichung ist der
