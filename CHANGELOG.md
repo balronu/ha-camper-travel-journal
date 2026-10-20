@@ -1,5 +1,16 @@
 # Änderungsprotokoll
 
+## 0.3.2 – Stable UI-Politur
+
+- Vereinheitlicht die Reiseaktionen in der zentralen Journal Card mit einem
+  responsiven Zwei-Spalten-Raster.
+- Hebt Starten/Fortsetzen/Reaktivieren als Primäraktionen hervor und trennt
+  Löschen mit dem bestehenden Bestätigungsdialog optisch ab.
+- Integriert „Reise wechseln“ in das Aktionsraster, ohne Statusänderung oder
+  Backend-Aufruf.
+- Prüft Desktop- und mobile Chromium-Darstellung einschließlich Reihenfolge,
+  Überlauffreiheit und unveränderter Aktionen.
+
 ## 0.3.1 – Stable Hotfix
 
 - Stellt die vollständige Reiseverwaltung direkt im geöffneten Kontext der

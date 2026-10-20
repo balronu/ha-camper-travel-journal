@@ -31,7 +31,9 @@ await waitFor(() => card.shadowRoot?.querySelector("select"));
 const select = card.shadowRoot.querySelector("select"); select.value = trip.id; select.dispatchEvent(new Event("change", { bubbles: true }));
 card.shadowRoot.querySelector(".entry button:not(.secondary)")?.click();
 await waitFor(() => card.shadowRoot?.querySelector(".trip-header") && embeddedManager()?.shadowRoot?.querySelector(".trip-actions"));
-const initial = { pausedResume: Boolean(actionButton("Reise fortsetzen")), pausedComplete: Boolean(actionButton("Abschließen")), edit: Boolean(actionButton("Bearbeiten")), delete: Boolean(actionButton("Löschen")) };
+const actionGrid = embeddedManager().shadowRoot.querySelector(".trip-actions-grid");
+const initial = { pausedResume: Boolean(actionButton("Reise fortsetzen")), pausedComplete: Boolean(actionButton("Abschließen")), edit: Boolean(actionButton("Bearbeiten")), switchTrip: Boolean(actionButton("Reise wechseln")), delete: Boolean(actionButton("Löschen")), order: [...(actionGrid?.querySelectorAll("button") ?? [])].map((button) => button.textContent.trim()), normalGrid: Boolean(actionGrid && getComputedStyle(actionGrid).display === "grid"), deleteSeparated: Boolean(embeddedManager().shadowRoot.querySelector(".trip-delete-action")) };
+const layout = { display: actionGrid ? getComputedStyle(actionGrid).display : "", columns: actionGrid ? getComputedStyle(actionGrid).gridTemplateColumns : "", overflowFree: Boolean(actionGrid && actionGrid.scrollWidth <= actionGrid.clientWidth) };
 actionButton("Abschließen")?.click(); await waitFor(() => trip.status === "completed" && Boolean(actionButton("Reise wieder aktivieren")));
 actionButton("Reise wieder aktivieren")?.click(); await waitFor(() => trip.status === "active" && Boolean(actionButton("Pausieren")));
 actionButton("Pausieren")?.click(); await waitFor(() => trip.status === "paused" && Boolean(actionButton("Reise fortsetzen")));
@@ -43,7 +45,7 @@ const titleInput = embeddedManager().shadowRoot.querySelector("dialog.editor-dia
 embeddedManager().shadowRoot.querySelector("dialog.editor-dialog form")?.dispatchEvent(new SubmitEvent("submit", { bubbles: true, cancelable: true }));
 await waitFor(() => trip.title.includes("aktualisiert") && card.shadowRoot.textContent.includes("aktualisiert"));
 const beforeSwitch = calls.filter((call) => call.type === "camper_travel_journal/transition_trip").length;
-card.shadowRoot.querySelector("button.switch-trip")?.click(); await waitFor(() => Boolean(card.shadowRoot.querySelector(".entry")));
+actionButton("Reise wechseln")?.click(); await waitFor(() => Boolean(card.shadowRoot.querySelector(".entry")));
 const switchNeutral = calls.filter((call) => call.type === "camper_travel_journal/transition_trip").length === beforeSwitch;
 card.shadowRoot.querySelector("select").value = trip.id; card.shadowRoot.querySelector("select").dispatchEvent(new Event("change", { bubbles: true })); card.shadowRoot.querySelector(".entry button:not(.secondary)")?.click();
 await waitFor(() => embeddedManager()?.shadowRoot?.querySelector(".trip-actions"));
@@ -54,5 +56,5 @@ dialog.querySelector("button.secondary")?.click(); await waitFor(() => !embedded
 const cancelPreservedTrip = trips.length === 1 && !calls.some((call) => call.type === "camper_travel_journal/delete_trip");
 actionButton("Löschen")?.click(); await waitFor(() => Boolean(embeddedManager()?.shadowRoot?.querySelector("dialog.trip-delete-dialog")?.open));
 embeddedManager().shadowRoot.querySelector("dialog.trip-delete-dialog button[type='submit']")?.click(); await waitFor(() => trips.length === 0 && Boolean(card.shadowRoot.querySelector(".entry")));
-result.textContent = JSON.stringify({ initial, transitionStatuses, edited: trip.title.includes("aktualisiert"), switchNeutral, dialogExplainsData, cancelPreservedTrip, deleted: calls.some((call) => call.type === "camper_travel_journal/delete_trip"), visibleTemplateLeak: /lit\$\d|=>\s*this\.|currentTarget\.value/.test(card.shadowRoot.textContent) }, null, 2);
+result.textContent = JSON.stringify({ initial, layout, viewport: window.innerWidth, transitionStatuses, edited: trip.title.includes("aktualisiert"), switchNeutral, dialogExplainsData, cancelPreservedTrip, deleted: calls.some((call) => call.type === "camper_travel_journal/delete_trip"), visibleTemplateLeak: /lit\$\d|=>\s*this\.|currentTarget\.value/.test(card.shadowRoot.textContent) }, null, 2);
 </script>
