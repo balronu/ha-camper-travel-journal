@@ -2,6 +2,7 @@ import { css, html } from "lit";
 import { TravelCard, defineOnce } from "./base-card";
 import { assignInterruption, createStopFromInterruption, list, listVehicles, type Snapshot, type Trip, type TripInterruption } from "./api";
 import { clearActiveTrip, publishActiveTrip, readActiveTrip, type TripContextDetail, ACTIVE_TRIP_CHANGED_EVENT } from "./trip-context";
+import { TRAVEL_DATA_CHANGED_EVENT } from "./expense-events";
 import { formatDateTime, formatDuration, formatMoneyMinor, formatTripPeriod, messages, statusLabel } from "./i18n";
 
 type JournalConfig = { vehicle_id: string };
@@ -24,6 +25,11 @@ export class JournalCard extends TravelCard {
     if (detail?.vehicleId !== this.vehicleId || !detail.tripId || detail.tripId === this.openTripId) return;
     if (this.openTripId) void this.openTrip(detail.tripId);
   };
+  private readonly onTravelDataChanged = (event: Event) => {
+    const detail = (event as CustomEvent<{ vehicleId: string; tripId: string }>).detail;
+    if (detail?.vehicleId !== this.vehicleId) return;
+    void this.refreshOverview();
+  };
   private interruptionDialog?: TripInterruption;
   private interruptionAction: "stop" | "overnight" | "pause" | "ignored" = "stop";
   private interruptionPlaceId = "";
@@ -39,10 +45,12 @@ export class JournalCard extends TravelCard {
   connectedCallback() {
     super.connectedCallback();
     window.addEventListener(ACTIVE_TRIP_CHANGED_EVENT, this.onActiveTripChanged);
+    window.addEventListener(TRAVEL_DATA_CHANGED_EVENT, this.onTravelDataChanged);
     void this.refreshOverview();
   }
   disconnectedCallback() {
     window.removeEventListener(ACTIVE_TRIP_CHANGED_EVENT, this.onActiveTripChanged);
+    window.removeEventListener(TRAVEL_DATA_CHANGED_EVENT, this.onTravelDataChanged);
     super.disconnectedCallback();
   }
   protected onHassConnectionChanged() { void this.refreshOverview(); }
@@ -62,6 +70,11 @@ export class JournalCard extends TravelCard {
       const overview = await list(this.hass, this.vehicleId);
       if (request !== this.overviewRequest) return false;
       this.overview = overview;
+      if (this.openTripId && !overview.trips.some((trip) => trip.id === this.openTripId)) {
+        this.openTripId = "";
+        this.detail = undefined;
+        clearActiveTrip(this.vehicleId, "journal");
+      }
       try { this.vehicleName = (await listVehicles(this.hass)).find((vehicle) => vehicle.vehicle_id === this.vehicleId)?.name ?? ""; } catch { this.vehicleName = ""; }
       const remembered = readActiveTrip(this.vehicleId);
       this.selectedTripId = this.overview.trips.some((trip) => trip.id === (this.openTripId || remembered)) ? (this.openTripId || remembered) : "";
@@ -159,7 +172,7 @@ export class JournalCard extends TravelCard {
   }
   private renderPicker(lang: ReturnType<typeof messages>) {
     const trips = this.overview?.trips ?? [];
-    return html`<section class="entry" aria-labelledby="journal-entry-title"><div class="entry-icon" aria-hidden="true">🚐</div><h2 id="journal-entry-title">${lang.journalEntry ?? "Reise auswählen oder neu anlegen"}</h2><p class="muted">${lang.journalEntryHint ?? "Öffne eine Reise, um ihre Fahrten, Orte, Karte und Exporte zu sehen."}</p>${trips.length ? html`<label class="picker-label">${lang.journalSelect ?? "Reise auswählen"}<select aria-label=${lang.journalSelect ?? "Reise auswählen"} .value=${this.selectedTripId} @change=${(event: Event) => { this.selectedTripId = (event.currentTarget as HTMLSelectElement).value; this.requestUpdate(); }}><option value="">${lang.journalChoose ?? "Bitte auswählen …"}</option>${trips.map((trip) => html`<option value=${trip.id}>${trip.title} · ${statusLabel(trip.status, this.hass)} · ${formatTripPeriod(trip, this.hass)}</option>`)}</select></label>` : html`<p class="muted">${lang.noTrip}</p>`}<div class="actions"><button type="button" @click=${() => void this.openTrip() } ?disabled=${!this.selectedTripId || this.loading}>${lang.journalOpen ?? "Reise öffnen"}</button><button type="button" class="secondary" @click=${() => this.openTripCreateDialog()}>${lang.newTrip}</button></div><camper-travel-journal-manager-card .hass=${this.hass} .config=${{ vehicle_id: this.vehicleId, journal_section: "trip-create" }} @trip-created=${(event: Event) => void this.onTripCreated(event)}></camper-travel-journal-manager-card></section>`;
+    return html`<section class="entry" aria-labelledby="journal-entry-title"><div class="entry-icon" aria-hidden="true">🚐</div><h2 id="journal-entry-title">${lang.journalEntry ?? "Reise auswählen oder neu anlegen"}</h2><p class="muted">${lang.journalEntryHint ?? "Öffne eine Reise, um ihre Fahrten, Orte, Karte und Exporte zu sehen."}</p>${trips.length ? html`<label class="picker-label">${lang.journalSelect ?? "Reise auswählen"}<select aria-label=${lang.journalSelect ?? "Reise auswählen"} .value=${this.selectedTripId} @change=${(event: Event) => { this.selectedTripId = (event.currentTarget as HTMLSelectElement).value; this.requestUpdate(); }}><option value="">${lang.journalChoose ?? "Bitte auswählen …"}</option>${trips.map((trip) => html`<option value=${trip.id}>${trip.title} · ${statusLabel(trip.status, this.hass)} · ${formatTripPeriod(trip, this.hass)}</option>`)}</select></label>` : html`<p class="muted">${lang.noTrip}</p>`}<div class="actions"><button type="button" @click=${() => void this.openTrip() } ?disabled=${!this.selectedTripId || this.loading}>${lang.journalOpen ?? "Reise öffnen"}</button><button type="button" class="secondary" @click=${() => this.openTripCreateDialog()}>${lang.newTrip}</button></div><camper-travel-journal-manager-card .config=${{ vehicle_id: this.vehicleId, journal_section: "trip-create" }} .hass=${this.hass} @trip-created=${(event: Event) => void this.onTripCreated(event)}></camper-travel-journal-manager-card></section>`;
   }
   private renderOpenTrip(lang: ReturnType<typeof messages>, trip: Trip) {
     const snapshot = this.detail;
@@ -168,15 +181,15 @@ export class JournalCard extends TravelCard {
     const km = (snapshot?.drives ?? []).reduce((sum, drive) => sum + drive.distance_m, 0) / 1000;
     const expense = snapshot?.expense_summary;
     const total = expense?.mixed_currency ? lang.mixedCurrency : expense?.total_minor !== undefined && expense.currency ? formatMoneyMinor(expense.total_minor, expense.currency, this.hass) : formatMoneyMinor(0, "EUR", this.hass);
-    const manager = (section: string) => html`<camper-travel-journal-manager-card .hass=${this.hass} .config=${{ vehicle_id: this.vehicleId, trip_id: trip.id, journal_section: section }}></camper-travel-journal-manager-card>`;
-    const map = html`<camper-travel-journal-map-card .hass=${this.hass} .config=${{ vehicle_id: this.vehicleId, trip_id: trip.id }}></camper-travel-journal-map-card>`;
+    const manager = (section: string) => html`<camper-travel-journal-manager-card .config=${{ vehicle_id: this.vehicleId, trip_id: trip.id, journal_section: section }} .hass=${this.hass}></camper-travel-journal-manager-card>`;
+    const map = html`<camper-travel-journal-map-card .config=${{ vehicle_id: this.vehicleId, trip_id: trip.id }} .hass=${this.hass}></camper-travel-journal-map-card>`;
     const interruptions = snapshot?.interruptions ?? [];
     const timeline = [...(snapshot?.drives ?? [])].sort((left, right) => left.started_at.localeCompare(right.started_at)).flatMap((drive) => {
       const following = interruptions.find((item) => item.previous_drive_id === drive.id);
       const assigned = (snapshot?.stops ?? []).find((stop) => stop.id === following?.existing_place_id);
       return [html`<article class="drive-item"><strong>${lang.drive ?? "Fahrt"}</strong><span>${formatDateTime(drive.started_at, this.hass)} → ${drive.ended_at ? formatDateTime(drive.ended_at, this.hass) : (lang.notAvailable ?? "Nicht verfügbar")}</span><span>${(drive.distance_m / 1000).toFixed(1)} km · ${drive.duration_seconds ? formatDuration(drive.duration_seconds, this.hass) : "–"} · ${drive.source === "gpx" ? (lang.sourceGpx ?? "GPX-importiert") : drive.source === "manual" ? lang.sourceManual : lang.sourceGps}</span></article>`, ...(following ? [html`<article class="interruption-item"><strong>${following.status === "pause" ? (lang.drivePause ?? "Fahrtpause") : following.status === "ignored" ? (lang.interruptionIgnored ?? "Ignoriert") : assigned ? `${lang.assignedStay ?? "Aufenthalt"}: ${assigned.name}` : (lang.interruptionUnassigned ?? "Nicht zugeordnet")}</strong><span>${formatDateTime(following.started_at, this.hass)} → ${formatDateTime(following.ended_at, this.hass)} · ${formatDuration(following.duration_seconds, this.hass)}</span>${following.status === "unassigned" ? html`<button type="button" class="compact-action" @click=${() => this.openInterruptionDialog(following)}>${lang.assignStay ?? "Aufenthalt zuordnen"}</button>` : ""}</article>`] : [])];
     });
-    return html`<header class="trip-header"><div><p class="eyebrow">${lang.journalOpenTrip ?? "Geöffnete Reise"}</p><h2>${trip.title}</h2><p class="muted">${trip.destination || lang.noDestination} · ${formatTripPeriod(trip, this.hass)} · ${statusLabel(trip.status, this.hass)}${this.vehicleName ? ` · ${this.vehicleName}` : ""}</p></div><button type="button" class="secondary" @click=${() => this.closeTrip()}>${lang.journalClose ?? "Reise schließen / wechseln"}</button></header>
+    return html`<header class="trip-header"><div><p class="eyebrow">${lang.journalOpenTrip ?? "Geöffnete Reise"}</p><h2>${trip.title}</h2><p class="muted">${trip.destination || lang.noDestination} · ${formatTripPeriod(trip, this.hass)} · ${statusLabel(trip.status, this.hass)}${this.vehicleName ? ` · ${this.vehicleName}` : ""}</p><div class="trip-management">${manager("trip-actions")}</div></div><button type="button" class="secondary switch-trip" @click=${() => this.closeTrip()}>${lang.journalClose ?? "Reise wechseln"}</button></header>
       ${this.section(lang.journalOverview ?? "Reiseübersicht", "▣", undefined, html`<div class="metric-grid"><div><span>${lang.distance}</span><strong>${km.toFixed(1)} km</strong></div><div><span>${lang.drives}</span><strong>${snapshot?.drives.length ?? 0}</strong></div><div><span>${lang.stops}</span><strong>${confirmed.filter((stop) => !overnightKinds.has(stop.place_kind || stop.place_type || stop.stop_type)).length}</strong></div><div><span>${lang.overnights ?? "Übernachtungsplätze"}</span><strong>${overnights.length}</strong></div><div><span>${lang.costs}</span><strong>${total}</strong></div></div>`)}
       ${this.section(lang.journalDrives ?? "Fahrten und Unterbrechungen", "↔", (snapshot?.drives.length ?? 0) + interruptions.length, html`${timeline.length ? timeline : html`<p class="muted">${lang.noDrives ?? "Keine Fahrten erfasst."}</p>`}`)}
       ${this.section(lang.placesAndStays ?? "Orte & Aufenthalte", "●", confirmed.length, html`<p class="muted">${lang.journalStopsHint ?? "Bestätigte Aufenthalte dieser Reise."}</p>${manager("places")}`)}

@@ -36,7 +36,7 @@ const name = dialog.querySelector("input[aria-label='Name']"); name.value = "Rei
 dialog.querySelector("button[type='submit']")?.click();
 await waitFor(() => !card.shadowRoot.querySelector("dialog.interruption-dialog")?.open && card.shadowRoot.textContent.includes("Reisemobilstellplatz am Kuhhirten"));
 const interruption = { saved: overnightSaves === 1, overnightCount: card.shadowRoot.textContent.replace(/\s/g, "").includes("Übernachtungen2"), dialogClosedAfterRefresh: !card.shadowRoot.querySelector("dialog.interruption-dialog")?.open };
-const close = [...card.shadowRoot.querySelectorAll("button")].find((button) => button.textContent.includes("Reise schließen")); close?.click();
+const close = [...card.shadowRoot.querySelectorAll("button")].find((button) => button.textContent.includes("Reise wechseln")); close?.click();
 await waitFor(() => Boolean(card.shadowRoot.querySelector(".entry")));
 result.textContent = JSON.stringify({ closed: closed.title && closed.noMap && closed.noPdf, opened: opened.header && opened.drive && opened.interruption && opened.map && opened.noEmbeddedMigrationNotice, singleExpenseDisclosure, interruption, closedAgain: Boolean(card.shadowRoot.querySelector(".entry")), visibleTemplateLeak: /lit\$\d|=>\s*this\.|currentTarget\.value/.test(card.shadowRoot.textContent), }, null, 2);
 </script>
