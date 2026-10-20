@@ -54,7 +54,7 @@ mobile browsers and Home Assistant setups is important.
 1. Open **HACS → Integrations → Custom repositories**.
 2. Add `https://github.com/balronu/ha-camper-travel-journal` as an
    **Integration** repository.
-3. Install the stable `v0.3.1` release.
+3. Install the stable `v0.3.2` release.
 4. Restart Home Assistant manually.
 5. Add the integration under **Settings → Devices & services**.
 
@@ -70,6 +70,12 @@ Setup requires a vehicle name and a `device_tracker` entity with numeric
 tracker and your privacy requirements. Interval, minimum movement, stop
 detection, GPS gap, plausible maximum speed and unassigned-point retention are
 configurable options.
+
+Trip start and end dates are planning/display fields; a start date does not
+automatically activate a trip. GPS recording runs independently when enabled.
+Newly detected drives are assigned automatically only when exactly one active
+trip exists for the configured vehicle; otherwise they remain unassigned until
+you choose a trip.
 
 ## Dashboard cards
 
@@ -170,6 +176,13 @@ Trips can be created, edited, started, paused and completed. Detected drives can
 be linked to or unlinked from a trip, and manual drives can be stored separately.
 Expenses are summed per trip as integer cents. Mixed currencies are never added
 silently.
+
+The v0.3.1 trip actions remain available in the central Journal Card: resume,
+complete, edit, delete and switch trip, with status-dependent actions and the
+existing delete confirmation. v0.3.2 gives these actions a consistent,
+responsive button grid with two columns and a single-column fallback below
+420 px; the separate red delete button and its confirmation dialog are
+unchanged.
 
 ## Places, Home and reverse geocoding
 

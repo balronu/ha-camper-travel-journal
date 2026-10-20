@@ -75,6 +75,12 @@ Aufzeichnung erst, wenn Tracker und Datenschutzanforderungen geprüft sind.
 Intervall, Mindestbewegung, Stopperkennung, GPS-Lücke, plausible
 Maximalgeschwindigkeit und Aufbewahrung unzugeordneter Punkte sind Optionen.
 
+Start- und Enddatum einer Reise dienen der Planung und Anzeige; ein Startdatum
+aktiviert eine Reise nicht automatisch. Die GPS-Aufzeichnung läuft unabhängig
+vom Reisestatus, sofern sie aktiviert ist. Eine neu erkannte Fahrt wird nur
+automatisch zugeordnet, wenn für das konfigurierte Fahrzeug genau eine aktive
+Reise existiert; andernfalls bleibt sie bis zur manuellen Zuordnung frei.
+
 ## Dashboard-Karten
 
 > **WICHTIG – LOVELACE-KARTEN GEÄNDERT!**
@@ -179,6 +185,12 @@ werden. Erkannte Fahrten können einer Reise zugeordnet oder wieder gelöst
 werden; manuelle Fahrten sind separat möglich. Kosten werden als ganzzahlige
 Cent-Beträge pro Reise summiert. Unterschiedliche Währungen werden nicht
 stillschweigend addiert.
+
+Seit v0.3.1 stehen im geöffneten Reisekontext statusabhängige Aktionen zum
+Fortsetzen, Abschließen, Bearbeiten, Löschen und Wechseln der Reise bereit.
+v0.3.2 ordnet sie in einem einheitlichen responsiven Aktionsraster mit zwei
+Spalten und Einspalten-Fallback unter 420 px an. Der rote Löschbutton und der
+bestehende Bestätigungsdialog bleiben separat erhalten.
 
 ## Orte, Zuhause und Reverse Geocoding
 

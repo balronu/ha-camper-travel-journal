@@ -1,6 +1,6 @@
 # Lovelace-Frontend- und Cache-Standard
 
-Der Stable-Stand enthält die Bereinigung aller seit Beta 2 bekannten historischen
+Der Stable-Stand v0.3.2 enthält die Bereinigung aller seit Beta 2 bekannten historischen
 Camper-Bundle-URLs, bevor die aktuelle URL registriert wird. Diese Bereinigung
 wird bei jedem Domain- und Entry-Setup idempotent ausgeführt; dadurch bleiben
 nach wiederholten HACS-Updates nicht mehrere Beta-Module als Extra-Module
@@ -8,7 +8,7 @@ aktiv. Die versionierte URL bleibt für Browser-Cache-Busting erhalten.
 
 ## Aktueller Stand
 
-Der veröffentlichte Stand `v0.3.0` enthält die zentrale Journal Card, die
+Der veröffentlichte Stand `v0.3.2` enthält die zentrale Journal Card, die
 Phase-3-Lovelace-Karten
 und die GPX-Importvorschau,
 die optionale read-only-Diagnosekarte und registriert das Bundle
@@ -25,7 +25,7 @@ Resource-URL folgt dann
 diesem Muster:
 
 ```text
- /camper_travel_journal/camper-travel-journal.js?v=0.3.0
+ /camper_travel_journal/camper-travel-journal.js?v=0.3.2
 ```
 
 `<VERSION>` wird bei jeder Bundle-Änderung erhöht, auch zwischen stabilen
@@ -41,7 +41,7 @@ Registrierung über den unterstützten Helper. Die Resource-URL muss
 versionsgebunden sein und darf nicht durch direkte Änderungen an
 `.storage/lovelace.resources` gepflegt werden.
 
-Das Bundle registriert beide Kartentypen zusätzlich idempotent in
+Das Bundle registriert seine Custom Cards zusätzlich idempotent in
 `window.customCards`. Beide Karten liefern über `getConfigElement()` einen
 grafischen Editor. Dieser lädt die eingerichteten Camper über den
 authentifizierten Befehl `camper_travel_journal/list_vehicles`, übernimmt

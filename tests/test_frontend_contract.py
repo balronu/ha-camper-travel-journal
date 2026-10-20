@@ -12,7 +12,7 @@ def test_beta_contains_the_versioned_lovelace_bundle():
     assert "Lovelace-Karte" in text
     assert "async_register_static_paths" in text
     assert "customElements.get" in text
-    assert "0.3.0" in text
+    assert "0.3.2" in text
     api = (ROOT / "custom_components" / "camper_travel_journal" / "api.py").read_text(encoding="utf-8")
     assert "camper_travel_journal/list_vehicles" in api
     assert "ws_list_vehicles" in api

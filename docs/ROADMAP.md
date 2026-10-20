@@ -1,7 +1,7 @@
 # Camper Travel Journal – Roadmap
 
 This roadmap separates implemented work, current limitations and planned
-features. It is based on the released `v0.3.0` source tree and tests.
+features. It is based on the released `v0.3.2` source tree and tests.
 A database
 table or WebSocket method is not treated as a finished user feature
 without a corresponding UI and test path.
@@ -21,13 +21,16 @@ without a corresponding UI and test path.
 - Expense CRUD, integer-cent totals, mixed-currency protection, inline editing
   and canonical category IDs, including the `camping` round-trip.
 
-## Current stable baseline: `v0.3.0`
+## Current stable baseline: `v0.3.2`
 
 The stable baseline includes deterministic active-trip selection, persistent
 Summary Card trip selection, the central Journal Card, GPX import, place and
 rating management, offline PDF maps and the documented privacy boundaries. CI
 covers the pinned Home Assistant environment and synthetic/isolated data.
-Existing rows remain untouched until a user explicitly edits them.
+Existing rows remain untouched until a user explicitly edits them. Trip start
+dates do not automatically activate a trip. GPS recording remains independent
+of trip status, and automatic drive assignment requires exactly one active trip
+for the vehicle.
 
 ## Beta 12 – travel periods and drives (published)
 

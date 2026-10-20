@@ -6,6 +6,10 @@ max_columns: 2
 sections:
   - type: grid
     cards:
+      - type: custom:camper-travel-journal-journal-card
+        vehicle_id: REPLACE_WITH_CONFIG_ENTRY_ID
+  - type: grid
+    cards:
       - type: custom:camper-travel-journal-summary-card
         vehicle_id: REPLACE_WITH_CONFIG_ENTRY_ID
   - type: grid
