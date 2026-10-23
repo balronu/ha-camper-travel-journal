@@ -113,6 +113,17 @@ def _money(minor: int | None, currency: str | None, language: str) -> str:
     return f"{symbol} {value:,.2f}"
 
 
+def _fuel_details(expense: dict[str, Any], language: str) -> str:
+    parts = []
+    if expense.get("fuel_liters") is not None:
+        value = f"{float(expense['fuel_liters']):.3f} l"
+        parts.append(value.replace(".", ",") if language == "de" else value)
+    if expense.get("fuel_price_per_liter") is not None:
+        value = f"{float(expense['fuel_price_per_liter']):.3f} €/l"
+        parts.append(value.replace(".", ",") if language == "de" else value)
+    return " · ".join(parts)
+
+
 def _text(value: Any) -> str:
     return "" if value is None else str(value).strip()
 
@@ -432,6 +443,9 @@ def render_trip_report(report: dict[str, Any], *, language: str = "de", time_zon
         rows = [[labels["period_short"], labels["category"], labels["amount"], labels["description"]]]
         for expense in sorted(expenses, key=lambda item: (item.get("occurred_on") or item.get("created_at") or "", item.get("id", ""))):
             note, place = _text(expense.get("note")), _text(expense.get("place_name")); note = f"{note} · {place}" if note and place else note or place
+            fuel = _fuel_details(expense, language)
+            if fuel:
+                note = f"{fuel} · {note}" if note else fuel
             actual_date = _date(expense.get("occurred_on"), language, time_zone) if expense.get("occurred_on") else labels["unknown_date"]
             actual_time = _expense_time(expense.get("occurred_time"), language)
             date_text = f"{actual_date}, {actual_time}" if actual_time else actual_date

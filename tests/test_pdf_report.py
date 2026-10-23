@@ -2,7 +2,7 @@ import unittest
 
 try:
     from reportlab.platypus import KeepTogether, Paragraph, Table
-    from custom_components.camper_travel_journal.pdf_report import _RouteMap, _category_label, _date, _date_time, _duration, _expense_time, _place_label, _time, render_trip_report
+    from custom_components.camper_travel_journal.pdf_report import _RouteMap, _category_label, _date, _date_time, _duration, _expense_time, _fuel_details, _place_label, _time, render_trip_report
 except ModuleNotFoundError as error:  # pragma: no cover - CI installs manifest dependency
     if error.name != "reportlab":
         raise
@@ -45,6 +45,12 @@ def test_report_contains_pdf_structure_and_localized_content():
     assert b"/Type /Page" in pdf
     assert filename == "Camper-Travel-Journal_Bremen_Küste_Test_2026.pdf".encode("latin-1").decode("latin-1")
     assert b"49.0" not in pdf
+
+
+def test_fuel_details_are_optional_and_localized_for_pdf_rows():
+    assert _fuel_details({"fuel_liters": 75, "fuel_price_per_liter": 1.75}, "de") == "75,000 l · 1,750 €/l"
+    assert _fuel_details({"fuel_liters": 75}, "en") == "75.000 l"
+    assert _fuel_details({}, "de") == ""
 
 
 def test_report_includes_offline_route_map_from_real_track_points(monkeypatch):

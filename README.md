@@ -6,7 +6,7 @@
 
 <h1 align="center">Camper Travel Journal</h1>
 <p align="center">Dein digitales Wohnmobil-Reisetagebuch für Home Assistant</p>
-<p align="center"><strong>Stable: v0.3.2</strong></p>
+<p align="center"><strong>Stable: v0.3.3</strong></p>
 
 <p align="center">
   <a href="https://github.com/balronu/ha-camper-travel-journal/releases/latest"><img src="https://img.shields.io/github/v/release/balronu/ha-camper-travel-journal?label=Release" alt="Release"></a>
@@ -53,12 +53,20 @@ Installationen bleibt wichtig.
   bearbeiten, fortsetzen, pausieren, beenden, löschen oder wechseln; alle
   Reisebereiche verwenden denselben Reisekontext.
 
+### Kraftstoffkosten
+
+Bei der Kategorie **Kraftstoff** sind getankte Liter und Literpreis optional.
+Wenn zwei der drei Werte vorhanden sind, wird der fehlende Wert berechnet.
+Deutsche Kommaeingaben werden unterstützt; Betrag wird mit zwei, Liter und
+Literpreis mit bis zu drei Nachkommastellen dargestellt. Alte Kraftstoffkosten
+ohne diese Angaben bleiben gültig.
+
 ## Installation über HACS
 
 1. Öffne **HACS → Integrationen → Benutzerdefinierte Repositories**.
 2. Füge `https://github.com/balronu/ha-camper-travel-journal` als Repository
    vom Typ **Integration** hinzu.
-3. Installiere die stabile Version `v0.3.2`.
+3. Installiere die stabile Version `v0.3.3`.
 4. Starte Home Assistant manuell neu.
 5. Füge die Integration unter **Einstellungen → Geräte & Dienste** hinzu.
 
@@ -188,7 +196,7 @@ stillschweigend addiert.
 
 Seit v0.3.1 stehen im geöffneten Reisekontext statusabhängige Aktionen zum
 Fortsetzen, Abschließen, Bearbeiten, Löschen und Wechseln der Reise bereit.
-v0.3.2 ordnet sie in einem einheitlichen responsiven Aktionsraster mit zwei
+v0.3.3 ordnet sie in einem einheitlichen responsiven Aktionsraster mit zwei
 Spalten und Einspalten-Fallback unter 420 px an. Der rote Löschbutton und der
 bestehende Bestätigungsdialog bleiben separat erhalten.
 

@@ -16,10 +16,11 @@ from contextlib import contextmanager
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
+from .fuel import resolve_fuel_values
 from .travel import validate_amount, validate_expense_category, validate_expense_currency
 from .validation import is_coordinate_label
 
-SCHEMA_VERSION = 10
+SCHEMA_VERSION = 11
 V10_GPX_BACKFILL_MARKER = "v10_gpx_backfill"
 
 
@@ -74,7 +75,7 @@ CREATE TABLE IF NOT EXISTS expenses (
   id TEXT PRIMARY KEY, trip_id TEXT REFERENCES trips(id) ON DELETE SET NULL, occurred_at TEXT NOT NULL,
   category TEXT NOT NULL, amount_minor INTEGER NOT NULL, currency TEXT NOT NULL,
   note TEXT, created_at TEXT NOT NULL, updated_at TEXT NOT NULL, odometer_km REAL, stay_id TEXT REFERENCES stops(id) ON DELETE SET NULL,
-  occurred_on TEXT, occurred_time TEXT
+  occurred_on TEXT, occurred_time TEXT, fuel_liters REAL, fuel_price_per_liter REAL
 );
 CREATE INDEX IF NOT EXISTS idx_expenses_trip_time ON expenses(trip_id, occurred_at);
 CREATE TABLE IF NOT EXISTS stops (
@@ -180,6 +181,8 @@ class SQLiteStore:
                     self._migrate_v9()
                 if previous < 10:
                     self._migrate_v10()
+                if previous < 11:
+                    self._migrate_v11()
                 if self.connection.execute(
                     "SELECT 1 FROM schema_meta WHERE key=?", (V10_GPX_BACKFILL_MARKER,)
                 ).fetchone() is None:
@@ -403,6 +406,15 @@ class SQLiteStore:
             if name not in drive_columns:
                 self.connection.execute(f"ALTER TABLE drives ADD COLUMN {name} REAL")
 
+    def _migrate_v11(self) -> None:
+        """Add optional fuel details without rewriting existing expenses."""
+        if self.connection is None:
+            raise RuntimeError("store is not open")
+        columns = {row[1] for row in self.connection.execute("PRAGMA table_info(expenses)")}
+        for name in ("fuel_liters", "fuel_price_per_liter"):
+            if name not in columns:
+                self.connection.execute(f"ALTER TABLE expenses ADD COLUMN {name} REAL")
+
     def _backfill_v10_gpx_endpoints(self) -> None:
         """Reconstruct safe legacy memberships once, then persist endpoints.
 
@@ -621,7 +633,6 @@ class SQLiteStore:
         if "started_at" in changes and isinstance(changes["started_at"], datetime): changes["started_at"] = utc_iso(changes["started_at"])
         if "ended_at" in changes and isinstance(changes["ended_at"], datetime): changes["ended_at"] = utc_iso(changes["ended_at"])
         changes["updated_at"] = utc_iso(now)
-        assignments = ",".join(f"{key}=?" for key in changes)
         with self.transaction() as connection:
             current = connection.execute("SELECT start_date, end_date FROM trips WHERE id=?", (trip_id,)).fetchone()
             if current is None:
@@ -630,6 +641,7 @@ class SQLiteStore:
             proposed_end = changes.get("end_date", current[1])
             if proposed_start and proposed_end and proposed_end < proposed_start:
                 raise ValueError("trip_date_range_invalid")
+            assignments = ",".join(f"{key}=?" for key in changes)
             cursor = connection.execute(f"UPDATE trips SET {assignments} WHERE id=?", (*changes.values(), trip_id))
             if cursor.rowcount != 1: raise ValueError("trip_not_found")
 
@@ -1206,6 +1218,13 @@ class SQLiteStore:
         amount_minor = validate_amount(expense.amount_minor)
         category = validate_expense_category(expense.category)
         currency = validate_expense_currency(expense.currency)
+        fuel_amount, fuel_liters, fuel_price = resolve_fuel_values(
+            amount_minor if category == "fuel" else amount_minor,
+            expense.fuel_liters if category == "fuel" else None,
+            expense.fuel_price_per_liter if category == "fuel" else None,
+        )
+        if fuel_amount is not None:
+            amount_minor = fuel_amount
         occurred_on = expense.occurred_on or expense.occurred_at.astimezone(timezone.utc).date().isoformat()
         occurred_time = expense.occurred_time
         if occurred_time is not None and not re.fullmatch(r"(?:[01]\d|2[0-3]):[0-5]\d", occurred_time):
@@ -1220,7 +1239,7 @@ class SQLiteStore:
                 place = connection.execute("SELECT vehicle_id,trip_id FROM stops WHERE id=?", (place_id,)).fetchone()
                 if place is None: raise ValueError("place_not_found")
                 if place[0] != trip[0] or place[1] not in (None, expense.trip_id): raise ValueError("vehicle_mismatch")
-            connection.execute("INSERT INTO expenses(id,trip_id,occurred_at,category,amount_minor,currency,note,created_at,updated_at,odometer_km,stay_id,place_id,occurred_on,occurred_time) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?)", (expense_id, expense.trip_id, utc_iso(expense.occurred_at), category, amount_minor, currency, expense.note, stamp, stamp, expense.odometer_km, expense.stay_id, place_id, occurred_on, occurred_time))
+            connection.execute("INSERT INTO expenses(id,trip_id,occurred_at,category,amount_minor,currency,note,created_at,updated_at,odometer_km,stay_id,place_id,occurred_on,occurred_time,fuel_liters,fuel_price_per_liter) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)", (expense_id, expense.trip_id, utc_iso(expense.occurred_at), category, amount_minor, currency, expense.note, stamp, stamp, expense.odometer_km, expense.stay_id, place_id, occurred_on, occurred_time, fuel_liters, fuel_price))
         return expense_id
 
     def list_expenses(self, trip_id: str) -> list[dict]:
@@ -1234,8 +1253,8 @@ class SQLiteStore:
                 raise ValueError("expense_not_found")
 
     def update_expense(self, expense_id: str, now: datetime, **fields) -> None:
-        allowed = {"trip_id", "occurred_at", "occurred_on", "occurred_time", "category", "amount_minor", "currency", "note", "odometer_km", "stay_id", "place_id"}
-        nullable_fields = {"occurred_on", "occurred_time"}
+        allowed = {"trip_id", "occurred_at", "occurred_on", "occurred_time", "category", "amount_minor", "currency", "note", "odometer_km", "stay_id", "place_id", "fuel_liters", "fuel_price_per_liter"}
+        nullable_fields = {"occurred_on", "occurred_time", "fuel_liters", "fuel_price_per_liter"}
         changes = {
             key: value for key, value in fields.items()
             if key in allowed and (value is not None or key in nullable_fields)
@@ -1259,10 +1278,27 @@ class SQLiteStore:
         changes["updated_at"] = utc_iso(now)
         assignments = ",".join(f"{key}=?" for key in changes)
         with self.transaction() as connection:
+            current = connection.execute("SELECT trip_id,category,amount_minor,fuel_liters,fuel_price_per_liter FROM expenses WHERE id=?", (expense_id,)).fetchone()
+            if current is None:
+                raise ValueError("expense_not_found")
+            category = changes.get("category", current[1])
+            if category == "fuel":
+                explicit_clear = any(key in changes and changes[key] is None for key in ("fuel_liters", "fuel_price_per_liter"))
+                resolved_amount, resolved_liters, resolved_price = resolve_fuel_values(
+                    changes.get("amount_minor", current[2]),
+                    changes["fuel_liters"] if "fuel_liters" in changes else current[3],
+                    changes["fuel_price_per_liter"] if "fuel_price_per_liter" in changes else current[4],
+                    complete_missing=not explicit_clear,
+                )
+                if resolved_amount is not None:
+                    changes["amount_minor"] = resolved_amount
+                changes["fuel_liters"], changes["fuel_price_per_liter"] = resolved_liters, resolved_price
+            else:
+                changes["fuel_liters"] = None
+                changes["fuel_price_per_liter"] = None
+            assignments = ",".join(f"{key}=?" for key in changes)
             if "place_id" in changes and changes["place_id"]:
-                expense = connection.execute("SELECT trip_id FROM expenses WHERE id=?", (expense_id,)).fetchone()
-                if expense is None: raise ValueError("expense_not_found")
-                place = connection.execute("SELECT 1 FROM stops WHERE id=? AND (trip_id IS NULL OR trip_id=?)", (changes["place_id"], expense[0])).fetchone()
+                place = connection.execute("SELECT 1 FROM stops WHERE id=? AND (trip_id IS NULL OR trip_id=?)", (changes["place_id"], current[0])).fetchone()
                 if place is None: raise ValueError("place_not_found")
             cursor = connection.execute(f"UPDATE expenses SET {assignments} WHERE id=?", (*changes.values(), expense_id))
             if cursor.rowcount != 1: raise ValueError("expense_not_found")

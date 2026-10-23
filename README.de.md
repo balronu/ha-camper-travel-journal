@@ -9,7 +9,7 @@ lokal in einer eigenen SQLite-Datenbank.
 
 [🇬🇧 English](README.en.md) · [🇩🇪 Deutsche Hauptdokumentation](README.md)
 
-**Stable: v0.3.2**
+**Stable: v0.3.3**
 
 Für neue Dashboards wird die zentrale Journal Card empfohlen. Im geöffneten
 Reisekontext stehen Bearbeiten, Fortsetzen, Pausieren, Beenden, Löschen und
@@ -22,3 +22,10 @@ Fahrtzuordnung erfolgt nur bei genau einer aktiven Reise des Fahrzeugs.
 
 Technische Hinweise zur versionierten Frontend-Auslieferung stehen in der
 [Frontend-Cache-Dokumentation](docs/frontend-cache.md).
+## Kraftstoffkosten
+
+Bei der Kategorie **Kraftstoff** sind getankte Liter und Literpreis optional.
+Sind zwei der drei Werte vorhanden, wird der fehlende Wert berechnet. Deutsche
+Kommaeingaben werden unterstützt; Betrag wird mit zwei, Liter und Literpreis
+mit bis zu drei Nachkommastellen dargestellt. Alte Kraftstoffkosten ohne diese
+Angaben bleiben gültig.

@@ -68,7 +68,7 @@ class Phase2Tests(unittest.TestCase):
 
     def test_schema_version_and_phase2_tables(self):
         version = self.store.connection.execute("SELECT value FROM schema_meta WHERE key='version'").fetchone()[0]
-        self.assertEqual(version, "10")
+        self.assertEqual(version, "11")
         tables = self.store.table_names()
         self.assertIn("stops", tables)
         self.assertIn("expenses", tables)

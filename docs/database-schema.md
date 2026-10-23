@@ -55,6 +55,12 @@ All changes run through the serialized executor worker. A database newer than
 the supported version fails closed. No Recorder tables or migrations are
 touched, and retention remains non-destructive in this release.
 
+## Schema version 11 – optional fuel details
+
+Migration 11 adds nullable `fuel_liters` and `fuel_price_per_liter` columns to
+`expenses`. It does not rewrite existing amounts or rows. Non-fuel categories
+always clear these fields on update.
+
 ## Schema version 7 – route membership
 
 Migration 7 adds `drive_gps_points` without rewriting or deleting existing

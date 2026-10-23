@@ -30,7 +30,7 @@ class V03PlaceTests(unittest.TestCase):
         stop = self.store.create_stop(Stop("", "v1", "Stellplatz", self.now, trip_id=self.trip, automatic=False), self.now)
         expense = self.store.create_expense(Expense("", self.trip, self.now, "camping", 2400, "EUR", stay_id=stop), self.now)
         tables = self.store.table_names()
-        self.assertEqual(self.store.connection.execute("SELECT value FROM schema_meta WHERE key='version'").fetchone()[0], "10")
+        self.assertEqual(self.store.connection.execute("SELECT value FROM schema_meta WHERE key='version'").fetchone()[0], "11")
         self.assertTrue({"overnight_details", "place_ratings", "stop_suggestions", "interruption_links"}.issubset(tables))
         row = self.store.list_expenses(self.trip)[0]
         self.assertEqual((row["stay_id"], row["place_id"]), (stop, stop))
