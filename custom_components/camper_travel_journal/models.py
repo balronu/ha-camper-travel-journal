@@ -90,6 +90,8 @@ class Expense:
     place_id: str | None = None
     occurred_on: str | None = None
     occurred_time: str | None = None
+    fuel_liters: float | None = None
+    fuel_price_per_liter: float | None = None
 
 
 @dataclass(frozen=True, slots=True)

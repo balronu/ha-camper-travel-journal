@@ -369,3 +369,9 @@ Siehe [Release Notes](docs/releases/RELEASE_NOTES_v0.3.0.md),
 - Correct expense category editing for canonical and legacy values; improve responsive expense actions and the optional time checkbox.
 - Add responsive overnight-place metrics, robust route-map fitting, saved-place endpoint labels, and an offline GPX route map in PDF reports.
 - Preserve GPX data, distances, manual labels, and existing migration semantics; no external geocoding is required.
+# v0.3.3
+
+- Adds optional fuel liters and price-per-liter fields to create/edit expense forms.
+- Completes missing fuel values deterministically and rejects inconsistent values.
+- Shows fuel details in the central expense list and PDF travel reports.
+- Adds an additive SQLite migration; existing expenses remain unchanged.
