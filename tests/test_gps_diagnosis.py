@@ -1,0 +1,166 @@
+"""Isolated GPS duplicate and stop-detection diagnosis tests."""
+
+from __future__ import annotations
+
+import asyncio
+import tempfile
+import unittest
+from datetime import datetime, timedelta, timezone
+from pathlib import Path
+
+from custom_components.camper_travel_journal.collector import GPSCollector
+from custom_components.camper_travel_journal.detector import DetectorConfig, DriveDetector
+from custom_components.camper_travel_journal.models import Drive, GPSPoint
+from custom_components.camper_travel_journal.runtime import Runtime
+from custom_components.camper_travel_journal.storage import AsyncSQLiteWorker, SQLiteStore
+
+UTC = timezone.utc
+
+
+def gps(at: datetime, longitude: float = 7.0) -> GPSPoint:
+    return GPSPoint("v1", at, 49.0, longitude, accuracy_m=5, source_state="home", source_type="gps")
+
+
+def tracker_event(at: datetime, longitude: float = 7.0) -> dict:
+    return {"latitude": 49.0, "longitude": longitude, "gps_accuracy": 5, "timestamp": at}
+
+
+class GPSDiagnosisTests(unittest.TestCase):
+    def test_normal_drive_finishes_after_stationary_update(self):
+        detector = DriveDetector("v1", DetectorConfig(stop_after=timedelta(minutes=5)))
+        start = datetime(2026, 10, 23, 14, tzinfo=UTC)
+        detector.ingest(gps(start))
+        detector.ingest(gps(start + timedelta(seconds=30), 7.001))
+        self.assertTrue(any(event.kind == "drive_started" for event in detector.ingest(gps(start + timedelta(seconds=60), 7.002))))
+        finished = detector.ingest(gps(start + timedelta(minutes=6), 7.002))
+        self.assertEqual([event.kind for event in finished], ["drive_finished"])
+        self.assertEqual(finished[0].drive.end_reason, "stationary_timeout")
+
+    def test_no_followup_gps_message_cannot_prove_stationary_stop(self):
+        detector = DriveDetector("v1", DetectorConfig(stop_after=timedelta(minutes=5)))
+        start = datetime(2026, 10, 23, 14, tzinfo=UTC)
+        detector.ingest(gps(start))
+        detector.ingest(gps(start + timedelta(seconds=30), 7.001))
+        detector.ingest(gps(start + timedelta(seconds=60), 7.002))
+        self.assertEqual(detector.state.value, "driving")
+        # The live runtime has no end-of-stream callback; without another
+        # tracker point, ``ingest`` has not reached the stationary timeout.
+        self.assertEqual(detector.state.value, "driving")
+
+    def test_identical_state_changed_and_state_reported_events_store_one_point(self):
+        async def run():
+            collector = GPSCollector(None, {"v1": {"min_interval": 30, "min_movement": 25}}, dry_run=True)
+            runtime = Runtime.__new__(Runtime)
+            runtime.collector = collector
+            runtime.vehicle_id = "v1"
+            at = datetime(2026, 10, 23, 14, tzinfo=UTC)
+            event = type("Event", (), {"data": {"new_state": type("State", (), {"state": "home", "attributes": tracker_event(at)})(), "last_reported": at}})()
+            await runtime._async_state_event(event)
+            await runtime._async_state_reported_event(event)
+            self.assertEqual(collector.stats.accepted, 1)
+            self.assertEqual(collector.stats.invalid, 1)
+            self.assertEqual(collector.stats.reasons["timestamp_not_increasing"], 1)
+
+        asyncio.run(run())
+
+    def test_reload_like_second_detector_reuses_existing_live_drive(self):
+        async def run():
+            with tempfile.TemporaryDirectory() as directory:
+                worker = AsyncSQLiteWorker(Path(directory) / "journal.db")
+                await worker.async_open()
+                start = datetime(2026, 10, 23, 14, tzinfo=UTC)
+                await worker.async_insert_vehicle("v1", "Camper", "device_tracker.camper", start)
+                points = [
+                    (start, 7.0),
+                    (start + timedelta(seconds=30), 7.001),
+                    (start + timedelta(seconds=60), 7.002),
+                    (start + timedelta(minutes=6), 7.002),
+                ]
+                for _ in range(2):
+                    collector = GPSCollector(worker, {"v1": {"max_gap": 10, "stop_after": 5}}, dry_run=False)
+                    for at, longitude in points:
+                        await collector.async_process_event("v1", "home", tracker_event(at, longitude))
+                rows = worker.store.connection.execute("SELECT id,started_at,ended_at FROM drives WHERE vehicle_id='v1'").fetchall()
+                self.assertEqual(len(rows), 1)
+                self.assertEqual(rows[0][1:], ((start + timedelta(seconds=30)).isoformat(), (start + timedelta(minutes=6)).isoformat()))
+                await worker.async_close()
+
+        asyncio.run(run())
+
+    def test_same_interval_different_ids_is_not_a_database_unique_constraint(self):
+        with tempfile.TemporaryDirectory() as directory:
+            store = SQLiteStore(Path(directory) / "journal.db")
+            store.open()
+            now = datetime(2026, 10, 23, 14, tzinfo=UTC)
+            store.insert_vehicle("v1", "Camper", "device_tracker.camper", now)
+            first = Drive("d1", "v1", now, now + timedelta(hours=2), 162200, "stationary_timeout")
+            second = Drive("d2", "v1", now, now + timedelta(hours=2), 162000, "stationary_timeout")
+            self.assertEqual(store.insert_drive(first), "d1")
+            self.assertEqual(store.insert_drive(second), "d1")
+            self.assertEqual(store.connection.execute("SELECT count(*) FROM drives").fetchone()[0], 1)
+            store.close()
+
+    def test_repeated_drive_list_queries_are_read_only_and_stable(self):
+        with tempfile.TemporaryDirectory() as directory:
+            store = SQLiteStore(Path(directory) / "journal.db")
+            store.open()
+            now = datetime(2026, 10, 23, 14, tzinfo=UTC)
+            store.insert_vehicle("v1", "Camper", "device_tracker.camper", now)
+            store.insert_drive(Drive("d1", "v1", now, now + timedelta(hours=2), 162200, "stationary_timeout"))
+            self.assertEqual([row["id"] for row in store.list_drives("v1")], ["d1"])
+            self.assertEqual([row["id"] for row in store.list_drives("v1")], ["d1"])
+            store.close()
+
+    def test_stop_suggestions_need_contiguous_stationary_samples_and_are_pending(self):
+        with tempfile.TemporaryDirectory() as directory:
+            store = SQLiteStore(Path(directory) / "journal.db")
+            store.open()
+            start = datetime(2026, 10, 23, 14, tzinfo=UTC)
+            store.insert_vehicle("v1", "Camper", "device_tracker.camper", start)
+            for minutes in (0, 5, 10):
+                store.connection.execute(
+                    "INSERT INTO gps_points(vehicle_id,recorded_at,latitude,longitude) VALUES(?,?,?,?)",
+                    ("v1", (start + timedelta(minutes=minutes)).isoformat(), 49.0, 7.0),
+                )
+            store.connection.commit()
+            suggestions = store.generate_stop_suggestions("v1", start)
+            self.assertEqual(len(suggestions), 1)
+            self.assertEqual(suggestions[0]["status"], "pending")
+            self.assertEqual(store.list_stops("v1"), [])
+            store.close()
+
+    def test_gap_does_not_create_stationary_stop_suggestion(self):
+        with tempfile.TemporaryDirectory() as directory:
+            store = SQLiteStore(Path(directory) / "journal.db")
+            store.open()
+            start = datetime(2026, 10, 23, 14, tzinfo=UTC)
+            store.insert_vehicle("v1", "Camper", "device_tracker.camper", start)
+            for at, longitude in ((start, 7.0), (start + timedelta(minutes=20), 7.0)):
+                store.connection.execute(
+                    "INSERT INTO gps_points(vehicle_id,recorded_at,latitude,longitude) VALUES(?,?,?,?)",
+                    ("v1", at.isoformat(), 49.0, longitude),
+                )
+            store.connection.commit()
+            self.assertEqual(store.generate_stop_suggestions("v1", start), [])
+            store.close()
+
+    def test_trip_scoped_suggestion_does_not_require_active_trip(self):
+        with tempfile.TemporaryDirectory() as directory:
+            store = SQLiteStore(Path(directory) / "journal.db")
+            store.open()
+            start = datetime(2026, 10, 23, 14, tzinfo=UTC)
+            store.insert_vehicle("v1", "Camper", "device_tracker.camper", start)
+            trip_id = store.create_trip("v1", "Pausierte Reise", start, start, status="paused")
+            drive_id = store.insert_drive(Drive("d1", "v1", start, start + timedelta(minutes=10), 100, "stationary_timeout"))
+            for minutes in (0, 5, 10):
+                store.insert_point(gps(start + timedelta(minutes=minutes)))
+            store.associate_drive_points(drive_id, "v1", start, start + timedelta(minutes=10), "live_detector")
+            store.link_drives(trip_id, [drive_id], start)
+            suggestions = store.generate_stop_suggestions("v1", start, trip_id=trip_id)
+            self.assertEqual(len(suggestions), 1)
+            self.assertEqual(suggestions[0]["trip_id"], trip_id)
+            store.close()
+
+
+if __name__ == "__main__":
+    unittest.main()

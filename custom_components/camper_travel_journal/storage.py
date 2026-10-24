@@ -494,10 +494,22 @@ class SQLiteStore:
             cursor = connection.execute("INSERT OR IGNORE INTO gps_points(vehicle_id,recorded_at,latitude,longitude,accuracy_m,source_state,source_type) VALUES(?,?,?,?,?,?,?)", (point.vehicle_id, utc_iso(point.recorded_at), point.latitude, point.longitude, point.accuracy_m, point.source_state, point.source_type))
             return cursor.rowcount == 1
 
-    def insert_drive(self, drive) -> None:
+    def insert_drive(self, drive) -> str:
         with self.transaction() as connection:
+            # A reload or an accidentally overlapping runtime can reconstruct
+            # the same live GPS interval with a fresh UUID. Serialize the
+            # check inside the write transaction and reuse the existing row;
+            # manual and GPX drives deliberately keep their own provenance.
+            if drive.source == "gps":
+                existing = connection.execute(
+                    "SELECT id FROM drives WHERE vehicle_id=? AND started_at=? AND ended_at=? AND source='gps' LIMIT 1",
+                    (drive.vehicle_id, utc_iso(drive.started_at), utc_iso(drive.ended_at)),
+                ).fetchone()
+                if existing is not None:
+                    return existing[0]
             stamp = utc_iso(drive.ended_at)
             connection.execute("INSERT OR IGNORE INTO drives(id,vehicle_id,started_at,ended_at,distance_m,end_reason,manual_distance_km,source,start_label,end_label,start_latitude,start_longitude,end_latitude,end_longitude,created_at) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)", (drive.id, drive.vehicle_id, utc_iso(drive.started_at), utc_iso(drive.ended_at), drive.distance_m, drive.end_reason, drive.manual_distance_km, drive.source, drive.start_label, drive.end_label, drive.start_latitude, drive.start_longitude, drive.end_latitude, drive.end_longitude, stamp))
+            return drive.id
 
     def associate_drive_points(self, drive_id: str, vehicle_id: str, started_at: datetime, ended_at: datetime, association_source: str) -> int:
         """Associate existing points in a drive interval, without rewriting points."""
