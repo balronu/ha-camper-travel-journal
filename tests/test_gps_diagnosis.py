@@ -26,6 +26,47 @@ def tracker_event(at: datetime, longitude: float = 7.0) -> dict:
 
 
 class GPSDiagnosisTests(unittest.TestCase):
+    def test_stationary_timeout_creates_one_pending_suggestion_from_filtered_reports(self):
+        async def run():
+            with tempfile.TemporaryDirectory() as directory:
+                worker = AsyncSQLiteWorker(Path(directory) / "journal.db")
+                await worker.async_open()
+                start = datetime(2026, 10, 23, 14, tzinfo=UTC)
+                await worker.async_insert_vehicle("v1", "Camper", "device_tracker.camper", start)
+                collector = GPSCollector(worker, {"v1": {"max_gap": 10, "stop_after": 10, "min_interval": 30, "min_movement": 25}})
+                moving = [(0, 7.0), (30, 7.001), (60, 7.002)]
+                stationary = [(90 + offset, 7.002) for offset in range(0, 601, 30)]
+                for seconds, longitude in moving + stationary:
+                    await collector.async_process_event("v1", "home", tracker_event(start + timedelta(seconds=seconds), longitude))
+                suggestions = await worker.async_call("list_stop_suggestions", "v1")
+                self.assertEqual(len(suggestions), 1)
+                self.assertEqual(suggestions[0]["status"], "pending")
+                self.assertEqual(suggestions[0]["source"], "stationary_timeout")
+                self.assertEqual(suggestions[0]["arrived_at"], (start + timedelta(seconds=60)).isoformat())
+                self.assertEqual(collector.stats.stop_suggestions_generated, 1)
+                counts = await worker.async_call("diagnostic_counts", "v1")
+                self.assertEqual(counts["stop_suggestions_open"], 1)
+                await worker.async_close()
+        asyncio.run(run())
+
+    def test_stationary_timeout_suggestion_inherits_active_trip_and_is_idempotent(self):
+        async def run():
+            with tempfile.TemporaryDirectory() as directory:
+                worker = AsyncSQLiteWorker(Path(directory) / "journal.db")
+                await worker.async_open()
+                start = datetime(2026, 10, 23, 14, tzinfo=UTC)
+                await worker.async_insert_vehicle("v1", "Camper", "device_tracker.camper", start)
+                trip_id = await worker.async_call("create_trip", "v1", "Active", start, start, status="active")
+                drive_id = await worker.async_insert_drive(Drive("d1", "v1", start, start + timedelta(minutes=10), 100, "stationary_timeout"))
+                self.assertEqual(await worker.async_call("auto_assign_drive", "v1", drive_id, start), trip_id)
+                first = await worker.async_call("create_stationary_stop_suggestion", "v1", drive_id, start, start + timedelta(minutes=10), 49.0, 7.0, start)
+                second = await worker.async_call("create_stationary_stop_suggestion", "v1", drive_id, start, start + timedelta(minutes=10), 49.0, 7.0, start)
+                self.assertIsNotNone(first)
+                self.assertIsNone(second)
+                self.assertEqual(first["trip_id"], trip_id)
+                await worker.async_close()
+        asyncio.run(run())
+
     def test_normal_drive_finishes_after_stationary_update(self):
         detector = DriveDetector("v1", DetectorConfig(stop_after=timedelta(minutes=5)))
         start = datetime(2026, 10, 23, 14, tzinfo=UTC)
@@ -161,10 +202,12 @@ class GPSDiagnosisTests(unittest.TestCase):
         asyncio.run(collector.async_process_event("v1", "home", tracker_event(at)))
         report = collector.diagnostics("v1", at + timedelta(minutes=2))
         self.assertEqual(report["last_valid_tracker_event_at"], at.isoformat())
+        self.assertEqual(report["last_valid_gps_report_at"], at.isoformat())
         self.assertEqual(report["seconds_since_last_valid_tracker_event"], 120.0)
         self.assertEqual(report["configured_stop_after_seconds"], 300.0)
         self.assertEqual(report["configured_max_gap_seconds"], 420.0)
         self.assertIn("discard_reasons", report)
+        self.assertIn("discarded_gps_messages_by_cause", report)
         self.assertNotIn("latitude", report)
         self.assertNotIn("longitude", report)
 

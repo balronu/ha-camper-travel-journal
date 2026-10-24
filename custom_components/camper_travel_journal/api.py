@@ -87,7 +87,7 @@ async def _reverse_geocode(hass: HomeAssistant, runtime, latitude: float, longit
         async with session.get(
             _NOMINATIM_URL,
             params={"lat": f"{round(latitude, 3):.3f}", "lon": f"{round(longitude, 3):.3f}", "format": "jsonv2", "zoom": "10", "addressdetails": "1"},
-            headers={"User-Agent": "Camper Travel Journal/0.3.5"},
+            headers={"User-Agent": "Camper Travel Journal/0.3.6"},
             timeout=5,
         ) as response:
             if response.status != 200:

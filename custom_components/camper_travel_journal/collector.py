@@ -32,6 +32,7 @@ class CollectorStats:
     last_accepted_at: datetime | None = None
     last_drive_end_at: datetime | None = None
     last_drive_end_reason: str | None = None
+    stop_suggestions_generated: int = 0
 
 
 class GPSCollector:
@@ -113,6 +114,19 @@ class GPSCollector:
                                 "live_detector",
                             )
                             await self.storage.async_call("auto_assign_drive", vehicle_id, drive_id, event.drive.ended_at)
+                            if event.drive.end_reason == "stationary_timeout" and event.stationary_since and event.stationary_until:
+                                suggestion = await self.storage.async_call(
+                                    "create_stationary_stop_suggestion",
+                                    vehicle_id,
+                                    drive_id,
+                                    event.stationary_since.recorded_at,
+                                    event.stationary_until.recorded_at,
+                                    event.stationary_until.latitude,
+                                    event.stationary_until.longitude,
+                                    event.drive.ended_at,
+                                )
+                                if suggestion is not None:
+                                    self.stats.stop_suggestions_generated += 1
         except (KeyError, TypeError, ValueError, OverflowError, sqlite3.Error, OSError, RuntimeError):
             self.stats.errors += 1
             self.stats.reasons["processing_error"] += 1
@@ -130,8 +144,10 @@ class GPSCollector:
             "accepted_points": self.stats.accepted,
             "discarded_events": sum(self.stats.reasons.values()),
             "discard_reasons": dict(sorted(self.stats.reasons.items())),
+            "discarded_gps_messages_by_cause": dict(sorted(self.stats.reasons.items())),
             "last_tracker_event_at": self._iso(self.stats.last_event_at),
             "last_valid_tracker_event_at": self._iso(self.stats.last_valid_event_at),
+            "last_valid_gps_report_at": self._iso(self.stats.last_valid_event_at),
             "last_accepted_point_at": self._iso(self.stats.last_accepted_at),
             "seconds_since_last_valid_tracker_event": last_event_age,
             "drive_state": detector.state.value,
@@ -140,6 +156,7 @@ class GPSCollector:
             "gps_gap": detector.state.value == "gps_gap",
             "last_drive_end_at": self._iso(self.stats.last_drive_end_at),
             "last_drive_end_reason": self.stats.last_drive_end_reason,
+            "stop_suggestions_generated": self.stats.stop_suggestions_generated,
             "configured_stop_after_seconds": detector.config.stop_after.total_seconds(),
             "configured_max_gap_seconds": detector.config.max_gap.total_seconds(),
         }

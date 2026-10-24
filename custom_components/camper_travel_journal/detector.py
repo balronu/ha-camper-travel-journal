@@ -24,6 +24,8 @@ class DetectionEvent:
     at: datetime
     drive: Drive | None = None
     reason: str | None = None
+    stationary_since: GPSPoint | None = None
+    stationary_until: GPSPoint | None = None
 
 
 class DriveDetector:
@@ -84,14 +86,14 @@ class DriveDetector:
                     self.last_moving = point
             elif self.state == DriveState.DRIVING and self.last_moving is not None:
                 if ensure_aware_utc(point.recorded_at) - ensure_aware_utc(self.last_moving.recorded_at) >= self.config.stop_after:
-                    events.append(self._finish(point, "stationary_timeout"))
+                    events.append(self._finish(point, "stationary_timeout", stationary_since=self.last_moving))
             elif self.state == DriveState.START_CANDIDATE:
                 self.start_count = 0
                 self.state = DriveState.STOPPED
         self.previous = point
         return events
 
-    def _finish(self, point: GPSPoint, reason: str) -> DetectionEvent:
+    def _finish(self, point: GPSPoint, reason: str, *, stationary_since: GPSPoint | None = None) -> DetectionEvent:
         started = self.drive_started or point
         drive = Drive(str(uuid4()), self.vehicle_id, started.recorded_at, point.recorded_at, self.distance_m, reason)
         self.state = DriveState.STOPPED
@@ -99,7 +101,13 @@ class DriveDetector:
         self.last_moving = None
         self.distance_m = 0.0
         self.start_count = 0
-        return DetectionEvent("drive_finished", point.recorded_at, drive=drive)
+        return DetectionEvent(
+            "drive_finished",
+            point.recorded_at,
+            drive=drive,
+            stationary_since=stationary_since,
+            stationary_until=point if stationary_since is not None else None,
+        )
 
     def finish_at_end(self) -> list[DetectionEvent]:
         """Close an open import preview at its last observed point.
