@@ -6,7 +6,7 @@
 
 <h1 align="center">Camper Travel Journal</h1>
 <p align="center">Your digital camper travel journal for Home Assistant</p>
-<p align="center"><strong>Stable: v0.3.3</strong></p>
+<p align="center"><strong>Stable: v0.3.4</strong></p>
 
 <p align="center">
   <a href="https://github.com/balronu/ha-camper-travel-journal/releases/latest"><img src="https://img.shields.io/github/v/release/balronu/ha-camper-travel-journal?label=Release" alt="Release"></a>
@@ -54,7 +54,7 @@ mobile browsers and Home Assistant setups is important.
 1. Open **HACS → Integrations → Custom repositories**.
 2. Add `https://github.com/balronu/ha-camper-travel-journal` as an
    **Integration** repository.
-3. Install the stable `v0.3.3` release.
+3. Install the stable `v0.3.4` release.
 4. Restart Home Assistant manually.
 5. Add the integration under **Settings → Devices & services**.
 
@@ -179,7 +179,7 @@ silently.
 
 The v0.3.1 trip actions remain available in the central Journal Card: resume,
 complete, edit, delete and switch trip, with status-dependent actions and the
-existing delete confirmation. v0.3.3 gives these actions a consistent,
+existing delete confirmation. v0.3.4 gives these actions a consistent,
 responsive button grid with two columns and a single-column fallback below
 420 px; the separate red delete button and its confirmation dialog are
 unchanged.
@@ -256,3 +256,10 @@ For the **Fuel** category, liters and price per liter are optional. When two of
 the three values are entered, the missing value is calculated. Decimal comma
 input is supported; amounts use two decimals and liters/price use up to three.
 Existing fuel costs without these details remain valid.
+
+## Expense notes
+
+Every expense can optionally include a multiline note of up to 2,000
+characters. Newlines and special characters are rendered as safe text in the
+Journal Card and PDF travel report. Existing expenses without a note remain
+valid.

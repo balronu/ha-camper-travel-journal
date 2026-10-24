@@ -98,7 +98,9 @@ erforderlich und werden nicht im Frontend abgelegt.
 ## Darstellung und Fehlerbehebung
 
 - Die zentrale Karte passt sich an Mobil- und Desktopbreiten an.
-- Kosten, Datum und optionale Uhrzeit werden lokalisiert angezeigt.
+- Kosten, optionale mehrzeilige Bemerkungen, Datum und optionale Uhrzeit werden
+  lokalisiert angezeigt. Bemerkungen werden auf 2.000 Zeichen begrenzt und als
+  sicherer Text mit erhaltenen Zeilenumbrüchen dargestellt.
 - Wenn Tiles fehlen, bleibt die Route sichtbar und es erscheint ein Hinweis.
 - Wenn keine gültigen GPS-Punkte vorhanden sind, zeigt die Map Card einen
   verständlichen Leerzustand; gültige Ortsmarker bleiben sichtbar.

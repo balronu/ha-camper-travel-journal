@@ -17,7 +17,7 @@ from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 from .fuel import resolve_fuel_values
-from .travel import validate_amount, validate_expense_category, validate_expense_currency
+from .travel import validate_amount, validate_expense_category, validate_expense_currency, validate_expense_note
 from .validation import is_coordinate_label
 
 SCHEMA_VERSION = 11
@@ -1218,6 +1218,7 @@ class SQLiteStore:
         amount_minor = validate_amount(expense.amount_minor)
         category = validate_expense_category(expense.category)
         currency = validate_expense_currency(expense.currency)
+        note = validate_expense_note(expense.note)
         fuel_amount, fuel_liters, fuel_price = resolve_fuel_values(
             amount_minor if category == "fuel" else amount_minor,
             expense.fuel_liters if category == "fuel" else None,
@@ -1239,7 +1240,7 @@ class SQLiteStore:
                 place = connection.execute("SELECT vehicle_id,trip_id FROM stops WHERE id=?", (place_id,)).fetchone()
                 if place is None: raise ValueError("place_not_found")
                 if place[0] != trip[0] or place[1] not in (None, expense.trip_id): raise ValueError("vehicle_mismatch")
-            connection.execute("INSERT INTO expenses(id,trip_id,occurred_at,category,amount_minor,currency,note,created_at,updated_at,odometer_km,stay_id,place_id,occurred_on,occurred_time,fuel_liters,fuel_price_per_liter) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)", (expense_id, expense.trip_id, utc_iso(expense.occurred_at), category, amount_minor, currency, expense.note, stamp, stamp, expense.odometer_km, expense.stay_id, place_id, occurred_on, occurred_time, fuel_liters, fuel_price))
+            connection.execute("INSERT INTO expenses(id,trip_id,occurred_at,category,amount_minor,currency,note,created_at,updated_at,odometer_km,stay_id,place_id,occurred_on,occurred_time,fuel_liters,fuel_price_per_liter) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)", (expense_id, expense.trip_id, utc_iso(expense.occurred_at), category, amount_minor, currency, note, stamp, stamp, expense.odometer_km, expense.stay_id, place_id, occurred_on, occurred_time, fuel_liters, fuel_price))
         return expense_id
 
     def list_expenses(self, trip_id: str) -> list[dict]:
@@ -1254,7 +1255,7 @@ class SQLiteStore:
 
     def update_expense(self, expense_id: str, now: datetime, **fields) -> None:
         allowed = {"trip_id", "occurred_at", "occurred_on", "occurred_time", "category", "amount_minor", "currency", "note", "odometer_km", "stay_id", "place_id", "fuel_liters", "fuel_price_per_liter"}
-        nullable_fields = {"occurred_on", "occurred_time", "fuel_liters", "fuel_price_per_liter"}
+        nullable_fields = {"occurred_on", "occurred_time", "note", "fuel_liters", "fuel_price_per_liter"}
         changes = {
             key: value for key, value in fields.items()
             if key in allowed and (value is not None or key in nullable_fields)
@@ -1274,6 +1275,7 @@ class SQLiteStore:
         if "occurred_time" in changes and changes["occurred_time"] is not None and not re.fullmatch(r"(?:[01]\d|2[0-3]):[0-5]\d", changes["occurred_time"]):
             raise ValueError("expense_time_invalid")
         if "currency" in changes: changes["currency"] = validate_expense_currency(changes["currency"])
+        if "note" in changes: changes["note"] = validate_expense_note(changes["note"])
         if not changes: return
         changes["updated_at"] = utc_iso(now)
         assignments = ",".join(f"{key}=?" for key in changes)

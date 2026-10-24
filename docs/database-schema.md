@@ -61,6 +61,11 @@ Migration 11 adds nullable `fuel_liters` and `fuel_price_per_liter` columns to
 `expenses`. It does not rewrite existing amounts or rows. Non-fuel categories
 always clear these fields on update.
 
+The optional multiline expense note reuses the existing nullable `expenses.note`
+column. Version 0.3.4 therefore has no schema migration and preserves existing
+notes, amounts, and rows unchanged. New or edited notes are limited to 2,000
+characters by the API and are stored as plain text.
+
 ## Schema version 7 – route membership
 
 Migration 7 adds `drive_gps_points` without rewriting or deleting existing

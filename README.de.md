@@ -9,7 +9,7 @@ lokal in einer eigenen SQLite-Datenbank.
 
 [🇬🇧 English](README.en.md) · [🇩🇪 Deutsche Hauptdokumentation](README.md)
 
-**Stable: v0.3.3**
+**Stable: v0.3.4**
 
 Für neue Dashboards wird die zentrale Journal Card empfohlen. Im geöffneten
 Reisekontext stehen Bearbeiten, Fortsetzen, Pausieren, Beenden, Löschen und
@@ -29,3 +29,10 @@ Sind zwei der drei Werte vorhanden, wird der fehlende Wert berechnet. Deutsche
 Kommaeingaben werden unterstützt; Betrag wird mit zwei, Liter und Literpreis
 mit bis zu drei Nachkommastellen dargestellt. Alte Kraftstoffkosten ohne diese
 Angaben bleiben gültig.
+
+## Bemerkungen zu Kosten
+
+Jede Ausgabe kann optional eine mehrzeilige Bemerkung mit bis zu 2.000 Zeichen
+enthalten. Zeilenumbrüche und Sonderzeichen werden in der Journal Card und im
+PDF-Reisebericht sicher als Text dargestellt. Bestehende Ausgaben ohne
+Bemerkung bleiben gültig.

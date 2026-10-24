@@ -8,6 +8,7 @@ import pytest
 from custom_components.camper_travel_journal.fuel import resolve_fuel_values
 from custom_components.camper_travel_journal.models import Expense
 from custom_components.camper_travel_journal.storage import SQLiteStore
+from custom_components.camper_travel_journal.travel import MAX_EXPENSE_NOTE_LENGTH, validate_expense_note
 
 
 def test_fuel_calculations_use_decimal_safe_rounding():
@@ -52,4 +53,24 @@ def test_store_create_and_update_fuel_details_and_clear_on_category_change():
         store.update_expense(expense_id, now, fuel_liters=None)
         row = store.list_expenses(trip)[0]
         assert row["fuel_liters"] is None and row["fuel_price_per_liter"] == 1.75
+        store.close()
+
+
+def test_expense_note_reuses_existing_nullable_column_and_supports_unicode_edit_and_clear():
+    note = "Stellplatz inklusive Thermeneintritt, Brötchen und Kurtaxe.\nVielen Dank – Grüße!"
+    assert validate_expense_note("  " + note + "  ") == note
+    assert validate_expense_note("") is None
+    with pytest.raises(ValueError, match="expense_note_invalid"):
+        validate_expense_note("x" * (MAX_EXPENSE_NOTE_LENGTH + 1))
+    with tempfile.TemporaryDirectory() as directory:
+        store = SQLiteStore(Path(directory) / "journal.db"); store.open()
+        now = datetime(2026, 10, 23, tzinfo=timezone.utc); store.insert_vehicle("v", "Camper", None, now); trip = store.create_trip("v", "Trip", now, now)
+        expense_id = store.create_expense(Expense("", trip, now, "camping", 13125, "EUR", note=note), now)
+        assert store.list_expenses(trip)[0]["note"] == note
+        store.update_expense(expense_id, now, note="Geändert – Café\nzweite Zeile")
+        assert store.list_expenses(trip)[0]["note"] == "Geändert – Café\nzweite Zeile"
+        store.update_expense(expense_id, now, note=None)
+        assert store.list_expenses(trip)[0]["note"] is None
+        columns = {row[1] for row in store.connection.execute("PRAGMA table_info(expenses)")}
+        assert "note" in columns
         store.close()

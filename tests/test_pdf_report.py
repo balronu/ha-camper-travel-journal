@@ -53,6 +53,16 @@ def test_fuel_details_are_optional_and_localized_for_pdf_rows():
     assert _fuel_details({}, "de") == ""
 
 
+def test_pdf_expense_note_is_safe_multiline_text_in_both_languages():
+    for language in ("de", "en"):
+        report = _report(drives=0, expenses=1, stops=0)
+        report["expenses"][0]["category"] = "camping"
+        report["expenses"][0]["note"] = "Stellplatz <inklusive>\nTherme & Kurtaxe – Café"
+        pdf, _ = render_trip_report(report, language=language)
+        assert pdf.startswith(b"%PDF-")
+        assert b"<script" not in pdf.lower()
+
+
 def test_report_includes_offline_route_map_from_real_track_points(monkeypatch):
     import custom_components.camper_travel_journal.pdf_report as pdf_report
     captured = {}

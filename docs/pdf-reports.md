@@ -3,7 +3,9 @@
 Berichtzeitstempel werden in der konfigurierten Home-Assistant-Zeitzone
 angezeigt. Gespeicherte UTC-Zeitstempel bleiben unverändert; nur die Anzeige
 wird lokalisiert, einschließlich Sommer- und Winterzeit. Kostenkategorien
-werden in die Sprache des Berichts übersetzt.
+werden in die Sprache des Berichts übersetzt. Optionale Kostenbemerkungen werden
+als sicherer, umbruchfähiger Text in Deutsch und Englisch ausgegeben; die
+Eingabe ist auf 2.000 Zeichen begrenzt.
 
 Seit Beta.9 werden Start-/Ende-Zeitpunkte je Datensatz als kompakte,
 umbruchfähige Datum-/Zeit-Zellen ausgegeben. Ortskategorien werden zentral für
