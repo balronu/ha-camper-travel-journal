@@ -13,10 +13,10 @@ const bundle = resolve(root, "../custom_components/camper_travel_journal/fronten
 
 describe("frontend release contract", () => {
   it("keeps backend, npm metadata and beta bundle aligned", () => {
-    expect(manifest.version).toBe("0.3.7");
+    expect(manifest.version).toBe("0.3.8");
     expect(pkg.version).toBe(manifest.version);
     expect(existsSync(bundle)).toBe(true);
-    expect(readFileSync(resolve(root, "../custom_components/camper_travel_journal/const.py"), "utf8")).toContain('FRONTEND_VERSION = "0.3.7"');
+    expect(readFileSync(resolve(root, "../custom_components/camper_travel_journal/const.py"), "utf8")).toContain('FRONTEND_VERSION = "0.3.8"');
   });
   it("registers the central card in the catalog while retaining legacy elements", () => {
     const source = readFileSync(resolve(root, "src/index.ts"), "utf8");
@@ -121,6 +121,15 @@ describe("frontend release contract", () => {
     expect(manager).toContain("expenseNote");
     expect(manager).toContain("maxlength=\"2000\"");
     expect(manager).toContain("white-space:pre-wrap");
+  });
+  it("makes historical suggestion refresh observable and single-flight", () => {
+    const manager = readFileSync(resolve(root, "src/manager-card.ts"), "utf8");
+    expect(manager).toContain("private suggestionsBusy = false");
+    expect(manager).toContain("?disabled=${this.suggestionsBusy}");
+    expect(manager).toContain('role="status"');
+    expect(manager).toContain('role="alert"');
+    expect(manager).toContain("this.suggestionsBusy");
+    expect(readFileSync(resolve(root, "src/api.ts"), "utf8")).toContain("historical_only: true");
   });
   it("exposes the read-only route contract and map lifecycle", () => {
     const api = readFileSync(resolve(root, "src/api.ts"), "utf8");

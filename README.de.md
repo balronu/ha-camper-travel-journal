@@ -1,6 +1,6 @@
 # Camper Travel Journal – Deutsch
 
-**Stable: v0.3.7**
+**Stable: v0.3.8**
 
 Die vollständige deutsche Produktdokumentation steht in der
 [deutschen Haupt-README](README.md).
