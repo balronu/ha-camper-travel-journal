@@ -416,3 +416,7 @@ Siehe [Release Notes](docs/releases/RELEASE_NOTES_v0.3.0.md),
 - Completes missing fuel values deterministically and rejects inconsistent values.
 - Shows fuel details in the central expense list and PDF travel reports.
 - Adds an additive SQLite migration; existing expenses remain unchanged.
+## 0.3.8 – Sichtbares Feedback für historische GPS-Stoppvorschläge
+
+- **DE:** Der Button „Vorschläge aktualisieren“ zeigt jetzt Lade-, Erfolgs- und Fehlerzustände auch in der eingebetteten Journal-Card und verhindert parallele Requests.
+- **EN:** “Refresh suggestions” now shows loading, success and error states in the embedded journal card and prevents concurrent requests.
