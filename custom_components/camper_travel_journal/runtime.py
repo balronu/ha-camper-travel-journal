@@ -83,6 +83,8 @@ class Runtime:
             "tracker_entity": self.values[CONF_TRACKER_ENTITY],
             "stored_counts": await self.worker.async_call("diagnostic_counts", self.vehicle_id),
         })
+        result["stop_suggestions_generated"] = result["stored_counts"].get("stop_suggestions_generated", 0)
+        result["stop_suggestions_open"] = result["stored_counts"].get("stop_suggestions_open", 0)
         return result
 
     async def async_stop(self) -> None:

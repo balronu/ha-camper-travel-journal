@@ -1,5 +1,16 @@
 # Änderungsprotokoll
 
+## 0.3.6 – Stable GPS-Stoppvorschläge
+
+- Bestätigte `stationary_timeout`-Ereignisse erzeugen genau einen offenen,
+  noch nicht bestätigten GPS-Stoppvorschlag aus den echten Trackerzeitpunkten.
+- Stationäre Reports dürfen für diese Evidenz verarbeitet werden, ohne den
+  normalen Streckenpunktfilter oder GPS-Gap-Schutz aufzuweichen.
+- Diagnosewerte enthalten erzeugte und offene Vorschläge sowie weiterhin nur
+  datensparsame Tracker-/Detektorwerte ohne Koordinaten oder Routen.
+- Vorschläge werden nicht automatisch als Aufenthalt oder Übernachtungsplatz
+  gespeichert; historische Fahrten und produktive Daten werden nicht bereinigt.
+
 ## 0.3.5 – Stable GPS-Hotfix
 
 - GPS-Livefahrten werden bei exakt gleicher Fahrzeug-/Start-/Endzeit nur noch

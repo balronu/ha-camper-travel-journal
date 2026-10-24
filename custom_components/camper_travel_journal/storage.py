@@ -482,7 +482,59 @@ class SQLiteStore:
             "gps_points": self.connection.execute("SELECT count(*) FROM gps_points WHERE vehicle_id=?", (vehicle_id,)).fetchone()[0],
             "drives": self.connection.execute("SELECT count(*) FROM drives WHERE vehicle_id=?", (vehicle_id,)).fetchone()[0],
             "trips": self.connection.execute("SELECT count(*) FROM trips WHERE vehicle_id=?", (vehicle_id,)).fetchone()[0],
+            "stop_suggestions_generated": self.connection.execute("SELECT count(*) FROM stop_suggestions WHERE vehicle_id=?", (vehicle_id,)).fetchone()[0],
+            "stop_suggestions_open": self.connection.execute("SELECT count(*) FROM stop_suggestions WHERE vehicle_id=? AND status='pending'", (vehicle_id,)).fetchone()[0],
         }
+
+    def create_stationary_stop_suggestion(
+        self, vehicle_id: str, drive_id: str, arrived_at: datetime, departed_at: datetime,
+        latitude: float, longitude: float, now: datetime,
+    ) -> dict | None:
+        """Persist one pending suggestion from a confirmed detector timeout.
+
+        The timestamps and anchor are actual tracker evidence. This path is
+        intentionally separate from the retrospective GPS-window generator so
+        filtered stationary reports can still produce one reviewable proposal.
+        """
+        if self.connection is None:
+            raise RuntimeError("store is not open")
+        if departed_at <= arrived_at:
+            raise ValueError("stationary_evidence_invalid")
+        with self.transaction() as connection:
+            drive = connection.execute(
+                "SELECT vehicle_id FROM drives WHERE id=?", (drive_id,)
+            ).fetchone()
+            if drive is None or drive[0] != vehicle_id:
+                raise ValueError("drive_not_found")
+            existing = connection.execute(
+                "SELECT id FROM stop_suggestions WHERE vehicle_id=? AND drive_id=? "
+                "AND arrived_at=? AND status IN ('pending','accepted') LIMIT 1",
+                (vehicle_id, drive_id, utc_iso(arrived_at)),
+            ).fetchone()
+            if existing is not None:
+                return None
+            overlap = connection.execute(
+                "SELECT 1 FROM stops WHERE vehicle_id=? AND confirmed=1 "
+                "AND ((arrived_at IS NULL AND occurred_at BETWEEN ? AND ?) "
+                "OR (arrived_at <= ? AND (departed_at IS NULL OR departed_at >= ?))) LIMIT 1",
+                (vehicle_id, utc_iso(arrived_at), utc_iso(departed_at), utc_iso(departed_at), utc_iso(arrived_at)),
+            ).fetchone()
+            if overlap:
+                return None
+            trip = connection.execute(
+                "SELECT trip_id FROM trip_drives WHERE drive_id=?", (drive_id,)
+            ).fetchone()
+            stamp = utc_iso(now)
+            suggestion_id = str(uuid.uuid4())
+            connection.execute(
+                "INSERT INTO stop_suggestions "
+                "(id,vehicle_id,trip_id,drive_id,arrived_at,departed_at,latitude,longitude,source,status,created_at,updated_at) "
+                "VALUES(?,?,?,?,?,?,?,?,?,'pending',?,?)",
+                (suggestion_id, vehicle_id, trip[0] if trip else None, drive_id,
+                 utc_iso(arrived_at), utc_iso(departed_at), latitude, longitude,
+                 "stationary_timeout", stamp, stamp),
+            )
+            return dict(connection.execute("SELECT * FROM stop_suggestions WHERE id=?", (suggestion_id,)).fetchone())
 
     def insert_vehicle(self, vehicle_id: str, name: str, tracker_entity_id: str, now: datetime) -> None:
         with self.transaction() as connection:
