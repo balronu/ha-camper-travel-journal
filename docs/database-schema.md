@@ -87,6 +87,12 @@ the stable `previous_drive_id:next_drive_id` key, one of `unassigned`, `stop`,
 copies GPS points, deletes raw data, or confirms a stay without explicit user
 action. Reassignment updates only the link; deleting a place nulls the link.
 
+## Schema version 12 – expense services
+
+Migration 12 adds `expense_services` and `expense_service_links` for the
+optional multi-select services of the `water_waste` category. Existing expense
+rows receive no links and are not rewritten.
+
 ## Schema versioning and recovery
 
 `schema_meta.version` is checked during startup. A newer unsupported version

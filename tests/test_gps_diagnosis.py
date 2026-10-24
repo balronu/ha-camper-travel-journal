@@ -228,12 +228,10 @@ class GPSDiagnosisTests(unittest.TestCase):
             store.open()
             start = datetime(2026, 10, 23, 14, tzinfo=UTC)
             store.insert_vehicle("v1", "Camper", "device_tracker.camper", start)
+            drive_id = store.insert_drive(Drive("d1", "v1", start, start + timedelta(minutes=10), 100, "stationary_timeout"))
             for minutes in (0, 5, 10):
-                store.connection.execute(
-                    "INSERT INTO gps_points(vehicle_id,recorded_at,latitude,longitude) VALUES(?,?,?,?)",
-                    ("v1", (start + timedelta(minutes=minutes)).isoformat(), 49.0, 7.0),
-                )
-            store.connection.commit()
+                store.insert_point(gps(start + timedelta(minutes=minutes)))
+            store.associate_drive_points(drive_id, "v1", start, start + timedelta(minutes=10), "interval_reconstructed")
             suggestions = store.generate_stop_suggestions("v1", start)
             self.assertEqual(len(suggestions), 1)
             self.assertEqual(suggestions[0]["status"], "pending")
@@ -270,6 +268,25 @@ class GPSDiagnosisTests(unittest.TestCase):
             suggestions = store.generate_stop_suggestions("v1", start, trip_id=trip_id)
             self.assertEqual(len(suggestions), 1)
             self.assertEqual(suggestions[0]["trip_id"], trip_id)
+            store.close()
+
+    def test_historical_recalculation_requires_stationary_timeout_and_is_idempotent_after_dismissal(self):
+        with tempfile.TemporaryDirectory() as directory:
+            store = SQLiteStore(Path(directory) / "journal.db")
+            store.open()
+            start = datetime(2026, 10, 23, 14, tzinfo=UTC)
+            store.insert_vehicle("v1", "Camper", "device_tracker.camper", start)
+            trip_id = store.create_trip("v1", "Historisch", start, start, status="paused")
+            drive_id = store.insert_drive(Drive("d1", "v1", start, start + timedelta(minutes=10), 100, "stationary_timeout"))
+            for minutes in (0, 5, 10):
+                store.insert_point(gps(start + timedelta(minutes=minutes)))
+            store.associate_drive_points(drive_id, "v1", start, start + timedelta(minutes=10), "interval_reconstructed")
+            store.link_drives(trip_id, [drive_id], start)
+            first = store.generate_stop_suggestions("v1", start, trip_id=trip_id, historical_only=True)
+            self.assertEqual(len(first), 1)
+            store.dismiss_stop_suggestion(first[0]["id"], start)
+            self.assertEqual(store.generate_stop_suggestions("v1", start, trip_id=trip_id, historical_only=True), [])
+            self.assertEqual(store.connection.execute("SELECT count(*) FROM gps_points").fetchone()[0], 3)
             store.close()
 
 

@@ -25,9 +25,10 @@ PLACE_LABELS = {
     "en": {"campsite": "Campsite", "rv_site": "RV site", "wild_camp": "Wild camping", "overnight": "Overnight place", "parking": "Parking", "restaurant": "Restaurant", "fuel_stop": "Fuel station", "fuel": "Fuel", "attraction": "Attraction", "ferry": "Ferry", "other": "Other place"},
 }
 COST_LABELS = {
-    "de": {"camping": "Camping", "fuel": "Kraftstoff", "toll": "Maut", "parking": "Parkgebühren", "food": "Verpflegung", "activities": "Aktivitäten", "ferry": "Fähre", "other": "Sonstiges"},
-    "en": {"camping": "Camping", "fuel": "Fuel", "toll": "Toll", "parking": "Parking", "food": "Food", "activities": "Activities", "ferry": "Ferry", "other": "Other"},
+    "de": {"camping": "Camping", "fuel": "Kraftstoff", "toll": "Maut", "parking": "Parkgebühren", "food": "Verpflegung", "activities": "Aktivitäten", "ferry": "Fähre", "water_waste": "Ver- & Entsorgung", "other": "Sonstiges"},
+    "en": {"camping": "Camping", "fuel": "Fuel", "toll": "Toll", "parking": "Parking", "food": "Food", "activities": "Activities", "ferry": "Ferry", "water_waste": "Water & waste services", "other": "Other"},
 }
+SERVICE_LABELS = {"de": {"electricity": "Strom / Landstrom", "fresh_water": "Frischwasser auffüllen", "grey_water": "Grauwasser entsorgen", "toilet_cassette": "Toilettenkassette entsorgen", "shower": "Dusche"}, "en": {"electricity": "Electricity / shore power", "fresh_water": "Refill fresh water", "grey_water": "Dispose of grey water", "toilet_cassette": "Dispose of toilet cassette", "shower": "Shower"}}
 STATUS_LABELS = {
     "de": {"unassigned": "Nicht zugeordnet", "stop": "Zwischenstopp", "overnight": "Übernachtungsplatz", "pause": "Fahrtpause", "ignored": "Ignoriert"},
     "en": {"unassigned": "Unassigned", "stop": "Stop", "overnight": "Overnight place", "pause": "Drive pause", "ignored": "Ignored"},
@@ -150,6 +151,12 @@ def _place_details(stop: dict[str, Any], style: ParagraphStyle, language: str) -
 def _category_label(category: Any, language: str) -> str:
     value = _text(category)
     return COST_LABELS[language].get(value, value or "–")
+
+
+def _service_labels(services: Any, language: str) -> str:
+    if not isinstance(services, (list, tuple)):
+        return ""
+    return " · ".join(SERVICE_LABELS[language].get(_text(value), _text(value)) for value in services if _text(value))
 
 
 def _place_label(category: Any, language: str) -> str:
@@ -446,6 +453,9 @@ def render_trip_report(report: dict[str, Any], *, language: str = "de", time_zon
             fuel = _fuel_details(expense, language)
             if fuel:
                 note = f"{fuel} · {note}" if note else fuel
+            services = _service_labels(expense.get("services"), language)
+            if services:
+                note = f"{services} · {note}" if note else services
             actual_date = _date(expense.get("occurred_on"), language, time_zone) if expense.get("occurred_on") else labels["unknown_date"]
             actual_time = _expense_time(expense.get("occurred_time"), language)
             date_text = f"{actual_date}, {actual_time}" if actual_time else actual_date

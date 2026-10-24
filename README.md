@@ -6,7 +6,7 @@
 
 <h1 align="center">Camper Travel Journal</h1>
 <p align="center">Dein digitales Wohnmobil-Reisetagebuch für Home Assistant</p>
-<p align="center"><strong>Stable: v0.3.6</strong></p>
+<p align="center"><strong>Stable: v0.3.7</strong></p>
 
 <p align="center">
   <a href="https://github.com/balronu/ha-camper-travel-journal/releases/latest"><img src="https://img.shields.io/github/v/release/balronu/ha-camper-travel-journal?label=Release" alt="Release"></a>
@@ -70,12 +70,30 @@ enthalten. Zeilenumbrüche und Sonderzeichen werden in der Journal Card und im
 PDF-Reisebericht sicher als Text dargestellt. Bestehende Ausgaben ohne
 Bemerkung bleiben gültig.
 
+### Ver- & Entsorgung
+
+Die Kostenkategorie **Ver- & Entsorgung** kann optional mehrfach auswählbare
+Leistungen enthalten: Strom/Landstrom, Frischwasser, Grauwasser,
+Toilettenkassette und Dusche. Der Betrag wird einmal gespeichert. Die
+Leistungen werden über stabile technische Schlüssel in einer additiven
+Migration gespeichert; bestehende Ausgaben werden nicht verändert.
+
+### Historische GPS-Stoppvorschläge
+
+Neue bestätigte Stillstände werden weiterhin automatisch als `pending`
+Vorschlag angeboten. Für historische Daten gibt es zusätzlich die
+nutzergestartete Funktion **Vorschläge aktualisieren** im Ortsbereich einer
+Reise. Sie verwendet ausschließlich vorhandene GPS-Punkte, die einer echten
+`stationary_timeout`-Fahrt zugeordnet sind, ist idempotent und bestätigt weder
+einen Aufenthalt noch legt sie einen Übernachtungsplatz an. GPS-Lücken und
+bereits vorhandene, bestätigte oder verworfene Vorschläge werden übersprungen.
+
 ## Installation über HACS
 
 1. Öffne **HACS → Integrationen → Benutzerdefinierte Repositories**.
 2. Füge `https://github.com/balronu/ha-camper-travel-journal` als Repository
    vom Typ **Integration** hinzu.
-3. Installiere die stabile Version `v0.3.6`.
+3. Installiere die stabile Version `v0.3.7`.
 4. Starte Home Assistant manuell neu.
 5. Füge die Integration unter **Einstellungen → Geräte & Dienste** hinzu.
 

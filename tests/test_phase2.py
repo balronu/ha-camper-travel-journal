@@ -6,7 +6,7 @@ from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 from custom_components.camper_travel_journal.models import Drive, Expense, Stop
-from custom_components.camper_travel_journal.storage import SQLiteStore
+from custom_components.camper_travel_journal.storage import SCHEMA_VERSION, SQLiteStore
 from custom_components.camper_travel_journal.travel import EXPENSE_CATEGORIES, EXPENSE_CATEGORY_IDS, validate_transition
 
 UTC = timezone.utc
@@ -68,7 +68,7 @@ class Phase2Tests(unittest.TestCase):
 
     def test_schema_version_and_phase2_tables(self):
         version = self.store.connection.execute("SELECT value FROM schema_meta WHERE key='version'").fetchone()[0]
-        self.assertEqual(version, "11")
+        self.assertEqual(version, str(SCHEMA_VERSION))
         tables = self.store.table_names()
         self.assertIn("stops", tables)
         self.assertIn("expenses", tables)
@@ -106,6 +106,21 @@ class Phase2Tests(unittest.TestCase):
         self.store.open()
         persisted = next(row for row in self.store.list_expenses(trip_id) if row["id"] == created[0])
         self.assertEqual((persisted["category"], persisted["amount_minor"]), ("camping", 2300))
+
+    def test_water_waste_services_are_optional_multi_select_and_cleared_on_category_change(self):
+        trip_id = self.store.create_trip("v1", "Ver- und Entsorgung", self.now, self.now)
+        expense_id = self.store.create_expense(Expense("", trip_id, self.now, "water_waste", 500, "EUR", services=("fresh_water", "toilet_cassette")), self.now)
+        self.assertEqual(self.store.list_expenses(trip_id)[0]["services"], ["fresh_water", "toilet_cassette"])
+        self.store.update_expense(expense_id, self.now, services=["shower", "shower", "electricity"])
+        self.assertEqual(self.store.list_expenses(trip_id)[0]["services"], ["shower", "electricity"])
+        self.store.update_expense(expense_id, self.now, category="other")
+        self.assertEqual(self.store.list_expenses(trip_id)[0]["services"], [])
+
+    def test_existing_expenses_survive_schema_v12_migration_without_service_links(self):
+        trip_id = self.store.create_trip("v1", "Altbestand", self.now, self.now)
+        expense_id = self.store.create_expense(Expense("", trip_id, self.now, "other", 100, "EUR"), self.now)
+        self.assertEqual(self.store.list_expenses(trip_id)[0]["services"], [])
+        self.assertEqual(self.store.connection.execute("SELECT count(*) FROM expense_service_links WHERE expense_id=?", (expense_id,)).fetchone()[0], 0)
 
     def test_expense_validation_does_not_fallback_or_silently_delete(self):
         trip_id = self.store.create_trip("v1", "Validierung", self.now, self.now)

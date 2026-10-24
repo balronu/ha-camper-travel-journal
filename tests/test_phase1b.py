@@ -80,6 +80,8 @@ class Phase1BTests(unittest.TestCase):
                     connection.execute("INSERT INTO gps_points(vehicle_id,recorded_at,latitude,longitude) VALUES('missing','x',1,1)")
             self.assertEqual(store.connection.execute("SELECT value FROM schema_meta WHERE key='version'").fetchone()[0], str(SCHEMA_VERSION))
             self.assertIn("runtime_state", store.table_names())
+            self.assertIn("expense_services", store.table_names())
+            self.assertIn("expense_service_links", store.table_names())
             store.close()
 
     def test_async_worker_serializes_and_closes(self):

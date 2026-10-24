@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       tag:
-        description: "Existing tested stable tag, for example v0.3.6"
+        description: "Existing tested stable tag, for example v0.3.7"
         required: true
         type: string
 
@@ -19,8 +19,8 @@ jobs:
         with:
           fetch-depth: 0
       - name: Require stable tag
-        run: test "${{ inputs.tag }}" = "v0.3.6"
+        run: test "${{ inputs.tag }}" = "v0.3.7"
       - name: Create GitHub stable release
         env:
           GH_TOKEN: ${{ github.token }}
-        run: gh release create "${{ inputs.tag }}" --repo "${{ github.repository }}" --title "Camper Travel Journal ${{ inputs.tag }}" --notes-file docs/releases/RELEASE_NOTES_v0.3.6.md
+        run: gh release create "${{ inputs.tag }}" --repo "${{ github.repository }}" --title "Camper Travel Journal ${{ inputs.tag }}" --notes-file docs/releases/RELEASE_NOTES_v0.3.7.md

@@ -2,7 +2,8 @@ import type { Hass } from "./api";
 
 type Language = "de" | "en";
 /** Canonical wire/database IDs; labels must never be sent to the backend. */
-export const EXPENSE_CATEGORY_IDS = ["camping", "fuel", "toll", "parking", "food", "activities", "other"] as const;
+export const EXPENSE_CATEGORY_IDS = ["camping", "fuel", "toll", "parking", "food", "activities", "water_waste", "other"] as const;
+export const EXPENSE_SERVICE_IDS = ["electricity", "fresh_water", "grey_water", "toilet_cassette", "shower"] as const;
 export type ExpenseCategory = typeof EXPENSE_CATEGORY_IDS[number];
 export const EXPENSE_CATEGORIES = EXPENSE_CATEGORY_IDS;
 type Messages = {
@@ -16,7 +17,7 @@ type Messages = {
   tripDeleteError: string; expenseCreateError: string; expenseEditError: string; expenseDeleteError: string;
   driveAssignError: string; savedRefreshError: string; categories: Record<string, string>; statuses: Record<string, string>;
   amountInvalid: string; categoryInvalid: string; mixedCurrency: string; cancel: string; saving: string; total: string;
-  expenseDate?: string; expenseDateUnknown?: string; expenseTime?: string; time?: string; fuelLiters?: string; fuelPrice?: string;
+  expenseDate?: string; expenseDateUnknown?: string; expenseTime?: string; time?: string; fuelLiters?: string; fuelPrice?: string; services?: string;
   editorVehicle: string; editorChooseVehicle: string; editorLoading: string; editorNoVehicle: string; editorLoadError: string; confirmDelete: string;
   startDate: string; endDate: string; period: string; noDrives: string; driveStart: string; driveEnd: string; duration: string;
   sourceGps: string; sourceGpx?: string; sourceManual: string; startLocation: string; endLocation: string; distanceKm: string; durationMinutes: string;
@@ -47,6 +48,7 @@ const en: Messages = {
 
 const mapLabels: Record<"de" | "en", Partial<Messages>> = {
   de: {
+    categories: { camping: "Stellplatz/Campingplatz", fuel: "Kraftstoff", toll: "Maut", parking: "Parkgebühren", food: "Verpflegung", activities: "Aktivitäten", water_waste: "Ver- & Entsorgung", other: "Sonstiges" }, services: "Leistungen (optional)",
     mapNoValidPoints: "Für diese Reise sind keine gültigen GPS-Punkte verfügbar.", mapNoRouteWithPlaces: "Keine gültige GPS-Route verfügbar; gespeicherte Orte werden angezeigt.",
     mapTitle: "Reisekarte", mapVehicle: "Fahrzeug", mapTrip: "Reise", mapTotalDistance: "Kilometer",
     mapSelectedDrives: "Fahrtabschnitte", mapTripPeriod: "Reisezeitraum", mapPlaces: "Orte anzeigen", mapExpandSegments: "Fahrtabschnitte aufklappen",
@@ -54,6 +56,7 @@ const mapLabels: Record<"de" | "en", Partial<Messages>> = {
     mapCollapseSegments: "Fahrtabschnitte zuklappen", mapSelectAll: "Alle auswählen", mapSelectNone: "Alle abwählen", sourceGpx: "GPX-importiert", mapAddPlace: "Ort hinzufügen", mapCancelPlace: "Ortserfassung abbrechen", mapPlaceHint: "Kartenpunkt auswählen; erst nach ausdrücklichem Speichern wird ein Ort angelegt.", interruption: "Unterbrechung zwischen Fahrten", interruptionUnconfirmed: "Nicht als Aufenthalt nachgewiesen", recordInterruption: "Als Aufenthalt erfassen", suggestedPosition: "Vorgeschlagene Position", expenseNote: "Bemerkung (optional)", expenseNoteHint: "Bis zu 2.000 Zeichen, Zeilenumbrüche sind möglich.",
   },
   en: {
+    categories: { camping: "Camping site", fuel: "Fuel", toll: "Toll", parking: "Parking fees", food: "Food", activities: "Activities", water_waste: "Water & waste services", other: "Other" }, services: "Services (optional)",
     mapNoValidPoints: "No valid GPS points are available for this trip.", mapNoRouteWithPlaces: "No valid GPS route is available; saved places are shown.",
     mapTitle: "Travel map", mapVehicle: "Camper", mapTrip: "Trip", mapTotalDistance: "Kilometers",
     mapSelectedDrives: "Drive sections", mapTripPeriod: "Trip period", mapPlaces: "Show places", mapExpandSegments: "Expand drive sections",
@@ -124,6 +127,13 @@ export function formatCompactTripPeriod(trip: { start_date?: string | null; end_
 
 export function statusLabel(status: string, hass?: Hass): string { return messages(hass).statuses[status] ?? status; }
 export function categoryLabel(category: string, hass?: Hass): string { return messages(hass).categories[category] ?? category; }
+export function serviceLabel(service: string, hass?: Hass): string {
+  const german = (hass?.locale?.language ?? "").toLowerCase().startsWith("de");
+  const labels: Record<string, string> = german
+    ? { electricity: "Strom / Landstrom", fresh_water: "Frischwasser auffüllen", grey_water: "Grauwasser entsorgen", toilet_cassette: "Toilettenkassette entsorgen", shower: "Dusche" }
+    : { electricity: "Electricity / shore power", fresh_water: "Refill fresh water", grey_water: "Dispose of grey water", toilet_cassette: "Dispose of toilet cassette", shower: "Shower" };
+  return labels[service] ?? service;
+}
 const LEGACY_EXPENSE_CATEGORY_IDS: Record<string, ExpenseCategory> = {
   "Stellplatz/Campingplatz": "camping", Campingplatz: "camping", "Camping site": "camping", camping: "camping",
   Kraftstoff: "fuel", Fuel: "fuel", fuel: "fuel", Maut: "toll", Toll: "toll", toll: "toll",

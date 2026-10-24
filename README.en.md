@@ -6,7 +6,7 @@
 
 <h1 align="center">Camper Travel Journal</h1>
 <p align="center">Your digital camper travel journal for Home Assistant</p>
-<p align="center"><strong>Stable: v0.3.6</strong></p>
+<p align="center"><strong>Stable: v0.3.7</strong></p>
 
 <p align="center">
   <a href="https://github.com/balronu/ha-camper-travel-journal/releases/latest"><img src="https://img.shields.io/github/v/release/balronu/ha-camper-travel-journal?label=Release" alt="Release"></a>
@@ -45,7 +45,8 @@ mobile browsers and Home Assistant setups is important.
 - Map Card with CARTO Basemaps, GPS lines, drive sections and segment colors.
 - Safe atomic PAJ GPX 1.1 import with preview, duplicate protection, period
   warnings and explicit target-trip selection.
-- Expense management with stable categories, integer cents and currency checks.
+- Expense management with stable categories, integer cents and currency checks,
+  including optional multi-select water and waste services.
 - German and English user interfaces.
 - A central Journal Card for new dashboards: select, open, edit, resume,
   pause, complete, delete or switch a trip while all trip sections use the
@@ -56,7 +57,7 @@ mobile browsers and Home Assistant setups is important.
 1. Open **HACS → Integrations → Custom repositories**.
 2. Add `https://github.com/balronu/ha-camper-travel-journal` as an
    **Integration** repository.
-3. Install the stable `v0.3.6` release.
+3. Install the stable `v0.3.7` release.
 4. Restart Home Assistant manually.
 5. Add the integration under **Settings → Devices & services**.
 
@@ -64,6 +65,19 @@ The integration registers its versioned frontend bundle automatically. Do not
 add a second Lovelace resource for the same JavaScript file. See
 [docs/HACS_RELEASE_STRATEGY.md](docs/HACS_RELEASE_STRATEGY.md) for release and
 HACS guidance.
+
+### Historical GPS stop suggestions
+
+New confirmed stationary timeouts still create pending suggestions
+automatically. The **Refresh suggestions** action in a trip's places area can
+also process historical data, but only existing GPS points assigned to a real
+`stationary_timeout` drive. It is idempotent and never confirms a stay or
+creates an overnight place; GPS gaps and existing pending, accepted or
+dismissed suggestions are skipped.
+
+The **Water & waste services** expense category optionally supports multiple
+services (electricity/shore power, fresh water, grey water, toilet cassette and
+shower). The total is stored once and existing expenses remain unchanged.
 
 ## First setup
 

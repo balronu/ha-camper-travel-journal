@@ -17,10 +17,10 @@ from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 from .fuel import resolve_fuel_values
-from .travel import validate_amount, validate_expense_category, validate_expense_currency, validate_expense_note
+from .travel import validate_amount, validate_expense_category, validate_expense_currency, validate_expense_note, validate_expense_services
 from .validation import is_coordinate_label
 
-SCHEMA_VERSION = 11
+SCHEMA_VERSION = 12
 V10_GPX_BACKFILL_MARKER = "v10_gpx_backfill"
 
 
@@ -78,6 +78,14 @@ CREATE TABLE IF NOT EXISTS expenses (
   occurred_on TEXT, occurred_time TEXT, fuel_liters REAL, fuel_price_per_liter REAL
 );
 CREATE INDEX IF NOT EXISTS idx_expenses_trip_time ON expenses(trip_id, occurred_at);
+CREATE TABLE IF NOT EXISTS expense_services (
+  id TEXT PRIMARY KEY, label_key TEXT NOT NULL UNIQUE
+);
+CREATE TABLE IF NOT EXISTS expense_service_links (
+  expense_id TEXT NOT NULL REFERENCES expenses(id) ON DELETE CASCADE,
+  service_id TEXT NOT NULL REFERENCES expense_services(id) ON DELETE RESTRICT,
+  PRIMARY KEY(expense_id, service_id)
+);
 CREATE TABLE IF NOT EXISTS stops (
   id TEXT PRIMARY KEY, vehicle_id TEXT NOT NULL REFERENCES vehicles(id), trip_id TEXT REFERENCES trips(id) ON DELETE SET NULL,
   name TEXT NOT NULL, occurred_at TEXT NOT NULL, arrived_at TEXT, departed_at TEXT,
@@ -183,6 +191,8 @@ class SQLiteStore:
                     self._migrate_v10()
                 if previous < 11:
                     self._migrate_v11()
+                if previous < 12:
+                    self._migrate_v12()
                 if self.connection.execute(
                     "SELECT 1 FROM schema_meta WHERE key=?", (V10_GPX_BACKFILL_MARKER,)
                 ).fetchone() is None:
@@ -414,6 +424,21 @@ class SQLiteStore:
         for name in ("fuel_liters", "fuel_price_per_liter"):
             if name not in columns:
                 self.connection.execute(f"ALTER TABLE expenses ADD COLUMN {name} REAL")
+
+    def _migrate_v12(self) -> None:
+        """Add normalized, optional multi-select expense services."""
+        if self.connection is None:
+            raise RuntimeError("store is not open")
+        self.connection.executescript("""
+        CREATE TABLE IF NOT EXISTS expense_services (id TEXT PRIMARY KEY, label_key TEXT NOT NULL UNIQUE);
+        CREATE TABLE IF NOT EXISTS expense_service_links (
+          expense_id TEXT NOT NULL REFERENCES expenses(id) ON DELETE CASCADE,
+          service_id TEXT NOT NULL REFERENCES expense_services(id) ON DELETE RESTRICT,
+          PRIMARY KEY(expense_id, service_id)
+        );
+        """)
+        for service_id in ("electricity", "fresh_water", "grey_water", "toilet_cassette", "shower"):
+            self.connection.execute("INSERT OR IGNORE INTO expense_services(id,label_key) VALUES(?,?)", (service_id, service_id))
 
     def _backfill_v10_gpx_endpoints(self) -> None:
         """Reconstruct safe legacy memberships once, then persist endpoints.
@@ -1190,7 +1215,7 @@ class SQLiteStore:
         value = sin(dlat / 2) ** 2 + cos(lat1) * cos(lat2) * sin(dlon / 2) ** 2
         return 2 * earth * asin(min(1.0, sqrt(value)))
 
-    def generate_stop_suggestions(self, vehicle_id: str, now: datetime, *, minimum_minutes: int = 10, radius_m: float = 150.0, max_gap_minutes: int = 10, trip_id: str | None = None) -> list[dict]:
+    def generate_stop_suggestions(self, vehicle_id: str, now: datetime, *, minimum_minutes: int = 10, radius_m: float = 150.0, max_gap_minutes: int = 10, trip_id: str | None = None, historical_only: bool = False) -> list[dict]:
         """Create pending suggestions from contiguous, gap-free stationary GPS windows.
 
         This never creates a confirmed stop and never treats a GPS outage as a stay.
@@ -1207,17 +1232,26 @@ class SQLiteStore:
             # A retrospective analysis must use the points actually assigned to
             # this trip.  The vehicle-wide fallback below is retained for the
             # existing maintenance/API use case where no trip is supplied.
+            drive_filter = "JOIN drives AS d ON d.id=dgp.drive_id AND d.end_reason='stationary_timeout' " if historical_only else "JOIN drives AS d ON d.id=dgp.drive_id "
             rows = self.connection.execute(
                 "SELECT DISTINCT g.recorded_at,g.latitude,g.longitude,dgp.drive_id "
                 "FROM gps_points AS g "
-                "JOIN drive_gps_points AS dgp ON dgp.gps_point_id=g.id "
+                "JOIN drive_gps_points AS dgp ON dgp.gps_point_id=g.id " + drive_filter +
                 "JOIN trip_drives AS td ON td.drive_id=dgp.drive_id "
                 "WHERE g.vehicle_id=? AND td.trip_id=? "
                 "ORDER BY g.recorded_at,g.id",
                 (vehicle_id, trip_id),
             ).fetchall()
         else:
-            rows = self.connection.execute("SELECT recorded_at,latitude,longitude,NULL AS drive_id FROM gps_points WHERE vehicle_id=? ORDER BY recorded_at,id", (vehicle_id,)).fetchall()
+            if historical_only:
+                rows = self.connection.execute(
+                    "SELECT DISTINCT g.recorded_at,g.latitude,g.longitude,dgp.drive_id "
+                    "FROM gps_points AS g JOIN drive_gps_points AS dgp ON dgp.gps_point_id=g.id "
+                    "JOIN drives AS d ON d.id=dgp.drive_id AND d.end_reason='stationary_timeout' "
+                    "WHERE g.vehicle_id=? ORDER BY g.recorded_at,g.id", (vehicle_id,)
+                ).fetchall()
+            else:
+                rows = self.connection.execute("SELECT recorded_at,latitude,longitude,NULL AS drive_id FROM gps_points WHERE vehicle_id=? ORDER BY recorded_at,id", (vehicle_id,)).fetchall()
         candidates: list[tuple] = []
         window: list = []
         max_gap = timedelta(minutes=max_gap_minutes)
@@ -1237,7 +1271,7 @@ class SQLiteStore:
             if not window:
                 window = [row]; continue
             previous = datetime.fromisoformat(window[-1][0])
-            if current - previous > max_gap or self._distance_m(float(window[0][1]), float(window[0][2]), float(row[1]), float(row[2])) > radius_m:
+            if row[3] != window[-1][3] or current - previous > max_gap or self._distance_m(float(window[0][1]), float(window[0][2]), float(row[1]), float(row[2])) > radius_m:
                 flush()
             window.append(row)
         flush()
@@ -1247,8 +1281,13 @@ class SQLiteStore:
                 overlap = connection.execute("SELECT 1 FROM stops WHERE vehicle_id=? AND confirmed=1 AND latitude IS NOT NULL AND longitude IS NOT NULL AND ((arrived_at IS NULL AND occurred_at BETWEEN ? AND ?) OR (arrived_at <= ? AND (departed_at IS NULL OR departed_at >= ?))) LIMIT 1", (vehicle_id, utc_iso(start), utc_iso(end), utc_iso(end), utc_iso(start))).fetchone()
                 if overlap:
                     continue
-                duplicate_query = "SELECT 1 FROM stop_suggestions WHERE vehicle_id=? AND status IN ('pending','accepted') AND arrived_at=? AND abs(latitude-?) < 0.002 AND abs(longitude-?) < 0.002"
+                duplicate_query = "SELECT 1 FROM stop_suggestions WHERE vehicle_id=? AND arrived_at=? AND abs(latitude-?) < 0.002 AND abs(longitude-?) < 0.002"
                 duplicate_args: tuple = (vehicle_id, utc_iso(start), lat, lon)
+                if drive_id is None:
+                    duplicate_query += " AND drive_id IS NULL"
+                else:
+                    duplicate_query += " AND drive_id=?"
+                    duplicate_args = (vehicle_id, utc_iso(start), lat, lon, drive_id)
                 if trip_id:
                     duplicate_query += " AND (trip_id=? OR trip_id IS NULL)"
                     duplicate_args += (trip_id,)
@@ -1281,6 +1320,9 @@ class SQLiteStore:
         expense_id = expense.id or str(uuid.uuid4())
         amount_minor = validate_amount(expense.amount_minor)
         category = validate_expense_category(expense.category)
+        services = validate_expense_services(expense.services)
+        if category != "water_waste":
+            services = ()
         currency = validate_expense_currency(expense.currency)
         note = validate_expense_note(expense.note)
         fuel_amount, fuel_liters, fuel_price = resolve_fuel_values(
@@ -1305,11 +1347,16 @@ class SQLiteStore:
                 if place is None: raise ValueError("place_not_found")
                 if place[0] != trip[0] or place[1] not in (None, expense.trip_id): raise ValueError("vehicle_mismatch")
             connection.execute("INSERT INTO expenses(id,trip_id,occurred_at,category,amount_minor,currency,note,created_at,updated_at,odometer_km,stay_id,place_id,occurred_on,occurred_time,fuel_liters,fuel_price_per_liter) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)", (expense_id, expense.trip_id, utc_iso(expense.occurred_at), category, amount_minor, currency, note, stamp, stamp, expense.odometer_km, expense.stay_id, place_id, occurred_on, occurred_time, fuel_liters, fuel_price))
+            for service_id in services:
+                connection.execute("INSERT INTO expense_service_links(expense_id,service_id) VALUES(?,?)", (expense_id, service_id))
         return expense_id
 
     def list_expenses(self, trip_id: str) -> list[dict]:
         if self.connection is None: raise RuntimeError("store is not open")
-        return [dict(row) for row in self.connection.execute("SELECT e.*, s.name AS place_name FROM expenses e LEFT JOIN stops s ON s.id=COALESCE(e.place_id,e.stay_id) WHERE e.trip_id=? ORDER BY e.occurred_at DESC", (trip_id,)).fetchall()]
+        expenses = [dict(row) for row in self.connection.execute("SELECT e.*, s.name AS place_name FROM expenses e LEFT JOIN stops s ON s.id=COALESCE(e.place_id,e.stay_id) WHERE e.trip_id=? ORDER BY e.occurred_at DESC", (trip_id,)).fetchall()]
+        for expense in expenses:
+            expense["services"] = [row[0] for row in self.connection.execute("SELECT service_id FROM expense_service_links WHERE expense_id=? ORDER BY rowid", (expense["id"],)).fetchall()]
+        return expenses
 
     def delete_expense(self, expense_id: str) -> None:
         with self.transaction() as connection:
@@ -1318,8 +1365,8 @@ class SQLiteStore:
                 raise ValueError("expense_not_found")
 
     def update_expense(self, expense_id: str, now: datetime, **fields) -> None:
-        allowed = {"trip_id", "occurred_at", "occurred_on", "occurred_time", "category", "amount_minor", "currency", "note", "odometer_km", "stay_id", "place_id", "fuel_liters", "fuel_price_per_liter"}
-        nullable_fields = {"occurred_on", "occurred_time", "note", "fuel_liters", "fuel_price_per_liter"}
+        allowed = {"trip_id", "occurred_at", "occurred_on", "occurred_time", "category", "amount_minor", "currency", "note", "odometer_km", "stay_id", "place_id", "fuel_liters", "fuel_price_per_liter", "services"}
+        nullable_fields = {"occurred_on", "occurred_time", "note", "fuel_liters", "fuel_price_per_liter", "services"}
         changes = {
             key: value for key, value in fields.items()
             if key in allowed and (value is not None or key in nullable_fields)
@@ -1335,6 +1382,8 @@ class SQLiteStore:
                 # Preserve an unknown historical value only when the submitted
                 # value is byte-for-byte identical to the stored value.
                 changes["category"] = current[0]
+        if "services" in changes:
+            changes["services"] = validate_expense_services(changes["services"])
         if isinstance(changes.get("occurred_at"), datetime): changes["occurred_at"] = utc_iso(changes["occurred_at"])
         if "occurred_time" in changes and changes["occurred_time"] is not None and not re.fullmatch(r"(?:[01]\d|2[0-3]):[0-5]\d", changes["occurred_time"]):
             raise ValueError("expense_time_invalid")
@@ -1348,6 +1397,8 @@ class SQLiteStore:
             if current is None:
                 raise ValueError("expense_not_found")
             category = changes.get("category", current[1])
+            if category != "water_waste":
+                changes["services"] = ()
             if category == "fuel":
                 explicit_clear = any(key in changes and changes[key] is None for key in ("fuel_liters", "fuel_price_per_liter"))
                 resolved_amount, resolved_liters, resolved_price = resolve_fuel_values(
@@ -1362,12 +1413,17 @@ class SQLiteStore:
             else:
                 changes["fuel_liters"] = None
                 changes["fuel_price_per_liter"] = None
+            services = changes.pop("services", None)
             assignments = ",".join(f"{key}=?" for key in changes)
             if "place_id" in changes and changes["place_id"]:
                 place = connection.execute("SELECT 1 FROM stops WHERE id=? AND (trip_id IS NULL OR trip_id=?)", (changes["place_id"], current[0])).fetchone()
                 if place is None: raise ValueError("place_not_found")
             cursor = connection.execute(f"UPDATE expenses SET {assignments} WHERE id=?", (*changes.values(), expense_id))
             if cursor.rowcount != 1: raise ValueError("expense_not_found")
+            if services is not None:
+                connection.execute("DELETE FROM expense_service_links WHERE expense_id=?", (expense_id,))
+                for service_id in services:
+                    connection.execute("INSERT INTO expense_service_links(expense_id,service_id) VALUES(?,?)", (expense_id, service_id))
 
     def auto_assign_drive(self, vehicle_id: str, drive_id: str, now: datetime) -> str | None:
         """Assign a newly detected drive only when exactly one trip is active."""

@@ -2,7 +2,7 @@ import unittest
 
 try:
     from reportlab.platypus import KeepTogether, Paragraph, Table
-    from custom_components.camper_travel_journal.pdf_report import _RouteMap, _category_label, _date, _date_time, _duration, _expense_time, _fuel_details, _place_label, _time, render_trip_report
+    from custom_components.camper_travel_journal.pdf_report import _RouteMap, _category_label, _date, _date_time, _duration, _expense_time, _fuel_details, _place_label, _service_labels, _time, render_trip_report
 except ModuleNotFoundError as error:  # pragma: no cover - CI installs manifest dependency
     if error.name != "reportlab":
         raise
@@ -366,6 +366,7 @@ def test_report_uses_home_assistant_timezone_and_localized_categories():
     assert _time("2026-01-01T23:30:00+00:00", "de", "Europe/Berlin") == "00:30"
     assert _category_label("fuel", "de") == "Kraftstoff"
     assert _category_label("other", "en") == "Other"
+    assert _category_label("water_waste", "de") == "Ver- & Entsorgung"
     assert _place_label("rv_site", "de") == "Wohnmobilstellplatz"
     assert _place_label("rv_site", "en") == "RV site"
     assert [_duration(value, "de") for value in (629, 630, 659, 660)] == ["10 min", "11 min", "11 min", "11 min"]
@@ -377,6 +378,11 @@ def test_expense_wall_clock_time_never_shifts_with_home_assistant_timezone():
     assert _expense_time("12:00", "de") == _expense_time("12:00", "de")
     assert _expense_time("23:30", "en") == "11:30 PM"
     assert _expense_time(None, "de") == ""
+
+
+def test_water_waste_services_are_localized_for_pdf_rows():
+    assert _service_labels(["fresh_water", "toilet_cassette"], "de") == "Frischwasser auffüllen · Toilettenkassette entsorgen"
+    assert _service_labels(["fresh_water", "toilet_cassette"], "en") == "Refill fresh water · Dispose of toilet cassette"
 
 
 def test_report_accepts_overnight_places_ratings_and_linked_expenses():

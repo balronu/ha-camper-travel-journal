@@ -13,7 +13,9 @@ class TripStatus(StrEnum):
     COMPLETED = "completed"
 
 
-EXPENSE_CATEGORY_IDS = ("camping", "fuel", "toll", "parking", "food", "activities", "other")
+EXPENSE_CATEGORY_IDS = ("camping", "fuel", "toll", "parking", "food", "activities", "water_waste", "other")
+EXPENSE_SERVICE_IDS = ("electricity", "fresh_water", "grey_water", "toilet_cassette", "shower")
+EXPENSE_SERVICES = frozenset(EXPENSE_SERVICE_IDS)
 EXPENSE_CATEGORIES = frozenset(EXPENSE_CATEGORY_IDS)
 EXPENSE_CURRENCY_PATTERN = re.compile(r"^[A-Z]{3}$")
 MAX_EXPENSE_NOTE_LENGTH = 2000
@@ -48,6 +50,17 @@ def validate_expense_category(category: object) -> str:
     if not isinstance(category, str) or category not in EXPENSE_CATEGORIES:
         raise ValueError("expense_category_invalid")
     return category
+
+
+def validate_expense_services(services: object) -> tuple[str, ...]:
+    if services is None:
+        return ()
+    if isinstance(services, str) or not isinstance(services, (list, tuple, set)):
+        raise ValueError("expense_services_invalid")
+    normalized = tuple(dict.fromkeys(services))
+    if any(not isinstance(value, str) or value not in EXPENSE_SERVICES for value in normalized):
+        raise ValueError("expense_services_invalid")
+    return normalized
 
 
 def validate_expense_currency(currency: object) -> str:

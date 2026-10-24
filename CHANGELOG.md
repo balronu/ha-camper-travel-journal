@@ -1,5 +1,16 @@
 # Änderungsprotokoll
 
+## 0.3.7 – Stable Ver- & Entsorgung und historische GPS-Stoppnachberechnung
+
+- Neue Kostenkategorie **Ver- & Entsorgung** mit fünf optionalen, mehrfach
+  auswählbaren Leistungen und additiver SQLite-Migration 12.
+- Leistungen erscheinen in Journal Card und deutschen/englischen PDF-Berichten;
+  der Gesamtbetrag wird nicht aufgeteilt.
+- Nutzergestartete historische Nachberechnung berücksichtigt ausschließlich
+  vorhandene, zugeordnete GPS-Punkte echter `stationary_timeout`-Fahrten und
+  bleibt bei wiederholter Ausführung idempotent.
+- Bestehende Kosten, Fahrten, GPS-Punkte und Aufenthalte werden nicht verändert.
+
 ## 0.3.6 – Stable GPS-Stoppvorschläge
 
 - Bestätigte `stationary_timeout`-Ereignisse erzeugen genau einen offenen,
