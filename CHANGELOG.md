@@ -1,5 +1,18 @@
 # Änderungsprotokoll
 
+## 0.3.5 – Stable GPS-Hotfix
+
+- GPS-Livefahrten werden bei exakt gleicher Fahrzeug-/Start-/Endzeit nur noch
+  einmal gespeichert; die vorhandene Fahrt-ID wird für Zuordnung und Reise-Links
+  wiederverwendet.
+- Nahe oder überlappende Intervalle werden bewusst nicht automatisch
+  zusammengeführt, damit getrennte reale Fahrten nicht verloren gehen.
+- Diagnosewerte zeigen jetzt datensparsam letzten gültigen Trackerzeitpunkt,
+  Detektorzustand, Alter des letzten gültigen Ereignisses, Abschlussursache,
+  Stillstandszeit, GPS-Gap und Verwerfungszähler.
+- Es gibt weiterhin keine Timer-Fahrtbeendigung und keine rückwirkende
+  Bereinigung bestehender Fahrten oder GPS-Punkte.
+
 ## 0.3.2 – Stable UI-Politur
 
 - Vereinheitlicht die Reiseaktionen in der zentralen Journal Card mit einem

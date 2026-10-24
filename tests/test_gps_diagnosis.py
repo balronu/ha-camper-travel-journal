@@ -100,6 +100,74 @@ class GPSDiagnosisTests(unittest.TestCase):
             self.assertEqual(store.connection.execute("SELECT count(*) FROM drives").fetchone()[0], 1)
             store.close()
 
+    def test_minimal_start_or_end_difference_remains_a_separate_gps_drive(self):
+        with tempfile.TemporaryDirectory() as directory:
+            store = SQLiteStore(Path(directory) / "journal.db")
+            store.open()
+            now = datetime(2026, 10, 23, 14, tzinfo=UTC)
+            store.insert_vehicle("v1", "Camper", "device_tracker.camper", now)
+            first = Drive("d1", "v1", now, now + timedelta(hours=2), 162200, "stationary_timeout")
+            shifted = Drive("d2", "v1", now + timedelta(seconds=1), now + timedelta(hours=2), 162200, "stationary_timeout")
+            shortened = Drive("d3", "v1", now, now + timedelta(hours=2, seconds=-1), 162200, "stationary_timeout")
+            self.assertEqual(store.insert_drive(first), "d1")
+            self.assertEqual(store.insert_drive(shifted), "d2")
+            self.assertEqual(store.insert_drive(shortened), "d3")
+            self.assertEqual(store.connection.execute("SELECT count(*) FROM drives WHERE source='gps'").fetchone()[0], 3)
+            store.close()
+
+    def test_overlapping_gps_intervals_are_not_merged(self):
+        with tempfile.TemporaryDirectory() as directory:
+            store = SQLiteStore(Path(directory) / "journal.db")
+            store.open()
+            now = datetime(2026, 10, 23, 14, tzinfo=UTC)
+            store.insert_vehicle("v1", "Camper", "device_tracker.camper", now)
+            first = Drive("d1", "v1", now, now + timedelta(hours=2), 162200, "stationary_timeout")
+            overlap = Drive("d2", "v1", now + timedelta(minutes=1), now + timedelta(hours=2, minutes=1), 162000, "stationary_timeout")
+            self.assertEqual(store.insert_drive(first), "d1")
+            self.assertEqual(store.insert_drive(overlap), "d2")
+            self.assertEqual(store.connection.execute("SELECT count(*) FROM drives WHERE source='gps'").fetchone()[0], 2)
+            store.close()
+
+    def test_different_vehicles_have_independent_idempotency_keys(self):
+        with tempfile.TemporaryDirectory() as directory:
+            store = SQLiteStore(Path(directory) / "journal.db")
+            store.open()
+            now = datetime(2026, 10, 23, 14, tzinfo=UTC)
+            store.insert_vehicle("v1", "Camper 1", "device_tracker.camper_1", now)
+            store.insert_vehicle("v2", "Camper 2", "device_tracker.camper_2", now)
+            first = Drive("d1", "v1", now, now + timedelta(hours=2), 162200, "stationary_timeout")
+            other = Drive("d2", "v2", now, now + timedelta(hours=2), 162200, "stationary_timeout")
+            self.assertEqual(store.insert_drive(first), "d1")
+            self.assertEqual(store.insert_drive(other), "d2")
+            self.assertEqual(store.connection.execute("SELECT count(*) FROM drives WHERE source='gps'").fetchone()[0], 2)
+            store.close()
+
+    def test_manual_and_gpx_drives_are_not_deduplicated_by_gps_key(self):
+        with tempfile.TemporaryDirectory() as directory:
+            store = SQLiteStore(Path(directory) / "journal.db")
+            store.open()
+            now = datetime(2026, 10, 23, 14, tzinfo=UTC)
+            store.insert_vehicle("v1", "Camper", "device_tracker.camper", now)
+            manual = Drive("manual", "v1", now, now + timedelta(hours=2), 162200, "manual", source="manual")
+            gpx = Drive("gpx", "v1", now, now + timedelta(hours=2), 162200, "track_end", source="gpx")
+            self.assertEqual(store.insert_drive(manual), "manual")
+            self.assertEqual(store.insert_drive(gpx), "gpx")
+            self.assertEqual(store.connection.execute("SELECT count(*) FROM drives").fetchone()[0], 2)
+            store.close()
+
+    def test_diagnostics_exposes_safe_lifecycle_fields_without_coordinates(self):
+        collector = GPSCollector(None, {"v1": {"stop_after": 5, "max_gap": 7}}, dry_run=True)
+        at = datetime(2026, 10, 23, 14, tzinfo=UTC)
+        asyncio.run(collector.async_process_event("v1", "home", tracker_event(at)))
+        report = collector.diagnostics("v1", at + timedelta(minutes=2))
+        self.assertEqual(report["last_valid_tracker_event_at"], at.isoformat())
+        self.assertEqual(report["seconds_since_last_valid_tracker_event"], 120.0)
+        self.assertEqual(report["configured_stop_after_seconds"], 300.0)
+        self.assertEqual(report["configured_max_gap_seconds"], 420.0)
+        self.assertIn("discard_reasons", report)
+        self.assertNotIn("latitude", report)
+        self.assertNotIn("longitude", report)
+
     def test_repeated_drive_list_queries_are_read_only_and_stable(self):
         with tempfile.TemporaryDirectory() as directory:
             store = SQLiteStore(Path(directory) / "journal.db")

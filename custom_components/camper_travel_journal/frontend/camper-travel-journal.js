@@ -2054,10 +2054,10 @@ function Ro(c) {
 }
 async function No(c, i, s = Co) {
   const o = { state: "not_run", durationMs: null };
-  if (!c?.connection) return { version: "0.3.4", connectionBefore: "unavailable", connectionAfter: "unavailable", authentication: o, vehicles: o, trips: o, vehicleId: Yi(i) };
+  if (!c?.connection) return { version: "0.3.5", connectionBefore: "unavailable", connectionAfter: "unavailable", authentication: o, vehicles: o, trips: o, vehicleId: Yi(i) };
   const h = Ur(c), d = await Xi(c, { type: "auth/current_user" }, zo, s), f = await Xi(c, { type: "camper_travel_journal/list_vehicles" }, Oo, s), b = f.value?.vehicles?.filter((mt) => typeof mt.vehicle_id == "string") ?? [], p = b.length === 1 ? b[0].vehicle_id : void 0, w = await Xi(c, { type: "camper_travel_journal/list", vehicle_id: p ?? i }, Ro, s), { value: y, ...k } = d, { value: $, ...D } = f, { value: N, ...at } = w;
   return {
-    version: "0.3.4",
+    version: "0.3.5",
     connectionBefore: h,
     connectionAfter: Ur(c),
     authentication: k,

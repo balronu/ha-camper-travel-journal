@@ -9,7 +9,7 @@ lokal in einer eigenen SQLite-Datenbank.
 
 [🇬🇧 English](README.en.md) · [🇩🇪 Deutsche Hauptdokumentation](README.md)
 
-**Stable: v0.3.4**
+**Stable: v0.3.5**
 
 Für neue Dashboards wird die zentrale Journal Card empfohlen. Im geöffneten
 Reisekontext stehen Bearbeiten, Fortsetzen, Pausieren, Beenden, Löschen und

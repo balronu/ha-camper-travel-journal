@@ -51,8 +51,16 @@ Im Diagnosebranch prüft `insert_drive()` innerhalb derselben SQLite-
 Transaktion für `source='gps'`, ob Fahrzeug, Start- und Endzeit bereits
 vorhanden sind. Dann wird die bestehende kanonische ID zurückgegeben.
 Der Collector verwendet diese ID auch für GPS-Punktzuordnung und automatische
-Reisezuordnung. Manuelle und GPX-Fahrten bleiben davon unberührt. Es gibt keine
-Migration und keine Änderung bestehender Zeilen.
+Reisezuordnung. Die Korrektur bleibt absichtlich exakt: Minimal abweichende
+Start-/Endzeiten, überlappende Intervalle, kurze Folgefahrten und
+unterschiedliche Fahrzeuge werden nicht zusammengeführt. Manuelle und
+GPX-Fahrten bleiben davon unberührt. Es gibt keine Migration und keine
+Änderung bestehender Zeilen.
+
+Die Hotfix-Kandidatenversion ergänzt zusätzlich datensparsame Runtime-
+Diagnosefelder: letzter gültiger Trackerzeitpunkt, Alter dieses Ereignisses,
+Detektorzustand, letzte Abschlussursache, konfigurierte Stillstands-/Gap-
+Zeiten und Verwerfungszähler. Koordinaten und Rohdaten werden nicht ausgegeben.
 
 ## Stopperkennung
 
