@@ -36,7 +36,7 @@ def test_release_version_is_aligned_across_project_and_readmes():
     assert 'version = "0.3.8"' in (ROOT / "pyproject.toml").read_text(encoding="utf-8")
     for name in ("README.md", "README.de.md", "README.en.md"):
         text = (ROOT / name).read_text(encoding="utf-8")
-    assert "v0.3.8" in text
+        assert "v0.3.8" in text
         assert "v0.1.0" not in text
 
 
