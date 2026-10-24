@@ -13,7 +13,7 @@ export type DiagnosticResult = {
 };
 
 export type DiagnosticReport = {
-  version: "0.3.3";
+  version: "0.3.4";
   connectionBefore: ConnectionState;
   connectionAfter: ConnectionState;
   authentication: DiagnosticResult;
@@ -94,7 +94,7 @@ function validateTrips(value: unknown): Omit<DiagnosticResult, "durationMs"> {
 
 export async function runDiagnostic(hass: DiagnosticHass | undefined, requestedVehicleId: string, timeoutMs = DEFAULT_TIMEOUT_MS): Promise<DiagnosticReport> {
   const fallback: DiagnosticResult = { state: "not_run", durationMs: null };
-  if (!hass?.connection) return { version: "0.3.3", connectionBefore: "unavailable", connectionAfter: "unavailable", authentication: fallback, vehicles: fallback, trips: fallback, vehicleId: mask(requestedVehicleId) };
+  if (!hass?.connection) return { version: "0.3.4", connectionBefore: "unavailable", connectionAfter: "unavailable", authentication: fallback, vehicles: fallback, trips: fallback, vehicleId: mask(requestedVehicleId) };
   const connectionBefore = connectionState(hass);
   const authentication = await runRequest(hass, { type: "auth/current_user" }, validateAuth, timeoutMs);
   const vehicles = await runRequest<{ vehicles?: Array<{ vehicle_id?: string }> }>(hass, { type: "camper_travel_journal/list_vehicles" }, validateVehicles, timeoutMs);
@@ -106,7 +106,7 @@ export async function runDiagnostic(hass: DiagnosticHass | undefined, requestedV
   const { value: _vehiclesValue, ...vehiclesResult } = vehicles;
   const { value: _tripsValue, ...tripsResult } = trips;
   return {
-    version: "0.3.3",
+    version: "0.3.4",
     connectionBefore,
     connectionAfter: connectionState(hass),
     authentication: authenticationResult,
