@@ -13,10 +13,10 @@ const bundle = resolve(root, "../custom_components/camper_travel_journal/fronten
 
 describe("frontend release contract", () => {
   it("keeps backend, npm metadata and beta bundle aligned", () => {
-    expect(manifest.version).toBe("0.3.6");
+    expect(manifest.version).toBe("0.3.7");
     expect(pkg.version).toBe(manifest.version);
     expect(existsSync(bundle)).toBe(true);
-    expect(readFileSync(resolve(root, "../custom_components/camper_travel_journal/const.py"), "utf8")).toContain('FRONTEND_VERSION = "0.3.6"');
+    expect(readFileSync(resolve(root, "../custom_components/camper_travel_journal/const.py"), "utf8")).toContain('FRONTEND_VERSION = "0.3.7"');
   });
   it("registers the central card in the catalog while retaining legacy elements", () => {
     const source = readFileSync(resolve(root, "src/index.ts"), "utf8");
@@ -244,7 +244,7 @@ describe("frontend release contract", () => {
     expect(parseAmountMinor("-1")).toBeNull();
     expect(parseAmountMinor("23.456")).toBeNull();
     expect(formatMoneyMinor(2300, "EUR", { locale: { language: "de-DE" } } as any)).toBe("23,00 €");
-    expect(EXPENSE_CATEGORY_IDS).toEqual(["camping", "fuel", "toll", "parking", "food", "activities", "other"]);
+    expect(EXPENSE_CATEGORY_IDS).toEqual(["camping", "fuel", "toll", "parking", "food", "activities", "water_waste", "other"]);
     expect(EXPENSE_CATEGORIES).toEqual(EXPENSE_CATEGORY_IDS);
     expect(isExpenseCategory("camping")).toBe(true);
     expect(isExpenseCategory("Stellplatz/Campingplatz")).toBe(false);

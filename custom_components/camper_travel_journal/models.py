@@ -92,6 +92,7 @@ class Expense:
     occurred_time: str | None = None
     fuel_liters: float | None = None
     fuel_price_per_liter: float | None = None
+    services: tuple[str, ...] = ()
 
 
 @dataclass(frozen=True, slots=True)
