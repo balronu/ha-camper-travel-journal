@@ -20,7 +20,7 @@ from .fuel import resolve_fuel_values
 from .travel import validate_amount, validate_expense_category, validate_expense_currency, validate_expense_note, validate_expense_services
 from .validation import is_coordinate_label
 
-SCHEMA_VERSION = 12
+SCHEMA_VERSION = 13
 V10_GPX_BACKFILL_MARKER = "v10_gpx_backfill"
 
 
@@ -56,6 +56,13 @@ CREATE TABLE IF NOT EXISTS drives (
   created_at TEXT NOT NULL
 );
 CREATE INDEX IF NOT EXISTS idx_drives_vehicle_time ON drives(vehicle_id, started_at, ended_at);
+CREATE TABLE IF NOT EXISTS drive_identities (
+  vehicle_id TEXT NOT NULL REFERENCES vehicles(id) ON DELETE CASCADE,
+  started_at TEXT NOT NULL,
+  ended_at TEXT NOT NULL,
+  drive_id TEXT NOT NULL UNIQUE REFERENCES drives(id) ON DELETE RESTRICT,
+  PRIMARY KEY(vehicle_id, started_at, ended_at)
+);
 CREATE TABLE IF NOT EXISTS stays (
   id TEXT PRIMARY KEY, vehicle_id TEXT NOT NULL REFERENCES vehicles(id), started_at TEXT NOT NULL,
   ended_at TEXT, latitude REAL, longitude REAL, created_at TEXT NOT NULL
@@ -193,6 +200,8 @@ class SQLiteStore:
                     self._migrate_v11()
                 if previous < 12:
                     self._migrate_v12()
+                if previous < 13:
+                    self._migrate_v13()
                 if self.connection.execute(
                     "SELECT 1 FROM schema_meta WHERE key=?", (V10_GPX_BACKFILL_MARKER,)
                 ).fetchone() is None:
@@ -440,6 +449,38 @@ class SQLiteStore:
         for service_id in ("electricity", "fresh_water", "grey_water", "toilet_cassette", "shower"):
             self.connection.execute("INSERT OR IGNORE INTO expense_services(id,label_key) VALUES(?,?)", (service_id, service_id))
 
+    def _migrate_v13(self) -> None:
+        """Persist exact GPS-drive identity without deleting legacy duplicates."""
+        if self.connection is None:
+            raise RuntimeError("store is not open")
+        self.connection.executescript("""
+        CREATE TABLE IF NOT EXISTS drive_identities (
+          vehicle_id TEXT NOT NULL REFERENCES vehicles(id) ON DELETE CASCADE,
+          started_at TEXT NOT NULL,
+          ended_at TEXT NOT NULL,
+          drive_id TEXT NOT NULL UNIQUE REFERENCES drives(id) ON DELETE RESTRICT,
+          PRIMARY KEY(vehicle_id, started_at, ended_at)
+        );
+        """)
+        # Preserve every existing drive row. For an exact legacy duplicate,
+        # register only the deterministic earliest row as the future canonical
+        # identity; cleanup remains a separate, explicitly gated task.
+        self.connection.execute(
+            """INSERT OR IGNORE INTO drive_identities(vehicle_id,started_at,ended_at,drive_id)
+               SELECT d.vehicle_id,d.started_at,d.ended_at,d.id
+               FROM drives AS d
+               WHERE d.source='gps'
+                 AND NOT EXISTS (
+                   SELECT 1 FROM drives AS prior
+                   WHERE prior.source='gps'
+                     AND prior.vehicle_id=d.vehicle_id
+                     AND prior.started_at=d.started_at
+                     AND prior.ended_at=d.ended_at
+                     AND (prior.created_at < d.created_at
+                          OR (prior.created_at=d.created_at AND prior.id < d.id))
+                 )"""
+        )
+
     def _backfill_v10_gpx_endpoints(self) -> None:
         """Reconstruct safe legacy memberships once, then persist endpoints.
 
@@ -512,7 +553,7 @@ class SQLiteStore:
         }
 
     def create_stationary_stop_suggestion(
-        self, vehicle_id: str, drive_id: str, arrived_at: datetime, departed_at: datetime,
+        self, vehicle_id: str, drive_id: str, arrived_at: datetime, departed_at: datetime | None,
         latitude: float, longitude: float, now: datetime,
     ) -> dict | None:
         """Persist one pending suggestion from a confirmed detector timeout.
@@ -523,7 +564,7 @@ class SQLiteStore:
         """
         if self.connection is None:
             raise RuntimeError("store is not open")
-        if departed_at <= arrived_at:
+        if departed_at is not None and departed_at <= arrived_at:
             raise ValueError("stationary_evidence_invalid")
         with self.transaction() as connection:
             drive = connection.execute(
@@ -542,7 +583,7 @@ class SQLiteStore:
                 "SELECT 1 FROM stops WHERE vehicle_id=? AND confirmed=1 "
                 "AND ((arrived_at IS NULL AND occurred_at BETWEEN ? AND ?) "
                 "OR (arrived_at <= ? AND (departed_at IS NULL OR departed_at >= ?))) LIMIT 1",
-                (vehicle_id, utc_iso(arrived_at), utc_iso(departed_at), utc_iso(departed_at), utc_iso(arrived_at)),
+                (vehicle_id, utc_iso(arrived_at), utc_iso(departed_at or arrived_at), utc_iso(departed_at or arrived_at), utc_iso(arrived_at)),
             ).fetchone()
             if overlap:
                 return None
@@ -556,7 +597,7 @@ class SQLiteStore:
                 "(id,vehicle_id,trip_id,drive_id,arrived_at,departed_at,latitude,longitude,source,status,created_at,updated_at) "
                 "VALUES(?,?,?,?,?,?,?,?,?,'pending',?,?)",
                 (suggestion_id, vehicle_id, trip[0] if trip else None, drive_id,
-                 utc_iso(arrived_at), utc_iso(departed_at), latitude, longitude,
+                 utc_iso(arrived_at), utc_iso(departed_at) if departed_at else None, latitude, longitude,
                  "stationary_timeout", stamp, stamp),
             )
             return dict(connection.execute("SELECT * FROM stop_suggestions WHERE id=?", (suggestion_id,)).fetchone())
@@ -574,19 +615,43 @@ class SQLiteStore:
     def insert_drive(self, drive) -> str:
         with self.transaction() as connection:
             # A reload or an accidentally overlapping runtime can reconstruct
-            # the same live GPS interval with a fresh UUID. Serialize the
-            # check inside the write transaction and reuse the existing row;
+            # the same live GPS interval with a fresh UUID. The identity table
+            # makes the exact interval key durable and transactionally unique;
             # manual and GPX drives deliberately keep their own provenance.
             if drive.source == "gps":
                 existing = connection.execute(
-                    "SELECT id FROM drives WHERE vehicle_id=? AND started_at=? AND ended_at=? AND source='gps' LIMIT 1",
+                    "SELECT drive_id FROM drive_identities WHERE vehicle_id=? AND started_at=? AND ended_at=? LIMIT 1",
                     (drive.vehicle_id, utc_iso(drive.started_at), utc_iso(drive.ended_at)),
                 ).fetchone()
                 if existing is not None:
                     return existing[0]
             stamp = utc_iso(drive.ended_at)
             connection.execute("INSERT OR IGNORE INTO drives(id,vehicle_id,started_at,ended_at,distance_m,end_reason,manual_distance_km,source,start_label,end_label,start_latitude,start_longitude,end_latitude,end_longitude,created_at) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)", (drive.id, drive.vehicle_id, utc_iso(drive.started_at), utc_iso(drive.ended_at), drive.distance_m, drive.end_reason, drive.manual_distance_km, drive.source, drive.start_label, drive.end_label, drive.start_latitude, drive.start_longitude, drive.end_latitude, drive.end_longitude, stamp))
+            if drive.source == "gps":
+                connection.execute(
+                    "INSERT OR IGNORE INTO drive_identities(vehicle_id,started_at,ended_at,drive_id) VALUES(?,?,?,?)",
+                    (drive.vehicle_id, utc_iso(drive.started_at), utc_iso(drive.ended_at), drive.id),
+                )
+                canonical = connection.execute(
+                    "SELECT drive_id FROM drive_identities WHERE vehicle_id=? AND started_at=? AND ended_at=?",
+                    (drive.vehicle_id, utc_iso(drive.started_at), utc_iso(drive.ended_at)),
+                ).fetchone()[0]
+                if canonical != drive.id:
+                    connection.execute("DELETE FROM drives WHERE id=?", (drive.id,))
+                    return canonical
             return drive.id
+
+    def close_open_stops(self, vehicle_id: str, departed_at: datetime, now: datetime) -> int:
+        """Close confirmed ongoing stays only when later movement is observed."""
+        with self.transaction() as connection:
+            cursor = connection.execute(
+                """UPDATE stops
+                   SET departed_at=?, updated_at=?
+                   WHERE vehicle_id=? AND confirmed=1 AND departed_at IS NULL
+                     AND COALESCE(arrived_at, occurred_at) <= ?""",
+                (utc_iso(departed_at), utc_iso(now), vehicle_id, utc_iso(departed_at)),
+            )
+            return cursor.rowcount
 
     def associate_drive_points(self, drive_id: str, vehicle_id: str, started_at: datetime, ended_at: datetime, association_source: str) -> int:
         """Associate existing points in a drive interval, without rewriting points."""
@@ -1539,5 +1604,6 @@ class AsyncSQLiteWorker:
 
     async def async_insert_point(self, point): return await self._call("insert_point", point)
     async def async_insert_drive(self, drive): return await self._call("insert_drive", drive)
+    async def async_close_open_stops(self, vehicle_id, departed_at, now): return await self._call("close_open_stops", vehicle_id, departed_at, now)
     async def async_insert_vehicle(self, *args): return await self._call("insert_vehicle", *args)
     async def async_load_recent_points(self, *args): return await self._call("load_recent_points", *args)

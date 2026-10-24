@@ -1,6 +1,6 @@
 [project]
 name = "ha-camper-travel-journal"
-version = "0.3.8"
+version = "0.3.9"
 description = "Home Assistant Camper Travel Journal custom integration"
 requires-python = ">=3.12"
 license = {file = "LICENSE"}

@@ -95,7 +95,10 @@ class GPSCollector:
                 self._last_stored[vehicle_id] = point
             for event in self._detectors[vehicle_id].ingest(point):
                 if event.kind == "gps_gap": self.stats.gps_gaps += 1
-                elif event.kind == "drive_started": self.stats.drives += 1
+                elif event.kind == "drive_started":
+                    self.stats.drives += 1
+                    if not self.dry_run:
+                        await self.storage.async_close_open_stops(vehicle_id, event.at, event.at)
                 elif event.kind == "drive_finished":
                     self.stats.stops += 1
                     self.stats.last_drive_end_at = event.at
@@ -120,7 +123,7 @@ class GPSCollector:
                                     vehicle_id,
                                     drive_id,
                                     event.stationary_since.recorded_at,
-                                    event.stationary_until.recorded_at,
+                                    None,
                                     event.stationary_until.latitude,
                                     event.stationary_until.longitude,
                                     event.drive.ended_at,
