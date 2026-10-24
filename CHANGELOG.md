@@ -1,5 +1,15 @@
 # Änderungsprotokoll
 
+## 0.3.9 – GPS-Identität und laufende Aufenthalte
+
+- Exakte GPS-Fahrtintervalle erhalten eine transaktional eindeutige,
+  migrationssichere Identität; vorhandene historische Duplikate werden weder
+  gelöscht noch zusammengeführt.
+- Bestätigte laufende Aufenthalte können ohne bekannte Abfahrtszeit gespeichert
+  werden und werden erst bei später nachgewiesener Bewegung geschlossen.
+- Automatische GPS-Vorschläge erzeugen für den noch laufenden Aufenthalt keine
+  fiktive Abfahrtszeit; die Bestätigung bleibt weiterhin eine Nutzeraktion.
+
 ## 0.3.7 – Stable Ver- & Entsorgung und historische GPS-Stoppnachberechnung
 
 - Neue Kostenkategorie **Ver- & Entsorgung** mit fünf optionalen, mehrfach

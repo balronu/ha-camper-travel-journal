@@ -2076,10 +2076,10 @@ function Bo(c) {
 }
 async function Zo(c, i, s = Mo) {
   const o = { state: "not_run", durationMs: null };
-  if (!c?.connection) return { version: "0.3.8", connectionBefore: "unavailable", connectionAfter: "unavailable", authentication: o, vehicles: o, trips: o, vehicleId: Yi(i) };
+  if (!c?.connection) return { version: "0.3.9", connectionBefore: "unavailable", connectionAfter: "unavailable", authentication: o, vehicles: o, trips: o, vehicleId: Yi(i) };
   const h = Wr(c), d = await Xi(c, { type: "auth/current_user" }, Ro, s), p = await Xi(c, { type: "camper_travel_journal/list_vehicles" }, No, s), x = p.value?.vehicles?.filter((mt) => typeof mt.vehicle_id == "string") ?? [], f = x.length === 1 ? x[0].vehicle_id : void 0, E = await Xi(c, { type: "camper_travel_journal/list", vehicle_id: f ?? i }, Bo, s), { value: y, ...D } = d, { value: b, ...S } = p, { value: O, ...et } = E;
   return {
-    version: "0.3.8",
+    version: "0.3.9",
     connectionBefore: h,
     connectionAfter: Wr(c),
     authentication: D,

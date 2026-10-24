@@ -67,6 +67,31 @@ class GPSDiagnosisTests(unittest.TestCase):
                 await worker.async_close()
         asyncio.run(run())
 
+    def test_stationary_timeout_keeps_departure_unknown_until_movement(self):
+        async def run():
+            with tempfile.TemporaryDirectory() as directory:
+                worker = AsyncSQLiteWorker(Path(directory) / "journal.db")
+                await worker.async_open()
+                start = datetime(2026, 10, 23, 14, tzinfo=UTC)
+                await worker.async_insert_vehicle("v1", "Camper", "device_tracker.camper", start)
+                drive_id = await worker.async_insert_drive(Drive("d1", "v1", start, start + timedelta(minutes=10), 100, "stationary_timeout"))
+                suggestion = await worker.async_call(
+                    "create_stationary_stop_suggestion", "v1", drive_id, start, None, 49.0, 7.0, start
+                )
+                self.assertIsNone(suggestion["departed_at"])
+                await worker.async_close_open_stops("v1", start + timedelta(hours=1), start + timedelta(hours=1))
+                self.assertEqual(await worker.async_call("list_stops", "v1"), [])
+                stop_id = await worker.async_call("accept_stop_suggestion", suggestion["id"], start, name="Ziel")
+                stop = (await worker.async_call("list_stops", "v1"))[0]
+                self.assertEqual(stop["id"], stop_id)
+                self.assertIsNone(stop["departed_at"])
+                await worker.async_close_open_stops("v1", start + timedelta(hours=1), start + timedelta(hours=1))
+                stop = (await worker.async_call("list_stops", "v1"))[0]
+                self.assertEqual(stop["departed_at"], (start + timedelta(hours=1)).isoformat())
+                await worker.async_close()
+
+        asyncio.run(run())
+
     def test_normal_drive_finishes_after_stationary_update(self):
         detector = DriveDetector("v1", DetectorConfig(stop_after=timedelta(minutes=5)))
         start = datetime(2026, 10, 23, 14, tzinfo=UTC)
@@ -140,6 +165,34 @@ class GPSDiagnosisTests(unittest.TestCase):
             self.assertEqual(store.insert_drive(second), "d1")
             self.assertEqual(store.connection.execute("SELECT count(*) FROM drives").fetchone()[0], 1)
             store.close()
+
+    def test_schema_identity_migration_preserves_legacy_duplicates_and_selects_canonical(self):
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "journal.db"
+            store = SQLiteStore(path)
+            store.open()
+            now = datetime(2026, 10, 23, 14, tzinfo=UTC)
+            store.insert_vehicle("v1", "Camper", "device_tracker.camper", now)
+            store.connection.execute(
+                "INSERT INTO drives(id,vehicle_id,started_at,ended_at,distance_m, end_reason, source, created_at) VALUES(?,?,?,?,?,?,?,?)",
+                ("legacy-b", "v1", now.isoformat(), (now + timedelta(hours=2)).isoformat(), 1, "stationary_timeout", "gps", "2026-10-23T14:01:00+00:00"),
+            )
+            store.connection.execute(
+                "INSERT INTO drives(id,vehicle_id,started_at,ended_at,distance_m, end_reason, source, created_at) VALUES(?,?,?,?,?,?,?,?)",
+                ("legacy-a", "v1", now.isoformat(), (now + timedelta(hours=2)).isoformat(), 1, "stationary_timeout", "gps", "2026-10-23T14:01:00+00:00"),
+            )
+            store.connection.execute("UPDATE schema_meta SET value='12' WHERE key='version'")
+            store.connection.commit()
+            store.close()
+            reopened = SQLiteStore(path)
+            reopened.open()
+            self.assertEqual(reopened.connection.execute("SELECT count(*) FROM drives").fetchone()[0], 2)
+            self.assertEqual(reopened.connection.execute("SELECT drive_id FROM drive_identities").fetchone()[0], "legacy-a")
+            self.assertEqual(
+                reopened.insert_drive(Drive("new", "v1", now, now + timedelta(hours=2), 2, "stationary_timeout")),
+                "legacy-a",
+            )
+            reopened.close()
 
     def test_minimal_start_or_end_difference_remains_a_separate_gps_drive(self):
         with tempfile.TemporaryDirectory() as directory:
