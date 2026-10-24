@@ -21,7 +21,7 @@ except ImportError:  # pragma: no cover - offline domain tests
 
 from .models import Expense, Stop
 from .gpx_import import MAX_FILE_BYTES, analyze_gpx
-from .travel import validate_amount, validate_expense_category, validate_expense_currency, validate_transition
+from .travel import validate_amount, validate_expense_category, validate_expense_currency, validate_expense_note, validate_transition
 from .fuel import resolve_fuel_values
 from .validation import is_coordinate_label
 from .const import (
@@ -87,7 +87,7 @@ async def _reverse_geocode(hass: HomeAssistant, runtime, latitude: float, longit
         async with session.get(
             _NOMINATIM_URL,
             params={"lat": f"{round(latitude, 3):.3f}", "lon": f"{round(longitude, 3):.3f}", "format": "jsonv2", "zoom": "10", "addressdetails": "1"},
-            headers={"User-Agent": "Camper Travel Journal/0.3.3"},
+            headers={"User-Agent": "Camper Travel Journal/0.3.4"},
             timeout=5,
         ) as response:
             if response.status != 200:
@@ -514,7 +514,7 @@ if websocket_api is not None:
             connection.send_result(msg["id"], {"stop_id": stop_id})
         except Exception as err: _send_error(connection, msg, err)
 
-    @websocket_api.websocket_command({**_base("camper_travel_journal/create_expense"), vol.Required("trip_id"): str, vol.Optional("occurred_at"): str, vol.Optional("occurred_on"): str, vol.Optional("occurred_time"): str, vol.Required("category"): str, vol.Optional("amount_minor"): vol.Coerce(int), vol.Optional("currency", default="EUR"): str, vol.Optional("note"): str, vol.Optional("odometer_km"): vol.Coerce(float), vol.Optional("place_id"): str, vol.Optional("stay_id"): str, vol.Optional("fuel_liters"): vol.Any(vol.Coerce(float), None), vol.Optional("fuel_price_per_liter"): vol.Any(vol.Coerce(float), None)})
+    @websocket_api.websocket_command({**_base("camper_travel_journal/create_expense"), vol.Required("trip_id"): str, vol.Optional("occurred_at"): str, vol.Optional("occurred_on"): str, vol.Optional("occurred_time"): str, vol.Required("category"): str, vol.Optional("amount_minor"): vol.Coerce(int), vol.Optional("currency", default="EUR"): str, vol.Optional("note"): vol.Any(str, None), vol.Optional("odometer_km"): vol.Coerce(float), vol.Optional("place_id"): str, vol.Optional("stay_id"): str, vol.Optional("fuel_liters"): vol.Any(vol.Coerce(float), None), vol.Optional("fuel_price_per_liter"): vol.Any(vol.Coerce(float), None)})
     @websocket_api.async_response
     async def ws_create_expense(hass, connection, msg):
         try:
@@ -527,12 +527,12 @@ if websocket_api is not None:
             if category != "fuel" and amount is None:
                 raise ValueError("amount_required")
             amount, liters, price = resolve_fuel_values(amount, msg.get("fuel_liters"), msg.get("fuel_price_per_liter")) if category == "fuel" else (validate_amount(amount), None, None)
-            expense = Expense(id="", trip_id=msg["trip_id"], occurred_at=legacy_at, category=category, amount_minor=amount or 0, currency=validate_expense_currency(msg["currency"]), note=msg.get("note"), odometer_km=msg.get("odometer_km"), place_id=msg.get("place_id"), stay_id=msg.get("stay_id"), occurred_on=actual_on, occurred_time=msg.get("occurred_time"), fuel_liters=liters, fuel_price_per_liter=price)
+            expense = Expense(id="", trip_id=msg["trip_id"], occurred_at=legacy_at, category=category, amount_minor=amount or 0, currency=validate_expense_currency(msg["currency"]), note=validate_expense_note(msg.get("note")), odometer_km=msg.get("odometer_km"), place_id=msg.get("place_id"), stay_id=msg.get("stay_id"), occurred_on=actual_on, occurred_time=msg.get("occurred_time"), fuel_liters=liters, fuel_price_per_liter=price)
             result = await _call(hass, msg, "create_expense", expense, _now())
             connection.send_result(msg["id"], {"expense_id": result})
         except Exception as err: _send_error(connection, msg, err)
 
-    @websocket_api.websocket_command({**_base("camper_travel_journal/update_expense"), vol.Required("expense_id"): str, vol.Optional("occurred_at"): str, vol.Optional("occurred_on"): vol.Any(str, None), vol.Optional("occurred_time"): vol.Any(str, None), vol.Optional("category"): str, vol.Optional("amount_minor"): vol.Coerce(int), vol.Optional("currency"): str, vol.Optional("note"): str, vol.Optional("odometer_km"): vol.Coerce(float), vol.Optional("place_id"): str, vol.Optional("stay_id"): str, vol.Optional("fuel_liters"): vol.Any(vol.Coerce(float), None), vol.Optional("fuel_price_per_liter"): vol.Any(vol.Coerce(float), None)})
+    @websocket_api.websocket_command({**_base("camper_travel_journal/update_expense"), vol.Required("expense_id"): str, vol.Optional("occurred_at"): str, vol.Optional("occurred_on"): vol.Any(str, None), vol.Optional("occurred_time"): vol.Any(str, None), vol.Optional("category"): str, vol.Optional("amount_minor"): vol.Coerce(int), vol.Optional("currency"): str, vol.Optional("note"): vol.Any(str, None), vol.Optional("odometer_km"): vol.Coerce(float), vol.Optional("place_id"): str, vol.Optional("stay_id"): str, vol.Optional("fuel_liters"): vol.Any(vol.Coerce(float), None), vol.Optional("fuel_price_per_liter"): vol.Any(vol.Coerce(float), None)})
     @websocket_api.async_response
     async def ws_update_expense(hass, connection, msg):
         try:
@@ -542,6 +542,7 @@ if websocket_api is not None:
             if "occurred_on" in msg: fields["occurred_on"] = _date(msg["occurred_on"], required=True)
             if "amount_minor" in fields: fields["amount_minor"] = validate_amount(fields["amount_minor"])
             if "currency" in fields: fields["currency"] = validate_expense_currency(fields["currency"])
+            if "note" in fields: fields["note"] = validate_expense_note(fields["note"])
             await _call(hass, msg, "update_expense", msg["expense_id"], _now(), **fields)
             connection.send_result(msg["id"], {"success": True})
         except Exception as err: _send_error(connection, msg, err)

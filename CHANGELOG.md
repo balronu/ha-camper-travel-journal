@@ -369,6 +369,12 @@ Siehe [Release Notes](docs/releases/RELEASE_NOTES_v0.3.0.md),
 - Correct expense category editing for canonical and legacy values; improve responsive expense actions and the optional time checkbox.
 - Add responsive overnight-place metrics, robust route-map fitting, saved-place endpoint labels, and an offline GPX route map in PDF reports.
 - Preserve GPX data, distances, manual labels, and existing migration semantics; no external geocoding is required.
+# v0.3.4
+
+- Reuses the existing nullable expense `note` field for an optional multiline note across all categories.
+- Adds safe note editing, clearing, Unicode/newline support, a documented 2,000-character limit, Journal Card rendering, and wrapped bilingual PDF output.
+- Preserves fuel details, amounts, totals, and all existing records without a database migration.
+
 # v0.3.3
 
 - Adds optional fuel liters and price-per-liter fields to create/edit expense forms.

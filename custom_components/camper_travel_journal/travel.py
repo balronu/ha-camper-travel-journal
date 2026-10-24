@@ -16,6 +16,7 @@ class TripStatus(StrEnum):
 EXPENSE_CATEGORY_IDS = ("camping", "fuel", "toll", "parking", "food", "activities", "other")
 EXPENSE_CATEGORIES = frozenset(EXPENSE_CATEGORY_IDS)
 EXPENSE_CURRENCY_PATTERN = re.compile(r"^[A-Z]{3}$")
+MAX_EXPENSE_NOTE_LENGTH = 2000
 
 
 VALID_TRANSITIONS: dict[TripStatus, frozenset[TripStatus]] = {
@@ -57,3 +58,13 @@ def validate_expense_currency(currency: object) -> str:
     if not EXPENSE_CURRENCY_PATTERN.fullmatch(normalized):
         raise ValueError("currency_invalid")
     return normalized
+
+
+def validate_expense_note(note: object) -> str | None:
+    """Normalize the optional expense note without interpreting its contents."""
+    if note is None:
+        return None
+    if not isinstance(note, str) or len(note) > MAX_EXPENSE_NOTE_LENGTH:
+        raise ValueError("expense_note_invalid")
+    normalized = note.strip()
+    return normalized or None

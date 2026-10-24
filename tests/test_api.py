@@ -326,6 +326,19 @@ async def test_create_expense_preserves_canonical_camping_id_over_websocket():
 
 
 @pytest.mark.asyncio
+async def test_expense_note_api_is_optional_unicode_multiline_and_clearable():
+    hass = FakeHass()
+    connection = FakeConnection()
+    note = "Therme & Kurtaxe – Café\nzweite Zeile"
+    await api.ws_create_expense.__wrapped__(hass, connection, {"id": 15, "vehicle_id": "v1", "trip_id": "t1", "category": "camping", "amount_minor": 2300, "currency": "EUR", "note": note})
+    assert hass.worker.calls[-1][1][0].note == note
+    await api.ws_update_expense.__wrapped__(hass, connection, {"id": 16, "vehicle_id": "v1", "expense_id": "e1", "note": None})
+    assert hass.worker.calls[-1][2]["note"] is None
+    await api.ws_create_expense.__wrapped__(hass, connection, {"id": 17, "vehicle_id": "v1", "trip_id": "t1", "category": "camping", "amount_minor": 2300, "currency": "EUR", "note": "x" * 2001})
+    assert connection.errors[-1][2] == "expense_note_invalid"
+
+
+@pytest.mark.asyncio
 async def test_phase3_crud_and_assignment_commands_complete():
     hass = FakeHass()
     connection = FakeConnection()
