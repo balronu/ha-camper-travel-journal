@@ -6,7 +6,7 @@
 
 <h1 align="center">Camper Travel Journal</h1>
 <p align="center">Your digital camper travel journal for Home Assistant</p>
-<p align="center"><strong>Stable: v0.3.4</strong></p>
+<p align="center"><strong>Stable: v0.3.5</strong></p>
 
 <p align="center">
   <a href="https://github.com/balronu/ha-camper-travel-journal/releases/latest"><img src="https://img.shields.io/github/v/release/balronu/ha-camper-travel-journal?label=Release" alt="Release"></a>
@@ -54,7 +54,7 @@ mobile browsers and Home Assistant setups is important.
 1. Open **HACS → Integrations → Custom repositories**.
 2. Add `https://github.com/balronu/ha-camper-travel-journal` as an
    **Integration** repository.
-3. Install the stable `v0.3.4` release.
+3. Install the stable `v0.3.5` release.
 4. Restart Home Assistant manually.
 5. Add the integration under **Settings → Devices & services**.
 
@@ -151,6 +151,14 @@ from that selected trip.
 
 ## GPS recording and GPX import
 
+Live GPS drives are stored idempotently only when the vehicle, start timestamp,
+and end timestamp match exactly. Similar or overlapping intervals are not
+merged automatically. The optional diagnostics card shows the last valid
+tracker timestamp, detector state, end reason, stationary/GPS-gap thresholds,
+and rejection counters without coordinates or route geometry. A stationary
+stop still requires a later valid tracker point; no automatic timer completion
+is enabled.
+
 Recording reacts to tracker events, rejects invalid points and keeps sensitive
 coordinates local.
 
@@ -179,7 +187,7 @@ silently.
 
 The v0.3.1 trip actions remain available in the central Journal Card: resume,
 complete, edit, delete and switch trip, with status-dependent actions and the
-existing delete confirmation. v0.3.4 gives these actions a consistent,
+existing delete confirmation. v0.3.5 gives these actions a consistent,
 responsive button grid with two columns and a single-column fallback below
 420 px; the separate red delete button and its confirmation dialog are
 unchanged.

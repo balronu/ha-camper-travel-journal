@@ -32,6 +32,17 @@ in logs or browser reports.
   has enough samples.
 - Exactly one active trip is required for automatic drive assignment.
 
+The diagnostics also report the configured stationary timeout and GPS-gap
+threshold, the last valid tracker timestamp and its age, the detector state,
+the last drive-end reason, and rejection counters. These fields contain no
+coordinates, route geometry, addresses, or raw event payloads.
+
+Live-drive persistence is idempotent only for an exact `(vehicle_id,
+started_at, ended_at, source='gps')` match. Timestamp tolerances and interval
+overlap are intentionally not treated as proof of duplication, because that
+could merge two real short drives. Manual and GPX drives use separate source
+semantics.
+
 This command and the counters are process-lifetime diagnostics. Persisted
 database totals are read-only aggregate queries; event counters reset when the
 integration starts.

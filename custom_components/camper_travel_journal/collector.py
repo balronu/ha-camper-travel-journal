@@ -28,7 +28,10 @@ class CollectorStats:
     errors: int = 0
     reasons: Counter[str] = field(default_factory=Counter)
     last_event_at: datetime | None = None
+    last_valid_event_at: datetime | None = None
     last_accepted_at: datetime | None = None
+    last_drive_end_at: datetime | None = None
+    last_drive_end_reason: str | None = None
 
 
 class GPSCollector:
@@ -77,6 +80,7 @@ class GPSCollector:
                 self.stats.invalid += validation.reason != "implausible_jump"
                 self.stats.reasons[validation.reason or "invalid"] += 1
                 return
+            self.stats.last_valid_event_at = point.recorded_at
             previous = self._last_stored.get(vehicle_id)
             filter_reason = point_filter_reason(previous, point, int(self.vehicles[vehicle_id].get("min_interval", 30)), float(self.vehicles[vehicle_id].get("min_movement", 25)))
             if filter_reason is not None:
@@ -93,26 +97,33 @@ class GPSCollector:
                 elif event.kind == "drive_started": self.stats.drives += 1
                 elif event.kind == "drive_finished":
                     self.stats.stops += 1
+                    self.stats.last_drive_end_at = event.at
+                    self.stats.last_drive_end_reason = event.drive.end_reason if event.drive else event.reason
                     if event.drive:
                         self.stats.distance_m += event.drive.distance_m
                         if not self.dry_run:
-                            await self.storage.async_insert_drive(event.drive)
+                            stored_drive_id = await self.storage.async_insert_drive(event.drive)
+                            drive_id = stored_drive_id or event.drive.id
                             await self.storage.async_call(
                                 "associate_drive_points",
-                                event.drive.id,
+                                drive_id,
                                 vehicle_id,
                                 event.drive.started_at,
                                 event.drive.ended_at,
                                 "live_detector",
                             )
-                            await self.storage.async_call("auto_assign_drive", vehicle_id, event.drive.id, event.drive.ended_at)
+                            await self.storage.async_call("auto_assign_drive", vehicle_id, drive_id, event.drive.ended_at)
         except (KeyError, TypeError, ValueError, OverflowError, sqlite3.Error, OSError, RuntimeError):
             self.stats.errors += 1
             self.stats.reasons["processing_error"] += 1
 
-    def diagnostics(self, vehicle_id: str) -> dict[str, Any]:
+    def diagnostics(self, vehicle_id: str, now: datetime | None = None) -> dict[str, Any]:
         """Return counters and state without coordinates or private GPS data."""
         detector = self._detectors[vehicle_id]
+        now = ensure_aware_utc(now or datetime.now(timezone.utc))
+        last_event_age = None
+        if self.stats.last_valid_event_at is not None:
+            last_event_age = max(0.0, (now - ensure_aware_utc(self.stats.last_valid_event_at)).total_seconds())
         return {
             "started_at": self.started_at.isoformat(),
             "received_events": self.stats.received,
@@ -120,11 +131,17 @@ class GPSCollector:
             "discarded_events": sum(self.stats.reasons.values()),
             "discard_reasons": dict(sorted(self.stats.reasons.items())),
             "last_tracker_event_at": self._iso(self.stats.last_event_at),
+            "last_valid_tracker_event_at": self._iso(self.stats.last_valid_event_at),
             "last_accepted_point_at": self._iso(self.stats.last_accepted_at),
+            "seconds_since_last_valid_tracker_event": last_event_age,
             "drive_state": detector.state.value,
             "start_candidate_samples": detector.start_count,
             "open_drive": detector.drive_started is not None,
             "gps_gap": detector.state.value == "gps_gap",
+            "last_drive_end_at": self._iso(self.stats.last_drive_end_at),
+            "last_drive_end_reason": self.stats.last_drive_end_reason,
+            "configured_stop_after_seconds": detector.config.stop_after.total_seconds(),
+            "configured_max_gap_seconds": detector.config.max_gap.total_seconds(),
         }
 
     @staticmethod
