@@ -70,6 +70,12 @@ export function messages(hass?: Hass): Messages {
   return { ...(language.startsWith("de") ? de : en), ...(language.startsWith("de") ? mapLabels.de : mapLabels.en) };
 }
 
+export function driveDeleteMessages(hass?: Hass) {
+  return (hass?.locale?.language ?? "").toLowerCase().startsWith("de")
+    ? { label: "Fahrt löschen", title: "Fahrt löschen?", question: "Möchtest du diese Fahrt wirklich löschen?", confirm: "Fahrt löschen", effects: "Die Fahrt wird entfernt. GPS-Rohpunkte, Kosten, Aufenthalte und Reisen bleiben erhalten; dieselbe Fahrt wird nicht automatisch neu erzeugt.", date: "Datum / Uhrzeit" }
+    : { label: "Delete drive", title: "Delete drive?", question: "Do you really want to delete this drive?", confirm: "Delete drive", effects: "The drive is removed. Raw GPS points, costs, stays, and trips remain; the same drive will not be recreated automatically.", date: "Date / time" };
+}
+
 function localeFor(hass?: Hass): string {
   return (hass?.locale?.language ?? "").toLowerCase().startsWith("de") ? "de-DE" : "en-US";
 }

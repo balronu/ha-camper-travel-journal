@@ -443,3 +443,18 @@ Siehe [Release Notes](docs/releases/RELEASE_NOTES_v0.3.0.md),
 - Drive deletion now uses a confirmation dialog; raw GPS points, costs, stays, and trips remain intact.
 - Durable exclusions prevent an explicitly deleted GPS drive from reappearing without suppressing new point sequences.
 - Zero-duration suggestions are no longer created or accepted; ongoing suggestions keep departure unknown.
+# 0.3.11 – Direkte Fahrtlöschung in der zentralen Journal-Card
+
+- Jede GPS-Fahrt kann direkt im jeweiligen Fahrtdetail der zentralen Journal-Card über ein dezentes Papierkorb-Symbol gelöscht werden.
+- Vor der Löschung zeigt ein natives Bestätigungsdialogfeld Datum, Uhrzeit, Strecke und den Erhalt der GPS-Rohpunkte an.
+- Nach erfolgreicher Löschung wird die geöffnete Fahrtenliste unmittelbar aktualisiert.
+- Die bestehende sichere `delete_drive`-API und die dauerhaften Ausschlüsse aus Schema 14 werden wiederverwendet; Aufenthalte, Kosten, Reisen und GPS-Rohdaten bleiben unverändert.
+- Die mobile Dialogbedienung ist für schmale iOS-Ansichten optimiert.
+
+## 0.3.11 – Direct drive deletion in the central Journal Card
+
+- Each GPS drive can be deleted directly from its drive detail in the central Journal Card with a discreet trash icon.
+- A native confirmation dialog shows the date, time, distance, and that raw GPS points will be retained.
+- The open drive list refreshes immediately after a successful deletion.
+- The existing safe `delete_drive` API and Schema 14 durable exclusions are reused; stays, costs, trips, and raw GPS data remain unchanged.
+- The dialog actions are optimized for narrow iOS layouts.

@@ -31,7 +31,7 @@ jobs:
           manifest = json.loads(Path('custom_components/camper_travel_journal/manifest.json').read_text())
           hacs = json.loads(Path('hacs.json').read_text())
           assert manifest['domain'] == 'camper_travel_journal'
-          assert manifest['version'] == '0.3.10'
+          assert manifest['version'] == '0.3.11'
           assert manifest['config_flow'] is True
           assert hacs['homeassistant'] == '2026.10.1'
           PY
@@ -42,8 +42,8 @@ jobs:
           python - <<'PY'
           import json
           from pathlib import Path
-          assert json.loads(Path('frontend/package.json').read_text())['version'] == '0.3.10'
-          assert '0.3.10' in Path('custom_components/camper_travel_journal/const.py').read_text()
+          assert json.loads(Path('frontend/package.json').read_text())['version'] == '0.3.11'
+          assert '0.3.11' in Path('custom_components/camper_travel_journal/const.py').read_text()
           PY
 
   secret-scan:

@@ -6,7 +6,7 @@
 
 <h1 align="center">Camper Travel Journal</h1>
 <p align="center">Dein digitales Wohnmobil-Reisetagebuch für Home Assistant</p>
-<p align="center"><strong>Stable: v0.3.10</strong></p>
+<p align="center"><strong>Stable: v0.3.11</strong></p>
 
 <p align="center">
   <a href="https://github.com/balronu/ha-camper-travel-journal/releases/latest"><img src="https://img.shields.io/github/v/release/balronu/ha-camper-travel-journal?label=Release" alt="Release"></a>
@@ -93,7 +93,7 @@ bereits vorhandene, bestätigte oder verworfene Vorschläge werden übersprungen
 1. Öffne **HACS → Integrationen → Benutzerdefinierte Repositories**.
 2. Füge `https://github.com/balronu/ha-camper-travel-journal` als Repository
    vom Typ **Integration** hinzu.
-3. Installiere die stabile Version `v0.3.10`.
+3. Installiere die stabile Version `v0.3.11`.
 4. Starte Home Assistant manuell neu.
 5. Füge die Integration unter **Einstellungen → Geräte & Dienste** hinzu.
 
