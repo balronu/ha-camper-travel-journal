@@ -6,7 +6,7 @@
 
 <h1 align="center">Camper Travel Journal</h1>
 <p align="center">Dein digitales Wohnmobil-Reisetagebuch für Home Assistant</p>
-<p align="center"><strong>Stable: v0.3.11</strong></p>
+<p align="center"><strong>Stable: v0.3.12</strong></p>
 
 <p align="center">
   <a href="https://github.com/balronu/ha-camper-travel-journal/releases/latest"><img src="https://img.shields.io/github/v/release/balronu/ha-camper-travel-journal?label=Release" alt="Release"></a>
@@ -93,7 +93,7 @@ bereits vorhandene, bestätigte oder verworfene Vorschläge werden übersprungen
 1. Öffne **HACS → Integrationen → Benutzerdefinierte Repositories**.
 2. Füge `https://github.com/balronu/ha-camper-travel-journal` als Repository
    vom Typ **Integration** hinzu.
-3. Installiere die stabile Version `v0.3.11`.
+3. Installiere die stabile Version `v0.3.12`.
 4. Starte Home Assistant manuell neu.
 5. Füge die Integration unter **Einstellungen → Geräte & Dienste** hinzu.
 
@@ -192,9 +192,13 @@ Kennzahlen und Aktionen immer aus derselben Reise.
 
 ## GPS-Aufzeichnung und GPX-Import
 
-Live-GPS-Fahrten werden bei exakt identischem Fahrzeug sowie Start- und
-Endzeitpunkt idempotent gespeichert. Ähnliche oder überlappende Zeitintervalle
-werden nicht automatisch zusammengeführt. Die optionale Diagnosekarte zeigt
+Live-GPS-Fahrten werden bei identischem Fahrzeug und identischen GPS-Punkten
+idempotent gespeichert. Bei leicht abweichenden Abschlusszeiten werden nur
+Intervalle mit mindestens zwei gemeinsamen Punkten und mindestens 80 %
+gemeinsamer Punktfolge zusammengeführt; echte Folgefahrten mit nur einem
+gemeinsamen Grenzpunkt bleiben getrennt. Ein Stillstands-Timeout bestätigt das
+Fahrtende, speichert aber den letzten belastbaren Bewegungspunkt als tatsächliche
+Endzeit. Die optionale Diagnosekarte zeigt
 letzten gültigen Trackerzeitpunkt, Detektorzustand, Abschlussursache,
 Stillstands-/Gap-Schwellwerte und Verwerfungszähler ohne Koordinaten oder
 Routen. Ein Stillstand wird weiterhin erst durch einen nachfolgenden gültigen

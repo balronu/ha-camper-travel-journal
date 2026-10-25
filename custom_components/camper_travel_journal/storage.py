@@ -661,6 +661,15 @@ class SQLiteStore:
                 ).fetchone()
                 if existing is not None:
                     return existing[0]
+                # A timeout/reload can produce the same physical track with a
+                # slightly different boundary. Prefer shared persisted GPS
+                # point identities over fuzzy timestamps: at least two points
+                # must overlap and cover 80% of the smaller interval. One
+                # shared boundary point is insufficient, so adjacent real
+                # drives remain separate.
+                candidate = self._find_matching_gps_drive(connection, drive)
+                if candidate is not None:
+                    return candidate
             stamp = utc_iso(drive.ended_at)
             connection.execute("INSERT OR IGNORE INTO drives(id,vehicle_id,started_at,ended_at,distance_m,end_reason,manual_distance_km,source,start_label,end_label,start_latitude,start_longitude,end_latitude,end_longitude,created_at) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)", (drive.id, drive.vehicle_id, utc_iso(drive.started_at), utc_iso(drive.ended_at), drive.distance_m, drive.end_reason, drive.manual_distance_km, drive.source, drive.start_label, drive.end_label, drive.start_latitude, drive.start_longitude, drive.end_latitude, drive.end_longitude, stamp))
             if drive.source == "gps":
@@ -676,6 +685,33 @@ class SQLiteStore:
                     connection.execute("DELETE FROM drives WHERE id=?", (drive.id,))
                     return canonical
             return drive.id
+
+    @staticmethod
+    def _interval_point_ids(connection, vehicle_id: str, started_at: str, ended_at: str) -> set[int]:
+        rows = connection.execute(
+            "SELECT id FROM gps_points WHERE vehicle_id=? AND recorded_at>=? AND recorded_at<=?",
+            (vehicle_id, started_at, ended_at),
+        ).fetchall()
+        return {row[0] for row in rows}
+
+    def _find_matching_gps_drive(self, connection, drive) -> str | None:
+        started_at, ended_at = utc_iso(drive.started_at), utc_iso(drive.ended_at)
+        candidate_points = self._interval_point_ids(connection, drive.vehicle_id, started_at, ended_at)
+        if len(candidate_points) < 2:
+            return None
+        rows = connection.execute(
+            "SELECT id,started_at,ended_at FROM drives "
+            "WHERE vehicle_id=? AND source='gps' AND started_at < ? AND ended_at > ? "
+            "ORDER BY created_at,id",
+            (drive.vehicle_id, ended_at, started_at),
+        ).fetchall()
+        for existing_id, existing_started, existing_ended in rows:
+            existing_points = self._interval_point_ids(connection, drive.vehicle_id, existing_started, existing_ended)
+            shared = len(candidate_points & existing_points)
+            smaller = min(len(candidate_points), len(existing_points))
+            if shared >= 2 and smaller and shared / smaller >= 0.8:
+                return existing_id
+        return None
 
     @staticmethod
     def _point_fingerprint(connection, vehicle_id: str, started_at: str, ended_at: str) -> tuple[str, int]:
