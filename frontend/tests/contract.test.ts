@@ -13,10 +13,10 @@ const bundle = resolve(root, "../custom_components/camper_travel_journal/fronten
 
 describe("frontend release contract", () => {
   it("keeps backend, npm metadata and beta bundle aligned", () => {
-    expect(manifest.version).toBe("0.3.10");
+    expect(manifest.version).toBe("0.3.11");
     expect(pkg.version).toBe(manifest.version);
     expect(existsSync(bundle)).toBe(true);
-    expect(readFileSync(resolve(root, "../custom_components/camper_travel_journal/const.py"), "utf8")).toContain('FRONTEND_VERSION = "0.3.10"');
+    expect(readFileSync(resolve(root, "../custom_components/camper_travel_journal/const.py"), "utf8")).toContain('FRONTEND_VERSION = "0.3.11"');
   });
   it("registers the central card in the catalog while retaining legacy elements", () => {
     const source = readFileSync(resolve(root, "src/index.ts"), "utf8");
@@ -121,6 +121,18 @@ describe("frontend release contract", () => {
     expect(manager).toContain("expenseNote");
     expect(manager).toContain("maxlength=\"2000\"");
     expect(manager).toContain("white-space:pre-wrap");
+  });
+  it("exposes direct central-drive deletion with the shared safe API and bilingual confirmation", () => {
+    const journal = readFileSync(resolve(root, "src/journal-card.ts"), "utf8");
+    const api = readFileSync(resolve(root, "src/api.ts"), "utf8");
+    const i18n = readFileSync(resolve(root, "src/i18n.ts"), "utf8");
+    expect(journal).toContain("deleteDrive");
+    expect(journal).toContain('class="drive-delete-icon"');
+    expect(journal).toContain('class="drive-delete-dialog"');
+    expect(journal).toContain("notifyTravelChanged");
+    expect(api).toContain('"camper_travel_journal/delete_drive"');
+    expect(i18n).toContain("Raw GPS points");
+    expect(i18n).toContain("GPS-Rohpunkte");
   });
   it("makes historical suggestion refresh observable and single-flight", () => {
     const manager = readFileSync(resolve(root, "src/manager-card.ts"), "utf8");

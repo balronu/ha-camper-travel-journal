@@ -1,9 +1,9 @@
 import { css, html } from "lit";
 import { TravelCard, defineOnce } from "./base-card";
-import { assignInterruption, createStopFromInterruption, list, listVehicles, type Snapshot, type Trip, type TripInterruption } from "./api";
+import { assignInterruption, createStopFromInterruption, deleteDrive, list, listVehicles, type Drive, type Snapshot, type Trip, type TripInterruption } from "./api";
 import { clearActiveTrip, publishActiveTrip, readActiveTrip, type TripContextDetail, ACTIVE_TRIP_CHANGED_EVENT } from "./trip-context";
-import { TRAVEL_DATA_CHANGED_EVENT } from "./expense-events";
-import { formatDateTime, formatDuration, formatMoneyMinor, formatTripPeriod, messages, statusLabel } from "./i18n";
+import { notifyTravelChanged, TRAVEL_DATA_CHANGED_EVENT } from "./expense-events";
+import { driveDeleteMessages, formatDateTime, formatDuration, formatMoneyMinor, formatTripPeriod, messages, statusLabel } from "./i18n";
 
 type JournalConfig = { vehicle_id: string };
 
@@ -39,6 +39,8 @@ export class JournalCard extends TravelCard {
   private interruptionDescription = "";
   private interruptionWebsite = "";
   private interruptionSaving = false;
+  private deletingDrive?: Drive;
+  private driveDeleting = false;
   private overviewRequest = 0;
   private detailRequest = 0;
 
@@ -57,9 +59,14 @@ export class JournalCard extends TravelCard {
   protected onConfigChanged() { this.closeTrip(false); void this.refreshOverview(); }
   protected updated() {
     const dialog = this.renderRoot.querySelector("dialog.interruption-dialog") as HTMLDialogElement | null;
-    if (!dialog) return;
-    if (this.interruptionDialog && !dialog.open) dialog.showModal();
-    if (!this.interruptionDialog && dialog.open) dialog.close();
+    if (dialog) {
+      if (this.interruptionDialog && !dialog.open) dialog.showModal();
+      if (!this.interruptionDialog && dialog.open) dialog.close();
+    }
+    const driveDialog = this.renderRoot.querySelector("dialog.drive-delete-dialog") as HTMLDialogElement | null;
+    if (!driveDialog) return;
+    if (this.deletingDrive && !driveDialog.open) driveDialog.showModal();
+    if (!this.deletingDrive && driveDialog.open) driveDialog.close();
   }
 
   private async refreshOverview(): Promise<boolean> {
@@ -98,6 +105,21 @@ export class JournalCard extends TravelCard {
   }
   private closeTrip(confirm = true) {
     this.openTripId = ""; this.detail = undefined; clearActiveTrip(this.vehicleId, "journal"); this.requestUpdate();
+  }
+  private openDriveDeleteDialog(drive: Drive) { if (this.driveDeleting) return; this.deletingDrive = drive; this.requestUpdate(); }
+  private closeDriveDeleteDialog() { if (this.driveDeleting) return; this.deletingDrive = undefined; this.requestUpdate(); }
+  private async confirmDriveDelete() {
+    if (!this.hass || !this.deletingDrive || this.driveDeleting || !this.openTripId) return;
+    const drive = this.deletingDrive;
+    this.driveDeleting = true; this.requestUpdate();
+    try {
+      await deleteDrive(this.hass, this.vehicleId, drive.id);
+      this.deletingDrive = undefined;
+      const refreshed = await this.refreshOverview();
+      if (!refreshed) throw new Error("refresh_failed");
+      notifyTravelChanged({ vehicleId: this.vehicleId, tripId: this.openTripId });
+    } catch { this.error = messages(this.hass).driveDeleteError ?? messages(this.hass).loadError; }
+    finally { this.driveDeleting = false; this.requestUpdate(); }
   }
   private trip() { return this.overview?.trips.find((trip) => trip.id === this.openTripId) ?? this.detail?.trips.find((trip) => trip.id === this.openTripId); }
   private async onTripCreated(event: Event) {
@@ -170,6 +192,11 @@ export class JournalCard extends TravelCard {
     if (!current.open) return;
     this.shadowRoot?.querySelectorAll<HTMLDetailsElement>(".journal-section details").forEach((details) => { if (details !== current) details.open = false; });
   }
+  private renderDriveDeleteDialog(lang: ReturnType<typeof messages>) {
+    const drive = this.deletingDrive;
+    const text = driveDeleteMessages(this.hass);
+    return html`<dialog class="drive-delete-dialog" @cancel=${(event: Event) => { event.preventDefault(); this.closeDriveDeleteDialog(); }}><form method="dialog" @submit=${(event: SubmitEvent) => { event.preventDefault(); void this.confirmDriveDelete(); }}><h3>${text.title}</h3>${drive ? html`<p>${text.question}</p><dl><dt>${text.date}</dt><dd>${formatDateTime(drive.started_at, this.hass)}${drive.ended_at ? ` → ${formatDateTime(drive.ended_at, this.hass)}` : ""}</dd><dt>${lang.distance}</dt><dd>${(drive.distance_m / 1000).toFixed(1)} km</dd></dl><p class="muted">${text.effects}</p>` : ""}<div class="dialog-actions"><button type="button" class="secondary" @click=${() => this.closeDriveDeleteDialog()}>${lang.cancel}</button><button type="submit" class="danger" ?disabled=${this.driveDeleting}>${this.driveDeleting ? lang.saving : text.confirm}</button></div></form></dialog>`;
+  }
   private renderPicker(lang: ReturnType<typeof messages>) {
     const trips = this.overview?.trips ?? [];
     return html`<section class="entry" aria-labelledby="journal-entry-title"><div class="entry-icon" aria-hidden="true">🚐</div><h2 id="journal-entry-title">${lang.journalEntry ?? "Reise auswählen oder neu anlegen"}</h2><p class="muted">${lang.journalEntryHint ?? "Öffne eine Reise, um ihre Fahrten, Orte, Karte und Exporte zu sehen."}</p>${trips.length ? html`<label class="picker-label">${lang.journalSelect ?? "Reise auswählen"}<select aria-label=${lang.journalSelect ?? "Reise auswählen"} .value=${this.selectedTripId} @change=${(event: Event) => { this.selectedTripId = (event.currentTarget as HTMLSelectElement).value; this.requestUpdate(); }}><option value="">${lang.journalChoose ?? "Bitte auswählen …"}</option>${trips.map((trip) => html`<option value=${trip.id}>${trip.title} · ${statusLabel(trip.status, this.hass)} · ${formatTripPeriod(trip, this.hass)}</option>`)}</select></label>` : html`<p class="muted">${lang.noTrip}</p>`}<div class="actions"><button type="button" @click=${() => void this.openTrip() } ?disabled=${!this.selectedTripId || this.loading}>${lang.journalOpen ?? "Reise öffnen"}</button><button type="button" class="secondary" @click=${() => this.openTripCreateDialog()}>${lang.newTrip}</button></div><camper-travel-journal-manager-card .config=${{ vehicle_id: this.vehicleId, journal_section: "trip-create" }} .hass=${this.hass} @trip-created=${(event: Event) => void this.onTripCreated(event)}></camper-travel-journal-manager-card></section>`;
@@ -187,7 +214,7 @@ export class JournalCard extends TravelCard {
     const timeline = [...(snapshot?.drives ?? [])].sort((left, right) => left.started_at.localeCompare(right.started_at)).flatMap((drive) => {
       const following = interruptions.find((item) => item.previous_drive_id === drive.id);
       const assigned = (snapshot?.stops ?? []).find((stop) => stop.id === following?.existing_place_id);
-      return [html`<article class="drive-item"><strong>${lang.drive ?? "Fahrt"}</strong><span>${formatDateTime(drive.started_at, this.hass)} → ${drive.ended_at ? formatDateTime(drive.ended_at, this.hass) : (lang.notAvailable ?? "Nicht verfügbar")}</span><span>${(drive.distance_m / 1000).toFixed(1)} km · ${drive.duration_seconds ? formatDuration(drive.duration_seconds, this.hass) : "–"} · ${drive.source === "gpx" ? (lang.sourceGpx ?? "GPX-importiert") : drive.source === "manual" ? lang.sourceManual : lang.sourceGps}</span></article>`, ...(following ? [html`<article class="interruption-item"><strong>${following.status === "pause" ? (lang.drivePause ?? "Fahrtpause") : following.status === "ignored" ? (lang.interruptionIgnored ?? "Ignoriert") : assigned ? `${lang.assignedStay ?? "Aufenthalt"}: ${assigned.name}` : (lang.interruptionUnassigned ?? "Nicht zugeordnet")}</strong><span>${formatDateTime(following.started_at, this.hass)} → ${formatDateTime(following.ended_at, this.hass)} · ${formatDuration(following.duration_seconds, this.hass)}</span>${following.status === "unassigned" ? html`<button type="button" class="compact-action" @click=${() => this.openInterruptionDialog(following)}>${lang.assignStay ?? "Aufenthalt zuordnen"}</button>` : ""}</article>`] : [])];
+      return [html`<article class="drive-item"><div class="drive-heading"><strong>${lang.drive ?? "Fahrt"}</strong><button type="button" class="drive-delete-icon" aria-label=${lang.driveDelete ?? "Fahrt löschen"} title=${lang.driveDelete ?? "Fahrt löschen"} ?disabled=${this.driveDeleting} @click=${() => this.openDriveDeleteDialog(drive)}>🗑️</button></div><span>${formatDateTime(drive.started_at, this.hass)} → ${drive.ended_at ? formatDateTime(drive.ended_at, this.hass) : (lang.notAvailable ?? "Nicht verfügbar")}</span><span>${(drive.distance_m / 1000).toFixed(1)} km · ${drive.duration_seconds ? formatDuration(drive.duration_seconds, this.hass) : "–"} · ${drive.source === "gpx" ? (lang.sourceGpx ?? "GPX-importiert") : drive.source === "manual" ? lang.sourceManual : lang.sourceGps}</span></article>`, ...(following ? [html`<article class="interruption-item"><strong>${following.status === "pause" ? (lang.drivePause ?? "Fahrtpause") : following.status === "ignored" ? (lang.interruptionIgnored ?? "Ignoriert") : assigned ? `${lang.assignedStay ?? "Aufenthalt"}: ${assigned.name}` : (lang.interruptionUnassigned ?? "Nicht zugeordnet")}</strong><span>${formatDateTime(following.started_at, this.hass)} → ${formatDateTime(following.ended_at, this.hass)} · ${formatDuration(following.duration_seconds, this.hass)}</span>${following.status === "unassigned" ? html`<button type="button" class="compact-action" @click=${() => this.openInterruptionDialog(following)}>${lang.assignStay ?? "Aufenthalt zuordnen"}</button>` : ""}</article>`] : [])];
     });
     return html`<header class="trip-header"><div><p class="eyebrow">${lang.journalOpenTrip ?? "Geöffnete Reise"}</p><h2>${trip.title}</h2><p class="muted">${trip.destination || lang.noDestination} · ${formatTripPeriod(trip, this.hass)} · ${statusLabel(trip.status, this.hass)}${this.vehicleName ? ` · ${this.vehicleName}` : ""}</p><div class="trip-management" @trip-switch=${() => this.closeTrip()}>${manager("trip-actions")}</div></div></header>
       ${this.section(lang.journalOverview ?? "Reiseübersicht", "▣", undefined, html`<div class="metric-grid"><div><span>${lang.distance}</span><strong>${km.toFixed(1)} km</strong></div><div><span>${lang.drives}</span><strong>${snapshot?.drives.length ?? 0}</strong></div><div><span>${lang.stops}</span><strong>${confirmed.filter((stop) => !overnightKinds.has(stop.place_kind || stop.place_type || stop.stop_type)).length}</strong></div><div><span>${lang.overnights ?? "Übernachtungsplätze"}</span><strong>${overnights.length}</strong></div><div><span>${lang.costs}</span><strong>${total}</strong></div></div>`)}
@@ -204,13 +231,24 @@ export class JournalCard extends TravelCard {
   render() {
     const lang = messages(this.hass);
     const trip = this.trip();
-    return html`<ha-card><h1>${lang.title}</h1>${!trip ? this.renderPicker(lang) : this.renderOpenTrip(lang, trip)}${this.error && !trip ? html`<p class="error" role="alert">${this.error}</p>` : ""}${this.loading && !trip ? html`<p class="muted" role="status">${lang.loading}</p>` : ""}</ha-card>`;
+    return html`<ha-card><h1>${lang.title}</h1>${!trip ? this.renderPicker(lang) : this.renderOpenTrip(lang, trip)}${this.error && !trip ? html`<p class="error" role="alert">${this.error}</p>` : ""}${this.loading && !trip ? html`<p class="muted" role="status">${lang.loading}</p>` : ""}</ha-card>${this.renderDriveDeleteDialog(lang)}`;
   }
 }
 
 JournalCard.styles = [TravelCard.styles, css`
   :host { min-width: 0; } ha-card { padding: 0; overflow: hidden; } h1 { margin: 0; padding: 18px 18px 12px; font-size: 1.35rem; } h2 { margin: 0; } .entry, .trip-header { padding: 18px; } .entry { text-align: center; } .entry-icon { font-size: 2.4rem; } .entry h2 { margin: 8px 0; } .picker-label { display: grid; gap: 6px; text-align: left; margin: 18px 0 0; } select, input, textarea { box-sizing: border-box; min-width: 0; width: 100%; border: 1px solid var(--divider-color); border-radius: 8px; padding: 9px; background: var(--card-background-color); color: var(--primary-text-color); font: inherit; } .trip-header { display: flex; justify-content: space-between; gap: 14px; align-items: start; border-block: 1px solid var(--divider-color); background: var(--secondary-background-color); } .eyebrow { margin: 0 0 4px; color: var(--secondary-text-color); font-size: .78rem; text-transform: uppercase; letter-spacing: .04em; } .muted { color: var(--secondary-text-color); } .actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; } .form-grid { display: grid; grid-template-columns: repeat(auto-fit,minmax(9rem,1fr)); gap: 10px; align-items: end; } .form-grid label { display: grid; gap: 5px; text-align: left; } .new-trip { margin-top: 16px; padding: 14px; border: 1px solid var(--divider-color); border-radius: 10px; text-align: left; } .journal-section { border-bottom: 1px solid var(--divider-color); } .journal-section details { padding: 0 18px; } .journal-section summary { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 14px 0; cursor: pointer; list-style: none; } .journal-section summary::-webkit-details-marker { display:none; } .section-title { display: flex; gap: 9px; align-items: center; } .section-title span { color: var(--primary-color); width: 1.2em; text-align: center; } .count { color: var(--secondary-text-color); } .section-content { padding: 0 0 16px; min-width: 0; } .metric-grid { display: grid; grid-template-columns: repeat(auto-fit,minmax(7rem,1fr)); gap: 8px; } .metric-grid > div { min-width: 0; padding: 10px; border-radius: 9px; background: var(--secondary-background-color); } .metric-grid span, .metric-grid strong { display: block; min-width: 0; overflow-wrap: anywhere; word-break: normal; } .metric-grid span { color: var(--secondary-text-color); font-size: .78rem; line-height: 1.2; } .metric-grid strong { margin-top: 3px; } .drive-item, .interruption-item { display: grid; gap: 3px; padding: 10px; margin-bottom: 7px; border-radius: 8px; background: var(--secondary-background-color); } .interruption-item { border-inline-start: 4px solid var(--warning-color, #f57c00); } camper-travel-journal-manager-card, camper-travel-journal-map-card { display: block; min-width: 0; } button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible, summary:focus-visible { outline: 2px solid var(--primary-color); outline-offset: 2px; } @media (max-width: 600px) { h1 { padding: 14px; } .entry, .trip-header { padding: 14px; } .trip-header { flex-direction: column; } .trip-header button { width: 100%; } .journal-section details { padding-inline: 14px; } .form-grid { grid-template-columns: 1fr; } .metric-grid { grid-template-columns: repeat(2,minmax(0,1fr)); } }
   .compact-action { justify-self: start; padding: 5px 8px; font-size: .85em; }
+  .drive-heading { display:flex; justify-content:space-between; align-items:center; gap:8px; }
+  .drive-delete-icon { min-height:32px; min-width:32px; padding:4px; border-radius:50%; color:var(--secondary-text-color); background:transparent; font-size:1rem; line-height:1; }
+  .drive-delete-icon:hover, .drive-delete-icon:focus-visible { color:var(--error-color,#c62828); background:var(--secondary-background-color); }
+  .drive-delete-dialog { width:min(34rem,calc(100vw - 2rem)); max-width:calc(100vw - 2rem); padding:0; border:0; border-radius:12px; color:var(--primary-text-color); background:var(--card-background-color); }
+  .drive-delete-dialog::backdrop { background:rgb(0 0 0 / .5); }
+  .drive-delete-dialog form { display:grid; gap:12px; padding:18px; }
+  .drive-delete-dialog dl { display:grid; grid-template-columns:auto minmax(0,1fr); gap:4px 12px; margin:0; }
+  .drive-delete-dialog dt { color:var(--secondary-text-color); }
+  .drive-delete-dialog dd { margin:0; }
+  .danger { color:var(--text-primary-color,#fff); background:var(--error-color,#c62828); }
+  @media(max-width:650px) { .drive-delete-dialog { width:calc(100vw - 1rem); max-width:calc(100vw - 1rem); } .drive-delete-dialog .dialog-actions { flex-direction:column-reverse; } .drive-delete-dialog .dialog-actions button { width:100%; } }
   dialog { max-width: min(32rem, calc(100vw - 2rem)); width: calc(100% - 2rem); border: 0; border-radius: 12px; padding: 0; color: var(--primary-text-color); background: var(--card-background-color); }
   dialog::backdrop { background: rgb(0 0 0 / .48); }
   dialog form { display: grid; gap: 12px; padding: 18px; }
