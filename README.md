@@ -54,6 +54,8 @@ Installationen bleibt wichtig.
 - Zentrale Journal Card für neue Dashboards: Reise auswählen, öffnen,
   bearbeiten, fortsetzen, pausieren, beenden, löschen oder wechseln; alle
   Reisebereiche verwenden denselben Reisekontext.
+- Ein laufender Aufenthalt wird beim Beginn einer neuen Fahrt automatisch
+  abgeschlossen. Der erneute reale Praxistest dieses Ablaufs steht noch aus.
 
 ### Kraftstoffkosten
 
@@ -292,6 +294,12 @@ Weiter geplant sind unter anderem erweiterte Statistiken, Exporte und
 vollständige Lovelace-Verwaltung von Zwischenstopps. Die Kartenansicht, die
 zentrale Journal Card und der authentifizierte PDF-Reisebericht sind Bestandteil
 von v0.3.0.
+
+### v0.4.0 – ausschließlich geplant
+
+Für v0.4.0 sind eine modularere Journal-Oberfläche und optionale Schnittstellen
+zu eigenständigen Camper-Integrationen vorgesehen. Diese Punkte sind geplante
+Weiterentwicklung und gehören nicht zum aktuellen Stable-Stand.
 
 ## Support und Mitwirkung
 

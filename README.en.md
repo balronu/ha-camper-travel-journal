@@ -51,6 +51,8 @@ mobile browsers and Home Assistant setups is important.
 - A central Journal Card for new dashboards: select, open, edit, resume,
   pause, complete, delete or switch a trip while all trip sections use the
   same trip context.
+- A running stay is automatically completed when the next drive starts. A
+  renewed real-world practical test of this flow is still outstanding.
 
 ## HACS installation
 
@@ -260,6 +262,12 @@ See the status-separated [docs/ROADMAP.md](docs/ROADMAP.md). Planned work
 includes expanded statistics, exports and complete Lovelace stop management.
 The map view, central Journal Card and authenticated PDF travel reports are
 part of v0.3.0.
+
+### v0.4.0 – planned only
+
+v0.4.0 is planned to provide a more modular journal interface and optional
+interfaces to independent camper integrations. These are planned follow-up
+work and are not part of the current Stable release.
 
 ## Support and contributing
 
