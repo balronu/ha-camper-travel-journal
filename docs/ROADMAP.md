@@ -1,7 +1,7 @@
 # Camper Travel Journal – Roadmap
 
 This roadmap separates implemented work, current limitations and planned
-features. It is based on the released `v0.3.2` source tree and tests.
+features. It is based on the released `v0.3.13` source tree and tests.
 A database
 table or WebSocket method is not treated as a finished user feature
 without a corresponding UI and test path.
@@ -21,7 +21,7 @@ without a corresponding UI and test path.
 - Expense CRUD, integer-cent totals, mixed-currency protection, inline editing
   and canonical category IDs, including the `camping` round-trip.
 
-## Current stable baseline: `v0.3.2`
+## Current stable baseline: `v0.3.13`
 
 The stable baseline includes deterministic active-trip selection, persistent
 Summary Card trip selection, the central Journal Card, GPX import, place and
@@ -87,7 +87,18 @@ remain outside the repository and CI artifacts.
 - Add complete stop creation, editing and deletion to Lovelace.
 - Add acceptance tests for reload, empty data, failures and mobile layout.
 
-## `v0.4.x` – planned travel views
+## `v0.4.0` – planned modular journal interface
+
+The following items are planned only and are not part of the current Stable
+release:
+
+- A more modular Journal interface.
+- Optional interfaces to independent camper integrations.
+
+No implementation or compatibility commitment is implied by this planning
+entry.
+
+## `v0.4.x` – further planned travel views
 
 - Map view and trip route history.
 - Drive, distance and stop statistics.
