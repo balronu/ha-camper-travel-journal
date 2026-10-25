@@ -430,3 +430,16 @@ Siehe [Release Notes](docs/releases/RELEASE_NOTES_v0.3.0.md),
 
 - **DE:** Der Button „Vorschläge aktualisieren“ zeigt jetzt Lade-, Erfolgs- und Fehlerzustände auch in der eingebetteten Journal-Card und verhindert parallele Requests.
 - **EN:** “Refresh suggestions” now shows loading, success and error states in the embedded journal card and prevents concurrent requests.
+# 0.3.10 – Sichere Fahrtlöschung und laufende GPS-Aufenthalte
+
+## Deutsch
+
+- Fahrtlöschung mit Bestätigungsdialog; GPS-Rohpunkte, Kosten, Aufenthalte und Reisen bleiben erhalten.
+- Dauerhafte Ausschlüsse verhindern die Wiedererzeugung einer ausdrücklich gelöschten GPS-Fahrt, ohne neue Punktfolgen pauschal zu blockieren.
+- Null-Minuten-Vorschläge werden nicht mehr erzeugt oder übernommen; laufende Vorschläge bleiben ohne Abfahrtszeit.
+
+## English
+
+- Drive deletion now uses a confirmation dialog; raw GPS points, costs, stays, and trips remain intact.
+- Durable exclusions prevent an explicitly deleted GPS drive from reappearing without suppressing new point sequences.
+- Zero-duration suggestions are no longer created or accepted; ongoing suggestions keep departure unknown.

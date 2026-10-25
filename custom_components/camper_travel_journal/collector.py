@@ -107,7 +107,13 @@ class GPSCollector:
                         self.stats.distance_m += event.drive.distance_m
                         if not self.dry_run:
                             stored_drive_id = await self.storage.async_insert_drive(event.drive)
-                            drive_id = stored_drive_id or event.drive.id
+                            if stored_drive_id is None:
+                                # A user-deleted GPS interval is durably
+                                # excluded; do not recreate memberships or
+                                # count a failed association as a collector
+                                # error.
+                                continue
+                            drive_id = stored_drive_id
                             await self.storage.async_call(
                                 "associate_drive_points",
                                 drive_id,
