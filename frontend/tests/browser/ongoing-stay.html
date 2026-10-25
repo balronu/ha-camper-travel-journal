@@ -1,0 +1,42 @@
+<!doctype html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Camper Travel Journal ongoing stay regression</title>
+<div id="host"></div><pre id="result">starting</pre>
+<script type="module">
+const result = document.querySelector("#result");
+const trip = { id: "trip-1", title: "Synthetische Stadionreise", description: "", destination: "", status: "active", started_at: "2026-10-25T06:00:00Z", ended_at: null };
+const snapshot = {
+  trips: [trip], drives: [], interruptions: [], expenses: [], expense_summary: { total_minor: 0, currency: "EUR", mixed_currency: false },
+  stops: [
+    { id: "open-stay", trip_id: trip.id, name: "Dietmar-Hopp-Stadion", occurred_at: "2026-10-25T07:10:47Z", arrived_at: "2026-10-25T07:10:47Z", departed_at: null, place_type: "other", place_kind: "other", stop_type: "other", confirmed: true },
+    { id: "closed-stay", trip_id: trip.id, name: "Abgeschlossener Ort", occurred_at: "2026-10-25T05:00:00Z", arrived_at: "2026-10-25T05:00:00Z", departed_at: "2026-10-25T06:30:00Z", duration_seconds: 5400, place_type: "other", place_kind: "other", stop_type: "other", confirmed: true },
+  ],
+  stop_suggestions: [
+    { id: "open-suggestion", trip_id: trip.id, arrived_at: "2026-10-25T07:10:00Z", departed_at: null, latitude: 49, longitude: 8, status: "pending" },
+    { id: "closed-suggestion", trip_id: trip.id, arrived_at: "2026-10-25T09:00:00Z", departed_at: "2026-10-25T10:00:00Z", latitude: 49, longitude: 8, status: "pending" },
+  ],
+};
+const hass = { locale: { language: "de-DE" }, connection: { async sendMessagePromise(message) { if (message.type !== "camper_travel_journal/list") throw new Error(`unexpected ${message.type}`); return snapshot; } } };
+await import("/custom_components/camper_travel_journal/frontend/camper-travel-journal.js");
+await customElements.whenDefined("camper-travel-journal-manager-card");
+const card = document.createElement("camper-travel-journal-manager-card");
+card.setConfig({ vehicle_id: "camper", trip_id: trip.id, journal_section: "places" });
+card.hass = hass;
+document.querySelector("#host").append(card);
+const waitFor = async (predicate) => { for (let i = 0; i < 200; i += 1) { if (predicate()) return; await new Promise((resolve) => setTimeout(resolve, 25)); } throw new Error("ongoing stay harness timed out"); };
+await waitFor(() => card.shadowRoot?.textContent.includes("Dietmar-Hopp-Stadion"));
+const text = card.shadowRoot.textContent;
+const list = card.shadowRoot.querySelector(".place-list");
+const openRow = [...card.shadowRoot.querySelectorAll(".place-row")].find((row) => row.textContent.includes("Dietmar-Hopp-Stadion"));
+const closedRow = [...card.shadowRoot.querySelectorAll(".place-row")].find((row) => row.textContent.includes("Abgeschlossener Ort"));
+const suggestions = [...card.shadowRoot.querySelectorAll(".place-section ul li")].map((item) => item.textContent);
+result.textContent = JSON.stringify({
+  openStay: Boolean(openRow && openRow.textContent.includes("Seit") && openRow.textContent.includes("Aufenthalt läuft")),
+  closedStayKeepsDateAndDuration: Boolean(closedRow && !closedRow.textContent.includes("Seit") && closedRow.textContent.includes("1 h 30 min")),
+  openSuggestionHasNoEqualEnd: Boolean(suggestions[0]?.includes("Seit") && suggestions[0]?.includes("Aufenthalt läuft") && !suggestions[0]?.includes(" – ")),
+  closedSuggestionKeepsRange: Boolean(suggestions[1]?.includes(" – ") && !suggestions[1]?.includes("Aufenthalt läuft")),
+  noHorizontalOverflow: Boolean(list && list.scrollWidth <= list.clientWidth + 1),
+  visibleTemplateLeak: /lit\$\d|=>\s*this\.|currentTarget\.value/.test(text),
+}, null, 2);
+</script>

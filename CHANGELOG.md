@@ -1,5 +1,25 @@
 # Änderungsprotokoll
 
+## 0.3.13 – Stable laufende Aufenthalte
+
+### Deutsch
+
+- Laufende bestätigte Aufenthalte werden mit „Seit … · Aufenthalt läuft“
+  angezeigt, solange keine Abfahrtszeit vorliegt.
+- GPS-Stoppvorschläge ohne bekannte Abfahrt zeigen keine irreführende
+  Endezeit mehr; abgeschlossene Vorschläge behalten ihre Zeitspanne.
+- Die mobile Darstellung sowie die bestehenden Bearbeiten-, Löschen-,
+  Bewerten- und Übernehmen-Aktionen bleiben erhalten.
+
+### English
+
+- Confirmed ongoing stays now show “Since … · Stay ongoing” while no departure
+  time is known.
+- GPS stop suggestions without a known departure no longer repeat the arrival
+  time as a misleading end time; completed suggestions retain their range.
+- Mobile presentation and the existing edit, delete, rating, and accept actions
+  remain unchanged.
+
 ## 0.3.12 – Stable GPS-Fahrtabschluss und Duplikatschutz
 
 ### Deutsch

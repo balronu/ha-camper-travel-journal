@@ -288,6 +288,25 @@ jobs:
           for (const key of ['opened', 'savedThroughInterruptionApi', 'noRawCategoryCode', 'grouped']) if (!result[key]) throw new Error(`${key}=false`);
           console.log(JSON.stringify(result));
           NODE
+      - name: Run ongoing stay presentation regression
+        run: |
+          python3 -m http.server 8765 --bind 127.0.0.1 >/tmp/camper-travel-journal-ongoing-http.log 2>&1 &
+          server_pid=$!
+          trap 'kill "$server_pid"' EXIT
+          sleep 0.3
+          for width in 320 375 390 430; do
+            chromium --headless --no-sandbox --disable-gpu --window-size="${width},900" --virtual-time-budget=5000 --dump-dom http://127.0.0.1:8765/frontend/tests/browser/ongoing-stay.html >/tmp/camper-travel-journal-ongoing-dom.html
+            node - <<'NODE'
+          const fs = require('fs');
+          const html = fs.readFileSync('/tmp/camper-travel-journal-ongoing-dom.html', 'utf8');
+          const match = html.match(/<pre id="result">([\s\S]*?)<\/pre>/);
+          if (!match) throw new Error('ongoing stay harness returned no result');
+          const result = JSON.parse(match[1]);
+          for (const key of ['openStay', 'closedStayKeepsDateAndDuration', 'openSuggestionHasNoEqualEnd', 'closedSuggestionKeepsRange', 'noHorizontalOverflow']) if (!result[key]) throw new Error(`${key}=false: ${JSON.stringify(result)}`);
+          if (result.visibleTemplateLeak) throw new Error('frontend template source leaked into visible DOM');
+          console.log(JSON.stringify({ width: process.env.WIDTH, ...result }));
+          NODE
+          done
       - name: Run shared modal editor interaction regression
         run: |
           python3 -m http.server 8765 --bind 127.0.0.1 >/tmp/camper-travel-journal-modal-http.log 2>&1 &
