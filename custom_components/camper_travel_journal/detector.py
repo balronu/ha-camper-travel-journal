@@ -95,7 +95,12 @@ class DriveDetector:
 
     def _finish(self, point: GPSPoint, reason: str, *, stationary_since: GPSPoint | None = None) -> DetectionEvent:
         started = self.drive_started or point
-        drive = Drive(str(uuid4()), self.vehicle_id, started.recorded_at, point.recorded_at, self.distance_m, reason)
+        # The timeout sample confirms that the vehicle stayed stationary; it
+        # is not itself a movement endpoint. Keep the detection time on the
+        # event, but persist the last trustworthy movement sample as the
+        # drive's actual end.
+        ended = self.last_moving if reason == "stationary_timeout" and self.last_moving is not None else point
+        drive = Drive(str(uuid4()), self.vehicle_id, started.recorded_at, ended.recorded_at, self.distance_m, reason)
         self.state = DriveState.STOPPED
         self.drive_started = None
         self.last_moving = None

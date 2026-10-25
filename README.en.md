@@ -6,7 +6,7 @@
 
 <h1 align="center">Camper Travel Journal</h1>
 <p align="center">Your digital camper travel journal for Home Assistant</p>
-<p align="center"><strong>Stable: v0.3.11</strong></p>
+<p align="center"><strong>Stable: v0.3.12</strong></p>
 
 <p align="center">
   <a href="https://github.com/balronu/ha-camper-travel-journal/releases/latest"><img src="https://img.shields.io/github/v/release/balronu/ha-camper-travel-journal?label=Release" alt="Release"></a>
@@ -57,7 +57,7 @@ mobile browsers and Home Assistant setups is important.
 1. Open **HACS → Integrations → Custom repositories**.
 2. Add `https://github.com/balronu/ha-camper-travel-journal` as an
    **Integration** repository.
-3. Install the stable `v0.3.11` release.
+3. Install the stable `v0.3.12` release.
 4. Restart Home Assistant manually.
 5. Add the integration under **Settings → Devices & services**.
 
@@ -167,9 +167,12 @@ from that selected trip.
 
 ## GPS recording and GPX import
 
-Live GPS drives are stored idempotently only when the vehicle, start timestamp,
-and end timestamp match exactly. Similar or overlapping intervals are not
-merged automatically. The optional diagnostics card shows the last valid
+Live GPS drives are stored idempotently for the same vehicle and GPS points.
+Slightly different completion times are merged only when at least two points
+overlap and at least 80% of the smaller point sequence is shared; real adjacent
+drives with only one boundary point remain separate. A stationary timeout
+confirms the end of a drive but stores the last reliable movement sample as the
+actual end time. The optional diagnostics card shows the last valid
 tracker timestamp, detector state, end reason, stationary/GPS-gap thresholds,
 and rejection counters without coordinates or route geometry. A stationary
 stop still requires a later valid tracker point; no automatic timer completion

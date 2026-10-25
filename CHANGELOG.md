@@ -1,5 +1,28 @@
 # Änderungsprotokoll
 
+## 0.3.12 – Stable GPS-Fahrtabschluss und Duplikatschutz
+
+### Deutsch
+
+- `stationary_timeout` bestätigt das Fahrtende, verlängert aber nicht mehr die
+  gespeicherte Fahrt um das Stillstandsfenster; die Endzeit folgt dem letzten
+  belastbaren Bewegungspunkt.
+- Wiederholte GPS-Abschlüsse mit leicht abweichenden Zeitgrenzen werden über
+  gemeinsame Punktidentitäten idempotent erkannt. Echte Folgefahrten mit nur
+  einem gemeinsamen Grenzpunkt bleiben getrennt.
+- GPS-Punkte, Streckenberechnung, Aufenthalte, Kosten, Exporte und bestehende
+  Zuordnungen werden nicht pauschal verändert.
+
+### English
+
+- `stationary_timeout` confirms a drive end without adding the stationary window
+  to the persisted duration; the end follows the last reliable movement point.
+- Repeated GPS completions with slightly different time boundaries are made
+  idempotent through shared point identities. Real adjacent drives sharing only
+  one boundary point remain separate.
+- GPS points, distance calculation, stays, costs, exports, and existing
+  assignments are not changed wholesale.
+
 ## 0.3.9 – GPS-Identität und laufende Aufenthalte
 
 - Exakte GPS-Fahrtintervalle erhalten eine transaktional eindeutige,

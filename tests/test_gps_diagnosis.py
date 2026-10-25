@@ -101,6 +101,8 @@ class GPSDiagnosisTests(unittest.TestCase):
         finished = detector.ingest(gps(start + timedelta(minutes=6), 7.002))
         self.assertEqual([event.kind for event in finished], ["drive_finished"])
         self.assertEqual(finished[0].drive.end_reason, "stationary_timeout")
+        self.assertEqual(finished[0].drive.ended_at, start + timedelta(seconds=60))
+        self.assertEqual(finished[0].at, start + timedelta(minutes=6))
 
     def test_no_followup_gps_message_cannot_prove_stationary_stop(self):
         detector = DriveDetector("v1", DetectorConfig(stop_after=timedelta(minutes=5)))
@@ -148,7 +150,7 @@ class GPSDiagnosisTests(unittest.TestCase):
                         await collector.async_process_event("v1", "home", tracker_event(at, longitude))
                 rows = worker.store.connection.execute("SELECT id,started_at,ended_at FROM drives WHERE vehicle_id='v1'").fetchall()
                 self.assertEqual(len(rows), 1)
-                self.assertEqual(rows[0][1:], ((start + timedelta(seconds=30)).isoformat(), (start + timedelta(minutes=6)).isoformat()))
+                self.assertEqual(rows[0][1:], ((start + timedelta(seconds=30)).isoformat(), (start + timedelta(minutes=1)).isoformat()))
                 await worker.async_close()
 
         asyncio.run(run())
@@ -271,6 +273,37 @@ class GPSDiagnosisTests(unittest.TestCase):
             self.assertEqual(store.insert_drive(first), "d1")
             self.assertEqual(store.insert_drive(overlap), "d2")
             self.assertEqual(store.connection.execute("SELECT count(*) FROM drives WHERE source='gps'").fetchone()[0], 2)
+            store.close()
+
+    def test_same_gps_points_with_slightly_different_end_are_idempotent(self):
+        with tempfile.TemporaryDirectory() as directory:
+            store = SQLiteStore(Path(directory) / "journal.db")
+            store.open()
+            start = datetime(2026, 10, 23, 14, tzinfo=UTC)
+            store.insert_vehicle("v1", "Camper", "device_tracker.camper", start)
+            for offset, longitude in ((0, 7.0), (60, 7.001), (120, 7.002), (180, 7.003)):
+                store.insert_point(gps(start + timedelta(seconds=offset), longitude))
+            first = Drive("d1", "v1", start, start + timedelta(minutes=3), 162200, "stationary_timeout")
+            shifted = Drive("d2", "v1", start + timedelta(seconds=1), start + timedelta(minutes=3, seconds=30), 162200, "stationary_timeout")
+            self.assertEqual(store.insert_drive(first), "d1")
+            store.associate_drive_points("d1", "v1", start, start + timedelta(minutes=3), "live_detector")
+            self.assertEqual(store.insert_drive(shifted), "d1")
+            self.assertEqual(store.connection.execute("SELECT count(*) FROM drives").fetchone()[0], 1)
+            store.close()
+
+    def test_two_adjacent_drives_sharing_only_one_point_remain_separate(self):
+        with tempfile.TemporaryDirectory() as directory:
+            store = SQLiteStore(Path(directory) / "journal.db")
+            store.open()
+            start = datetime(2026, 10, 23, 14, tzinfo=UTC)
+            store.insert_vehicle("v1", "Camper", "device_tracker.camper", start)
+            for offset, longitude in ((0, 7.0), (60, 7.001), (120, 7.002), (600, 7.003), (660, 7.004)):
+                store.insert_point(gps(start + timedelta(seconds=offset), longitude))
+            first = Drive("d1", "v1", start, start + timedelta(seconds=120), 1000, "stationary_timeout")
+            second = Drive("d2", "v1", start + timedelta(seconds=120), start + timedelta(seconds=660), 1000, "stationary_timeout")
+            self.assertEqual(store.insert_drive(first), "d1")
+            self.assertEqual(store.insert_drive(second), "d2")
+            self.assertEqual(store.connection.execute("SELECT count(*) FROM drives").fetchone()[0], 2)
             store.close()
 
     def test_different_vehicles_have_independent_idempotency_keys(self):
