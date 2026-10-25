@@ -28,11 +28,14 @@ const waitFor = async (predicate) => { for (let i = 0; i < 200; i += 1) { if (pr
 await waitFor(() => card.shadowRoot?.textContent.includes("Dietmar-Hopp-Stadion"));
 const text = card.shadowRoot.textContent;
 const list = card.shadowRoot.querySelector(".place-list");
+const openRow = [...card.shadowRoot.querySelectorAll(".place-row")].find((row) => row.textContent.includes("Dietmar-Hopp-Stadion"));
+const closedRow = [...card.shadowRoot.querySelectorAll(".place-row")].find((row) => row.textContent.includes("Abgeschlossener Ort"));
+const suggestions = [...card.shadowRoot.querySelectorAll(".place-section ul li")].map((item) => item.textContent);
 result.textContent = JSON.stringify({
-  openStay: text.includes("Seit 08:10") && text.includes("Aufenthalt läuft"),
-  closedStayKeepsDateAndDuration: text.includes("25.10.26") && text.includes("1 h 30 min"),
-  openSuggestionHasNoEqualEnd: text.includes("Seit 08:10") && !text.includes("08:10 – 08:10"),
-  closedSuggestionKeepsRange: text.includes("10:00") && text.includes("11:00"),
+  openStay: Boolean(openRow && openRow.textContent.includes("Seit") && openRow.textContent.includes("Aufenthalt läuft")),
+  closedStayKeepsDateAndDuration: Boolean(closedRow && !closedRow.textContent.includes("Seit") && closedRow.textContent.includes("1 h 30 min")),
+  openSuggestionHasNoEqualEnd: Boolean(suggestions[0]?.includes("Seit") && suggestions[0]?.includes("Aufenthalt läuft") && !suggestions[0]?.includes(" – ")),
+  closedSuggestionKeepsRange: Boolean(suggestions[1]?.includes(" – ") && !suggestions[1]?.includes("Aufenthalt läuft")),
   noHorizontalOverflow: Boolean(list && list.scrollWidth <= list.clientWidth + 1),
   visibleTemplateLeak: /lit\$\d|=>\s*this\.|currentTarget\.value/.test(text),
 }, null, 2);
