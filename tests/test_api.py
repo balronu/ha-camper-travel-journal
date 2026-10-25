@@ -277,7 +277,9 @@ async def test_transition_and_write_commands_complete():
     await api.ws_link_drives.__wrapped__(hass, connection, {"id": 4, "vehicle_id": "v1", "trip_id": "t1", "drive_ids": []})
     await api.ws_create_stop.__wrapped__(hass, connection, {"id": 5, "vehicle_id": "v1", "trip_id": "t1", "occurred_at": "2026-10-01T12:00:00Z", "name": "Stopp", "category": "parking"})
     await api.ws_create_expense.__wrapped__(hass, connection, {"id": 6, "vehicle_id": "v1", "trip_id": "t1", "occurred_at": "2026-10-01T12:00:00Z", "category": "fuel", "amount_minor": 100, "currency": "EUR"})
-    assert len(connection.results) == 4, connection.errors
+    await api.ws_delete_drive.__wrapped__(hass, connection, {"id": 7, "vehicle_id": "v1", "drive_id": "d1"})
+    assert len(connection.results) == 5, connection.errors
+    assert hass.worker.calls[-1][0] == "delete_drive"
 
 
 @pytest.mark.asyncio

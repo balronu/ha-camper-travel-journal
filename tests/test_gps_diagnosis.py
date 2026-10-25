@@ -166,6 +166,57 @@ class GPSDiagnosisTests(unittest.TestCase):
             self.assertEqual(store.connection.execute("SELECT count(*) FROM drives").fetchone()[0], 1)
             store.close()
 
+    def test_manual_gps_drive_delete_keeps_points_and_blocks_replay(self):
+        with tempfile.TemporaryDirectory() as directory:
+            store = SQLiteStore(Path(directory) / "journal.db")
+            store.open()
+            start = datetime(2026, 10, 23, 14, tzinfo=UTC)
+            store.insert_vehicle("v1", "Camper", "device_tracker.camper", start)
+            for offset, longitude in ((0, 7.0), (60, 7.001), (120, 7.002)):
+                store.insert_point(gps(start + timedelta(seconds=offset), longitude))
+            first = Drive("deleted", "v1", start, start + timedelta(minutes=2), 162200, "stationary_timeout")
+            second = Drive("kept", "v1", start + timedelta(hours=1), start + timedelta(hours=2), 1000, "stationary_timeout")
+            store.insert_drive(first)
+            store.insert_drive(second)
+            store.associate_drive_points("deleted", "v1", start, start + timedelta(minutes=2), "live_detector")
+            store.delete_drive("deleted", "v1", start + timedelta(hours=3))
+            self.assertEqual(store.connection.execute("SELECT count(*) FROM gps_points").fetchone()[0], 3)
+            self.assertEqual(store.connection.execute("SELECT count(*) FROM drives").fetchone()[0], 1)
+            self.assertIsNone(store.insert_drive(Drive("replay", "v1", start, start + timedelta(minutes=2), 162200, "stationary_timeout")))
+            self.assertIsNone(store.insert_drive(Drive("replay-shortened", "v1", start, start + timedelta(seconds=120), 162200, "stationary_timeout")))
+            self.assertEqual(store.connection.execute("SELECT count(*) FROM drives").fetchone()[0], 1)
+            with self.assertRaisesRegex(ValueError, "drive_not_found"):
+                store.delete_drive("deleted", "v1", start)
+            with self.assertRaisesRegex(ValueError, "drive_not_found"):
+                store.delete_drive("missing", "v1", start)
+            store.close()
+
+    def test_new_drive_with_new_point_is_not_blocked_by_deleted_fingerprint(self):
+        with tempfile.TemporaryDirectory() as directory:
+            store = SQLiteStore(Path(directory) / "journal.db")
+            store.open()
+            start = datetime(2026, 10, 23, 14, tzinfo=UTC)
+            store.insert_vehicle("v1", "Camper", "device_tracker.camper", start)
+            for offset, longitude in ((0, 7.0), (60, 7.001)):
+                store.insert_point(gps(start + timedelta(seconds=offset), longitude))
+            store.insert_drive(Drive("old", "v1", start, start + timedelta(minutes=1), 1000, "stationary_timeout"))
+            store.delete_drive("old", "v1", start + timedelta(hours=1))
+            store.insert_point(gps(start + timedelta(minutes=2), 7.002))
+            self.assertEqual(store.insert_drive(Drive("new", "v1", start, start + timedelta(minutes=2), 2000, "stationary_timeout")), "new")
+            store.close()
+
+    def test_zero_duration_retrospective_suggestion_is_ignored(self):
+        with tempfile.TemporaryDirectory() as directory:
+            store = SQLiteStore(Path(directory) / "journal.db")
+            store.open()
+            now = datetime(2026, 10, 23, 14, tzinfo=UTC)
+            store.insert_vehicle("v1", "Camper", "device_tracker.camper", now)
+            for longitude in (7.0, 7.0001):
+                store.connection.execute("INSERT INTO gps_points(vehicle_id,recorded_at,latitude,longitude) VALUES(?,?,?,?)", ("v1", now.isoformat(), 49.0, longitude))
+            store.connection.commit()
+            self.assertEqual(store.generate_stop_suggestions("v1", now), [])
+            store.close()
+
     def test_schema_identity_migration_preserves_legacy_duplicates_and_selects_canonical(self):
         with tempfile.TemporaryDirectory() as directory:
             path = Path(directory) / "journal.db"

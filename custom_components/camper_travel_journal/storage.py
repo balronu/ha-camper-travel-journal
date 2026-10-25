@@ -6,6 +6,7 @@ SQLite connection may be used directly from an event-loop callback.
 """
 
 import asyncio
+import hashlib
 import re
 import sqlite3
 import uuid
@@ -20,7 +21,7 @@ from .fuel import resolve_fuel_values
 from .travel import validate_amount, validate_expense_category, validate_expense_currency, validate_expense_note, validate_expense_services
 from .validation import is_coordinate_label
 
-SCHEMA_VERSION = 13
+SCHEMA_VERSION = 14
 V10_GPX_BACKFILL_MARKER = "v10_gpx_backfill"
 
 
@@ -63,6 +64,18 @@ CREATE TABLE IF NOT EXISTS drive_identities (
   drive_id TEXT NOT NULL UNIQUE REFERENCES drives(id) ON DELETE RESTRICT,
   PRIMARY KEY(vehicle_id, started_at, ended_at)
 );
+CREATE TABLE IF NOT EXISTS drive_deletion_exclusions (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  vehicle_id TEXT NOT NULL REFERENCES vehicles(id) ON DELETE CASCADE,
+  started_at TEXT NOT NULL,
+  ended_at TEXT NOT NULL,
+  point_fingerprint TEXT NOT NULL,
+  point_count INTEGER NOT NULL,
+  deleted_at TEXT NOT NULL,
+  UNIQUE(vehicle_id, started_at, ended_at, point_fingerprint)
+);
+CREATE INDEX IF NOT EXISTS idx_drive_deletion_exclusions_vehicle_time
+  ON drive_deletion_exclusions(vehicle_id, started_at, ended_at);
 CREATE TABLE IF NOT EXISTS stays (
   id TEXT PRIMARY KEY, vehicle_id TEXT NOT NULL REFERENCES vehicles(id), started_at TEXT NOT NULL,
   ended_at TEXT, latitude REAL, longitude REAL, created_at TEXT NOT NULL
@@ -202,6 +215,8 @@ class SQLiteStore:
                     self._migrate_v12()
                 if previous < 13:
                     self._migrate_v13()
+                if previous < 14:
+                    self._migrate_v14()
                 if self.connection.execute(
                     "SELECT 1 FROM schema_meta WHERE key=?", (V10_GPX_BACKFILL_MARKER,)
                 ).fetchone() is None:
@@ -478,8 +493,27 @@ class SQLiteStore:
                      AND prior.ended_at=d.ended_at
                      AND (prior.created_at < d.created_at
                           OR (prior.created_at=d.created_at AND prior.id < d.id))
-                 )"""
+                )"""
         )
+
+    def _migrate_v14(self) -> None:
+        """Persist explicit user exclusions for manually deleted GPS drives."""
+        if self.connection is None:
+            raise RuntimeError("store is not open")
+        self.connection.executescript("""
+        CREATE TABLE IF NOT EXISTS drive_deletion_exclusions (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          vehicle_id TEXT NOT NULL REFERENCES vehicles(id) ON DELETE CASCADE,
+          started_at TEXT NOT NULL,
+          ended_at TEXT NOT NULL,
+          point_fingerprint TEXT NOT NULL,
+          point_count INTEGER NOT NULL,
+          deleted_at TEXT NOT NULL,
+          UNIQUE(vehicle_id, started_at, ended_at, point_fingerprint)
+        );
+        CREATE INDEX IF NOT EXISTS idx_drive_deletion_exclusions_vehicle_time
+          ON drive_deletion_exclusions(vehicle_id, started_at, ended_at);
+        """)
 
     def _backfill_v10_gpx_endpoints(self) -> None:
         """Reconstruct safe legacy memberships once, then persist endpoints.
@@ -612,8 +646,10 @@ class SQLiteStore:
             cursor = connection.execute("INSERT OR IGNORE INTO gps_points(vehicle_id,recorded_at,latitude,longitude,accuracy_m,source_state,source_type) VALUES(?,?,?,?,?,?,?)", (point.vehicle_id, utc_iso(point.recorded_at), point.latitude, point.longitude, point.accuracy_m, point.source_state, point.source_type))
             return cursor.rowcount == 1
 
-    def insert_drive(self, drive) -> str:
+    def insert_drive(self, drive) -> str | None:
         with self.transaction() as connection:
+            if drive.source == "gps" and self._is_deleted_drive_replay(connection, drive):
+                return None
             # A reload or an accidentally overlapping runtime can reconstruct
             # the same live GPS interval with a fresh UUID. The identity table
             # makes the exact interval key durable and transactionally unique;
@@ -640,6 +676,37 @@ class SQLiteStore:
                     connection.execute("DELETE FROM drives WHERE id=?", (drive.id,))
                     return canonical
             return drive.id
+
+    @staticmethod
+    def _point_fingerprint(connection, vehicle_id: str, started_at: str, ended_at: str) -> tuple[str, int]:
+        rows = connection.execute(
+            "SELECT recorded_at,latitude,longitude FROM gps_points "
+            "WHERE vehicle_id=? AND recorded_at>=? AND recorded_at<=? "
+            "ORDER BY recorded_at,id",
+            (vehicle_id, started_at, ended_at),
+        ).fetchall()
+        digest = hashlib.sha256()
+        for row in rows:
+            digest.update(f"{row[0]}|{row[1]:.8f}|{row[2]:.8f}\n".encode("utf-8"))
+        return digest.hexdigest(), len(rows)
+
+    def _is_deleted_drive_replay(self, connection, drive) -> bool:
+        started_at, ended_at = utc_iso(drive.started_at), utc_iso(drive.ended_at)
+        fingerprint, point_count = self._point_fingerprint(connection, drive.vehicle_id, started_at, ended_at)
+        exact = connection.execute(
+            "SELECT 1 FROM drive_deletion_exclusions WHERE vehicle_id=? "
+            "AND started_at=? AND ended_at=? LIMIT 1",
+            (drive.vehicle_id, started_at, ended_at),
+        ).fetchone()
+        if exact:
+            return True
+        if point_count == 0:
+            return False
+        return connection.execute(
+            "SELECT 1 FROM drive_deletion_exclusions WHERE vehicle_id=? "
+            "AND point_count=? AND point_fingerprint=? LIMIT 1",
+            (drive.vehicle_id, point_count, fingerprint),
+        ).fetchone() is not None
 
     def close_open_stops(self, vehicle_id: str, departed_at: datetime, now: datetime) -> int:
         """Close confirmed ongoing stays only when later movement is observed."""
@@ -1130,6 +1197,36 @@ class SQLiteStore:
             connection.execute("DELETE FROM trip_drives WHERE drive_id=?", (drive_id,))
             connection.execute("DELETE FROM drives WHERE id=?", (drive_id,))
 
+    def delete_drive(self, drive_id: str, vehicle_id: str, now: datetime) -> None:
+        """Delete one drive while retaining raw GPS points and unrelated data."""
+        with self.transaction() as connection:
+            drive = connection.execute(
+                "SELECT id,vehicle_id,started_at,ended_at,source FROM drives WHERE id=?",
+                (drive_id,),
+            ).fetchone()
+            if drive is None:
+                raise ValueError("drive_not_found")
+            if drive[1] != vehicle_id:
+                raise ValueError("vehicle_mismatch")
+            fingerprint, point_count = self._point_fingerprint(connection, vehicle_id, drive[2], drive[3])
+            if drive[4] == "gps":
+                connection.execute(
+                    "INSERT OR IGNORE INTO drive_deletion_exclusions "
+                    "(vehicle_id,started_at,ended_at,point_fingerprint,point_count,deleted_at) "
+                    "VALUES(?,?,?,?,?,?)",
+                    (vehicle_id, drive[2], drive[3], fingerprint, point_count, utc_iso(now)),
+                )
+            # These are the only known drive-owned references. Detach them
+            # explicitly; do not cascade-delete trips, expenses, stops, or GPS.
+            connection.execute("DELETE FROM trip_drives WHERE drive_id=?", (drive_id,))
+            connection.execute("DELETE FROM interruption_links WHERE previous_drive_id=? OR next_drive_id=?", (drive_id, drive_id))
+            connection.execute("UPDATE stops SET drive_id=NULL WHERE drive_id=?", (drive_id,))
+            connection.execute("UPDATE stop_suggestions SET drive_id=NULL WHERE drive_id=?", (drive_id,))
+            connection.execute("DELETE FROM drive_identities WHERE drive_id=?", (drive_id,))
+            connection.execute("DELETE FROM drives WHERE id=?", (drive_id,))
+            if connection.execute("SELECT 1 FROM drives WHERE id=?", (drive_id,)).fetchone() is not None:
+                raise ValueError("drive_delete_failed")
+
     def _insert_stop(self, connection, stop, now: datetime) -> str:
         stop_id = stop.id or str(uuid.uuid4())
         vehicle = connection.execute("SELECT 1 FROM vehicles WHERE id=?", (stop.vehicle_id,)).fetchone()
@@ -1325,7 +1422,7 @@ class SQLiteStore:
             nonlocal window
             if len(window) >= 2:
                 start = datetime.fromisoformat(window[0][0]); end = datetime.fromisoformat(window[-1][0])
-                if end - start >= minimum:
+                if end > start and end - start >= minimum:
                     lat = sum(float(row[1]) for row in window) / len(window)
                     lon = sum(float(row[2]) for row in window) / len(window)
                     drive_ids = {row[3] for row in window if row[3]}
@@ -1369,6 +1466,8 @@ class SQLiteStore:
         row = self.connection.execute("SELECT * FROM stop_suggestions WHERE id=?", (suggestion_id,)).fetchone()
         if row is None: raise ValueError("suggestion_not_found")
         if row["status"] != "pending": raise ValueError("suggestion_not_pending")
+        if row["departed_at"] is not None and row["departed_at"] <= row["arrived_at"]:
+            raise ValueError("suggestion_duration_invalid")
         selected_trip = trip_id or row["trip_id"]
         stop = type("SuggestionStop", (), {"id": "", "vehicle_id": row["vehicle_id"], "trip_id": selected_trip, "drive_id": row["drive_id"], "name": name, "occurred_at": datetime.fromisoformat(row["arrived_at"]), "arrived_at": datetime.fromisoformat(row["arrived_at"]), "departed_at": datetime.fromisoformat(row["departed_at"]) if row["departed_at"] else None, "latitude": row["latitude"], "longitude": row["longitude"], "description": "", "stop_type": place_type, "place_type": place_type, "address": "", "source": "gps_suggestion", "automatic": True, "confirmed": True})()
         stop_id = self.create_stop(stop, now)
