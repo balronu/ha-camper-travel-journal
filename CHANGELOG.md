@@ -1,5 +1,23 @@
 # Änderungsprotokoll
 
+## 0.4.0-beta.2 – UX-Hotfix für den modularen Karteneditor
+
+### Deutsch
+
+- Modulpositionen zeigen jetzt sichtbar „n von m“.
+- Verschobene Module werden kurz hervorgehoben; Fokus und Scrollposition folgen dem verschobenen Element.
+- Die vollständige Modulreihenfolge bleibt beim Deaktivieren, Speichern, Reload und erneuten Aktivieren erhalten.
+- Tankbuch bleibt als geplantes Modul nicht aktivierbar und löst keine Datenbank- oder Providerabfragen aus.
+- Keine Änderungen an GPS, Fahrten, Aufenthalten, Kosten, Exporten oder SQLite.
+
+### English
+
+- Module positions now show a visible “n of m” indicator.
+- Moved modules are briefly highlighted; focus and scrolling follow the moved element.
+- The complete module order is preserved across disabling, saving, reload and re-enabling.
+- The fuel log remains a planned module and cannot be activated; it performs no database or provider requests.
+- GPS, drives, stays, expenses, exports and SQLite remain unchanged.
+
 ## 0.4.0-beta.1 – Modulare Journal Card
 
 ### Deutsch

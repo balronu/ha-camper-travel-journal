@@ -1,7 +1,7 @@
 <!doctype html>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Camper Travel Journal beta.1 module editor</title>
+<title>Camper Travel Journal beta.2 module editor</title>
 <div id="host"></div>
 <pre id="result">starting</pre>
 <script type="module">
@@ -22,22 +22,70 @@ editor.addEventListener("config-changed", (event) => { configEvents += 1; latest
 document.querySelector("#host").append(editor);
 editor.setConfig({ type: "custom:camper-travel-journal-journal-card" });
 editor.hass = hass;
-const waitFor = async (predicate) => { for (let i = 0; i < 160; i += 1) { if (predicate()) return true; await new Promise((resolve) => setTimeout(resolve, 25)); } return false; };
-const ready = await waitFor(() => editor.shadowRoot?.querySelectorAll(".module-row").length === 8);
+const waitFor = async (predicate) => { for (let i = 0; i < 200; i += 1) { if (predicate()) return true; await new Promise((resolve) => setTimeout(resolve, 25)); } return false; };
+const rows = () => [...editor.shadowRoot.querySelectorAll(".module-row")];
+const row = (name) => rows().find((item) => item.textContent.includes(name));
+const touchClick = (button) => { button.dispatchEvent(new PointerEvent("pointerdown", { bubbles: true, pointerType: "touch" })); button.dispatchEvent(new PointerEvent("pointerup", { bubbles: true, pointerType: "touch" })); button.click(); };
+const ready = await waitFor(() => rows().length === 8);
 if (!ready) { result.textContent = JSON.stringify({ error: "module editor did not render", shadow: editor.shadowRoot?.textContent, config: editor._config, hasHass: Boolean(editor.hass) }); throw new Error("module editor harness timed out"); }
-const tankbook = [...editor.shadowRoot.querySelectorAll(".module-row")].find((row) => row.textContent.includes("Tankbuch"));
-tankbook.querySelector("input").click();
-await waitFor(() => latestConfig?.modules?.includes("tankbook"));
-const drives = [...editor.shadowRoot.querySelectorAll(".module-row")].find((row) => row.textContent.includes("Fahrten"));
-drives.querySelectorAll("button")[1].click();
-await waitFor(() => latestConfig?.modules?.[1] === "drives");
-const active = [...editor.shadowRoot.querySelectorAll(".module-row")].filter((row) => row.querySelector("input")?.checked).map((row) => row.textContent.trim());
+const initialOrder = rows().map((item) => item.dataset.module);
+const tankbook = row("Tankbuch");
+const tankbookInput = tankbook.querySelector("input");
+const tankbookRejected = tankbookInput.disabled;
+const drives = row("Fahrten");
+touchClick(drives.querySelectorAll("button")[1]);
+await waitFor(() => latestConfig?.module_order?.[2] === "drives" && row("Fahrten")?.classList.contains("moved"));
+const movedOrder = [...latestConfig.module_order];
+const movedFocus = editor.shadowRoot.activeElement?.dataset.module === "drives";
+const movedPosition = row("Fahrten")?.querySelector(".module-position")?.textContent;
+const savedConfig = { ...latestConfig };
+editor.remove();
+const reloaded = document.createElement("camper-travel-journal-card-editor");
+document.querySelector("#host").append(reloaded);
+reloaded.addEventListener("config-changed", (event) => { configEvents += 1; latestConfig = event.detail.config; });
+reloaded.setConfig(savedConfig);
+reloaded.hass = hass;
+await waitFor(() => reloaded.shadowRoot?.querySelectorAll(".module-row").length === 8);
+const reloadedOrder = [...reloaded.shadowRoot.querySelectorAll(".module-row")].map((item) => item.dataset.module);
+const drivesReloaded = [...reloaded.shadowRoot.querySelectorAll(".module-row")].find((item) => item.textContent.includes("Fahrten"));
+const drivesInput = drivesReloaded.querySelector("input");
+drivesInput.click();
+await waitFor(() => !latestConfig?.modules?.includes("drives"));
+const disabledConfig = { ...latestConfig };
+reloaded.remove();
+const afterDisable = document.createElement("camper-travel-journal-card-editor");
+document.querySelector("#host").append(afterDisable);
+afterDisable.addEventListener("config-changed", (event) => { configEvents += 1; latestConfig = event.detail.config; });
+afterDisable.setConfig(disabledConfig);
+afterDisable.hass = hass;
+await waitFor(() => afterDisable.shadowRoot?.querySelectorAll(".module-row").length === 8);
+const disabledRows = [...afterDisable.shadowRoot.querySelectorAll(".module-row")];
+const disabledDrives = disabledRows.find((item) => item.textContent.includes("Fahrten"));
+const disabledStillOrdered = disabledRows.map((item) => item.dataset.module)[2] === "drives";
+touchClick(disabledDrives.querySelector("input"));
+await waitFor(() => latestConfig?.modules?.includes("drives"));
+const reenabledOrder = [...latestConfig.module_order];
+const restoredPosition = reenabledOrder.indexOf("drives") === movedOrder.indexOf("drives");
+const active = [...afterDisable.shadowRoot.querySelectorAll(".module-row")].filter((item) => item.querySelector("input")?.checked).map((item) => item.dataset.module);
+const firstRow = afterDisable.shadowRoot.querySelector(".module-row");
+const lastRow = [...afterDisable.shadowRoot.querySelectorAll(".module-row")].at(-1);
 result.textContent = JSON.stringify({
   configEvents,
   selectedVehicle: latestConfig?.vehicle_id,
   modules: latestConfig?.modules,
+  initialOrder,
+  movedOrder,
+  reloadedOrder,
+  reenabledOrder,
+  disabledStillOrdered,
+  restoredPosition,
+  movedPosition,
+  movedFocus,
+  firstUpDisabled: firstRow.querySelectorAll("button")[0].disabled,
+  lastDownDisabled: lastRow.querySelectorAll("button")[1].disabled,
   activeCount: active.length,
   tankbookPlanned: tankbook.textContent.includes("geplant"),
+  tankbookRejected,
   noProviderRequest: true,
   noHorizontalOverflow: document.documentElement.scrollWidth <= window.innerWidth + 1,
 }, null, 2);
