@@ -1603,7 +1603,19 @@ class SQLiteStore:
 
     def list_expenses(self, trip_id: str) -> list[dict]:
         if self.connection is None: raise RuntimeError("store is not open")
-        expenses = [dict(row) for row in self.connection.execute("SELECT e.*, s.name AS place_name FROM expenses e LEFT JOIN stops s ON s.id=COALESCE(e.place_id,e.stay_id) WHERE e.trip_id=? ORDER BY e.occurred_at DESC", (trip_id,)).fetchall()]
+        # Sort by the user-facing event date, not capture/update timestamps.
+        # On a day without a recorded time, timed entries come first; the
+        # stable id tie-breaker keeps reloads deterministic without inventing
+        # a time value.
+        expenses = [dict(row) for row in self.connection.execute(
+            "SELECT e.*, s.name AS place_name FROM expenses e "
+            "LEFT JOIN stops s ON s.id=COALESCE(e.place_id,e.stay_id) "
+            "WHERE e.trip_id=? "
+            "ORDER BY COALESCE(NULLIF(e.occurred_on,''), substr(e.occurred_at,1,10)) DESC, "
+            "CASE WHEN e.occurred_time IS NULL THEN 0 ELSE 1 END DESC, "
+            "COALESCE(e.occurred_time,'') DESC, e.id DESC",
+            (trip_id,),
+        ).fetchall()]
         for expense in expenses:
             expense["services"] = [row[0] for row in self.connection.execute("SELECT service_id FROM expense_service_links WHERE expense_id=? ORDER BY rowid", (expense["id"],)).fetchall()]
         return expenses

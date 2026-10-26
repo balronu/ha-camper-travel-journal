@@ -1,5 +1,23 @@
 # Änderungsprotokoll
 
+## 0.4.0-beta.5 – UI-Hotfix für Tankbuch, Dialoge und Kostenreihenfolge
+
+### Deutsch
+
+- Tankbuch ist im Karteneditor nicht mehr als geplant markiert und kann aktiviert, sortiert, deaktiviert und reaktiviert werden.
+- Kosten-, Reise-, Aufenthalts-, Fahrt- und Tankbuchdialoge begrenzen das Scrollen auf genau einen Inhaltsbereich; Touch und Bildschirmtastatur bleiben erreichbar.
+- Ausgaben werden nach tatsächlichem Ausgabedatum und vorhandener Uhrzeit absteigend sortiert; `created_at`/`updated_at` überschreiben die fachliche Reihenfolge nicht.
+- PDF-Ausgaben verwenden dieselbe chronologische Regel. Bestehende Daten, Summen, Schema 15 und GPS-Funktionen bleiben unverändert.
+- Beta-Release; v0.3.13 bleibt Stable. Echte iPhone-/Safari-Abnahme bleibt offen.
+
+### English
+
+- The fuel log is no longer marked as planned in the card editor and can be enabled, reordered, disabled and re-enabled.
+- Expense, trip, stay, drive and fuel-log dialogs limit scrolling to one content area while keeping touch and keyboard access usable.
+- Expenses are sorted newest first by actual expense date and recorded time; `created_at`/`updated_at` never override the domain order.
+- PDF expense lists use the same chronological rule. Existing data, totals, schema 15 and GPS functions remain unchanged.
+- Beta release; v0.3.13 remains Stable. Real iPhone/Safari acceptance is still open.
+
 ## 0.4.0-beta.4 – Tankbuch und Verbrauchsqualität
 
 ### Deutsch

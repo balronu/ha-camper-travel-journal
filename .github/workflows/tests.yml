@@ -71,7 +71,7 @@ jobs:
           if (!match) throw new Error('module editor harness returned no result');
           const result = JSON.parse(match[1]);
           if (result.selectedVehicle !== 'camper') throw new Error(`unexpected selected vehicle: ${result.selectedVehicle}`);
-          if (!result.tankbookPlanned || !result.tankbookRejected) throw new Error(`tankbook was incorrectly activatable: ${JSON.stringify(result)}`);
+          if (!result.tankbookActivatable || !result.tankbookEnabled) throw new Error(`tankbook was not activatable: ${JSON.stringify(result)}`);
           if (!result.restoredPosition || !result.disabledStillOrdered) throw new Error(`disabled module lost its saved position: ${JSON.stringify(result)}`);
           if (!result.movedFocus || result.movedPosition !== '3 von 8') throw new Error(`move feedback/focus failed: ${JSON.stringify(result)}`);
           if (!result.firstUpDisabled || !result.lastDownDisabled) throw new Error(`boundary controls are incorrect: ${JSON.stringify(result)}`);
@@ -345,7 +345,7 @@ jobs:
           if (!match) throw new Error('modal harness returned no result');
           const result = JSON.parse(match[1]);
           if (result.savedCount !== result.requiredKinds || result.savedCount !== 9) throw new Error(`expected all 9 modal kinds to save: ${JSON.stringify(result)}`);
-          for (const key of ['retainedOnError', 'discardPrompt', 'invalidGuard', 'keyboardFocus', 'centralDialogOnly', 'centralNarrow', 'noDuplicateTripCreate', 'modalAria']) if (!result[key]) throw new Error(`${key}=false`);
+          for (const key of ['retainedOnError', 'discardPrompt', 'invalidGuard', 'keyboardFocus', 'centralDialogOnly', 'centralNarrow', 'tankbookActivatable', 'tankbookEnabled', 'noDuplicateTripCreate', 'modalAria']) if (!result[key]) throw new Error(`${key}=false`);
           if (result.visibleTemplateLeak) throw new Error('frontend template source leaked into visible DOM');
           console.log(JSON.stringify(result));
           NODE

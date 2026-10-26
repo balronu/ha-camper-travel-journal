@@ -14,10 +14,10 @@ const bundle = resolve(root, "../custom_components/camper_travel_journal/fronten
 
 describe("frontend release contract", () => {
   it("keeps backend, npm metadata and stable bundle aligned", () => {
-    expect(manifest.version).toBe("0.4.0-beta.4");
+    expect(manifest.version).toBe("0.4.0-beta.5");
     expect(pkg.version).toBe(manifest.version);
     expect(existsSync(bundle)).toBe(true);
-    expect(readFileSync(resolve(root, "../custom_components/camper_travel_journal/const.py"), "utf8")).toContain('FRONTEND_VERSION = "0.4.0-beta.4"');
+    expect(readFileSync(resolve(root, "../custom_components/camper_travel_journal/const.py"), "utf8")).toContain('FRONTEND_VERSION = "0.4.0-beta.5"');
   });
   it("registers the central card in the catalog while retaining legacy elements", () => {
     const source = readFileSync(resolve(root, "src/index.ts"), "utf8");
@@ -223,6 +223,15 @@ describe("frontend release contract", () => {
     expect(journal).toContain("renderModule");
     expect(journal).toContain("module_tankbook");
     expect(journal).toContain("listTankbook");
+  });
+  it("keeps the fuel log activatable and dialogs single-scroll", () => {
+    const editor = readFileSync(resolve(root, "src/card-editor.ts"), "utf8");
+    const manager = readFileSync(resolve(root, "src/manager-card.ts"), "utf8");
+    expect(editor).not.toContain("if (module === \"tankbook\") return");
+    expect(editor).not.toContain("const planned = module === \"tankbook\"");
+    expect(manager).toContain(".editor-dialog{width:min(36rem");
+    expect(manager).toContain("overflow:hidden");
+    expect(manager).toContain("overflow-y:auto");
   });
   it("keeps legacy cards visible without advertising them as new cards", () => {
     const base = readFileSync(resolve(root, "src/base-card.ts"), "utf8");

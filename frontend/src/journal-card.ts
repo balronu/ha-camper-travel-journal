@@ -314,9 +314,9 @@ JournalCard.styles = [TravelCard.styles, css`
   .drive-delete-dialog dd { margin:0; }
   .danger { color:var(--text-primary-color,#fff); background:var(--error-color,#c62828); }
   @media(max-width:650px) { .drive-delete-dialog { width:calc(100vw - 1rem); max-width:calc(100vw - 1rem); } .drive-delete-dialog .dialog-actions { flex-direction:column-reverse; } .drive-delete-dialog .dialog-actions button { width:100%; } }
-  dialog { max-width: min(32rem, calc(100vw - 2rem)); width: calc(100% - 2rem); border: 0; border-radius: 12px; padding: 0; color: var(--primary-text-color); background: var(--card-background-color); }
+  dialog { max-width: min(32rem, calc(100vw - 2rem)); width: calc(100% - 2rem); max-height: calc(100dvh - 2rem); overflow: hidden; border: 0; border-radius: 12px; padding: 0; color: var(--primary-text-color); background: var(--card-background-color); }
   dialog::backdrop { background: rgb(0 0 0 / .48); }
-  dialog form { display: grid; gap: 12px; padding: 18px; }
+  dialog form { display: grid; gap: 12px; padding: 18px; max-height: calc(100dvh - 2rem); overflow-y: auto; overscroll-behavior: contain; scrollbar-gutter: stable; }
   dialog label { display: grid; gap: 5px; }
   dialog textarea { min-height: 4rem; }
   .dialog-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 4px; }

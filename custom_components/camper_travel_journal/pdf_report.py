@@ -129,6 +129,14 @@ def _text(value: Any) -> str:
     return "" if value is None else str(value).strip()
 
 
+def _expense_sort_key(expense: dict[str, Any]) -> tuple[str, int, str, str]:
+    """Sort by the recorded expense date/time, never capture timestamps."""
+    date = _text(expense.get("occurred_on")) or _text(expense.get("occurred_at"))[:10]
+    time = _text(expense.get("occurred_time"))
+    # Missing time is deliberately placed after timed entries on the same day.
+    return date, 1 if time else 0, time, _text(expense.get("id"))
+
+
 def _markup(value: Any) -> str:
     return escape(_text(value)).replace("\n", "<br/>")
 
@@ -448,7 +456,7 @@ def render_trip_report(report: dict[str, Any], *, language: str = "de", time_zon
     expenses = report.get("expenses", [])
     if expenses:
         rows = [[labels["period_short"], labels["category"], labels["amount"], labels["description"]]]
-        for expense in sorted(expenses, key=lambda item: (item.get("occurred_on") or item.get("created_at") or "", item.get("id", ""))):
+        for expense in sorted(expenses, key=_expense_sort_key, reverse=True):
             note, place = _text(expense.get("note")), _text(expense.get("place_name")); note = f"{note} · {place}" if note and place else note or place
             fuel = _fuel_details(expense, language)
             if fuel:
