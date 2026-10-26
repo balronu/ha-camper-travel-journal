@@ -14,7 +14,7 @@ from .runtime import Runtime
 from .storage import AsyncSQLiteWorker
 from .api import async_register as async_register_api
 
-VERSION = "0.4.0-beta.1"
+VERSION = "0.4.0-beta.2"
 
 PLATFORMS: list[str] = []
 CONFIG_SCHEMA = cv.config_entry_only_config_schema(DOMAIN) if cv else None

@@ -4,9 +4,9 @@ import { assignInterruption, createStopFromInterruption, deleteDrive, list, list
 import { clearActiveTrip, publishActiveTrip, readActiveTrip, type TripContextDetail, ACTIVE_TRIP_CHANGED_EVENT } from "./trip-context";
 import { notifyTravelChanged, TRAVEL_DATA_CHANGED_EVENT } from "./expense-events";
 import { driveDeleteMessages, formatDateTime, formatDuration, formatMoneyMinor, formatTripPeriod, messages, statusLabel } from "./i18n";
-import { normalizeJournalModules, type JournalModuleId } from "./journal-modules";
+import { orderedJournalModules, type JournalModuleId } from "./journal-modules";
 
-type JournalConfig = { vehicle_id: string; modules?: string[] };
+type JournalConfig = { vehicle_id: string; modules?: string[]; module_order?: string[] };
 
 const overnightKinds = new Set(["campsite", "rv_site", "wild_camp", "overnight"]);
 
@@ -242,7 +242,7 @@ export class JournalCard extends TravelCard {
       gpx: html`${manager("gpx")}`,
       pdf: html`${manager("pdf")}`,
     };
-    const modules = normalizeJournalModules(this.config.modules);
+    const modules = orderedJournalModules(this.config.modules, this.config.module_order);
     const moduleCounts: Partial<Record<JournalModuleId, number>> = {
       drives: (snapshot?.drives.length ?? 0) + interruptions.length,
       stays: confirmed.length,

@@ -71,8 +71,11 @@ jobs:
           if (!match) throw new Error('module editor harness returned no result');
           const result = JSON.parse(match[1]);
           if (result.selectedVehicle !== 'camper') throw new Error(`unexpected selected vehicle: ${result.selectedVehicle}`);
-          if (!result.modules.includes('tankbook') || !result.tankbookPlanned) throw new Error(`tankbook module was not selectable as planned: ${JSON.stringify(result)}`);
-          if (result.activeCount !== 8 || result.modules[0] !== 'overview') throw new Error(`unexpected module configuration: ${JSON.stringify(result)}`);
+          if (!result.tankbookPlanned || !result.tankbookRejected) throw new Error(`tankbook was incorrectly activatable: ${JSON.stringify(result)}`);
+          if (!result.restoredPosition || !result.disabledStillOrdered) throw new Error(`disabled module lost its saved position: ${JSON.stringify(result)}`);
+          if (!result.movedFocus || result.movedPosition !== '3 von 8') throw new Error(`move feedback/focus failed: ${JSON.stringify(result)}`);
+          if (!result.firstUpDisabled || !result.lastDownDisabled) throw new Error(`boundary controls are incorrect: ${JSON.stringify(result)}`);
+          if (result.activeCount !== 7 || result.modules[0] !== 'overview') throw new Error(`unexpected module configuration: ${JSON.stringify(result)}`);
           if (!result.noProviderRequest || !result.noHorizontalOverflow) throw new Error(`module editor mobile regression failed: ${JSON.stringify(result)}`);
           console.log(JSON.stringify(result));
           NODE

@@ -5,7 +5,7 @@ import { categoryLabel, EXPENSE_CATEGORIES, EXPENSE_CATEGORY_IDS, formatDate, fo
 import { autoSelectVehicle, sameCardConfig } from "../src/card-editor";
 import { listVehicles } from "../src/api";
 import { sortDrivesChronologically } from "../src/map-utils";
-import { DEFAULT_JOURNAL_MODULES, normalizeJournalModules, sameJournalModules } from "../src/journal-modules";
+import { DEFAULT_JOURNAL_MODULES, normalizeJournalModuleOrder, normalizeJournalModules, orderedJournalModules, sameJournalModuleOrder, sameJournalModules } from "../src/journal-modules";
 
 const root = resolve(import.meta.dirname, "..");
 const manifest = JSON.parse(readFileSync(resolve(root, "../custom_components/camper_travel_journal/manifest.json"), "utf8"));
@@ -14,10 +14,10 @@ const bundle = resolve(root, "../custom_components/camper_travel_journal/fronten
 
 describe("frontend release contract", () => {
   it("keeps backend, npm metadata and stable bundle aligned", () => {
-    expect(manifest.version).toBe("0.4.0-beta.1");
+    expect(manifest.version).toBe("0.4.0-beta.2");
     expect(pkg.version).toBe(manifest.version);
     expect(existsSync(bundle)).toBe(true);
-    expect(readFileSync(resolve(root, "../custom_components/camper_travel_journal/const.py"), "utf8")).toContain('FRONTEND_VERSION = "0.4.0-beta.1"');
+    expect(readFileSync(resolve(root, "../custom_components/camper_travel_journal/const.py"), "utf8")).toContain('FRONTEND_VERSION = "0.4.0-beta.2"');
   });
   it("registers the central card in the catalog while retaining legacy elements", () => {
     const source = readFileSync(resolve(root, "src/index.ts"), "utf8");
@@ -70,6 +70,11 @@ describe("frontend release contract", () => {
   it("keeps journal module configuration backward compatible and deterministic", () => {
     expect(normalizeJournalModules(undefined)).toEqual([...DEFAULT_JOURNAL_MODULES]);
     expect(normalizeJournalModules(["drives", "tankbook", "drives", "unknown"])).toEqual(["drives", "tankbook"]);
+    expect(normalizeJournalModuleOrder(["overview", "drives", "tankbook"], ["drives", "overview"])).toEqual(["overview", "drives", "tankbook", "stays", "expenses", "map", "gpx", "pdf"]);
+    expect(orderedJournalModules(["overview", "drives"], ["drives", "overview", "stays"])).toEqual(["drives", "overview"]);
+    expect(orderedJournalModules(["overview"], ["drives", "overview"])).toEqual(["overview"]);
+    expect(sameJournalModuleOrder(["drives", "overview"], ["overview", "drives"])).toBe(false);
+    expect(sameJournalModuleOrder(undefined, undefined)).toBe(true);
     expect(sameJournalModules(undefined, [...DEFAULT_JOURNAL_MODULES])).toBe(true);
     expect(sameJournalModules(["overview", "drives"], ["overview", "drives"])).toBe(true);
     expect(sameJournalModules(["overview", "drives"], ["drives", "overview"])).toBe(false);
@@ -214,7 +219,7 @@ describe("frontend release contract", () => {
   });
   it("renders the journal through the internal module registry without provider calls", () => {
     const journal = readFileSync(resolve(root, "src/journal-card.ts"), "utf8");
-    expect(journal).toContain("normalizeJournalModules");
+    expect(journal).toContain("orderedJournalModules");
     expect(journal).toContain("renderModule");
     expect(journal).toContain("module_tankbook");
     expect(journal).toContain("No tank data or provider request");
