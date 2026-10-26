@@ -5,7 +5,7 @@ import { messages } from "./i18n";
 
 export abstract class TravelCard extends LitElement {
   private _hass?: Hass;
-  config: { vehicle_id?: string; trip_id?: string; journal_section?: string } = {};
+  config: { vehicle_id?: string; trip_id?: string; journal_section?: string; modules?: string[] } = {};
   static styles = css`
     :host { display:block; color:var(--primary-text-color); } ha-card { padding:16px; background:var(--ha-card-background,var(--card-background-color)); }
     h2,h3 { margin:0 0 12px; } .muted { color:var(--secondary-text-color); } .error { color:var(--error-color); }
@@ -22,11 +22,11 @@ export abstract class TravelCard extends LitElement {
     if (connectionChanged) this.onHassConnectionChanged();
     this.requestUpdate();
   }
-  setConfig(config: { vehicle_id?: string; trip_id?: string; journal_section?: string }) {
+  setConfig(config: { vehicle_id?: string; trip_id?: string; journal_section?: string; modules?: string[] }) {
     // Compatibility marker: the original vehicle-only guard remains part of
     // the release contract; embedded cards additionally compare their scope.
     // if (this.config.vehicle_id === config.vehicle_id) return
-    if (this.config.vehicle_id === config.vehicle_id && this.config.trip_id === config.trip_id && this.config.journal_section === config.journal_section) return;
+    if (this.config.vehicle_id === config.vehicle_id && this.config.trip_id === config.trip_id && this.config.journal_section === config.journal_section && JSON.stringify(this.config.modules ?? null) === JSON.stringify(config.modules ?? null)) return;
     this.config = { ...config };
     this.onConfigChanged();
     this.requestUpdate();

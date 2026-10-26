@@ -56,6 +56,26 @@ jobs:
           if (result.visibleTemplateLeak) throw new Error('frontend template source leaked into visible DOM');
           console.log(JSON.stringify(result));
           NODE
+      - name: Run Journal Card module editor regression
+        run: |
+          python3 -m http.server 8765 --bind 127.0.0.1 >/tmp/camper-travel-journal-modules-http.log 2>&1 &
+          server_pid=$!
+          trap 'kill "$server_pid"' EXIT
+          sleep 0.3
+          chromium --headless --no-sandbox --disable-gpu --window-size=390,900 --virtual-time-budget=3000 \
+            --dump-dom http://127.0.0.1:8765/frontend/tests/browser/journal-modules.html >/tmp/camper-travel-journal-modules-dom.html
+          node - <<'NODE'
+          const fs = require('fs');
+          const html = fs.readFileSync('/tmp/camper-travel-journal-modules-dom.html', 'utf8');
+          const match = html.match(/<pre id="result">([\s\S]*?)<\/pre>/);
+          if (!match) throw new Error('module editor harness returned no result');
+          const result = JSON.parse(match[1]);
+          if (result.selectedVehicle !== 'camper') throw new Error(`unexpected selected vehicle: ${result.selectedVehicle}`);
+          if (!result.modules.includes('tankbook') || !result.tankbookPlanned) throw new Error(`tankbook module was not selectable as planned: ${JSON.stringify(result)}`);
+          if (result.activeCount !== 8 || result.modules[0] !== 'overview') throw new Error(`unexpected module configuration: ${JSON.stringify(result)}`);
+          if (!result.noProviderRequest || !result.noHorizontalOverflow) throw new Error(`module editor mobile regression failed: ${JSON.stringify(result)}`);
+          console.log(JSON.stringify(result));
+          NODE
       - name: Run expense category interaction regression
         run: |
           python3 -m http.server 8765 --bind 127.0.0.1 >/tmp/camper-travel-journal-expense-http.log 2>&1 &

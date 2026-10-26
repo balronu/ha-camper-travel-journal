@@ -6,7 +6,7 @@
 
 <h1 align="center">Camper Travel Journal</h1>
 <p align="center">Dein digitales Wohnmobil-Reisetagebuch für Home Assistant</p>
-<p align="center"><strong>Stable: v0.3.13</strong></p>
+<p align="center"><strong>Stable: v0.3.13</strong> · <strong>Beta: v0.4.0-beta.1</strong></p>
 
 <p align="center">
   <a href="https://github.com/balronu/ha-camper-travel-journal/releases/latest"><img src="https://img.shields.io/github/v/release/balronu/ha-camper-travel-journal?label=Release" alt="Release"></a>
@@ -55,7 +55,7 @@ Installationen bleibt wichtig.
   bearbeiten, fortsetzen, pausieren, beenden, löschen oder wechseln; alle
   Reisebereiche verwenden denselben Reisekontext.
 - Ein laufender Aufenthalt wird beim Beginn einer neuen Fahrt automatisch
-  abgeschlossen. Der erneute reale Praxistest dieses Ablaufs steht noch aus.
+  abgeschlossen. Dieser Ablauf wurde am 25.10.2026 im realen Praxistest bestätigt.
 
 ### Kraftstoffkosten
 

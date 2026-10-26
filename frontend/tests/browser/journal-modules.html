@@ -1,0 +1,44 @@
+<!doctype html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Camper Travel Journal beta.1 module editor</title>
+<div id="host"></div>
+<pre id="result">starting</pre>
+<script type="module">
+const result = document.querySelector("#result");
+window.addEventListener("error", (event) => { result.textContent = JSON.stringify({ error: event.error?.stack || event.message }); });
+window.addEventListener("unhandledrejection", (event) => { result.textContent = JSON.stringify({ error: String(event.reason?.stack || event.reason) }); });
+let configEvents = 0;
+let latestConfig;
+const connection = { async sendMessagePromise(message) {
+  if (message.type !== "camper_travel_journal/list_vehicles") throw new Error(`unexpected ${message.type}`);
+  return { vehicles: [{ vehicle_id: "camper", name: "Wohnmobil", title: "Camper Travel Journal" }] };
+} };
+const hass = { connection, locale: { language: "de-DE" } };
+await import("/custom_components/camper_travel_journal/frontend/camper-travel-journal.js");
+await customElements.whenDefined("camper-travel-journal-card-editor");
+const editor = document.createElement("camper-travel-journal-card-editor");
+editor.addEventListener("config-changed", (event) => { configEvents += 1; latestConfig = event.detail.config; });
+document.querySelector("#host").append(editor);
+editor.setConfig({ type: "custom:camper-travel-journal-journal-card" });
+editor.hass = hass;
+const waitFor = async (predicate) => { for (let i = 0; i < 160; i += 1) { if (predicate()) return true; await new Promise((resolve) => setTimeout(resolve, 25)); } return false; };
+const ready = await waitFor(() => editor.shadowRoot?.querySelectorAll(".module-row").length === 8);
+if (!ready) { result.textContent = JSON.stringify({ error: "module editor did not render", shadow: editor.shadowRoot?.textContent, config: editor._config, hasHass: Boolean(editor.hass) }); throw new Error("module editor harness timed out"); }
+const tankbook = [...editor.shadowRoot.querySelectorAll(".module-row")].find((row) => row.textContent.includes("Tankbuch"));
+tankbook.querySelector("input").click();
+await waitFor(() => latestConfig?.modules?.includes("tankbook"));
+const drives = [...editor.shadowRoot.querySelectorAll(".module-row")].find((row) => row.textContent.includes("Fahrten"));
+drives.querySelectorAll("button")[1].click();
+await waitFor(() => latestConfig?.modules?.[1] === "drives");
+const active = [...editor.shadowRoot.querySelectorAll(".module-row")].filter((row) => row.querySelector("input")?.checked).map((row) => row.textContent.trim());
+result.textContent = JSON.stringify({
+  configEvents,
+  selectedVehicle: latestConfig?.vehicle_id,
+  modules: latestConfig?.modules,
+  activeCount: active.length,
+  tankbookPlanned: tankbook.textContent.includes("geplant"),
+  noProviderRequest: true,
+  noHorizontalOverflow: document.documentElement.scrollWidth <= window.innerWidth + 1,
+}, null, 2);
+</script>
