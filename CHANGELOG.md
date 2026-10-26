@@ -1,5 +1,23 @@
 # Änderungsprotokoll
 
+## 0.4.0 – Stable
+
+### Deutsch
+
+- Die Beta-Reihe 0.4.0 ist als Stable bestätigt und veröffentlicht.
+- Numerische Werte werden in der Oberfläche sprachabhängig formatiert: Deutsch mit Dezimalkomma, Englisch mit Dezimalpunkt. Tankmengen und Literpreise zeigen bis zu drei Nachkommastellen, Verbrauchswerte zwei und Strecken eine Nachkommastelle.
+- Deutsche Eingaben wie `42,420` werden als 42,420 Liter verarbeitet; gespeicherte Werte bleiben numerisch und unverändert.
+- Tankbuch, Kostenverknüpfungen, GPS-Verbrauchsdiagnose, Webasto-Hinweis und Schema 15 bleiben erhalten. Der GPS-Verbrauch bleibt ein geschätzter kombinierter Fahr-/Heizungsverbrauch, wenn keine belastbaren Heizdaten vorliegen.
+- Vor einer Schema-Migration wird ein Backup empfohlen. Ein direktes Downgrade auf v0.3.13 ist ohne Wiederherstellung einer kompatiblen Datenbank nicht vorgesehen.
+
+### English
+
+- The 0.4.0 beta series is confirmed and published as Stable.
+- User-facing numbers now follow the selected language: German uses decimal commas and English uses decimal points. Fuel quantities and prices show up to three fractional digits, consumption two, and distances one.
+- German input such as `42,420` is parsed as 42.420 liters; persisted values remain numeric and unchanged.
+- Fuel log, expense links, GPS consumption diagnostics, the Webasto note and schema 15 remain intact. GPS consumption remains an estimated combined driving/heating figure when reliable heater data is unavailable.
+- Back up before a schema migration. A direct downgrade to v0.3.13 is not supported without restoring a compatible database.
+
 ## 0.4.0-beta.8 – Verbrauchsdiagnose und mobile Tankbuch-Aktionen
 
 ### Deutsch

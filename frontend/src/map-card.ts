@@ -1,7 +1,7 @@
 import { css, html, unsafeCSS } from "lit";
 import { TravelCard, defineOnce } from "./base-card";
 import { createStop, list, listVehicles, route, type Drive, type MapConfig, type RouteResponse, type Snapshot } from "./api";
-import { formatCompactTripPeriod, formatDate, formatDateTime, formatDuration, formatTime, messages } from "./i18n";
+import { formatCompactTripPeriod, formatDate, formatDateTime, formatDecimal, formatDuration, formatTime, messages } from "./i18n";
 import * as L from "leaflet";
 import leafletCss from "leaflet/dist/leaflet.css?inline";
 import { sortDrivesChronologically } from "./map-utils";
@@ -327,7 +327,7 @@ export class MapCard extends TravelCard {
     const source = drive.source === "manual" ? lang.sourceManual : drive.source === "gpx" ? (lang.sourceGpx ?? lang.sourceGps) : lang.sourceGps;
     return html`<label class="drive-row" style=${`--drive-color:${this.driveColor(index)}`}>
       <input type="checkbox" value=${drive.id} .checked=${this.selectedDriveIds.includes(drive.id)} @change=${(event: Event) => void this.toggleDrive(event)}>
-      <span class="drive-info"><strong>${formatDate(drive.started_at, this.hass)} · ${formatTime(drive.started_at, this.hass)} → ${drive.ended_at ? `${formatDate(drive.ended_at, this.hass)} · ${formatTime(drive.ended_at, this.hass)}` : "–"}</strong><span>${(drive.distance_m / 1000).toFixed(1)} km · ${drive.duration_seconds ? formatDuration(drive.duration_seconds, this.hass) : "–"} · ${source}</span></span>
+      <span class="drive-info"><strong>${formatDate(drive.started_at, this.hass)} · ${formatTime(drive.started_at, this.hass)} → ${drive.ended_at ? `${formatDate(drive.ended_at, this.hass)} · ${formatTime(drive.ended_at, this.hass)}` : "–"}</strong><span>${formatDecimal(drive.distance_m / 1000, 1, this.hass)} km · ${drive.duration_seconds ? formatDuration(drive.duration_seconds, this.hass) : "–"} · ${source}</span></span>
     </label>`;
   }
 
@@ -353,7 +353,7 @@ export class MapCard extends TravelCard {
         ${this.trips.length && !(manualConfig.trip_id) ? html`<label class="trip-picker"><span>${lang.mapTrip}</span><select @change=${(event: Event) => void this.selectTrip(event)} .value=${this.selectedTripId}>${this.trips.map((trip) => html`<option value=${trip.id}>${trip.title}</option>`)}</select></label>` : ""}
       </header>
       ${selectedTrip ? html`<div class="metrics" aria-label=${lang.mapTrip}>
-        <div class="metric"><span>${lang.mapTotalDistance}</span><strong>${totalDistance.toFixed(1)} km</strong></div>
+        <div class="metric"><span>${lang.mapTotalDistance}</span><strong>${formatDecimal(totalDistance, 1, this.hass)} km</strong></div>
         <div class="metric"><span>${lang.mapSelectedDrives}</span><strong>${selectedDrives.length} / ${this.drives.length}</strong></div>
         <div class="metric"><span>${lang.mapTripPeriod}</span><strong>${formatCompactTripPeriod(selectedTrip, this.hass) || "–"}</strong></div>
       </div>` : ""}

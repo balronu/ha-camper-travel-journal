@@ -1,7 +1,7 @@
 # Camper Travel Journal – Roadmap
 
 This roadmap separates implemented work, current limitations and planned
-features. It is based on the released `v0.3.13` source tree and tests.
+features. It is based on the released `v0.4.0` source tree and tests.
 A database
 table or WebSocket method is not treated as a finished user feature
 without a corresponding UI and test path.
@@ -21,7 +21,7 @@ without a corresponding UI and test path.
 - Expense CRUD, integer-cent totals, mixed-currency protection, inline editing
   and canonical category IDs, including the `camping` round-trip.
 
-## Current stable baseline: `v0.3.13`
+## Current stable baseline: `v0.4.0`
 
 The stable baseline includes deterministic active-trip selection, persistent
 Summary Card trip selection, the central Journal Card, GPX import, place and
