@@ -187,12 +187,12 @@ class SQLiteStore:
             self.connection.execute("PRAGMA journal_mode = WAL")
             self.connection.execute("PRAGMA synchronous = NORMAL")
             self.connection.execute("PRAGMA busy_timeout = 30000")
-            self.connection.executescript(SCHEMA_SQL)
-            current = self.connection.execute("SELECT value FROM schema_meta WHERE key='version'").fetchone()
-            if current is not None and int(current[0]) > SCHEMA_VERSION:
-                raise RuntimeError(f"database schema {current[0]} is newer than supported {SCHEMA_VERSION}")
-            previous = int(current[0]) if current is not None else 0
             with self.transaction() as connection:
+                self._execute_migration_script(SCHEMA_SQL)
+                current = connection.execute("SELECT value FROM schema_meta WHERE key='version'").fetchone()
+                if current is not None and int(current[0]) > SCHEMA_VERSION:
+                    raise RuntimeError(f"database schema {current[0]} is newer than supported {SCHEMA_VERSION}")
+                previous = int(current[0]) if current is not None else 0
                 if previous < 3:
                     self._migrate_v3()
                 if previous < 4:
@@ -244,7 +244,7 @@ class SQLiteStore:
             self.connection.execute("ALTER TABLE expenses ADD COLUMN odometer_km REAL")
         if "stay_id" not in columns:
             self.connection.execute("ALTER TABLE expenses ADD COLUMN stay_id TEXT REFERENCES stops(id) ON DELETE SET NULL")
-        self.connection.executescript("""
+        self._execute_migration_script("""
         CREATE TABLE IF NOT EXISTS stops (
           id TEXT PRIMARY KEY, vehicle_id TEXT NOT NULL REFERENCES vehicles(id), trip_id TEXT REFERENCES trips(id) ON DELETE SET NULL,
           name TEXT NOT NULL, occurred_at TEXT NOT NULL, arrived_at TEXT, departed_at TEXT,
@@ -286,7 +286,7 @@ class SQLiteStore:
         """Add GPX provenance and idempotency tables only."""
         if self.connection is None:
             raise RuntimeError("store is not open")
-        self.connection.executescript("""
+        self._execute_migration_script("""
         CREATE TABLE IF NOT EXISTS gpx_imports (
           file_hash TEXT PRIMARY KEY, vehicle_id TEXT NOT NULL REFERENCES vehicles(id), imported_at TEXT NOT NULL,
           point_count INTEGER NOT NULL, drive_count INTEGER NOT NULL
@@ -306,7 +306,7 @@ class SQLiteStore:
         """Add explicit, non-destructive GPS-point-to-drive membership."""
         if self.connection is None:
             raise RuntimeError("store is not open")
-        self.connection.executescript("""
+        self._execute_migration_script("""
         CREATE TABLE IF NOT EXISTS drive_gps_points (
           drive_id TEXT NOT NULL REFERENCES drives(id) ON DELETE CASCADE,
           gps_point_id INTEGER NOT NULL REFERENCES gps_points(id) ON DELETE CASCADE,
@@ -355,7 +355,7 @@ class SQLiteStore:
                 self.connection.execute(f"ALTER TABLE stops ADD COLUMN {name} {definition}")
         self.connection.execute("UPDATE stops SET place_type=stop_type WHERE place_type='other' AND stop_type <> 'other'")
         self.connection.execute("UPDATE stops SET source=CASE WHEN automatic=1 THEN 'legacy' ELSE 'manual' END WHERE source='legacy'")
-        self.connection.executescript("""
+        self._execute_migration_script("""
         CREATE INDEX IF NOT EXISTS idx_stops_drive ON stops(drive_id);
         CREATE INDEX IF NOT EXISTS idx_stops_type ON stops(vehicle_id, place_type, occurred_at);
         CREATE TABLE IF NOT EXISTS overnight_details (
@@ -407,7 +407,7 @@ class SQLiteStore:
         """Persist user decisions for derived drive interruptions only."""
         if self.connection is None:
             raise RuntimeError("store is not open")
-        self.connection.executescript("""
+        self._execute_migration_script("""
         CREATE TABLE IF NOT EXISTS interruption_links (
           trip_id TEXT NOT NULL REFERENCES trips(id) ON DELETE CASCADE,
           interruption_id TEXT NOT NULL,
@@ -453,7 +453,7 @@ class SQLiteStore:
         """Add normalized, optional multi-select expense services."""
         if self.connection is None:
             raise RuntimeError("store is not open")
-        self.connection.executescript("""
+        self._execute_migration_script("""
         CREATE TABLE IF NOT EXISTS expense_services (id TEXT PRIMARY KEY, label_key TEXT NOT NULL UNIQUE);
         CREATE TABLE IF NOT EXISTS expense_service_links (
           expense_id TEXT NOT NULL REFERENCES expenses(id) ON DELETE CASCADE,
@@ -468,7 +468,7 @@ class SQLiteStore:
         """Persist exact GPS-drive identity without deleting legacy duplicates."""
         if self.connection is None:
             raise RuntimeError("store is not open")
-        self.connection.executescript("""
+        self._execute_migration_script("""
         CREATE TABLE IF NOT EXISTS drive_identities (
           vehicle_id TEXT NOT NULL REFERENCES vehicles(id) ON DELETE CASCADE,
           started_at TEXT NOT NULL,
@@ -500,7 +500,7 @@ class SQLiteStore:
         """Persist explicit user exclusions for manually deleted GPS drives."""
         if self.connection is None:
             raise RuntimeError("store is not open")
-        self.connection.executescript("""
+        self._execute_migration_script("""
         CREATE TABLE IF NOT EXISTS drive_deletion_exclusions (
           id INTEGER PRIMARY KEY AUTOINCREMENT,
           vehicle_id TEXT NOT NULL REFERENCES vehicles(id) ON DELETE CASCADE,
@@ -514,6 +514,27 @@ class SQLiteStore:
         CREATE INDEX IF NOT EXISTS idx_drive_deletion_exclusions_vehicle_time
           ON drive_deletion_exclusions(vehicle_id, started_at, ended_at);
         """)
+
+    def _execute_migration_script(self, script: str) -> None:
+        """Execute migration statements without ``sqlite3.executescript``.
+
+        ``executescript`` implicitly commits an open transaction before it
+        starts.  That makes a later migration failure leave a partial schema
+        behind even though ``open()`` wraps all migrations in a transaction.
+        Parsing complete statements and executing each one on the existing
+        connection keeps DDL and DML inside that caller-owned transaction.
+        """
+        if self.connection is None:
+            raise RuntimeError("store is not open")
+        statement = ""
+        for line in script.splitlines(keepends=True):
+            statement += line
+            if sqlite3.complete_statement(statement):
+                if statement.strip():
+                    self.connection.execute(statement)
+                statement = ""
+        if statement.strip():
+            raise ValueError("incomplete migration statement")
 
     def _backfill_v10_gpx_endpoints(self) -> None:
         """Reconstruct safe legacy memberships once, then persist endpoints.

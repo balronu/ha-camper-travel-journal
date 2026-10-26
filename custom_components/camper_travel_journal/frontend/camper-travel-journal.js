@@ -2138,10 +2138,10 @@ function Ho(d) {
 }
 async function jo(d, i, r = Zo) {
   const o = { state: "not_run", durationMs: null };
-  if (!d?.connection) return { version: "0.4.0-beta.2", connectionBefore: "unavailable", connectionAfter: "unavailable", authentication: o, vehicles: o, trips: o, vehicleId: tn(i) };
+  if (!d?.connection) return { version: "0.4.0-beta.3", connectionBefore: "unavailable", connectionAfter: "unavailable", authentication: o, vehicles: o, trips: o, vehicleId: tn(i) };
   const l = Gr(d), c = await en(d, { type: "auth/current_user" }, Wo, r), p = await en(d, { type: "camper_travel_journal/list_vehicles" }, qo, r), y = p.value?.vehicles?.filter((H) => typeof H.vehicle_id == "string") ?? [], f = y.length === 1 ? y[0].vehicle_id : void 0, P = await en(d, { type: "camper_travel_journal/list", vehicle_id: f ?? i }, Ho, r), { value: b, ...D } = c, { value: $, ...C } = p, { value: R, ...E } = P;
   return {
-    version: "0.4.0-beta.2",
+    version: "0.4.0-beta.3",
     connectionBefore: l,
     connectionAfter: Gr(d),
     authentication: D,
