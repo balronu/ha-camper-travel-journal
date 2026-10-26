@@ -1,5 +1,25 @@
 # Änderungsprotokoll
 
+## 0.4.0-beta.6 – Kraftstoffausgaben ins Tankbuch übernehmen
+
+### Deutsch
+
+- Vorhandene Kraftstoffausgaben können im Tankbuch chronologisch ausgewählt und als bearbeitbare Vorschau übernommen werden.
+- Die bestehende Ausgabe wird dauerhaft mit höchstens einem Tankvorgang verknüpft; es entsteht keine zweite Kostenbuchung.
+- Bereits übernommene Ausgaben bleiben sichtbar und sind nicht erneut auswählbar. Eine Verknüpfung kann nur nach ausdrücklicher Bestätigung gelöst werden.
+- Löschen einer verknüpften Ausgabe wird kontrolliert verhindert; Tankvorgänge und Kosten bleiben beim Entkoppeln getrennt erhalten.
+- Schema 15 und die bestehende GPS-/Webasto-Verbrauchslogik bleiben unverändert. Mobile-Fuel-Stations bleibt eine optionale spätere Erweiterung.
+- Beta-Release; v0.3.13 bleibt Stable. Echte iPhone-/Safari-Abnahme bleibt offen.
+
+### English
+
+- Existing fuel expenses can be selected chronologically in the fuel log and copied into an editable preview.
+- Each expense can be permanently linked to at most one tank event; no second expense record is created.
+- Imported expenses remain visible but cannot be selected again. A link can only be removed after explicit confirmation.
+- Deleting a linked expense is blocked safely; unlinking keeps the tank event and expense as separate records.
+- Schema 15 and the existing GPS/Webasto consumption logic remain unchanged. Mobile Fuel Stations stays an optional future extension.
+- Beta release; v0.3.13 remains Stable. Real iPhone/Safari acceptance is still open.
+
 ## 0.4.0-beta.5 – UI-Hotfix für Tankbuch, Dialoge und Kostenreihenfolge
 
 ### Deutsch

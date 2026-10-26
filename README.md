@@ -6,7 +6,7 @@
 
 <h1 align="center">Camper Travel Journal</h1>
 <p align="center">Dein digitales Wohnmobil-Reisetagebuch für Home Assistant</p>
-<p align="center"><strong>Stable: v0.3.13</strong> · <strong>Beta: v0.4.0-beta.5</strong></p>
+<p align="center"><strong>Stable: v0.3.13</strong> · <strong>Beta: v0.4.0-beta.6</strong></p>
 
 <p align="center">
   <a href="https://github.com/balronu/ha-camper-travel-journal/releases/latest"><img src="https://img.shields.io/github/v/release/balronu/ha-camper-travel-journal?label=Release" alt="Release"></a>
@@ -64,6 +64,11 @@ Wenn zwei der drei Werte vorhanden sind, wird der fehlende Wert berechnet.
 Deutsche Kommaeingaben werden unterstützt; Betrag wird mit zwei, Liter und
 Literpreis mit bis zu drei Nachkommastellen dargestellt. Alte Kraftstoffkosten
 ohne diese Angaben bleiben gültig.
+
+Im aktivierbaren Tankbuch können vorhandene Kraftstoffkosten über **Aus Kosten
+übernehmen** als bearbeitbare Tankvorschau übernommen werden. Die ursprüngliche
+Ausgabe wird 1:1 verknüpft; es entsteht keine zweite Kostenbuchung. Bereits
+übernommene Ausgaben sind gekennzeichnet und nicht erneut auswählbar.
 
 ### Bemerkungen zu Kosten
 

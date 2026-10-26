@@ -121,6 +121,35 @@ class TankbookTests(unittest.TestCase):
         self.store.delete_tank_event(event)
         self.assertEqual(self.store.connection.execute("SELECT count(*) FROM expenses").fetchone()[0], 1)
 
+    def test_fuel_expenses_are_importable_once_and_link_is_explicitly_removable(self):
+        from custom_components.camper_travel_journal.models import Expense
+        trip = self.store.create_trip("v1", "Reise", self.now, self.now)
+        older = self.store.create_expense(Expense("", trip, self.now, "fuel", 13125, "EUR", note="Vollgetankt vor der Fahrt", occurred_on="2026-10-23", fuel_liters=60.792, fuel_price_per_liter=2.159), self.now)
+        newer = self.store.create_expense(Expense("", trip, self.now, "fuel", 9201, "EUR", note="Vollgetankt nach der Fahrt", occurred_on="2026-10-26", occurred_time="11:04", fuel_liters=42.420, fuel_price_per_liter=2.169), self.now)
+        available = self.store.list_fuel_expenses("v1")
+        self.assertEqual([row["id"] for row in available], [newer, older])
+        self.assertTrue(all(row["tank_event_id"] is None for row in available))
+        event = self.store.create_tank_event("v1", self.now, occurred_at=self.now, liters=60.792, fill_level="full", amount_minor=13125, price_per_liter=2.159, expense_id=older)
+        self.assertEqual(self.store.list_fuel_expenses("v1")[1]["tank_event_id"], event)
+        with self.assertRaisesRegex(ValueError, "tankbook_expense_already_linked"):
+            self.store.create_tank_event("v1", self.now + timedelta(days=1), occurred_at=self.now + timedelta(days=1), liters=60.792, fill_level="full", amount_minor=13125, expense_id=older)
+        with self.assertRaisesRegex(ValueError, "tankbook_expense_linked"):
+            self.store.delete_expense(older)
+        with self.assertRaisesRegex(ValueError, "tankbook_unlink_confirmation_required"):
+            self.store.unlink_tank_event(event)
+        self.store.unlink_tank_event(event, confirmed=True)
+        self.assertIsNone(self.store.list_fuel_expenses("v1")[1]["tank_event_id"])
+
+    def test_linked_expense_delete_does_not_delete_tank_event_after_explicit_unlink(self):
+        from custom_components.camper_travel_journal.models import Expense
+        trip = self.store.create_trip("v1", "Reise", self.now, self.now)
+        expense = self.store.create_expense(Expense("", trip, self.now, "fuel", 1000, "EUR", fuel_liters=10, fuel_price_per_liter=1), self.now)
+        event = self.store.create_tank_event("v1", self.now, occurred_at=self.now, liters=10, fill_level="partial", expense_id=expense)
+        self.store.unlink_tank_event(event, confirmed=True)
+        self.store.delete_expense(expense)
+        self.assertEqual(self.store.list_tank_events("v1")[0]["id"], event)
+        self.assertIsNone(self.store.list_tank_events("v1")[0]["expense_id"])
+
     def test_values_can_be_missing_but_inconsistent_values_are_rejected(self):
         self.assertEqual(normalize_tank_values("60,792", "2,159", None)[2], 13125)
         with self.assertRaisesRegex(ValueError, "tankbook_values_inconsistent"):

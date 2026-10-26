@@ -87,7 +87,7 @@ async def _reverse_geocode(hass: HomeAssistant, runtime, latitude: float, longit
         async with session.get(
             _NOMINATIM_URL,
             params={"lat": f"{round(latitude, 3):.3f}", "lon": f"{round(longitude, 3):.3f}", "format": "jsonv2", "zoom": "10", "addressdetails": "1"},
-            headers={"User-Agent": "Camper Travel Journal/0.4.0-beta.5"},
+            headers={"User-Agent": "Camper Travel Journal/0.4.0-beta.6"},
             timeout=5,
         ) as response:
             if response.status != 200:
@@ -530,6 +530,13 @@ if websocket_api is not None:
             connection.send_result(msg["id"], await _call(hass, msg, "tankbook_snapshot", msg["vehicle_id"]))
         except Exception as err: _send_error(connection, msg, err)
 
+    @websocket_api.websocket_command({**_base("camper_travel_journal/list_fuel_expenses")})
+    @websocket_api.async_response
+    async def ws_list_fuel_expenses(hass, connection, msg):
+        try:
+            connection.send_result(msg["id"], {"expenses": await _call(hass, msg, "list_fuel_expenses", msg["vehicle_id"])})
+        except Exception as err: _send_error(connection, msg, err)
+
     _tank_event_fields = {
         vol.Required("occurred_at"): str,
         vol.Required("liters"): vol.Coerce(float),
@@ -569,6 +576,14 @@ if websocket_api is not None:
     async def ws_delete_tank_event(hass, connection, msg):
         try:
             await _call(hass, msg, "delete_tank_event", msg["event_id"])
+            connection.send_result(msg["id"], {"success": True})
+        except Exception as err: _send_error(connection, msg, err)
+
+    @websocket_api.websocket_command({**_base("camper_travel_journal/unlink_tank_event"), vol.Required("event_id"): str, vol.Required("confirmed"): bool})
+    @websocket_api.async_response
+    async def ws_unlink_tank_event(hass, connection, msg):
+        try:
+            await _call(hass, msg, "unlink_tank_event", msg["event_id"], confirmed=msg["confirmed"])
             connection.send_result(msg["id"], {"success": True})
         except Exception as err: _send_error(connection, msg, err)
 
@@ -701,7 +716,7 @@ if websocket_api is not None:
             connection.send_result(msg["id"], result)
         except Exception as err: _send_error(connection, msg, err)
 
-    COMMANDS = (ws_list_vehicles, ws_export_pdf, ws_list, ws_route, ws_diagnostics, ws_create_trip, ws_update_trip, ws_delete_trip, ws_transition_trip, ws_link_drives, ws_unlink_drive, ws_create_manual_drive, ws_update_manual_drive, ws_delete_manual_drive, ws_delete_drive, ws_create_stop, ws_update_stop, ws_delete_stop, ws_assign_interruption, ws_create_stop_from_interruption, ws_list_tankbook, ws_create_tank_event, ws_update_tank_event, ws_delete_tank_event, ws_create_expense, ws_update_expense, ws_delete_expense, ws_update_overnight, ws_update_rating, ws_delete_rating, ws_list_stop_suggestions, ws_generate_stop_suggestions, ws_accept_stop_suggestion, ws_dismiss_stop_suggestion, ws_analyze_gpx, ws_import_gpx)
+    COMMANDS = (ws_list_vehicles, ws_export_pdf, ws_list, ws_route, ws_diagnostics, ws_create_trip, ws_update_trip, ws_delete_trip, ws_transition_trip, ws_link_drives, ws_unlink_drive, ws_create_manual_drive, ws_update_manual_drive, ws_delete_manual_drive, ws_delete_drive, ws_create_stop, ws_update_stop, ws_delete_stop, ws_assign_interruption, ws_create_stop_from_interruption, ws_list_tankbook, ws_list_fuel_expenses, ws_create_tank_event, ws_update_tank_event, ws_delete_tank_event, ws_unlink_tank_event, ws_create_expense, ws_update_expense, ws_delete_expense, ws_update_overnight, ws_update_rating, ws_delete_rating, ws_list_stop_suggestions, ws_generate_stop_suggestions, ws_accept_stop_suggestion, ws_dismiss_stop_suggestion, ws_analyze_gpx, ws_import_gpx)
 else:
     COMMANDS = ()
 
