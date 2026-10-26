@@ -71,6 +71,41 @@ class TankbookTests(unittest.TestCase):
         self.assertEqual(interval["quality"], "incomplete")
         self.assertIsNone(interval["combined_l_per_100km"])
 
+    def test_stationary_periods_between_recorded_drives_are_not_called_gps_gaps(self):
+        events = [
+            {"occurred_at": self.now.isoformat(), "fuel_type": "diesel", "fill_level": "full", "liters": 50},
+            {"occurred_at": (self.now + timedelta(days=1)).isoformat(), "fuel_type": "diesel", "fill_level": "full", "liters": 40},
+        ]
+        drives = [
+            {"id": "d1", "started_at": (self.now + timedelta(hours=2)).isoformat(), "ended_at": (self.now + timedelta(hours=3)).isoformat(), "distance_m": 50000},
+            {"id": "d2", "started_at": (self.now + timedelta(hours=8)).isoformat(), "ended_at": (self.now + timedelta(hours=9)).isoformat(), "distance_m": 30000},
+        ]
+        points = [
+            {"recorded_at": self.now.isoformat(), "latitude": 49, "longitude": 7},
+            {"recorded_at": (self.now + timedelta(days=1)).isoformat(), "latitude": 49, "longitude": 7},
+        ]
+        interval = calculate_consumption(events, drives, gps_points=points)["intervals"]["diesel"][0]
+        self.assertEqual(interval["quality"], "estimated")
+        self.assertEqual(interval["distance_source"], "gps_drives")
+        self.assertEqual(interval["gps_diagnosis"]["stationary_or_unobserved_periods"], 1)
+
+    def test_boundary_drive_uses_only_timestamped_overlap(self):
+        start, end = self.now, self.now + timedelta(hours=2)
+        events = [
+            {"occurred_at": start.isoformat(), "fuel_type": "diesel", "fill_level": "full", "liters": 10},
+            {"occurred_at": end.isoformat(), "fuel_type": "diesel", "fill_level": "full", "liters": 8},
+        ]
+        drive = {"id": "boundary", "started_at": (start - timedelta(hours=1)).isoformat(), "ended_at": (end + timedelta(hours=1)).isoformat(), "distance_m": 999999,
+                 "gps_points": [
+                     {"recorded_at": (start - timedelta(minutes=30)).isoformat(), "latitude": 49, "longitude": 7},
+                     {"recorded_at": (start + timedelta(minutes=30)).isoformat(), "latitude": 49, "longitude": 7.01},
+                     {"recorded_at": (end + timedelta(minutes=30)).isoformat(), "latitude": 49, "longitude": 7.02},
+                 ]}
+        interval = calculate_consumption(events, [drive], gps_points=[{"recorded_at": start.isoformat()} , {"recorded_at": end.isoformat()}])["intervals"]["diesel"][0]
+        self.assertEqual(interval["quality"], "estimated")
+        self.assertLess(interval["distance_km"], 999.0)
+        self.assertGreater(interval["distance_km"], 0)
+
     def test_no_gps_distance_is_not_presented_as_zero_consumption(self):
         events = [
             {"occurred_at": self.now.isoformat(), "fuel_type": "diesel", "fill_level": "full", "liters": 50},
@@ -79,6 +114,7 @@ class TankbookTests(unittest.TestCase):
         interval = calculate_consumption(events, [])['intervals']['diesel'][0]
         self.assertEqual(interval['quality'], 'not_calculable')
         self.assertIsNone(interval['combined_l_per_100km'])
+        self.assertIn("no_drives", interval["gps_diagnosis"]["gaps"])
 
     def test_adblue_is_separate_and_heating_is_not_called_engine_consumption(self):
         self.event(self.now, liters=10, fill_level="full", fuel_type="adblue", odometer=10000)

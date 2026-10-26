@@ -1,5 +1,25 @@
 # Änderungsprotokoll
 
+## 0.4.0-beta.7 – GPS-Verbrauchsdiagnose
+
+### Deutsch
+
+- GPS-Fahrten werden als Fallback für fehlende Kilometerstände ausgewertet; die relevante Tankmenge bleibt die abschließende Volltankung einschließlich möglicher Teilbetankungen.
+- Mehrtägige Standzeiten zwischen aufgezeichneten Fahrten werden nicht mehr automatisch als GPS-Lücke bewertet. Fehlende Intervallgrenzen und unvollständige Grenzfahrten werden ausdrücklich diagnostiziert.
+- Grenzfahrten werden nur aus vorhandenen zeitgestempelten GPS-Punkten anteilig berechnet; geplante Routen, Luftlinien und künstliche Punkte werden nicht verwendet.
+- Die Journal Card zeigt Streckenquelle, GPS-Abdeckung, erfasste Strecke, Datenlücken und den konkreten Berechnungsgrund verständlich an. GPS-Werte bleiben als geschätzter kombinierter Verbrauch (Fahren + mögliche Webasto) gekennzeichnet.
+- Keine SQLite-Migration, keine Änderung bestehender GPS-/Tank-/Kosten-/Reisedaten und kein Eingriff in VM104.
+- Beta-Release; v0.3.13 bleibt Stable. Echte iPhone-/Safari-Abnahme bleibt nach Veröffentlichung offen.
+
+### English
+
+- Recorded GPS drives are used as the fallback when odometer readings are missing; the interval fuel quantity remains the ending full fill plus any intervening partial fills.
+- Multi-day stationary periods between recorded drives are no longer automatically treated as GPS gaps. Missing interval boundaries and incomplete boundary-crossing drives are reported explicitly.
+- Boundary-crossing drives are clipped only from existing timestamped GPS points; planned routes, straight-line distances and synthetic points are never used.
+- The Journal Card now explains the distance source, GPS coverage, recorded distance, gaps and the concrete calculation reason. GPS results remain labelled as estimated combined consumption (driving + possible Webasto heating).
+- No SQLite migration, existing GPS/tank/expense/trip data rewrite or VM104 change is included.
+- Beta release; v0.3.13 remains Stable. Real iPhone/Safari acceptance remains open after publication.
+
 ## 0.4.0-beta.6 – Kraftstoffausgaben ins Tankbuch übernehmen
 
 ### Deutsch
