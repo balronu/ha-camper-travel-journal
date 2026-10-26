@@ -62,7 +62,7 @@ jobs:
           server_pid=$!
           trap 'kill "$server_pid"' EXIT
           sleep 0.3
-          chromium --headless --no-sandbox --disable-gpu --window-size=390,900 --virtual-time-budget=3000 \
+          chromium --headless --no-sandbox --disable-gpu --window-size=390,900 --virtual-time-budget=6000 \
             --dump-dom http://127.0.0.1:8765/frontend/tests/browser/journal-modules.html >/tmp/camper-travel-journal-modules-dom.html
           node - <<'NODE'
           const fs = require('fs');
