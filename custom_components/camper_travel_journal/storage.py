@@ -1608,8 +1608,9 @@ class SQLiteStore:
         # stable id tie-breaker keeps reloads deterministic without inventing
         # a time value.
         expenses = [dict(row) for row in self.connection.execute(
-            "SELECT e.*, s.name AS place_name FROM expenses e "
+            "SELECT e.*, s.name AS place_name, te.id AS tank_event_id FROM expenses e "
             "LEFT JOIN stops s ON s.id=COALESCE(e.place_id,e.stay_id) "
+            "LEFT JOIN tank_events te ON te.expense_id=e.id "
             "WHERE e.trip_id=? "
             "ORDER BY COALESCE(NULLIF(e.occurred_on,''), substr(e.occurred_at,1,10)) DESC, "
             "CASE WHEN e.occurred_time IS NULL THEN 0 ELSE 1 END DESC, "
@@ -1619,6 +1620,22 @@ class SQLiteStore:
         for expense in expenses:
             expense["services"] = [row[0] for row in self.connection.execute("SELECT service_id FROM expense_service_links WHERE expense_id=? ORDER BY rowid", (expense["id"],)).fetchall()]
         return expenses
+
+    def list_fuel_expenses(self, vehicle_id: str) -> list[dict]:
+        """List vehicle fuel expenses for an explicit tankbook import choice."""
+        if self.connection is None:
+            raise RuntimeError("store is not open")
+        rows = self.connection.execute(
+            "SELECT e.*, t.vehicle_id, t.title AS trip_title, te.id AS tank_event_id "
+            "FROM expenses e JOIN trips t ON t.id=e.trip_id "
+            "LEFT JOIN tank_events te ON te.expense_id=e.id "
+            "WHERE t.vehicle_id=? AND e.category='fuel' "
+            "ORDER BY COALESCE(NULLIF(e.occurred_on,''), substr(e.occurred_at,1,10)) DESC, "
+            "CASE WHEN e.occurred_time IS NULL THEN 0 ELSE 1 END DESC, "
+            "COALESCE(e.occurred_time,'') DESC, e.id DESC",
+            (vehicle_id,),
+        ).fetchall()
+        return [dict(row) for row in rows]
 
     def create_tank_event(self, vehicle_id: str, now: datetime, **fields) -> str:
         """Create a vehicle-scoped tank event without creating an expense."""
@@ -1661,7 +1678,7 @@ class SQLiteStore:
         return event_id
 
     @staticmethod
-    def _validate_tank_links(connection, vehicle_id: str, trip_id: str | None, expense_id: str | None) -> None:
+    def _validate_tank_links(connection, vehicle_id: str, trip_id: str | None, expense_id: str | None, event_id: str | None = None) -> None:
         if trip_id is not None:
             trip = connection.execute("SELECT vehicle_id FROM trips WHERE id=?", (trip_id,)).fetchone()
             if trip is None:
@@ -1679,6 +1696,12 @@ class SQLiteStore:
                 raise ValueError("tankbook_expense_not_fuel")
             if expense[1] != vehicle_id:
                 raise ValueError("vehicle_mismatch")
+            linked = connection.execute(
+                "SELECT id FROM tank_events WHERE expense_id=? AND id<>COALESCE(?, '')",
+                (expense_id, event_id),
+            ).fetchone()
+            if linked is not None:
+                raise ValueError("tankbook_expense_already_linked")
 
     def list_tank_events(self, vehicle_id: str) -> list[dict]:
         if self.connection is None:
@@ -1710,7 +1733,7 @@ class SQLiteStore:
             liters, price, amount = normalize_tank_values(merged["liters"], merged.get("price_per_liter"), merged.get("amount_minor"))
             if merged.get("odometer_km") is not None and (not isfinite(float(merged["odometer_km"])) or float(merged["odometer_km"]) < 0):
                 raise ValueError("tankbook_odometer_invalid")
-            self._validate_tank_links(connection, current["vehicle_id"], merged.get("trip_id"), merged.get("expense_id"))
+            self._validate_tank_links(connection, current["vehicle_id"], merged.get("trip_id"), merged.get("expense_id"), event_id)
             connection.execute(
                 "UPDATE tank_events SET occurred_at=?,odometer_km=?,fuel_type=?,liters=?,price_per_liter=?,amount_minor=?,fill_level=?,station=?,note=?,trip_id=?,expense_id=?,updated_at=? WHERE id=?",
                 (merged["occurred_at"], merged.get("odometer_km"), merged["fuel_type"], liters, price, amount,
@@ -1730,9 +1753,21 @@ class SQLiteStore:
 
     def delete_expense(self, expense_id: str) -> None:
         with self.transaction() as connection:
+            linked = connection.execute("SELECT 1 FROM tank_events WHERE expense_id=?", (expense_id,)).fetchone()
+            if linked is not None:
+                raise ValueError("tankbook_expense_linked")
             cursor = connection.execute("DELETE FROM expenses WHERE id=?", (expense_id,))
             if cursor.rowcount != 1:
                 raise ValueError("expense_not_found")
+
+    def unlink_tank_event(self, event_id: str, *, confirmed: bool = False) -> None:
+        """Explicitly remove a cost/tankbook link without deleting either row."""
+        if not confirmed:
+            raise ValueError("tankbook_unlink_confirmation_required")
+        with self.transaction() as connection:
+            cursor = connection.execute("UPDATE tank_events SET expense_id=NULL WHERE id=?", (event_id,))
+            if cursor.rowcount != 1:
+                raise ValueError("tankbook_not_found")
 
     def update_expense(self, expense_id: str, now: datetime, **fields) -> None:
         allowed = {"trip_id", "occurred_at", "occurred_on", "occurred_time", "category", "amount_minor", "currency", "note", "odometer_km", "stay_id", "place_id", "fuel_liters", "fuel_price_per_liter", "services"}

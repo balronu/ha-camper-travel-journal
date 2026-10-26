@@ -1,4 +1,4 @@
-const ei = globalThis, un = ei.ShadowRoot && (ei.ShadyCSS === void 0 || ei.ShadyCSS.nativeShadow) && "adoptedStyleSheets" in Document.prototype && "replace" in CSSStyleSheet.prototype, pn = /* @__PURE__ */ Symbol(), Ir = /* @__PURE__ */ new WeakMap();
+const ii = globalThis, un = ii.ShadowRoot && (ii.ShadyCSS === void 0 || ii.ShadyCSS.nativeShadow) && "adoptedStyleSheets" in Document.prototype && "replace" in CSSStyleSheet.prototype, pn = /* @__PURE__ */ Symbol(), Lr = /* @__PURE__ */ new WeakMap();
 let Qr = class {
   constructor(i, r, o) {
     if (this._$cssResult$ = !0, o !== pn) throw Error("CSSResult is not constructable. Use `unsafeCSS` or `css` instead.");
@@ -9,7 +9,7 @@ let Qr = class {
     const r = this.t;
     if (un && i === void 0) {
       const o = r !== void 0 && r.length === 1;
-      o && (i = Ir.get(r)), i === void 0 && ((this.o = i = new CSSStyleSheet()).replaceSync(this.cssText), o && Ir.set(r, i));
+      o && (i = Lr.get(r)), i === void 0 && ((this.o = i = new CSSStyleSheet()).replaceSync(this.cssText), o && Lr.set(r, i));
     }
     return i;
   }
@@ -27,7 +27,7 @@ const ts = (c) => new Qr(typeof c == "string" ? c : c + "", void 0, pn), gt = (c
 }, Za = (c, i) => {
   if (un) c.adoptedStyleSheets = i.map((r) => r instanceof CSSStyleSheet ? r : r.styleSheet);
   else for (const r of i) {
-    const o = document.createElement("style"), l = ei.litNonce;
+    const o = document.createElement("style"), l = ii.litNonce;
     l !== void 0 && o.setAttribute("nonce", l), o.textContent = r.cssText, c.appendChild(o);
   }
 }, Cr = un ? (c) => c : (c) => c instanceof CSSStyleSheet ? ((i) => {
@@ -35,7 +35,7 @@ const ts = (c) => new Qr(typeof c == "string" ? c : c + "", void 0, pn), gt = (c
   for (const o of i.cssRules) r += o.cssText;
   return ts(r);
 })(c) : c;
-const { is: Ua, defineProperty: Wa, getOwnPropertyDescriptor: qa, getOwnPropertyNames: Ha, getOwnPropertySymbols: ja, getPrototypeOf: Ga } = Object, li = globalThis, Mr = li.trustedTypes, Ka = Mr ? Mr.emptyScript : "", Va = li.reactiveElementPolyfillSupport, Se = (c, i) => c, ln = { toAttribute(c, i) {
+const { is: Ua, defineProperty: Wa, getOwnPropertyDescriptor: qa, getOwnPropertyNames: Ha, getOwnPropertySymbols: ja, getPrototypeOf: Ga } = Object, hi = globalThis, Mr = hi.trustedTypes, Ka = Mr ? Mr.emptyScript : "", Va = hi.reactiveElementPolyfillSupport, Se = (c, i) => c, ln = { toAttribute(c, i) {
   switch (i) {
     case Boolean:
       c = c ? Ka : null;
@@ -64,7 +64,7 @@ const { is: Ua, defineProperty: Wa, getOwnPropertyDescriptor: qa, getOwnProperty
   }
   return r;
 } }, es = (c, i) => !Ua(c, i), zr = { attribute: !0, type: String, converter: ln, reflect: !1, useDefault: !1, hasChanged: es };
-Symbol.metadata ??= /* @__PURE__ */ Symbol("metadata"), li.litPropertyMetadata ??= /* @__PURE__ */ new WeakMap();
+Symbol.metadata ??= /* @__PURE__ */ Symbol("metadata"), hi.litPropertyMetadata ??= /* @__PURE__ */ new WeakMap();
 let re = class extends HTMLElement {
   static addInitializer(i) {
     this._$Ei(), (this.l ??= []).push(i);
@@ -246,10 +246,10 @@ let re = class extends HTMLElement {
   firstUpdated(i) {
   }
 };
-re.elementStyles = [], re.shadowRootOptions = { mode: "open" }, re[Se("elementProperties")] = /* @__PURE__ */ new Map(), re[Se("finalized")] = /* @__PURE__ */ new Map(), Va?.({ ReactiveElement: re }), (li.reactiveElementVersions ??= []).push("2.1.2");
-const fn = globalThis, Or = (c) => c, ri = fn.trustedTypes, Rr = ri ? ri.createPolicy("lit-html", { createHTML: (c) => c }) : void 0, is = "$lit$", zt = `lit$${Math.random().toFixed(9).slice(2)}$`, ns = "?" + zt, Ja = `<${ns}>`, Kt = document, De = () => Kt.createComment(""), Ae = (c) => c === null || typeof c != "object" && typeof c != "function", mn = Array.isArray, Ya = (c) => mn(c) || typeof c?.[Symbol.iterator] == "function", Ji = `[ \t
-\f\r]`, Ee = /<(?:(!--|\/[^a-zA-Z])|(\/?[a-zA-Z][^>\s]*)|(\/?$))/g, Nr = /-->/g, Br = />/g, qt = RegExp(`>|${Ji}(?:([^\\s"'>=/]+)(${Ji}*=${Ji}*(?:[^ \t
-\f\r"'\`<>=]|("|')|))|$)`, "g"), Fr = /'/g, Zr = /"/g, rs = /^(?:script|style|textarea|title)$/i, Xa = (c) => (i, ...r) => ({ _$litType$: c, strings: i, values: r }), m = Xa(1), le = /* @__PURE__ */ Symbol.for("lit-noChange"), tt = /* @__PURE__ */ Symbol.for("lit-nothing"), Ur = /* @__PURE__ */ new WeakMap(), Ht = Kt.createTreeWalker(Kt, 129);
+re.elementStyles = [], re.shadowRootOptions = { mode: "open" }, re[Se("elementProperties")] = /* @__PURE__ */ new Map(), re[Se("finalized")] = /* @__PURE__ */ new Map(), Va?.({ ReactiveElement: re }), (hi.reactiveElementVersions ??= []).push("2.1.2");
+const fn = globalThis, Or = (c) => c, si = fn.trustedTypes, Rr = si ? si.createPolicy("lit-html", { createHTML: (c) => c }) : void 0, is = "$lit$", zt = `lit$${Math.random().toFixed(9).slice(2)}$`, ns = "?" + zt, Ja = `<${ns}>`, Kt = document, De = () => Kt.createComment(""), Ie = (c) => c === null || typeof c != "object" && typeof c != "function", mn = Array.isArray, Ya = (c) => mn(c) || typeof c?.[Symbol.iterator] == "function", Yi = `[ \t
+\f\r]`, Ee = /<(?:(!--|\/[^a-zA-Z])|(\/?[a-zA-Z][^>\s]*)|(\/?$))/g, Nr = /-->/g, Br = />/g, qt = RegExp(`>|${Yi}(?:([^\\s"'>=/]+)(${Yi}*=${Yi}*(?:[^ \t
+\f\r"'\`<>=]|("|')|))|$)`, "g"), Fr = /'/g, Zr = /"/g, rs = /^(?:script|style|textarea|title)$/i, Xa = (c) => (i, ...r) => ({ _$litType$: c, strings: i, values: r }), f = Xa(1), le = /* @__PURE__ */ Symbol.for("lit-noChange"), tt = /* @__PURE__ */ Symbol.for("lit-nothing"), Ur = /* @__PURE__ */ new WeakMap(), Ht = Kt.createTreeWalker(Kt, 129);
 function ss(c, i) {
   if (!mn(c) || !c.hasOwnProperty("raw")) throw Error("invalid template strings array");
   return Rr !== void 0 ? Rr.createHTML(i) : i;
@@ -258,42 +258,42 @@ const Qa = (c, i) => {
   const r = c.length - 1, o = [];
   let l, d = i === 2 ? "<svg>" : i === 3 ? "<math>" : "", p = Ee;
   for (let y = 0; y < r; y++) {
-    const f = c[y];
+    const m = c[y];
     let v, k, b = -1, D = 0;
-    for (; D < f.length && (p.lastIndex = D, k = p.exec(f), k !== null); ) D = p.lastIndex, p === Ee ? k[1] === "!--" ? p = Nr : k[1] !== void 0 ? p = Br : k[2] !== void 0 ? (rs.test(k[2]) && (l = RegExp("</" + k[2], "g")), p = qt) : k[3] !== void 0 && (p = qt) : p === qt ? k[0] === ">" ? (p = l ?? Ee, b = -1) : k[1] === void 0 ? b = -2 : (b = p.lastIndex - k[2].length, v = k[1], p = k[3] === void 0 ? qt : k[3] === '"' ? Zr : Fr) : p === Zr || p === Fr ? p = qt : p === Nr || p === Br ? p = Ee : (p = qt, l = void 0);
+    for (; D < m.length && (p.lastIndex = D, k = p.exec(m), k !== null); ) D = p.lastIndex, p === Ee ? k[1] === "!--" ? p = Nr : k[1] !== void 0 ? p = Br : k[2] !== void 0 ? (rs.test(k[2]) && (l = RegExp("</" + k[2], "g")), p = qt) : k[3] !== void 0 && (p = qt) : p === qt ? k[0] === ">" ? (p = l ?? Ee, b = -1) : k[1] === void 0 ? b = -2 : (b = p.lastIndex - k[2].length, v = k[1], p = k[3] === void 0 ? qt : k[3] === '"' ? Zr : Fr) : p === Zr || p === Fr ? p = qt : p === Nr || p === Br ? p = Ee : (p = qt, l = void 0);
     const $ = p === qt && c[y + 1].startsWith("/>") ? " " : "";
-    d += p === Ee ? f + Ja : b >= 0 ? (o.push(v), f.slice(0, b) + is + f.slice(b) + zt + $) : f + zt + (b === -2 ? y : $);
+    d += p === Ee ? m + Ja : b >= 0 ? (o.push(v), m.slice(0, b) + is + m.slice(b) + zt + $) : m + zt + (b === -2 ? y : $);
   }
   return [ss(c, d + (c[r] || "<?>") + (i === 2 ? "</svg>" : i === 3 ? "</math>" : "")), o];
 };
-class Le {
+class Ae {
   constructor({ strings: i, _$litType$: r }, o) {
     let l;
     this.parts = [];
     let d = 0, p = 0;
-    const y = i.length - 1, f = this.parts, [v, k] = Qa(i, r);
-    if (this.el = Le.createElement(v, o), Ht.currentNode = this.el.content, r === 2 || r === 3) {
+    const y = i.length - 1, m = this.parts, [v, k] = Qa(i, r);
+    if (this.el = Ae.createElement(v, o), Ht.currentNode = this.el.content, r === 2 || r === 3) {
       const b = this.el.content.firstChild;
       b.replaceWith(...b.childNodes);
     }
-    for (; (l = Ht.nextNode()) !== null && f.length < y; ) {
+    for (; (l = Ht.nextNode()) !== null && m.length < y; ) {
       if (l.nodeType === 1) {
         if (l.hasAttributes()) for (const b of l.getAttributeNames()) if (b.endsWith(is)) {
-          const D = k[p++], $ = l.getAttribute(b).split(zt), I = /([.?@])?(.*)/.exec(D);
-          f.push({ type: 1, index: d, name: I[2], strings: $, ctor: I[1] === "." ? eo : I[1] === "?" ? io : I[1] === "@" ? no : hi }), l.removeAttribute(b);
-        } else b.startsWith(zt) && (f.push({ type: 6, index: d }), l.removeAttribute(b));
+          const D = k[p++], $ = l.getAttribute(b).split(zt), A = /([.?@])?(.*)/.exec(D);
+          m.push({ type: 1, index: d, name: A[2], strings: $, ctor: A[1] === "." ? eo : A[1] === "?" ? io : A[1] === "@" ? no : di }), l.removeAttribute(b);
+        } else b.startsWith(zt) && (m.push({ type: 6, index: d }), l.removeAttribute(b));
         if (rs.test(l.tagName)) {
           const b = l.textContent.split(zt), D = b.length - 1;
           if (D > 0) {
-            l.textContent = ri ? ri.emptyScript : "";
-            for (let $ = 0; $ < D; $++) l.append(b[$], De()), Ht.nextNode(), f.push({ type: 2, index: ++d });
+            l.textContent = si ? si.emptyScript : "";
+            for (let $ = 0; $ < D; $++) l.append(b[$], De()), Ht.nextNode(), m.push({ type: 2, index: ++d });
             l.append(b[D], De());
           }
         }
-      } else if (l.nodeType === 8) if (l.data === ns) f.push({ type: 2, index: d });
+      } else if (l.nodeType === 8) if (l.data === ns) m.push({ type: 2, index: d });
       else {
         let b = -1;
-        for (; (b = l.data.indexOf(zt, b + 1)) !== -1; ) f.push({ type: 7, index: d }), b += zt.length - 1;
+        for (; (b = l.data.indexOf(zt, b + 1)) !== -1; ) m.push({ type: 7, index: d }), b += zt.length - 1;
       }
       d++;
     }
@@ -306,7 +306,7 @@ class Le {
 function he(c, i, r = c, o) {
   if (i === le) return i;
   let l = o !== void 0 ? r._$Co?.[o] : r._$Cl;
-  const d = Ae(i) ? void 0 : i._$litDirective$;
+  const d = Ie(i) ? void 0 : i._$litDirective$;
   return l?.constructor !== d && (l?._$AO?.(!1), d === void 0 ? l = void 0 : (l = new d(c), l._$AT(c, r, o)), o !== void 0 ? (r._$Co ??= [])[o] = l : r._$Cl = l), l !== void 0 && (i = he(c, l._$AS(c, i.values), l, o)), i;
 }
 class to {
@@ -322,13 +322,13 @@ class to {
   u(i) {
     const { el: { content: r }, parts: o } = this._$AD, l = (i?.creationScope ?? Kt).importNode(r, !0);
     Ht.currentNode = l;
-    let d = Ht.nextNode(), p = 0, y = 0, f = o[0];
-    for (; f !== void 0; ) {
-      if (p === f.index) {
+    let d = Ht.nextNode(), p = 0, y = 0, m = o[0];
+    for (; m !== void 0; ) {
+      if (p === m.index) {
         let v;
-        f.type === 2 ? v = new Ce(d, d.nextSibling, this, i) : f.type === 1 ? v = new f.ctor(d, f.name, f.strings, this, i) : f.type === 6 && (v = new ro(d, this, i)), this._$AV.push(v), f = o[++y];
+        m.type === 2 ? v = new Ce(d, d.nextSibling, this, i) : m.type === 1 ? v = new m.ctor(d, m.name, m.strings, this, i) : m.type === 6 && (v = new ro(d, this, i)), this._$AV.push(v), m = o[++y];
       }
-      p !== f?.index && (d = Ht.nextNode(), p++);
+      p !== m?.index && (d = Ht.nextNode(), p++);
     }
     return Ht.currentNode = Kt, l;
   }
@@ -356,7 +356,7 @@ class Ce {
     return this._$AB;
   }
   _$AI(i, r = this) {
-    i = he(this, i, r), Ae(i) ? i === tt || i == null || i === "" ? (this._$AH !== tt && this._$AR(), this._$AH = tt) : i !== this._$AH && i !== le && this._(i) : i._$litType$ !== void 0 ? this.$(i) : i.nodeType !== void 0 ? this.T(i) : Ya(i) ? this.k(i) : this._(i);
+    i = he(this, i, r), Ie(i) ? i === tt || i == null || i === "" ? (this._$AH !== tt && this._$AR(), this._$AH = tt) : i !== this._$AH && i !== le && this._(i) : i._$litType$ !== void 0 ? this.$(i) : i.nodeType !== void 0 ? this.T(i) : Ya(i) ? this.k(i) : this._(i);
   }
   O(i) {
     return this._$AA.parentNode.insertBefore(i, this._$AB);
@@ -365,10 +365,10 @@ class Ce {
     this._$AH !== i && (this._$AR(), this._$AH = this.O(i));
   }
   _(i) {
-    this._$AH !== tt && Ae(this._$AH) ? this._$AA.nextSibling.data = i : this.T(Kt.createTextNode(i)), this._$AH = i;
+    this._$AH !== tt && Ie(this._$AH) ? this._$AA.nextSibling.data = i : this.T(Kt.createTextNode(i)), this._$AH = i;
   }
   $(i) {
-    const { values: r, _$litType$: o } = i, l = typeof o == "number" ? this._$AC(i) : (o.el === void 0 && (o.el = Le.createElement(ss(o.h, o.h[0]), this.options)), o);
+    const { values: r, _$litType$: o } = i, l = typeof o == "number" ? this._$AC(i) : (o.el === void 0 && (o.el = Ae.createElement(ss(o.h, o.h[0]), this.options)), o);
     if (this._$AH?._$AD === l) this._$AH.p(r);
     else {
       const d = new to(l, this), p = d.u(this.options);
@@ -377,7 +377,7 @@ class Ce {
   }
   _$AC(i) {
     let r = Ur.get(i.strings);
-    return r === void 0 && Ur.set(i.strings, r = new Le(i)), r;
+    return r === void 0 && Ur.set(i.strings, r = new Ae(i)), r;
   }
   k(i) {
     mn(this._$AH) || (this._$AH = [], this._$AR());
@@ -396,7 +396,7 @@ class Ce {
     this._$AM === void 0 && (this._$Cv = i, this._$AP?.(i));
   }
 }
-class hi {
+class di {
   get tagName() {
     return this.element.tagName;
   }
@@ -409,11 +409,11 @@ class hi {
   _$AI(i, r = this, o, l) {
     const d = this.strings;
     let p = !1;
-    if (d === void 0) i = he(this, i, r, 0), p = !Ae(i) || i !== this._$AH && i !== le, p && (this._$AH = i);
+    if (d === void 0) i = he(this, i, r, 0), p = !Ie(i) || i !== this._$AH && i !== le, p && (this._$AH = i);
     else {
       const y = i;
-      let f, v;
-      for (i = d[0], f = 0; f < d.length - 1; f++) v = he(this, y[o + f], r, f), v === le && (v = this._$AH[f]), p ||= !Ae(v) || v !== this._$AH[f], v === tt ? i = tt : i !== tt && (i += (v ?? "") + d[f + 1]), this._$AH[f] = v;
+      let m, v;
+      for (i = d[0], m = 0; m < d.length - 1; m++) v = he(this, y[o + m], r, m), v === le && (v = this._$AH[m]), p ||= !Ie(v) || v !== this._$AH[m], v === tt ? i = tt : i !== tt && (i += (v ?? "") + d[m + 1]), this._$AH[m] = v;
     }
     p && !l && this.j(i);
   }
@@ -421,7 +421,7 @@ class hi {
     i === tt ? this.element.removeAttribute(this.name) : this.element.setAttribute(this.name, i ?? "");
   }
 }
-class eo extends hi {
+class eo extends di {
   constructor() {
     super(...arguments), this.type = 3;
   }
@@ -429,7 +429,7 @@ class eo extends hi {
     this.element[this.name] = i === tt ? void 0 : i;
   }
 }
-let io = class extends hi {
+let io = class extends di {
   constructor() {
     super(...arguments), this.type = 4;
   }
@@ -437,7 +437,7 @@ let io = class extends hi {
     this.element.toggleAttribute(this.name, !!i && i !== tt);
   }
 };
-class no extends hi {
+class no extends di {
   constructor(i, r, o, l, d) {
     super(i, r, o, l, d), this.type = 5;
   }
@@ -462,7 +462,7 @@ class ro {
   }
 }
 const so = fn.litHtmlPolyfillSupport;
-so?.(Le, Ce), (fn.litHtmlVersions ??= []).push("3.3.3");
+so?.(Ae, Ce), (fn.litHtmlVersions ??= []).push("3.3.3");
 const ao = (c, i, r) => {
   const o = r?.renderBefore ?? i;
   let l = o._$litPart$;
@@ -958,28 +958,28 @@ function w(c) {
 function uo(c) {
   return (c?.locale?.language ?? "").toLowerCase().startsWith("de") ? { label: "Fahrt löschen", title: "Fahrt löschen?", question: "Möchtest du diese Fahrt wirklich löschen?", confirm: "Fahrt löschen", effects: "Die Fahrt wird entfernt. GPS-Rohpunkte, Kosten, Aufenthalte und Reisen bleiben erhalten; dieselbe Fahrt wird nicht automatisch neu erzeugt.", date: "Datum / Uhrzeit" } : { label: "Delete drive", title: "Delete drive?", question: "Do you really want to delete this drive?", confirm: "Delete drive", effects: "The drive is removed. Raw GPS points, costs, stays, and trips remain; the same drive will not be recreated automatically.", date: "Date / time" };
 }
-function si(c) {
+function ai(c) {
   return (c?.locale?.language ?? "").toLowerCase().startsWith("de") ? "de-DE" : "en-US";
 }
 function se(c, i) {
   const r = /^(\d{4})-(\d{2})-(\d{2})$/.exec(c);
   if (r) {
     const [, o, l, d] = r;
-    return si(i).startsWith("de") ? `${d}.${l}.${o}` : `${l}/${d}/${o}`;
+    return ai(i).startsWith("de") ? `${d}.${l}.${o}` : `${l}/${d}/${o}`;
   }
-  return new Date(c).toLocaleDateString(si(i));
+  return new Date(c).toLocaleDateString(ai(i));
 }
 function W(c, i) {
-  return new Date(c).toLocaleString(si(i), { dateStyle: "short", timeStyle: "short" });
+  return new Date(c).toLocaleString(ai(i), { dateStyle: "short", timeStyle: "short" });
 }
-function ai(c, i) {
-  return new Date(c).toLocaleTimeString(si(i), { hour: "2-digit", minute: "2-digit" });
+function oi(c, i) {
+  return new Date(c).toLocaleTimeString(ai(i), { hour: "2-digit", minute: "2-digit" });
 }
-function At(c, i) {
+function It(c, i) {
   const r = Math.max(0, Math.round((c ?? 0) / 60));
   return r < 60 ? `${r} min` : `${Math.floor(r / 60)} h ${r % 60} min`;
 }
-function Lt(c, i) {
+function At(c, i) {
   return c.start_date || c.end_date ? [c.start_date, c.end_date].filter(Boolean).map((r) => se(r, i)).join(" – ") || "" : c.started_at ? `${se(c.started_at, i)}${c.ended_at ? ` – ${se(c.ended_at, i)}` : ""}` : "";
 }
 function po(c, i) {
@@ -989,18 +989,18 @@ function po(c, i) {
     const k = /^(\d{4})-(\d{2})-(\d{2})$/.exec(v);
     return k ? new Date(Number(k[1]), Number(k[2]) - 1, Number(k[3])) : new Date(v);
   }, d = l(r || o || ""), p = l(o || r || "");
-  if (Number.isNaN(d.getTime()) || Number.isNaN(p.getTime())) return Lt(c, i);
+  if (Number.isNaN(d.getTime()) || Number.isNaN(p.getTime())) return At(c, i);
   if (!(i?.locale?.language ?? "").toLowerCase().startsWith("de")) {
     const v = new Intl.DateTimeFormat("en-US", { month: "short" }), k = (D) => D.getDate(), b = (D) => D.getFullYear();
     return b(d) === b(p) && d.getMonth() === p.getMonth() ? `${v.format(d)} ${k(d)}–${k(p)}, ${b(d)}` : b(d) === b(p) ? `${v.format(d)} ${k(d)}–${v.format(p)} ${k(p)}, ${b(d)}` : `${v.format(d)} ${k(d)}, ${b(d)}–${v.format(p)} ${k(p)}, ${b(p)}`;
   }
-  const f = (v) => `${String(v.getDate()).padStart(2, "0")}.${String(v.getMonth() + 1).padStart(2, "0")}.${String(v.getFullYear()).slice(-2)}`;
-  return d.getFullYear() === p.getFullYear() && d.getMonth() === p.getMonth() ? `${String(d.getDate()).padStart(2, "0")}.–${f(p).slice(0, 2)}.${String(p.getMonth() + 1).padStart(2, "0")}.${String(p.getFullYear()).slice(-2)}` : `${f(d)}–${f(p)}`;
+  const m = (v) => `${String(v.getDate()).padStart(2, "0")}.${String(v.getMonth() + 1).padStart(2, "0")}.${String(v.getFullYear()).slice(-2)}`;
+  return d.getFullYear() === p.getFullYear() && d.getMonth() === p.getMonth() ? `${String(d.getDate()).padStart(2, "0")}.–${m(p).slice(0, 2)}.${String(p.getMonth() + 1).padStart(2, "0")}.${String(p.getFullYear()).slice(-2)}` : `${m(d)}–${m(p)}`;
 }
 function Gt(c, i) {
   return w(i).statuses[c] ?? c;
 }
-function Yi(c, i) {
+function Xi(c, i) {
   return w(i).categories[c] ?? c;
 }
 function qr(c, i) {
@@ -1118,27 +1118,27 @@ class Nt extends jt {
   }
   migrationNotice() {
     const i = w(this.hass);
-    return m`<aside class="migration-notice" role="note"><strong>${i.migrationTitle}</strong><p>${i.migrationText}</p><a href="https://github.com/balronu/ha-camper-travel-journal/blob/main/README.md#migration" target="_blank" rel="noreferrer">${i.migrationLink}</a></aside>`;
+    return f`<aside class="migration-notice" role="note"><strong>${i.migrationTitle}</strong><p>${i.migrationText}</p><a href="https://github.com/balronu/ha-camper-travel-journal/blob/main/README.md#migration" target="_blank" rel="noreferrer">${i.migrationLink}</a></aside>`;
   }
 }
-function di(c, i) {
+function ci(c, i) {
   customElements.get(c) || customElements.define(c, i);
 }
-async function Z(c, i, r, o = {}) {
+async function F(c, i, r, o = {}) {
   return c.connection.sendMessagePromise({ type: i, vehicle_id: r, ...o });
 }
-const Rt = (c, i, r) => Z(c, "camper_travel_journal/list", i, r ? { trip_id: r } : {}), yo = (c, i, r, o, l = 5e3) => Z(c, "camper_travel_journal/route", i, { trip_id: r, drive_ids: o, max_points: l }), os = (c, i, r, o) => Z(c, "camper_travel_journal/transition_trip", i, { trip_id: r, status: o }), bo = (c, i, r, o = "", l = "", d = "") => Z(c, "camper_travel_journal/create_trip", i, { title: r, start_date: o || void 0, end_date: l || void 0, destination: d }), xo = (c, i, r, o) => Z(c, "camper_travel_journal/update_trip", i, { trip_id: r, ...o }), wo = (c, i, r) => Z(c, "camper_travel_journal/delete_trip", i, { trip_id: r }), $o = (c, i, r, o) => Z(c, "camper_travel_journal/unlink_drive", i, { trip_id: r, drive_id: o }), To = (c, i, r, o) => Z(c, "camper_travel_journal/link_drives", i, { trip_id: r, drive_ids: o }), ko = (c, i, r) => Z(c, "camper_travel_journal/create_manual_drive", i, r), Eo = (c, i, r, o) => Z(c, "camper_travel_journal/update_manual_drive", i, { drive_id: r, ...o }), ls = (c, i, r) => Z(c, "camper_travel_journal/delete_drive", i, { drive_id: r }), Po = (c, i, r, o) => Z(c, "camper_travel_journal/create_expense", i, { trip_id: r, ...o }), So = (c, i, r, o) => Z(c, "camper_travel_journal/update_expense", i, { expense_id: r, ...o }), hs = (c, i, r, o) => Z(c, "camper_travel_journal/create_stop", i, { trip_id: r, ...o }), Do = (c, i, r, o) => Z(c, "camper_travel_journal/update_stop", i, { stop_id: r, ...o }), Ao = (c, i, r) => Z(c, "camper_travel_journal/delete_stop", i, { stop_id: r }), hn = (c, i, r, o, l, d) => Z(c, "camper_travel_journal/assign_interruption", i, { trip_id: r, interruption_id: o, status: l, stop_id: d }), ds = (c, i, r, o, l) => Z(c, "camper_travel_journal/create_stop_from_interruption", i, { trip_id: r, interruption_id: o, ...l }), Lo = (c, i, r, o) => Z(c, "camper_travel_journal/update_overnight", i, { place_id: r, ...o }), Io = (c, i, r, o) => Z(c, "camper_travel_journal/update_rating", i, { place_id: r, ...o }), Co = (c, i, r) => Z(c, "camper_travel_journal/delete_rating", i, { place_id: r }), Mo = (c, i, r) => Z(c, "camper_travel_journal/generate_stop_suggestions", i, { trip_id: r, historical_only: !0 }), zo = (c, i, r, o, l, d) => Z(c, "camper_travel_journal/accept_stop_suggestion", i, { suggestion_id: r, trip_id: o, name: l, place_type: d }), Oo = (c, i, r) => Z(c, "camper_travel_journal/dismiss_stop_suggestion", i, { suggestion_id: r }), Ro = (c, i, r) => Z(c, "camper_travel_journal/delete_expense", i, { expense_id: r }), No = (c, i, r) => Z(c, "camper_travel_journal/export_pdf", i, { trip_id: r }), ci = async (c) => (await c.connection.sendMessagePromise({ type: "camper_travel_journal/list_vehicles" })).vehicles ?? [], Bo = (c, i, r) => Z(c, "camper_travel_journal/analyze_gpx", i, { content_base64: r }), Fo = (c, i, r, o, l, d) => Z(c, "camper_travel_journal/import_gpx", i, { content_base64: r, file_hash: o, drive_keys: l, trip_id: d }), Xi = (c, i) => Z(c, "camper_travel_journal/list_tankbook", i), Zo = (c, i, r) => Z(c, "camper_travel_journal/create_tank_event", i, r), Uo = (c, i, r, o) => Z(c, "camper_travel_journal/update_tank_event", i, { event_id: r, ...o }), Wo = (c, i, r) => Z(c, "camper_travel_journal/delete_tank_event", i, { event_id: r }), dn = "camper-travel-journal-expenses-changed", Ie = "camper-travel-journal-data-changed";
+const Rt = (c, i, r) => F(c, "camper_travel_journal/list", i, r ? { trip_id: r } : {}), yo = (c, i, r, o, l = 5e3) => F(c, "camper_travel_journal/route", i, { trip_id: r, drive_ids: o, max_points: l }), os = (c, i, r, o) => F(c, "camper_travel_journal/transition_trip", i, { trip_id: r, status: o }), bo = (c, i, r, o = "", l = "", d = "") => F(c, "camper_travel_journal/create_trip", i, { title: r, start_date: o || void 0, end_date: l || void 0, destination: d }), xo = (c, i, r, o) => F(c, "camper_travel_journal/update_trip", i, { trip_id: r, ...o }), wo = (c, i, r) => F(c, "camper_travel_journal/delete_trip", i, { trip_id: r }), $o = (c, i, r, o) => F(c, "camper_travel_journal/unlink_drive", i, { trip_id: r, drive_id: o }), To = (c, i, r, o) => F(c, "camper_travel_journal/link_drives", i, { trip_id: r, drive_ids: o }), ko = (c, i, r) => F(c, "camper_travel_journal/create_manual_drive", i, r), Eo = (c, i, r, o) => F(c, "camper_travel_journal/update_manual_drive", i, { drive_id: r, ...o }), ls = (c, i, r) => F(c, "camper_travel_journal/delete_drive", i, { drive_id: r }), Po = (c, i, r, o) => F(c, "camper_travel_journal/create_expense", i, { trip_id: r, ...o }), So = (c, i, r, o) => F(c, "camper_travel_journal/update_expense", i, { expense_id: r, ...o }), hs = (c, i, r, o) => F(c, "camper_travel_journal/create_stop", i, { trip_id: r, ...o }), Do = (c, i, r, o) => F(c, "camper_travel_journal/update_stop", i, { stop_id: r, ...o }), Io = (c, i, r) => F(c, "camper_travel_journal/delete_stop", i, { stop_id: r }), hn = (c, i, r, o, l, d) => F(c, "camper_travel_journal/assign_interruption", i, { trip_id: r, interruption_id: o, status: l, stop_id: d }), ds = (c, i, r, o, l) => F(c, "camper_travel_journal/create_stop_from_interruption", i, { trip_id: r, interruption_id: o, ...l }), Ao = (c, i, r, o) => F(c, "camper_travel_journal/update_overnight", i, { place_id: r, ...o }), Lo = (c, i, r, o) => F(c, "camper_travel_journal/update_rating", i, { place_id: r, ...o }), Co = (c, i, r) => F(c, "camper_travel_journal/delete_rating", i, { place_id: r }), Mo = (c, i, r) => F(c, "camper_travel_journal/generate_stop_suggestions", i, { trip_id: r, historical_only: !0 }), zo = (c, i, r, o, l, d) => F(c, "camper_travel_journal/accept_stop_suggestion", i, { suggestion_id: r, trip_id: o, name: l, place_type: d }), Oo = (c, i, r) => F(c, "camper_travel_journal/dismiss_stop_suggestion", i, { suggestion_id: r }), Ro = (c, i, r) => F(c, "camper_travel_journal/delete_expense", i, { expense_id: r }), No = (c, i, r) => F(c, "camper_travel_journal/export_pdf", i, { trip_id: r }), ui = async (c) => (await c.connection.sendMessagePromise({ type: "camper_travel_journal/list_vehicles" })).vehicles ?? [], Bo = (c, i, r) => F(c, "camper_travel_journal/analyze_gpx", i, { content_base64: r }), Fo = (c, i, r, o, l, d) => F(c, "camper_travel_journal/import_gpx", i, { content_base64: r, file_hash: o, drive_keys: l, trip_id: d }), ei = (c, i) => F(c, "camper_travel_journal/list_tankbook", i), Zo = async (c, i) => (await F(c, "camper_travel_journal/list_fuel_expenses", i)).expenses, Uo = (c, i, r) => F(c, "camper_travel_journal/create_tank_event", i, r), Wo = (c, i, r, o) => F(c, "camper_travel_journal/update_tank_event", i, { event_id: r, ...o }), qo = (c, i, r) => F(c, "camper_travel_journal/delete_tank_event", i, { event_id: r }), Ho = (c, i, r) => F(c, "camper_travel_journal/unlink_tank_event", i, { event_id: r, confirmed: !0 }), dn = "camper-travel-journal-expenses-changed", Le = "camper-travel-journal-data-changed";
 function Qi(c) {
   window.dispatchEvent(new CustomEvent(dn, { detail: c }));
 }
 function Q(c) {
-  window.dispatchEvent(new CustomEvent(Ie, { detail: c }));
+  window.dispatchEvent(new CustomEvent(Le, { detail: c }));
 }
 const wt = "camper-travel-journal-active-trip-changed";
 function vn(c) {
   return `camper-travel-journal:${typeof window < "u" && window.location.pathname || "/"}:${c}`;
 }
-function ui(c) {
+function pi(c) {
   if (!c || typeof window > "u") return "";
   try {
     return window.sessionStorage.getItem(vn(c)) ?? "";
@@ -1179,10 +1179,10 @@ class cs extends Nt {
     r?.vehicleId !== this.vehicleId || r.tripId === this.selectedTripId || (this.selectedTripId = r.tripId, this.refresh());
   };
   connectedCallback() {
-    super.connectedCallback(), window.addEventListener(dn, this.onDataChanged), window.addEventListener(Ie, this.onDataChanged), window.addEventListener(wt, this.onActiveTripChanged), this.refresh();
+    super.connectedCallback(), window.addEventListener(dn, this.onDataChanged), window.addEventListener(Le, this.onDataChanged), window.addEventListener(wt, this.onActiveTripChanged), this.refresh();
   }
   disconnectedCallback() {
-    window.removeEventListener(dn, this.onDataChanged), window.removeEventListener(Ie, this.onDataChanged), window.removeEventListener(wt, this.onActiveTripChanged), super.disconnectedCallback();
+    window.removeEventListener(dn, this.onDataChanged), window.removeEventListener(Le, this.onDataChanged), window.removeEventListener(wt, this.onActiveTripChanged), super.disconnectedCallback();
   }
   onHassConnectionChanged() {
     this.refresh();
@@ -1200,7 +1200,7 @@ class cs extends Nt {
     try {
       const i = await Rt(this.hass, this.vehicleId);
       this.trips = i.trips;
-      const r = ui(this.vehicleId), l = i.trips.find((p) => p.id === (r || this.selectedTripId)) ?? this.chooseDefaultTrip(i.trips);
+      const r = pi(this.vehicleId), l = i.trips.find((p) => p.id === (r || this.selectedTripId)) ?? this.chooseDefaultTrip(i.trips);
       this.selectedTripId = l?.id ?? "", l && Ot({ vehicleId: this.vehicleId, tripId: l.id, source: "summary" });
       const d = l ? await Rt(this.hass, this.vehicleId, l.id) : i;
       return this.snapshot = l ? { ...d, trips: [l] } : d, this.loadError = "", !0;
@@ -1223,14 +1223,14 @@ class cs extends Nt {
     !this.hass || this.loading || !this.trips.some((r) => r.id === i) || (this.selectedTripId = i, Ot({ vehicleId: this.vehicleId, tripId: i, source: "summary" }), await this.refresh());
   }
   render() {
-    const i = w(this.hass), r = this.snapshot?.trips[0], o = this.trips, l = (this.snapshot?.drives ?? []).reduce((b, D) => b + D.distance_m, 0) / 1e3, p = (this.snapshot?.stops ?? []).filter((b) => b.confirmed !== !1).filter((b) => ["campsite", "rv_site", "wild_camp", "overnight"].includes(b.place_kind || b.place_type || b.stop_type)).length, y = this.snapshot?.expense_summary, f = y?.mixed_currency ? i.mixedCurrency : y?.total_minor !== void 0 && y.currency ? xt(y.total_minor, y.currency, this.hass) : xt(0, "EUR", this.hass), v = this.loadError || this.actionError, k = r ? Lt(r, this.hass) : "";
-    return m`<ha-card><h2>${r?.title ?? i.title}</h2>${o.length ? m`<label class="trip-selector">${i.summaryChooseTrip}<select aria-label=${i.summaryTrip} @change=${(b) => {
+    const i = w(this.hass), r = this.snapshot?.trips[0], o = this.trips, l = (this.snapshot?.drives ?? []).reduce((b, D) => b + D.distance_m, 0) / 1e3, p = (this.snapshot?.stops ?? []).filter((b) => b.confirmed !== !1).filter((b) => ["campsite", "rv_site", "wild_camp", "overnight"].includes(b.place_kind || b.place_type || b.stop_type)).length, y = this.snapshot?.expense_summary, m = y?.mixed_currency ? i.mixedCurrency : y?.total_minor !== void 0 && y.currency ? xt(y.total_minor, y.currency, this.hass) : xt(0, "EUR", this.hass), v = this.loadError || this.actionError, k = r ? At(r, this.hass) : "";
+    return f`<ha-card><h2>${r?.title ?? i.title}</h2>${o.length ? f`<label class="trip-selector">${i.summaryChooseTrip}<select aria-label=${i.summaryTrip} @change=${(b) => {
       this.selectTrip(b.currentTarget.value);
-    }} ?disabled=${this.loading}>${o.map((b) => m`<option value=${b.id} ?selected=${b.id === this.selectedTripId}>${b.title} · ${Gt(b.status, this.hass)} · ${Lt(b, this.hass)}</option>`)}</select></label>` : ""}${v ? m`<p class="error" role="alert">${v}</p>` : r ? m`<p class="muted">${r.destination || i.noDestination} · ${Gt(r.status, this.hass)} · ${k}</p><div class="grid"><div class="metric"><span class="muted">${i.distance}</span><span class="value">${l.toFixed(1)} km</span></div><div class="metric"><span class="muted">${i.drives}</span><span class="value">${this.snapshot?.drives.length ?? 0}</span></div><div class="metric"><span class="muted">${i.stops}</span><span class="value">${this.snapshot?.stops.length ?? 0}</span></div><div class="metric"><span class="muted">${i.overnights ?? "Übernachtungsplätze"}</span><span class="value">${p}</span></div><div class="metric"><span class="muted">${i.costs}</span><span class="value">${f}</span></div></div><div class="actions">${r.status === "planned" ? m`<button @click=${() => this.setStatus("active")}>${i.start}</button>` : r.status === "paused" ? m`<button @click=${() => this.setStatus("active")}>${i.resume}</button>` : ""}${r.status === "active" ? m`<button class="secondary" @click=${() => this.setStatus("paused")}>${i.pause}</button><button @click=${() => this.setStatus("completed")}>${i.complete}</button>` : ""}</div>` : m`<p class="muted">${i.noTrip}</p>`}${this.loading ? m`<p class="muted">${i.loading}</p>` : ""}</ha-card>`;
+    }} ?disabled=${this.loading}>${o.map((b) => f`<option value=${b.id} ?selected=${b.id === this.selectedTripId}>${b.title} · ${Gt(b.status, this.hass)} · ${At(b, this.hass)}</option>`)}</select></label>` : ""}${v ? f`<p class="error" role="alert">${v}</p>` : r ? f`<p class="muted">${r.destination || i.noDestination} · ${Gt(r.status, this.hass)} · ${k}</p><div class="grid"><div class="metric"><span class="muted">${i.distance}</span><span class="value">${l.toFixed(1)} km</span></div><div class="metric"><span class="muted">${i.drives}</span><span class="value">${this.snapshot?.drives.length ?? 0}</span></div><div class="metric"><span class="muted">${i.stops}</span><span class="value">${this.snapshot?.stops.length ?? 0}</span></div><div class="metric"><span class="muted">${i.overnights ?? "Übernachtungsplätze"}</span><span class="value">${p}</span></div><div class="metric"><span class="muted">${i.costs}</span><span class="value">${m}</span></div></div><div class="actions">${r.status === "planned" ? f`<button @click=${() => this.setStatus("active")}>${i.start}</button>` : r.status === "paused" ? f`<button @click=${() => this.setStatus("active")}>${i.resume}</button>` : ""}${r.status === "active" ? f`<button class="secondary" @click=${() => this.setStatus("paused")}>${i.pause}</button><button @click=${() => this.setStatus("completed")}>${i.complete}</button>` : ""}</div>` : f`<p class="muted">${i.noTrip}</p>`}${this.loading ? f`<p class="muted">${i.loading}</p>` : ""}</ha-card>`;
   }
 }
 cs.styles = [Nt.styles, gt`.trip-selector{display:grid;gap:4px;margin:12px 0;font-size:.9em}.trip-selector select{min-width:0;width:100%;box-sizing:border-box;padding:6px}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(9rem,1fr));gap:8px}.metric{min-width:0;min-height:3.7rem;padding:10px;border-radius:9px;background:var(--secondary-background-color);display:flex;flex-direction:column;justify-content:center}.metric .muted{min-width:0;overflow-wrap:anywhere;word-break:normal;line-height:1.2}.metric .value{margin-top:3px;white-space:nowrap}@media(max-width:420px){.grid{grid-template-columns:repeat(2,minmax(0,1fr))}.metric{padding:8px;font-size:.9em}}`];
-di("camper-travel-journal-summary-card", cs);
+ci("camper-travel-journal-summary-card", cs);
 function ae(c) {
   const i = c.trim().replace(",", ".");
   if (!i) return null;
@@ -1465,7 +1465,7 @@ class $t extends Nt {
     try {
       const r = this.placePayload();
       let o = this.editingPlaceId;
-      o ? await Do(this.hass, this.vehicleId, o, r) : this.interruptionId ? o = (await ds(this.hass, this.vehicleId, i, this.interruptionId, { name: this.placeName.trim(), place_type: this.placeType, overnight: ["campsite", "rv_site", "wild_camp", "overnight"].includes(this.placeType), address: this.placeAddress.trim(), description: this.placeDescription.trim(), website_url: this.placeWebsite.trim() || void 0 })).stop_id : o = (await hs(this.hass, this.vehicleId, i, r)).stop_id, !this.interruptionId && ["campsite", "rv_site", "wild_camp", "overnight"].includes(this.placeType) && await Lo(this.hass, this.vehicleId, o, { place_kind: this.placeType, website_url: this.placeWebsite }), this.resetPlaceForm(), this.closeEditor(!0), await this.refreshAfterWrite(() => Q({ vehicleId: this.vehicleId, tripId: i }));
+      o ? await Do(this.hass, this.vehicleId, o, r) : this.interruptionId ? o = (await ds(this.hass, this.vehicleId, i, this.interruptionId, { name: this.placeName.trim(), place_type: this.placeType, overnight: ["campsite", "rv_site", "wild_camp", "overnight"].includes(this.placeType), address: this.placeAddress.trim(), description: this.placeDescription.trim(), website_url: this.placeWebsite.trim() || void 0 })).stop_id : o = (await hs(this.hass, this.vehicleId, i, r)).stop_id, !this.interruptionId && ["campsite", "rv_site", "wild_camp", "overnight"].includes(this.placeType) && await Ao(this.hass, this.vehicleId, o, { place_kind: this.placeType, website_url: this.placeWebsite }), this.resetPlaceForm(), this.closeEditor(!0), await this.refreshAfterWrite(() => Q({ vehicleId: this.vehicleId, tripId: i }));
     } catch {
       this.fail(w(this.hass).placeSaveError ?? w(this.hass).loadError);
     } finally {
@@ -1480,7 +1480,7 @@ class $t extends Nt {
       }
       this.placeSaving = !0;
       try {
-        await Ao(this.hass, this.vehicleId, i.id), this.confirmingPlaceId = "", await this.refreshAfterWrite(() => Q({ vehicleId: this.vehicleId, tripId: r }));
+        await Io(this.hass, this.vehicleId, i.id), this.confirmingPlaceId = "", await this.refreshAfterWrite(() => Q({ vehicleId: this.vehicleId, tripId: r }));
       } catch {
         this.fail(w(this.hass).placeDeleteError ?? w(this.hass).loadError);
       } finally {
@@ -1494,7 +1494,7 @@ class $t extends Nt {
     if (!this.ratingOverall || o.slice(1).some((l) => l && (!/^\d$/.test(l) || Number(l) < 1 || Number(l) > 5))) return this.fail(w(this.hass).ratingInvalid ?? w(this.hass).dateInvalid);
     this.ratingSaving = !0;
     try {
-      await Io(this.hass, this.vehicleId, i, { overall: Number(this.ratingOverall), large_rv_access: this.ratingAccess ? Number(this.ratingAccess) : void 0, space_maneuvering: this.ratingSpace ? Number(this.ratingSpace) : void 0, facilities: this.ratingFacilities ? Number(this.ratingFacilities) : void 0, surroundings: this.ratingSurroundings ? Number(this.ratingSurroundings) : void 0, review_text: this.ratingText }), this.ratingPlaceId = "", this.closeEditor(!0), await this.refreshAfterWrite(() => Q({ vehicleId: this.vehicleId, tripId: r }));
+      await Lo(this.hass, this.vehicleId, i, { overall: Number(this.ratingOverall), large_rv_access: this.ratingAccess ? Number(this.ratingAccess) : void 0, space_maneuvering: this.ratingSpace ? Number(this.ratingSpace) : void 0, facilities: this.ratingFacilities ? Number(this.ratingFacilities) : void 0, surroundings: this.ratingSurroundings ? Number(this.ratingSurroundings) : void 0, review_text: this.ratingText }), this.ratingPlaceId = "", this.closeEditor(!0), await this.refreshAfterWrite(() => Q({ vehicleId: this.vehicleId, tripId: r }));
     } catch {
       this.fail(w(this.hass).ratingSaveError ?? w(this.hass).loadError);
     } finally {
@@ -1531,13 +1531,13 @@ class $t extends Nt {
   async refresh() {
     if (!this.hass || !this.vehicleId) return !1;
     try {
-      const i = this.embeddedTripId() || ui(this.vehicleId);
+      const i = this.embeddedTripId() || pi(this.vehicleId);
       this.activeTripId || (this.activeTripId = i);
       let r = await Rt(this.hass, this.vehicleId, this.activeTripId || void 0);
       const o = r.trips.find((l) => l.id === this.activeTripId) ?? r.trips.find((l) => l.status === "active") ?? r.trips[0];
       o && this.activeTripId !== o.id ? (this.activeTripId = o.id, this.embeddedTripId() || Ot({ vehicleId: this.vehicleId, tripId: this.activeTripId, source: "manager" }), r = await Rt(this.hass, this.vehicleId, this.activeTripId)) : o && !this.embeddedTripId() && Ot({ vehicleId: this.vehicleId, tripId: o.id, source: "manager" }), this.snapshot = r;
       try {
-        const l = await ci(this.hass);
+        const l = await ui(this.hass);
         this.vehicleName = l.find((d) => d.vehicle_id === this.vehicleId)?.name || "";
       } catch {
         this.vehicleName = "";
@@ -1684,17 +1684,17 @@ class $t extends Nt {
     this.dispatchEvent(new CustomEvent("trip-switch", { bubbles: !0, composed: !0 }));
   }
   renderTripActions(i, r) {
-    return m`<section class="trip-actions" aria-label=${i.tripActions ?? "Reiseaktionen"}><div class="trip-actions-grid">
-      ${r.status === "planned" ? m`<button type="button" class="trip-action trip-action-primary" data-trip-action="start" @click=${() => this.changeStatus(r.id, "active")}>${i.start}</button>` : ""}
-      ${r.status === "active" ? m`<button type="button" class="trip-action trip-action-secondary" data-trip-action="pause" @click=${() => this.changeStatus(r.id, "paused")}>${i.pause}</button><button type="button" class="trip-action trip-action-secondary" data-trip-action="complete" @click=${() => this.changeStatus(r.id, "completed")}>${i.complete}</button>` : ""}
-      ${r.status === "paused" ? m`<button type="button" class="trip-action trip-action-primary" data-trip-action="resume" @click=${() => this.changeStatus(r.id, "active")}>${i.resume}</button><button type="button" class="trip-action trip-action-secondary" data-trip-action="complete" @click=${() => this.changeStatus(r.id, "completed")}>${i.complete}</button>` : ""}
-      ${r.status === "completed" ? m`<button type="button" class="trip-action trip-action-primary" data-trip-action="reactivate" @click=${() => this.changeStatus(r.id, "active")}>${i.tripReactivate ?? i.resume}</button>` : ""}
+    return f`<section class="trip-actions" aria-label=${i.tripActions ?? "Reiseaktionen"}><div class="trip-actions-grid">
+      ${r.status === "planned" ? f`<button type="button" class="trip-action trip-action-primary" data-trip-action="start" @click=${() => this.changeStatus(r.id, "active")}>${i.start}</button>` : ""}
+      ${r.status === "active" ? f`<button type="button" class="trip-action trip-action-secondary" data-trip-action="pause" @click=${() => this.changeStatus(r.id, "paused")}>${i.pause}</button><button type="button" class="trip-action trip-action-secondary" data-trip-action="complete" @click=${() => this.changeStatus(r.id, "completed")}>${i.complete}</button>` : ""}
+      ${r.status === "paused" ? f`<button type="button" class="trip-action trip-action-primary" data-trip-action="resume" @click=${() => this.changeStatus(r.id, "active")}>${i.resume}</button><button type="button" class="trip-action trip-action-secondary" data-trip-action="complete" @click=${() => this.changeStatus(r.id, "completed")}>${i.complete}</button>` : ""}
+      ${r.status === "completed" ? f`<button type="button" class="trip-action trip-action-primary" data-trip-action="reactivate" @click=${() => this.changeStatus(r.id, "active")}>${i.tripReactivate ?? i.resume}</button>` : ""}
       <button type="button" class="trip-action trip-action-secondary" data-trip-action="edit" @click=${() => this.startTripEdit(r)}>${i.edit}</button>
       <button type="button" class="trip-action trip-action-secondary" data-trip-action="switch" @click=${() => this.switchTrip()}>${i.journalClose ?? "Reise wechseln"}</button>
     </div><div class="trip-delete-action"><button type="button" class="trip-action danger" data-trip-action="delete" @click=${() => this.removeTrip(r.id)}>${i.remove}</button></div></section>${this.renderTripDeleteDialog(i)}`;
   }
   renderTripDeleteDialog(i) {
-    return this.deletingTrip ? m`<dialog class="trip-delete-dialog" aria-labelledby="trip-delete-title" @cancel=${(r) => {
+    return this.deletingTrip ? f`<dialog class="trip-delete-dialog" aria-labelledby="trip-delete-title" @cancel=${(r) => {
       r.preventDefault(), this.cancelTripDelete();
     }}><form method="dialog" @submit=${(r) => {
       r.preventDefault(), this.confirmTripDelete();
@@ -1854,89 +1854,89 @@ class $t extends Nt {
   }
   renderExpense(i, r) {
     const o = i.occurred_on ? `${se(i.occurred_on, this.hass)}${i.occurred_time ? ` ${i.occurred_time}` : ""}` : r.expenseDateUnknown ?? "Ausgabendatum unbekannt";
-    return m`<div class="expense-row"><div class="expense-info"><span class="expense-date">${o}</span><strong>${Yi(i.category, this.hass)}</strong><span class="expense-amount">${xt(i.amount_minor, i.currency, this.hass)}</span>${i.category === "water_waste" && i.services?.length ? m`<span class="expense-services">${i.services.map((l) => qr(l, this.hass)).join(" · ")}</span>` : ""}${i.category === "fuel" && (i.fuel_liters != null || i.fuel_price_per_liter != null) ? m`<span class="fuel-details">${i.fuel_liters == null ? "" : `${i.fuel_liters.toFixed(3)} l`}${i.fuel_liters != null && i.fuel_price_per_liter != null ? " · " : ""}${i.fuel_price_per_liter == null ? "" : `${i.fuel_price_per_liter.toFixed(3)} €/l`}</span>` : ""}${i.note ? m`<span class="expense-note">${i.note}</span>` : ""}</div><span class="actions expense-actions"><button type="button" class="link" @click=${() => this.startExpenseEdit(i)} ?disabled=${!!this.expenseSavingId}>${r.edit}</button><button type="button" class="link" @click=${() => this.removeExpense(i.id)}>${this.confirmingExpenseId === i.id ? r.confirmDelete : r.remove}</button></span></div>`;
+    return f`<div class="expense-row"><div class="expense-info"><span class="expense-date">${o}</span><strong>${Xi(i.category, this.hass)}</strong><span class="expense-amount">${xt(i.amount_minor, i.currency, this.hass)}</span>${i.tank_event_id ? f`<span class="linked-label">Mit Tankbuch verknüpft</span>` : ""}${i.category === "water_waste" && i.services?.length ? f`<span class="expense-services">${i.services.map((l) => qr(l, this.hass)).join(" · ")}</span>` : ""}${i.category === "fuel" && (i.fuel_liters != null || i.fuel_price_per_liter != null) ? f`<span class="fuel-details">${i.fuel_liters == null ? "" : `${i.fuel_liters.toFixed(3)} l`}${i.fuel_liters != null && i.fuel_price_per_liter != null ? " · " : ""}${i.fuel_price_per_liter == null ? "" : `${i.fuel_price_per_liter.toFixed(3)} €/l`}</span>` : ""}${i.note ? f`<span class="expense-note">${i.note}</span>` : ""}</div><span class="actions expense-actions"><button type="button" class="link" @click=${() => this.startExpenseEdit(i)} ?disabled=${!!this.expenseSavingId}>${r.edit}</button><button type="button" class="link" @click=${() => this.removeExpense(i.id)}>${this.confirmingExpenseId === i.id ? r.confirmDelete : r.remove}</button></span></div>`;
   }
   renderDrive(i, r, o) {
-    const l = i.source === "manual" ? o.sourceManual : i.source === "gpx" ? o.sourceGpx ?? o.sourceGps : o.sourceGps, d = `${o.driveStart}: ${W(i.started_at, this.hass)} · ${o.driveEnd}: ${i.ended_at ? W(i.ended_at, this.hass) : "–"}`, p = i.trip_id === r ? m`<button type="button" class="link" @click=${() => this.unassignDrive(r, i.id)}>${o.unassign}</button>` : m`<button type="button" class="link" @click=${() => this.assignDrive(r, i.id)}>${o.assign}</button>`, y = m`${i.source === "manual" ? m`<button type="button" class="link" @click=${() => this.startManualDriveEdit(i)} ?disabled=${!!this.driveSavingId}>${o.edit}</button>` : ""}<button type="button" class="link danger-link" @click=${() => this.openDriveDeleteDialog(i, r)} ?disabled=${!!this.driveSavingId}>${o.driveDelete ?? o.remove}</button>`;
-    return m`<div class="drive-row"><div><strong>${l}</strong> · ${d}${i.start_label || i.end_label ? m`<br><span class="muted">${i.start_label || "–"} → ${i.end_label || "–"}</span>` : ""}<br><span class="muted">${(i.distance_m / 1e3).toFixed(1)} km · ${i.duration_seconds ? At(i.duration_seconds, this.hass) : "–"} · ${i.assignment_status === "assigned" ? o.assignedDrives : o.freeDrives}</span></div><span class="actions">${y}${p}</span></div>`;
+    const l = i.source === "manual" ? o.sourceManual : i.source === "gpx" ? o.sourceGpx ?? o.sourceGps : o.sourceGps, d = `${o.driveStart}: ${W(i.started_at, this.hass)} · ${o.driveEnd}: ${i.ended_at ? W(i.ended_at, this.hass) : "–"}`, p = i.trip_id === r ? f`<button type="button" class="link" @click=${() => this.unassignDrive(r, i.id)}>${o.unassign}</button>` : f`<button type="button" class="link" @click=${() => this.assignDrive(r, i.id)}>${o.assign}</button>`, y = f`${i.source === "manual" ? f`<button type="button" class="link" @click=${() => this.startManualDriveEdit(i)} ?disabled=${!!this.driveSavingId}>${o.edit}</button>` : ""}<button type="button" class="link danger-link" @click=${() => this.openDriveDeleteDialog(i, r)} ?disabled=${!!this.driveSavingId}>${o.driveDelete ?? o.remove}</button>`;
+    return f`<div class="drive-row"><div><strong>${l}</strong> · ${d}${i.start_label || i.end_label ? f`<br><span class="muted">${i.start_label || "–"} → ${i.end_label || "–"}</span>` : ""}<br><span class="muted">${(i.distance_m / 1e3).toFixed(1)} km · ${i.duration_seconds ? It(i.duration_seconds, this.hass) : "–"} · ${i.assignment_status === "assigned" ? o.assignedDrives : o.freeDrives}</span></div><span class="actions">${y}${p}</span></div>`;
   }
   renderDriveDeleteDialog(i) {
     const r = this.deletingDrive, l = (this.hass?.locale?.language ?? "").toLowerCase().startsWith("de") ? { title: "Fahrt löschen?", question: "Möchtest du diese Fahrt wirklich löschen?", date: "Datum", distance: "Entfernung", effects: "Die Fahrt wird entfernt. GPS-Rohpunkte, Kosten, Aufenthalte und Reisen bleiben erhalten; dieselbe Fahrt wird nicht automatisch neu erzeugt.", confirm: "Fahrt löschen" } : { title: "Delete drive?", question: "Do you really want to delete this drive?", date: "Date", distance: "Distance", effects: "The drive is removed. Raw GPS points, costs, stays, and trips remain; the same drive will not be recreated automatically.", confirm: "Delete drive" };
-    return m`<dialog class="drive-delete-dialog" @cancel=${(d) => {
+    return f`<dialog class="drive-delete-dialog" @cancel=${(d) => {
       d.preventDefault(), this.closeDriveDeleteDialog();
     }}><form method="dialog" @submit=${(d) => {
       d.preventDefault(), this.confirmDriveDelete();
-    }}><h3>${l.title}</h3>${r ? m`<p>${l.question}</p><dl><dt>${l.date}</dt><dd>${W(r.started_at, this.hass)}</dd><dt>${i.driveStart ?? "Start"}</dt><dd>${W(r.started_at, this.hass)}</dd><dt>${i.driveEnd ?? "Ende"}</dt><dd>${r.ended_at ? W(r.ended_at, this.hass) : "–"}</dd><dt>${l.distance}</dt><dd>${(r.distance_m / 1e3).toFixed(1)} km</dd></dl><p class="muted">${l.effects}</p>` : ""}<div class="dialog-actions"><button type="button" class="secondary" @click=${() => this.closeDriveDeleteDialog()}>${i.cancel}</button><button type="submit" class="danger" ?disabled=${!!this.driveSavingId}>${this.driveSavingId ? i.saving : l.confirm}</button></div></form></dialog>`;
+    }}><h3>${l.title}</h3>${r ? f`<p>${l.question}</p><dl><dt>${l.date}</dt><dd>${W(r.started_at, this.hass)}</dd><dt>${i.driveStart ?? "Start"}</dt><dd>${W(r.started_at, this.hass)}</dd><dt>${i.driveEnd ?? "Ende"}</dt><dd>${r.ended_at ? W(r.ended_at, this.hass) : "–"}</dd><dt>${l.distance}</dt><dd>${(r.distance_m / 1e3).toFixed(1)} km</dd></dl><p class="muted">${l.effects}</p>` : ""}<div class="dialog-actions"><button type="button" class="secondary" @click=${() => this.closeDriveDeleteDialog()}>${i.cancel}</button><button type="submit" class="danger" ?disabled=${!!this.driveSavingId}>${this.driveSavingId ? i.saving : l.confirm}</button></div></form></dialog>`;
   }
   renderInterruptions(i, r) {
     const o = (this.snapshot?.interruptions ?? []).filter((l) => l.status === "unassigned");
-    return m`<section class="place-section"><details open><summary><strong>${i.unassignedInterruptions ?? "Nicht zugeordnete Fahrtunterbrechungen"}</strong><span>${o.length}</span></summary>${o.length ? o.map((l) => m`<article class="interruption-row"><div class="interruption-copy"><strong>${W(l.started_at, this.hass)} → ${W(l.ended_at, this.hass)}</strong><span class="muted">${At(l.duration_seconds, this.hass)} · ${i.interruptionUnconfirmed ?? "Nicht als Aufenthalt nachgewiesen"}</span>${l.existing_places?.length ? m`<span class="candidate-label">Vorhandener Aufenthalt: ${l.existing_places.map((d) => d.name).join(", ")}</span>` : ""}</div><div class="actions compact-actions">${l.existing_places?.map((d) => m`<button type="button" class="link" @click=${() => {
+    return f`<section class="place-section"><details open><summary><strong>${i.unassignedInterruptions ?? "Nicht zugeordnete Fahrtunterbrechungen"}</strong><span>${o.length}</span></summary>${o.length ? o.map((l) => f`<article class="interruption-row"><div class="interruption-copy"><strong>${W(l.started_at, this.hass)} → ${W(l.ended_at, this.hass)}</strong><span class="muted">${It(l.duration_seconds, this.hass)} · ${i.interruptionUnconfirmed ?? "Nicht als Aufenthalt nachgewiesen"}</span>${l.existing_places?.length ? f`<span class="candidate-label">Vorhandener Aufenthalt: ${l.existing_places.map((d) => d.name).join(", ")}</span>` : ""}</div><div class="actions compact-actions">${l.existing_places?.map((d) => f`<button type="button" class="link" @click=${() => {
       this.assignExistingInterruption(l, d.id);
-    }} ?disabled=${this.placeSaving}>${i.assign ?? "Zuordnen"}: ${d.name}</button>`)}<button type="button" @click=${() => this.startInterruption(l)}>${i.recordInterruption ?? "Neuen Aufenthalt erfassen"}</button></div></article>`) : m`<p class="muted">${i.noPlaces ?? "Keine Unterbrechungen zwischen Fahrten."}</p>`}</details></section>`;
+    }} ?disabled=${this.placeSaving}>${i.assign ?? "Zuordnen"}: ${d.name}</button>`)}<button type="button" @click=${() => this.startInterruption(l)}>${i.recordInterruption ?? "Neuen Aufenthalt erfassen"}</button></div></article>`) : f`<p class="muted">${i.noPlaces ?? "Keine Unterbrechungen zwischen Fahrten."}</p>`}</details></section>`;
   }
   renderGpx(i, r, o) {
-    const l = !!this.embeddedTripId(), d = r.find((f) => f.id === this.gpxTripId), p = this.gpxPeriod(), y = this.gpxTripPeriodWarning(d);
-    return m`<section class="gpx-import gpx-explicit"><h3>${i.gpxImport}</h3><p class="muted"><strong>${l ? i.gpxTargetTrip ?? "Reise" : i.gpxVehicle}:</strong> ${l ? d?.title || "" : this.vehicleName || i.editorVehicle}</p>${l ? "" : m`<label>${i.gpxTargetTrip}<select aria-label=${i.gpxTargetTrip} .value=${this.gpxTripId} @change=${(f) => {
-      this.gpxTripId = f.currentTarget.value, this.requestUpdate();
-    }}><option value="">${i.gpxNoTrip}</option>${r.map((f) => m`<option value=${f.id}>${f.title} · ${Gt(f.status, this.hass)} · ${Lt(f, this.hass) || i.period}</option>`)}</select></label>`}<input type="file" accept=".gpx,application/gpx+xml,application/xml" @change=${(f) => this.readGPX(f)} ?disabled=${this.gpxBusy}><p class="muted">${this.gpxName || i.gpxPrivacy}</p>${this.gpxError ? m`<p class="error" role="alert">${this.gpxError}</p>` : ""}${o ? m`<div class="gpx-preview"><strong>${o.drives.length} ${i.gpxSections}, ${o.points.length} ${i.gpxPoints}</strong>${p ? m`<p class="muted">${i.gpxPeriod}: ${W(p.start, this.hass)} – ${W(p.end, this.hass)}</p>` : ""}${y ? m`<p class="warning" role="alert">${i.gpxPeriodWarning}</p>` : ""}<h3>${i.gpxSummary}</h3><p class="muted">${o.points.length} ${i.gpxPoints}, ${this.gpxSelected.size} ${i.gpxSelectedDrives}, ${this.gpxSelectedDistanceKm().toFixed(1)} ${i.gpxDistance}, ${d?.title || i.gpxNoTrip}</p><div class="gpx-drive-list">${o.drives.map((f) => m`<label><input type="checkbox" .checked=${this.gpxSelected.has(f.key)} @change=${(v) => {
-      v.currentTarget.checked ? this.gpxSelected.add(f.key) : this.gpxSelected.delete(f.key), this.requestUpdate();
-    }}> ${W(f.started_at, this.hass)} – ${W(f.ended_at, this.hass)} · ${(f.distance_m / 1e3).toFixed(1)} km · ${At(f.duration_seconds, this.hass)}</label>`)}</div>${o.warnings.length ? m`<p class="muted">${i.gpxWarnings}: ${o.warnings.map((f) => f === "gpx_gap_possible_drive_boundary" ? i.gpxGapBoundary : f).join(", ")}</p>` : ""}${o.conflicts.duplicate_file ? m`<p class="error" role="alert">${i.gpxDuplicate}</p>` : m`<button type="button" @click=${() => this.confirmGPX()} ?disabled=${this.gpxBusy || this.gpxSelected.size === 0}>${this.gpxBusy ? i.saving : i.gpxConfirm}</button>`}</div>` : ""}</section>`;
+    const l = !!this.embeddedTripId(), d = r.find((m) => m.id === this.gpxTripId), p = this.gpxPeriod(), y = this.gpxTripPeriodWarning(d);
+    return f`<section class="gpx-import gpx-explicit"><h3>${i.gpxImport}</h3><p class="muted"><strong>${l ? i.gpxTargetTrip ?? "Reise" : i.gpxVehicle}:</strong> ${l ? d?.title || "" : this.vehicleName || i.editorVehicle}</p>${l ? "" : f`<label>${i.gpxTargetTrip}<select aria-label=${i.gpxTargetTrip} .value=${this.gpxTripId} @change=${(m) => {
+      this.gpxTripId = m.currentTarget.value, this.requestUpdate();
+    }}><option value="">${i.gpxNoTrip}</option>${r.map((m) => f`<option value=${m.id}>${m.title} · ${Gt(m.status, this.hass)} · ${At(m, this.hass) || i.period}</option>`)}</select></label>`}<input type="file" accept=".gpx,application/gpx+xml,application/xml" @change=${(m) => this.readGPX(m)} ?disabled=${this.gpxBusy}><p class="muted">${this.gpxName || i.gpxPrivacy}</p>${this.gpxError ? f`<p class="error" role="alert">${this.gpxError}</p>` : ""}${o ? f`<div class="gpx-preview"><strong>${o.drives.length} ${i.gpxSections}, ${o.points.length} ${i.gpxPoints}</strong>${p ? f`<p class="muted">${i.gpxPeriod}: ${W(p.start, this.hass)} – ${W(p.end, this.hass)}</p>` : ""}${y ? f`<p class="warning" role="alert">${i.gpxPeriodWarning}</p>` : ""}<h3>${i.gpxSummary}</h3><p class="muted">${o.points.length} ${i.gpxPoints}, ${this.gpxSelected.size} ${i.gpxSelectedDrives}, ${this.gpxSelectedDistanceKm().toFixed(1)} ${i.gpxDistance}, ${d?.title || i.gpxNoTrip}</p><div class="gpx-drive-list">${o.drives.map((m) => f`<label><input type="checkbox" .checked=${this.gpxSelected.has(m.key)} @change=${(v) => {
+      v.currentTarget.checked ? this.gpxSelected.add(m.key) : this.gpxSelected.delete(m.key), this.requestUpdate();
+    }}> ${W(m.started_at, this.hass)} – ${W(m.ended_at, this.hass)} · ${(m.distance_m / 1e3).toFixed(1)} km · ${It(m.duration_seconds, this.hass)}</label>`)}</div>${o.warnings.length ? f`<p class="muted">${i.gpxWarnings}: ${o.warnings.map((m) => m === "gpx_gap_possible_drive_boundary" ? i.gpxGapBoundary : m).join(", ")}</p>` : ""}${o.conflicts.duplicate_file ? f`<p class="error" role="alert">${i.gpxDuplicate}</p>` : f`<button type="button" @click=${() => this.confirmGPX()} ?disabled=${this.gpxBusy || this.gpxSelected.size === 0}>${this.gpxBusy ? i.saving : i.gpxConfirm}</button>`}</div>` : ""}</section>`;
   }
   renderPdfExport(i, r) {
     if (!r.length) return "";
     const o = r.some((d) => d.id === this.activeTripId) ? this.activeTripId : r[0].id, l = r.find((d) => d.id === o) ?? r[0];
-    return m`<section class="pdf-export"><h3>${i.pdfExportTitle}</h3><p class="muted">${l.title} · ${Lt(l, this.hass)}</p><div class="pdf-export-row"><button type="button" @click=${() => {
+    return f`<section class="pdf-export"><h3>${i.pdfExportTitle}</h3><p class="muted">${l.title} · ${At(l, this.hass)}</p><div class="pdf-export-row"><button type="button" @click=${() => {
       this.downloadPdf(l);
     }} ?disabled=${!!this.pdfBusyTripId}>${this.pdfBusyTripId ? i.pdfExporting : i.pdfExport}</button></div></section>`;
   }
   renderSuggestions(i, r) {
-    const o = this.snapshot?.stop_suggestions ?? [], l = this.actionError || this.loadError, d = (p) => p.departed_at ? `${W(p.arrived_at, this.hass)} – ${W(p.departed_at, this.hass)}` : `${i.staySince ?? "Seit"} ${ai(p.arrived_at, this.hass)} · ${i.stayOngoing ?? "Aufenthalt läuft"}`;
-    return m`<section class="place-section"><h3>${i.gpsSuggestions ?? "GPS-Stoppvorschläge"}</h3><button type="button" ?disabled=${this.suggestionsBusy} aria-busy=${this.suggestionsBusy ? "true" : "false"} @click=${() => {
+    const o = this.snapshot?.stop_suggestions ?? [], l = this.actionError || this.loadError, d = (p) => p.departed_at ? `${W(p.arrived_at, this.hass)} – ${W(p.departed_at, this.hass)}` : `${i.staySince ?? "Seit"} ${oi(p.arrived_at, this.hass)} · ${i.stayOngoing ?? "Aufenthalt läuft"}`;
+    return f`<section class="place-section"><h3>${i.gpsSuggestions ?? "GPS-Stoppvorschläge"}</h3><button type="button" ?disabled=${this.suggestionsBusy} aria-busy=${this.suggestionsBusy ? "true" : "false"} @click=${() => {
       this.refreshSuggestions(r);
-    }}>${this.suggestionsBusy ? "Vorschläge werden aktualisiert …" : i.generateSuggestions ?? "Vorschläge aktualisieren"}</button>${this.suggestionStatus ? m`<p class="muted" role="status">${this.suggestionStatus}</p>` : ""}${l ? m`<p class="error" role="alert">${l}</p>` : ""}${o.length ? m`<ul>${o.map((p) => m`<li>${d(p)}${this.suggestionEditingId === p.id ? m`<div class="form-grid"><input aria-label=${i.placeName ?? "Name"} .value=${this.suggestionName} @input=${(y) => this.suggestionName = y.currentTarget.value}><select aria-label=${i.placeCategory ?? "Kategorie"} .value=${this.suggestionType} @change=${(y) => this.suggestionType = y.currentTarget.value}><option value="other">${i.placeOther ?? "Sonstiger Ort"}</option><option value="restaurant">${i.placeRestaurant ?? "Restaurant"}</option><option value="fuel_stop">${i.placeFuel ?? "Tankpause"}</option><option value="campsite">${i.placeCampsite ?? "Campingplatz"}</option><option value="rv_site">${i.placeRvSite ?? "Wohnmobilstellplatz"}</option></select></div>` : ""} <button type="button" @click=${() => {
+    }}>${this.suggestionsBusy ? "Vorschläge werden aktualisiert …" : i.generateSuggestions ?? "Vorschläge aktualisieren"}</button>${this.suggestionStatus ? f`<p class="muted" role="status">${this.suggestionStatus}</p>` : ""}${l ? f`<p class="error" role="alert">${l}</p>` : ""}${o.length ? f`<ul>${o.map((p) => f`<li>${d(p)}${this.suggestionEditingId === p.id ? f`<div class="form-grid"><input aria-label=${i.placeName ?? "Name"} .value=${this.suggestionName} @input=${(y) => this.suggestionName = y.currentTarget.value}><select aria-label=${i.placeCategory ?? "Kategorie"} .value=${this.suggestionType} @change=${(y) => this.suggestionType = y.currentTarget.value}><option value="other">${i.placeOther ?? "Sonstiger Ort"}</option><option value="restaurant">${i.placeRestaurant ?? "Restaurant"}</option><option value="fuel_stop">${i.placeFuel ?? "Tankpause"}</option><option value="campsite">${i.placeCampsite ?? "Campingplatz"}</option><option value="rv_site">${i.placeRvSite ?? "Wohnmobilstellplatz"}</option></select></div>` : ""} <button type="button" @click=${() => {
       this.acceptSuggestion(p, r);
     }}>${this.suggestionEditingId === p.id ? i.save ?? "Speichern" : i.accept ?? "Übernehmen"}</button><button type="button" class="secondary" @click=${() => {
       this.dismissSuggestion(p, r);
-    }}>${i.dismiss ?? "Verwerfen"}</button></li>`)}</ul>` : m`<p class="muted">${i.noSuggestions ?? "Keine offenen Vorschläge."}</p>`}</section>`;
+    }}>${i.dismiss ?? "Verwerfen"}</button></li>`)}</ul>` : f`<p class="muted">${i.noSuggestions ?? "Keine offenen Vorschläge."}</p>`}</section>`;
   }
   starPicker(i, r, o) {
-    return m`<fieldset class="star-picker"><legend>${i}</legend><div role="radiogroup" aria-label=${i}>${[1, 2, 3, 4, 5].map((l) => m`<button type="button" class="star-button" role="radio" aria-label=${`${l}/5`} aria-checked=${r === String(l)} ?data-selected=${r === String(l)} @click=${() => {
+    return f`<fieldset class="star-picker"><legend>${i}</legend><div role="radiogroup" aria-label=${i}>${[1, 2, 3, 4, 5].map((l) => f`<button type="button" class="star-button" role="radio" aria-label=${`${l}/5`} aria-checked=${r === String(l)} ?data-selected=${r === String(l)} @click=${() => {
       o(String(l)), this.requestUpdate();
     }} @keydown=${(d) => {
       (d.key === "ArrowRight" || d.key === "ArrowUp") && (d.preventDefault(), o(String(Math.min(5, l + 1))), this.requestUpdate()), (d.key === "ArrowLeft" || d.key === "ArrowDown") && (d.preventDefault(), o(String(Math.max(1, l - 1))), this.requestUpdate());
     }}>${r && Number(r) >= l ? "★" : "☆"}</button>`)}</div></fieldset>`;
   }
   renderPlacesLegacy(i, r) {
-    const o = this.snapshot?.stops ?? [], l = m`<option value="other">${i.placeOther ?? "Sonstiger Ort"}</option><option value="restaurant">${i.placeRestaurant ?? "Restaurant"}</option><option value="fuel_stop">${i.placeFuel ?? "Tankpause"}</option><option value="attraction">${i.placeAttraction ?? "Sehenswürdigkeit"}</option><option value="ferry">${i.placeFerry ?? "Fähre"}</option><option value="campsite">${i.placeCampsite ?? "Campingplatz"}</option><option value="rv_site">${i.placeRvSite ?? "Wohnmobilstellplatz"}</option><option value="wild_camp">${i.placeWildCamp ?? "Freistehplatz"}</option>`;
-    return m`<section class="place-section"><details open><summary><strong>${i.places ?? "Orte und Zwischenstopps"}</strong><span>${o.length}</span></summary><form class="form-grid" @submit=${(d) => {
+    const o = this.snapshot?.stops ?? [], l = f`<option value="other">${i.placeOther ?? "Sonstiger Ort"}</option><option value="restaurant">${i.placeRestaurant ?? "Restaurant"}</option><option value="fuel_stop">${i.placeFuel ?? "Tankpause"}</option><option value="attraction">${i.placeAttraction ?? "Sehenswürdigkeit"}</option><option value="ferry">${i.placeFerry ?? "Fähre"}</option><option value="campsite">${i.placeCampsite ?? "Campingplatz"}</option><option value="rv_site">${i.placeRvSite ?? "Wohnmobilstellplatz"}</option><option value="wild_camp">${i.placeWildCamp ?? "Freistehplatz"}</option>`;
+    return f`<section class="place-section"><details open><summary><strong>${i.places ?? "Orte und Zwischenstopps"}</strong><span>${o.length}</span></summary><form class="form-grid" @submit=${(d) => {
       d.preventDefault(), this.savePlace(r);
-    }}><input aria-label=${i.placeName ?? "Name"} placeholder=${i.placeName ?? "Name"} .value=${this.placeName} @input=${(d) => this.placeName = d.currentTarget.value} required><select aria-label=${i.placeCategory ?? "Kategorie"} .value=${this.placeType} @change=${(d) => this.placeType = d.currentTarget.value}>${l}</select><label>${i.placeArrived ?? "Ankunft"}<input type="datetime-local" .value=${this.placeArrived} @input=${(d) => this.placeArrived = d.currentTarget.value} required></label><label>${i.placeDeparted ?? "Abfahrt"}<input type="datetime-local" .value=${this.placeDeparted} @input=${(d) => this.placeDeparted = d.currentTarget.value}></label><input aria-label=${i.placeAddress ?? "Adresse"} placeholder=${i.placeAddress ?? "Adresse"} .value=${this.placeAddress} @input=${(d) => this.placeAddress = d.currentTarget.value}><input aria-label=${i.placeWebsite ?? "Webseite"} type="url" placeholder=${i.placeWebsite ?? "Webseite (optional)"} .value=${this.placeWebsite} @input=${(d) => this.placeWebsite = d.currentTarget.value}><input aria-label="Latitude" inputmode="decimal" placeholder="Latitude" .value=${this.placeLatitude} @input=${(d) => this.placeLatitude = d.currentTarget.value}><input aria-label="Longitude" inputmode="decimal" placeholder="Longitude" .value=${this.placeLongitude} @input=${(d) => this.placeLongitude = d.currentTarget.value}><textarea aria-label=${i.placeDescription ?? "Notizen"} placeholder=${i.placeDescription ?? "Beschreibung und Notizen"} .value=${this.placeDescription} @input=${(d) => this.placeDescription = d.currentTarget.value}></textarea><div class="actions"><button type="submit" ?disabled=${this.placeSaving}>${this.placeSaving ? i.saving : this.editingPlaceId ? i.save : i.create ?? "Anlegen"}</button>${this.editingPlaceId ? m`<button type="button" class="secondary" @click=${() => this.resetPlaceForm()}>${i.cancel}</button>` : ""}</div></form>${o.length ? m`<div class="place-list">${o.map((d) => m`<article class="place-row"><div><strong>${d.name}</strong><span class="muted">${d.place_type || d.stop_type} · ${W(d.arrived_at || d.occurred_at, this.hass)}${d.duration_seconds ? ` · ${At(d.duration_seconds, this.hass)}` : ""}${d.rating_overall ? ` · ${d.rating_overall}/5` : ""}</span><span>${d.description || ""}</span>${d.website_url ? m`<a href=${d.website_url} target="_blank" rel="noopener noreferrer">${i.placeWebsiteOpen ?? "Webseite öffnen"}</a>` : ""}</div><div class="actions"><button type="button" class="link" @click=${() => this.editPlace(d)}>${i.edit}</button><button type="button" class="link" @click=${() => {
+    }}><input aria-label=${i.placeName ?? "Name"} placeholder=${i.placeName ?? "Name"} .value=${this.placeName} @input=${(d) => this.placeName = d.currentTarget.value} required><select aria-label=${i.placeCategory ?? "Kategorie"} .value=${this.placeType} @change=${(d) => this.placeType = d.currentTarget.value}>${l}</select><label>${i.placeArrived ?? "Ankunft"}<input type="datetime-local" .value=${this.placeArrived} @input=${(d) => this.placeArrived = d.currentTarget.value} required></label><label>${i.placeDeparted ?? "Abfahrt"}<input type="datetime-local" .value=${this.placeDeparted} @input=${(d) => this.placeDeparted = d.currentTarget.value}></label><input aria-label=${i.placeAddress ?? "Adresse"} placeholder=${i.placeAddress ?? "Adresse"} .value=${this.placeAddress} @input=${(d) => this.placeAddress = d.currentTarget.value}><input aria-label=${i.placeWebsite ?? "Webseite"} type="url" placeholder=${i.placeWebsite ?? "Webseite (optional)"} .value=${this.placeWebsite} @input=${(d) => this.placeWebsite = d.currentTarget.value}><input aria-label="Latitude" inputmode="decimal" placeholder="Latitude" .value=${this.placeLatitude} @input=${(d) => this.placeLatitude = d.currentTarget.value}><input aria-label="Longitude" inputmode="decimal" placeholder="Longitude" .value=${this.placeLongitude} @input=${(d) => this.placeLongitude = d.currentTarget.value}><textarea aria-label=${i.placeDescription ?? "Notizen"} placeholder=${i.placeDescription ?? "Beschreibung und Notizen"} .value=${this.placeDescription} @input=${(d) => this.placeDescription = d.currentTarget.value}></textarea><div class="actions"><button type="submit" ?disabled=${this.placeSaving}>${this.placeSaving ? i.saving : this.editingPlaceId ? i.save : i.create ?? "Anlegen"}</button>${this.editingPlaceId ? f`<button type="button" class="secondary" @click=${() => this.resetPlaceForm()}>${i.cancel}</button>` : ""}</div></form>${o.length ? f`<div class="place-list">${o.map((d) => f`<article class="place-row"><div><strong>${d.name}</strong><span class="muted">${d.place_type || d.stop_type} · ${W(d.arrived_at || d.occurred_at, this.hass)}${d.duration_seconds ? ` · ${It(d.duration_seconds, this.hass)}` : ""}${d.rating_overall ? ` · ${d.rating_overall}/5` : ""}</span><span>${d.description || ""}</span>${d.website_url ? f`<a href=${d.website_url} target="_blank" rel="noopener noreferrer">${i.placeWebsiteOpen ?? "Webseite öffnen"}</a>` : ""}</div><div class="actions"><button type="button" class="link" @click=${() => this.editPlace(d)}>${i.edit}</button><button type="button" class="link" @click=${() => {
       this.removePlace(d, r);
-    }}>${this.confirmingPlaceId === d.id ? i.confirmDelete : i.remove}</button><button type="button" class="link" @click=${() => this.startRating(d)}>${d.rating_overall ? i.ratingEdit ?? "Bewertung" : i.ratingAdd ?? "Bewerten"}</button></div>${this.ratingPlaceId === d.id ? m`<div class="rating-form form-grid">${this.starPicker(i.ratingOverall ?? "Gesamt", this.ratingOverall, (p) => this.ratingOverall = p)}${this.starPicker(i.ratingAccess ?? "Anfahrt", this.ratingAccess, (p) => this.ratingAccess = p)}${this.starPicker(i.ratingSpace ?? "Platzgröße", this.ratingSpace, (p) => this.ratingSpace = p)}${this.starPicker(i.ratingFacilities ?? "Ausstattung", this.ratingFacilities, (p) => this.ratingFacilities = p)}${this.starPicker(i.ratingSurroundings ?? "Umgebung", this.ratingSurroundings, (p) => this.ratingSurroundings = p)}<textarea aria-label=${i.ratingComment ?? "Kommentar"} .value=${this.ratingText} @input=${(p) => this.ratingText = p.currentTarget.value}></textarea><button type="button" @click=${() => {
+    }}>${this.confirmingPlaceId === d.id ? i.confirmDelete : i.remove}</button><button type="button" class="link" @click=${() => this.startRating(d)}>${d.rating_overall ? i.ratingEdit ?? "Bewertung" : i.ratingAdd ?? "Bewerten"}</button></div>${this.ratingPlaceId === d.id ? f`<div class="rating-form form-grid">${this.starPicker(i.ratingOverall ?? "Gesamt", this.ratingOverall, (p) => this.ratingOverall = p)}${this.starPicker(i.ratingAccess ?? "Anfahrt", this.ratingAccess, (p) => this.ratingAccess = p)}${this.starPicker(i.ratingSpace ?? "Platzgröße", this.ratingSpace, (p) => this.ratingSpace = p)}${this.starPicker(i.ratingFacilities ?? "Ausstattung", this.ratingFacilities, (p) => this.ratingFacilities = p)}${this.starPicker(i.ratingSurroundings ?? "Umgebung", this.ratingSurroundings, (p) => this.ratingSurroundings = p)}<textarea aria-label=${i.ratingComment ?? "Kommentar"} .value=${this.ratingText} @input=${(p) => this.ratingText = p.currentTarget.value}></textarea><button type="button" @click=${() => {
       this.saveRating(d.id, r);
-    }}>${i.save}</button></div>` : ""}</article>`)}</div>` : m`<p class="muted">${i.noPlaces ?? "Keine Orte gespeichert."}</p>`}</details></section>`;
+    }}>${i.save}</button></div>` : ""}</article>`)}</div>` : f`<p class="muted">${i.noPlaces ?? "Keine Orte gespeichert."}</p>`}</details></section>`;
   }
   renderPlaces(i, r) {
     const o = this.snapshot?.stops ?? [], l = /* @__PURE__ */ new Set(["campsite", "rv_site", "wild_camp", "overnight"]), d = o.filter((v) => l.has(v.place_kind || v.place_type || v.stop_type)), p = o.filter((v) => !l.has(v.place_kind || v.place_type || v.stop_type)), y = (v) => {
-      const k = v.departed_at == null ? `${i.staySince ?? "Seit"} ${ai(v.arrived_at || v.occurred_at, this.hass)} · ${i.stayOngoing ?? "Aufenthalt läuft"}` : `${W(v.arrived_at || v.occurred_at, this.hass)}${v.duration_seconds ? ` · ${At(v.duration_seconds, this.hass)}` : ""}`;
-      return m`<article class="place-row"><div><strong>${v.name}</strong><span class="muted">${go(v.place_kind || v.place_type || v.stop_type, this.hass)} · ${k}${v.rating_overall ? ` · ${v.rating_overall}/5` : ""}</span>${v.address ? m`<span class="muted">${v.address}</span>` : ""}${v.description ? m`<span>${v.description}</span>` : ""}${v.website_url ? m`<a href=${v.website_url} target="_blank" rel="noopener noreferrer">${i.placeWebsiteOpen ?? "Webseite öffnen"}</a>` : ""}</div><div class="actions compact-actions"><button type="button" class="link" @click=${() => this.editPlace(v)}>${i.edit}</button><button type="button" class="link" @click=${() => {
+      const k = v.departed_at == null ? `${i.staySince ?? "Seit"} ${oi(v.arrived_at || v.occurred_at, this.hass)} · ${i.stayOngoing ?? "Aufenthalt läuft"}` : `${W(v.arrived_at || v.occurred_at, this.hass)}${v.duration_seconds ? ` · ${It(v.duration_seconds, this.hass)}` : ""}`;
+      return f`<article class="place-row"><div><strong>${v.name}</strong><span class="muted">${go(v.place_kind || v.place_type || v.stop_type, this.hass)} · ${k}${v.rating_overall ? ` · ${v.rating_overall}/5` : ""}</span>${v.address ? f`<span class="muted">${v.address}</span>` : ""}${v.description ? f`<span>${v.description}</span>` : ""}${v.website_url ? f`<a href=${v.website_url} target="_blank" rel="noopener noreferrer">${i.placeWebsiteOpen ?? "Webseite öffnen"}</a>` : ""}</div><div class="actions compact-actions"><button type="button" class="link" @click=${() => this.editPlace(v)}>${i.edit}</button><button type="button" class="link" @click=${() => {
         this.removePlace(v, r);
       }}>${this.confirmingPlaceId === v.id ? i.confirmDelete : i.remove}</button><button type="button" class="link" @click=${() => this.startRating(v)}>${v.rating_overall ? i.ratingEdit ?? "Bewertung" : i.ratingAdd ?? "Bewerten"}</button></div></article>`;
-    }, f = (v, k) => m`<details class="stay-group" open><summary><strong>${v}</strong><span>${k.length}</span></summary>${k.length ? m`<div class="place-list">${k.map(y)}</div>` : m`<p class="muted">${i.noPlaces ?? "Keine Orte gespeichert."}</p>`}</details>`;
-    return m`<section class="place-section stay-management"><div class="actions compact-actions"><button type="button" @click=${() => {
+    }, m = (v, k) => f`<details class="stay-group" open><summary><strong>${v}</strong><span>${k.length}</span></summary>${k.length ? f`<div class="place-list">${k.map(y)}</div>` : f`<p class="muted">${i.noPlaces ?? "Keine Orte gespeichert."}</p>`}</details>`;
+    return f`<section class="place-section stay-management"><div class="actions compact-actions"><button type="button" @click=${() => {
       this.resetPlaceForm(), this.placeArrived = this.nowLocalDateTime(), this.openEditor("place-create", r);
-    }}>${i.create ?? "Hinzufügen"}</button></div>${f(i.overnightPlaces ?? "Übernachtungsplätze", d)}${f(i.places ?? "Zwischenstopps", p)}${this.renderInterruptions(i, r)}${this.renderSuggestions(i, r)}</section>`;
+    }}>${i.create ?? "Hinzufügen"}</button></div>${m(i.overnightPlaces ?? "Übernachtungsplätze", d)}${m(i.places ?? "Zwischenstopps", p)}${this.renderInterruptions(i, r)}${this.renderSuggestions(i, r)}</section>`;
   }
   renderRatingActions(i, r) {
     const o = (this.snapshot?.stops ?? []).filter((l) => l.rating_overall);
-    return o.length ? m`<section class="place-section"><details><summary><strong>${i.ratingEdit ?? "Bewertungen"}</strong><span>${o.length}</span></summary>${o.map((l) => m`<div class="row"><span>${l.name} · ${l.rating_overall}/5</span><button type="button" class="link" @click=${() => {
+    return o.length ? f`<section class="place-section"><details><summary><strong>${i.ratingEdit ?? "Bewertungen"}</strong><span>${o.length}</span></summary>${o.map((l) => f`<div class="row"><span>${l.name} · ${l.rating_overall}/5</span><button type="button" class="link" @click=${() => {
       this.removeRating(l.id, r);
     }}>${i.ratingRemove ?? "Bewertung löschen"}</button></div>`)}</details></section>` : "";
   }
   renderEditorDialog(i, r) {
     if (!this.editorKind) return "";
-    const o = this.editorKind === "trip-edit", l = this.editorKind === "drive-edit", d = this.editorKind === "place-edit", p = this.editorKind === "expense-edit", y = this.editorKind === "rating-edit", f = o ? i.edit : this.editorKind === "trip-create" ? i.newTrip : l ? i.edit : this.editorKind === "drive-create" ? i.manualDrive : d ? i.edit : this.editorKind === "place-create" ? i.places ?? "Ort hinzufügen" : p ? i.edit : this.editorKind === "expense-create" ? i.expenses : i.ratingEdit ?? "Bewertung", v = this.actionError || this.loadError, k = () => this.closeEditor();
-    return m`<dialog class="editor-dialog" aria-labelledby="editor-dialog-title" @cancel=${(b) => {
+    const o = this.editorKind === "trip-edit", l = this.editorKind === "drive-edit", d = this.editorKind === "place-edit", p = this.editorKind === "expense-edit", y = this.editorKind === "rating-edit", m = o ? i.edit : this.editorKind === "trip-create" ? i.newTrip : l ? i.edit : this.editorKind === "drive-create" ? i.manualDrive : d ? i.edit : this.editorKind === "place-create" ? i.places ?? "Ort hinzufügen" : p ? i.edit : this.editorKind === "expense-create" ? i.expenses : i.ratingEdit ?? "Bewertung", v = this.actionError || this.loadError, k = () => this.closeEditor();
+    return f`<dialog class="editor-dialog" aria-labelledby="editor-dialog-title" @cancel=${(b) => {
       b.preventDefault(), k();
     }}>
       <form @submit=${(b) => {
@@ -1955,14 +1955,14 @@ class $t extends Nt {
         D && this.saveExpense(D);
       } else y && this.ratingPlaceId && this.saveRating(this.ratingPlaceId, r);
     }}>
-        <h3 id="editor-dialog-title">${f}</h3>
-        ${this.discardPrompt ? m`<div class="warning" role="alert"><strong>${i.unsavedTripChange ?? "Ungespeicherte Änderungen verwerfen?"}</strong><div class="actions"><button type="button" @click=${() => {
+        <h3 id="editor-dialog-title">${m}</h3>
+        ${this.discardPrompt ? f`<div class="warning" role="alert"><strong>${i.unsavedTripChange ?? "Ungespeicherte Änderungen verwerfen?"}</strong><div class="actions"><button type="button" @click=${() => {
       this.discardPrompt = !1, this.requestUpdate();
     }}>${i.cancel}</button><button type="button" class="secondary" @click=${() => {
       this.editingTripId = "", this.editingDriveId = "", this.editingExpenseId = "", this.resetPlaceForm(), this.ratingPlaceId = "", this.closeEditor(!0);
-    }}>${i.confirmDelete ?? "Verwerfen"}</button></div></div>` : m`
-          ${v ? m`<p class="error" role="alert">${v}</p>` : ""}
-          ${this.editorKind === "trip-create" ? m`<label>${i.tripName}<input required .value=${this.tripTitle} @input=${(b) => {
+    }}>${i.confirmDelete ?? "Verwerfen"}</button></div></div>` : f`
+          ${v ? f`<p class="error" role="alert">${v}</p>` : ""}
+          ${this.editorKind === "trip-create" ? f`<label>${i.tripName}<input required .value=${this.tripTitle} @input=${(b) => {
       this.tripTitle = b.currentTarget.value, this.markEditorDirty();
     }}></label><label>${i.destination}<input .value=${this.destination} @input=${(b) => {
       this.destination = b.currentTarget.value, this.markEditorDirty();
@@ -1971,7 +1971,7 @@ class $t extends Nt {
     }}></label><label>${i.endDate}<input type="date" .value=${this.tripEndDate} @input=${(b) => {
       this.tripEndDate = b.currentTarget.value, this.markEditorDirty();
     }}></label>` : ""}
-          ${o ? m`<label>${i.tripName}<input required .value=${this.editingTripTitle} @input=${(b) => {
+          ${o ? f`<label>${i.tripName}<input required .value=${this.editingTripTitle} @input=${(b) => {
       this.editingTripTitle = b.currentTarget.value, this.markEditorDirty();
     }}></label><label>${i.destination}<input .value=${this.editingDestination} @input=${(b) => {
       this.editingDestination = b.currentTarget.value, this.markEditorDirty();
@@ -1983,7 +1983,7 @@ class $t extends Nt {
           ${this.editorKind === "drive-create" ? this.renderDriveEditorFields(i, !1) : l ? this.renderDriveEditorFields(i, !0) : ""}
           ${this.editorKind === "place-create" || d ? this.renderPlaceEditorFields(i) : ""}
           ${this.editorKind === "expense-create" ? this.renderExpenseEditorFields(i, !1) : p ? this.renderExpenseEditorFields(i, !0) : ""}
-          ${y ? m`${this.starPicker(i.ratingOverall ?? "Gesamt", this.ratingOverall, (b) => {
+          ${y ? f`${this.starPicker(i.ratingOverall ?? "Gesamt", this.ratingOverall, (b) => {
       this.ratingOverall = b, this.markEditorDirty();
     })}${this.starPicker(i.ratingAccess ?? "Anfahrt", this.ratingAccess, (b) => {
       this.ratingAccess = b, this.markEditorDirty();
@@ -2003,7 +2003,7 @@ class $t extends Nt {
   }
   renderDriveEditorFields(i, r) {
     const o = r ? this.editingDriveOccurredAt : this.manualOccurredAt;
-    return m`<label>${i.driveStart}<input type="datetime-local" required .value=${o} @input=${(l) => {
+    return f`<label>${i.driveStart}<input type="datetime-local" required .value=${o} @input=${(l) => {
       r ? this.editingDriveOccurredAt = l.currentTarget.value : this.manualOccurredAt = l.currentTarget.value, this.markEditorDirty();
     }}></label><label>${i.startLocation}<input required .value=${r ? this.editingDriveStartLocation : this.manualStartLocation} @input=${(l) => {
       r ? this.editingDriveStartLocation = l.currentTarget.value : this.manualStartLocation = l.currentTarget.value, this.markEditorDirty();
@@ -2016,8 +2016,8 @@ class $t extends Nt {
     }}></label>`;
   }
   renderPlaceEditorFields(i) {
-    const r = m`<option value="other">${i.placeOther ?? "Sonstiger Ort"}</option><option value="restaurant">${i.placeRestaurant ?? "Restaurant"}</option><option value="fuel_stop">${i.placeFuel ?? "Tankpause"}</option><option value="attraction">${i.placeAttraction ?? "Sehenswürdigkeit"}</option><option value="ferry">${i.placeFerry ?? "Fähre"}</option><option value="campsite">${i.placeCampsite ?? "Campingplatz"}</option><option value="rv_site">${i.placeRvSite ?? "Wohnmobilstellplatz"}</option><option value="wild_camp">${i.placeWildCamp ?? "Freistehplatz"}</option>`;
-    return m`<label>${i.placeName ?? "Name"}<input required .value=${this.placeName} @input=${(o) => {
+    const r = f`<option value="other">${i.placeOther ?? "Sonstiger Ort"}</option><option value="restaurant">${i.placeRestaurant ?? "Restaurant"}</option><option value="fuel_stop">${i.placeFuel ?? "Tankpause"}</option><option value="attraction">${i.placeAttraction ?? "Sehenswürdigkeit"}</option><option value="ferry">${i.placeFerry ?? "Fähre"}</option><option value="campsite">${i.placeCampsite ?? "Campingplatz"}</option><option value="rv_site">${i.placeRvSite ?? "Wohnmobilstellplatz"}</option><option value="wild_camp">${i.placeWildCamp ?? "Freistehplatz"}</option>`;
+    return f`<label>${i.placeName ?? "Name"}<input required .value=${this.placeName} @input=${(o) => {
       this.placeName = o.currentTarget.value, this.markEditorDirty();
     }}></label><label>${i.placeCategory ?? "Kategorie"}<select .value=${this.placeType} @change=${(o) => {
       this.placeType = o.currentTarget.value, this.markEditorDirty();
@@ -2038,52 +2038,52 @@ class $t extends Nt {
     }}></textarea></label>`;
   }
   renderExpenseEditorFields(i, r) {
-    const o = r ? this.editingExpenseDate : this.expenseDate, l = r ? this.editingExpenseTime : this.expenseTime, d = r ? this.editingExpenseTimeEnabled : this.expenseTimeEnabled, p = r ? this.editingCategory : this.category, y = r ? this.editingFuel : this.fuel, f = p === "fuel", v = r ? this.editingExpenseServices : this.expenseServices, k = p === "water_waste", b = r ? this.editingExpenseNote : this.expenseNote, D = ($, I) => {
-      const R = I ? [.../* @__PURE__ */ new Set([...v, $])] : v.filter((E) => E !== $);
+    const o = r ? this.editingExpenseDate : this.expenseDate, l = r ? this.editingExpenseTime : this.expenseTime, d = r ? this.editingExpenseTimeEnabled : this.expenseTimeEnabled, p = r ? this.editingCategory : this.category, y = r ? this.editingFuel : this.fuel, m = p === "fuel", v = r ? this.editingExpenseServices : this.expenseServices, k = p === "water_waste", b = r ? this.editingExpenseNote : this.expenseNote, D = ($, A) => {
+      const R = A ? [.../* @__PURE__ */ new Set([...v, $])] : v.filter((E) => E !== $);
       r ? this.editingExpenseServices = R : this.expenseServices = R, this.markEditorDirty(), this.requestUpdate();
     };
-    return m`<label>${i.amount}<input ${f ? "" : "required"} type="number" min="0" step="0.01" inputmode="decimal" .value=${y.amount} @input=${($) => {
-      f ? this.setFuel("amount", $.currentTarget.value, r) : r ? (this.editingAmount = $.currentTarget.value, this.markEditorDirty()) : this.setExpenseAmount($.currentTarget.value);
-    }}></label>${f ? m`<label>${i.fuelLiters ?? "Getankte Liter (l)"}<input type="text" inputmode="decimal" .value=${y.liters} @input=${($) => this.setFuel("liters", $.currentTarget.value, r)}></label><label>${i.fuelPrice ?? "Literpreis (€/l)"}<input type="text" inputmode="decimal" .value=${y.price} @input=${($) => this.setFuel("price", $.currentTarget.value, r)}></label>` : ""}<label>${i.category}<select .value=${p} @change=${($) => {
-      const I = $.currentTarget.value;
-      r ? this.setEditingExpenseCategory(I) : this.setExpenseCategory(I), this.markEditorDirty();
-    }}>${this.categoryOptions(p).map(($) => m`<option value=${$} ?selected=${$ === p}>${Yi($, this.hass)}</option>`)}</select></label>${k ? m`<fieldset class="expense-services"><legend>${i.services ?? "Leistungen (optional)"}</legend>${lo.map(($) => m`<label class="inline-check"><input type="checkbox" .checked=${v.includes($)} @change=${(I) => D($, I.currentTarget.checked)}> ${qr($, this.hass)}</label>`)}</fieldset>` : ""}<label>${i.expenseNote ?? "Bemerkung (optional)"}<textarea rows="4" maxlength="2000" aria-describedby="expense-note-hint" .value=${b} @input=${($) => {
+    return f`<label>${i.amount}<input ${m ? "" : "required"} type="number" min="0" step="0.01" inputmode="decimal" .value=${y.amount} @input=${($) => {
+      m ? this.setFuel("amount", $.currentTarget.value, r) : r ? (this.editingAmount = $.currentTarget.value, this.markEditorDirty()) : this.setExpenseAmount($.currentTarget.value);
+    }}></label>${m ? f`<label>${i.fuelLiters ?? "Getankte Liter (l)"}<input type="text" inputmode="decimal" .value=${y.liters} @input=${($) => this.setFuel("liters", $.currentTarget.value, r)}></label><label>${i.fuelPrice ?? "Literpreis (€/l)"}<input type="text" inputmode="decimal" .value=${y.price} @input=${($) => this.setFuel("price", $.currentTarget.value, r)}></label>` : ""}<label>${i.category}<select .value=${p} @change=${($) => {
+      const A = $.currentTarget.value;
+      r ? this.setEditingExpenseCategory(A) : this.setExpenseCategory(A), this.markEditorDirty();
+    }}>${this.categoryOptions(p).map(($) => f`<option value=${$} ?selected=${$ === p}>${Xi($, this.hass)}</option>`)}</select></label>${k ? f`<fieldset class="expense-services"><legend>${i.services ?? "Leistungen (optional)"}</legend>${lo.map(($) => f`<label class="inline-check"><input type="checkbox" .checked=${v.includes($)} @change=${(A) => D($, A.currentTarget.checked)}> ${qr($, this.hass)}</label>`)}</fieldset>` : ""}<label>${i.expenseNote ?? "Bemerkung (optional)"}<textarea rows="4" maxlength="2000" aria-describedby="expense-note-hint" .value=${b} @input=${($) => {
       r ? this.editingExpenseNote = $.currentTarget.value : this.expenseNote = $.currentTarget.value, this.markEditorDirty();
     }}></textarea><small id="expense-note-hint" class="muted">${i.expenseNoteHint ?? "Bis zu 2.000 Zeichen, Zeilenumbrüche sind möglich."}</small></label><label>${i.expenseDate ?? "Tatsächliches Ausgabendatum"}<input type="date" ?required=${!r || !!o} .value=${o} @input=${($) => {
       r ? this.editingExpenseDate = $.currentTarget.value : this.expenseDate = $.currentTarget.value, this.markEditorDirty();
     }}></label><label class="inline-check"><input type="checkbox" .checked=${d} @change=${($) => {
-      const I = $.currentTarget.checked;
-      r ? this.editingExpenseTimeEnabled = I : this.expenseTimeEnabled = I, this.markEditorDirty();
-    }}> ${i.expenseTime ?? "Uhrzeit erfassen"}</label>${d ? m`<label>${i.time ?? "Uhrzeit"}<input type="time" .value=${l} @input=${($) => {
+      const A = $.currentTarget.checked;
+      r ? this.editingExpenseTimeEnabled = A : this.expenseTimeEnabled = A, this.markEditorDirty();
+    }}> ${i.expenseTime ?? "Uhrzeit erfassen"}</label>${d ? f`<label>${i.time ?? "Uhrzeit"}<input type="time" .value=${l} @input=${($) => {
       r ? this.editingExpenseTime = $.currentTarget.value : this.expenseTime = $.currentTarget.value, this.markEditorDirty();
     }}></label>` : ""}`;
   }
   render() {
     const i = w(this.hass), r = this.snapshot?.trips ?? [];
-    if (this.embeddedSection() === "trip-create") return m`${this.renderEditorDialog(i, "")}`;
-    if (!this.embeddedTripId()) return m`${this.renderGpx(i, r, this.gpxPreview)}${this.renderPdfExport(i, r)}${this.activeTripId ? this.renderPlaces(i, this.activeTripId) : ""}${this.activeTripId ? this.renderRatingActions(i, this.activeTripId) : ""}${this.renderLegacy()}${this.renderEditorDialog(i, this.activeTripId)}${this.renderTripDeleteDialog(i)}`;
+    if (this.embeddedSection() === "trip-create") return f`${this.renderEditorDialog(i, "")}`;
+    if (!this.embeddedTripId()) return f`${this.renderGpx(i, r, this.gpxPreview)}${this.renderPdfExport(i, r)}${this.activeTripId ? this.renderPlaces(i, this.activeTripId) : ""}${this.activeTripId ? this.renderRatingActions(i, this.activeTripId) : ""}${this.renderLegacy()}${this.renderEditorDialog(i, this.activeTripId)}${this.renderTripDeleteDialog(i)}`;
     const o = this.embeddedSection(), l = r.find((d) => d.id === this.embeddedTripId());
-    return m`${o === "trip-actions" && l ? this.renderTripActions(i, l) : ""}${o === "gpx" ? this.renderGpx(i, r, this.gpxPreview) : ""}${o === "pdf" ? this.renderPdfExport(i, r) : ""}${o === "places" ? m`${this.activeTripId ? this.renderPlaces(i, this.activeTripId) : ""}${this.activeTripId ? this.renderRatingActions(i, this.activeTripId) : ""}` : ""}${o === "expenses" ? this.renderEmbeddedExpenses(i) : ""}${this.renderEditorDialog(i, this.embeddedTripId())}`;
+    return f`${o === "trip-actions" && l ? this.renderTripActions(i, l) : ""}${o === "gpx" ? this.renderGpx(i, r, this.gpxPreview) : ""}${o === "pdf" ? this.renderPdfExport(i, r) : ""}${o === "places" ? f`${this.activeTripId ? this.renderPlaces(i, this.activeTripId) : ""}${this.activeTripId ? this.renderRatingActions(i, this.activeTripId) : ""}` : ""}${o === "expenses" ? this.renderEmbeddedExpenses(i) : ""}${this.renderEditorDialog(i, this.embeddedTripId())}`;
   }
   renderEmbeddedExpenses(i) {
     const r = this.snapshot?.expenses ?? [], o = this.snapshot?.expense_summary?.total_minor !== void 0 && this.snapshot.expense_summary.currency ? xt(this.snapshot.expense_summary.total_minor, this.snapshot.expense_summary.currency, this.hass) : xt(0, "EUR", this.hass);
-    return m`<div class="embedded-expenses"><div class="actions compact-actions"><button type="button" @click=${() => this.startExpenseCreate(this.embeddedTripId())}>${i.create ?? "Hinzufügen"}</button></div>${r.map((l) => this.renderExpense(l, i))}<p class="total"><strong>${i.total}: ${o}</strong></p></div>`;
+    return f`<div class="embedded-expenses"><div class="actions compact-actions"><button type="button" @click=${() => this.startExpenseCreate(this.embeddedTripId())}>${i.create ?? "Hinzufügen"}</button></div>${r.map((l) => this.renderExpense(l, i))}<p class="total"><strong>${i.total}: ${o}</strong></p></div>`;
   }
   renderLegacySource() {
     const i = w(this.hass), r = this.snapshot?.trips ?? [], o = this.snapshot?.expenses ?? [], l = this.snapshot?.expense_summary, d = l?.mixed_currency ? i.mixedCurrency : l?.total_minor !== void 0 && l.currency ? xt(l.total_minor, l.currency, this.hass) : xt(0, "EUR", this.hass), p = this.actionError || this.loadError, y = this.gpxPreview;
-    return m`<ha-card><h2>${i.manager}</h2>${p ? m`<p class="error" role="alert">${p}</p>` : ""}<section class="gpx-import"><h3>${i.gpxImport}</h3><input type="file" accept=".gpx,application/gpx+xml,application/xml" @change=${(f) => this.readGPX(f)} ?disabled=${this.gpxBusy}><p class="muted">${this.gpxName || i.gpxPrivacy}</p>${this.gpxError ? m`<p class="error" role="alert">${this.gpxError}</p>` : ""}${y ? m`<div class="gpx-preview"><strong>${y.drives.length} ${i.gpxSections}, ${y.points.length} ${i.gpxPoints}</strong><ul>${y.drives.map((f) => m`<li><label><input type="checkbox" .checked=${this.gpxSelected.has(f.key)} @change=${(v) => {
-      v.currentTarget.checked ? this.gpxSelected.add(f.key) : this.gpxSelected.delete(f.key), this.requestUpdate();
-    }}> ${W(f.started_at, this.hass)} – ${W(f.ended_at, this.hass)} · ${(f.distance_m / 1e3).toFixed(1)} km · ${At(f.duration_seconds, this.hass)}</label></li>`)}</ul>${y.warnings.length ? m`<p class="muted">${i.gpxWarnings}: ${y.warnings.join(", ")}</p>` : ""}${y.conflicts.duplicate_file ? m`<p class="error" role="alert">${i.gpxDuplicate}</p>` : m`<button type="button" @click=${() => this.confirmGPX()} ?disabled=${this.gpxBusy || this.gpxSelected.size === 0}>${this.gpxBusy ? i.saving : i.gpxConfirm}</button>`}</div>` : ""}</section><section><h3>${i.newTrip}</h3><div class="form-grid"><input aria-label=${i.tripName} placeholder=${i.tripName} .value=${this.tripTitle} @input=${(f) => this.tripTitle = f.target.value}><input aria-label=${i.destination} placeholder=${i.destination} .value=${this.destination} @input=${(f) => this.destination = f.target.value}><label>${i.startDate}<input type="date" .value=${this.tripStartDate} @input=${(f) => this.tripStartDate = f.currentTarget.value}></label><label>${i.endDate}<input type="date" .value=${this.tripEndDate} @input=${(f) => this.tripEndDate = f.currentTarget.value}></label><button type="button" @click=${() => this.addTrip()}>${i.create}</button></div></section><section><h3>${i.trips}</h3>${r.length ? r.map((f) => m`<article class="trip"><div class="row"><strong>${f.title}</strong><span class="muted">${f.destination || ""} · ${Gt(f.status, this.hass)} · ${Lt(f, this.hass) || i.period}</span></div>${this.editingTripId === f.id ? m`<form class="form-grid" @submit=${(v) => {
-      v.preventDefault(), this.saveTrip(f);
-    }}><input aria-label=${i.tripName} .value=${this.editingTripTitle} @input=${(v) => this.editingTripTitle = v.currentTarget.value}><input aria-label=${i.destination} .value=${this.editingDestination} @input=${(v) => this.editingDestination = v.currentTarget.value}><label>${i.startDate}<input type="date" .value=${this.editingStartDate} @input=${(v) => this.editingStartDate = v.currentTarget.value}></label><label>${i.endDate}<input type="date" .value=${this.editingEndDate} @input=${(v) => this.editingEndDate = v.currentTarget.value}></label><button type="submit">${i.save}</button><button type="button" class="secondary" @click=${() => this.cancelTripEdit()}>${i.cancel}</button></form>` : m`<div class="actions"><button type="button" class="secondary" @click=${() => this.startTripEdit(f)}>${i.edit}</button><button type="button" class="secondary" @click=${() => this.removeTrip(f.id)}>${this.confirmingTripId === f.id ? i.confirmDelete : i.remove}</button>${f.status === "planned" || f.status === "paused" ? m`<button type="button" @click=${() => this.changeStatus(f.id, "active")}>${i.resume}</button>` : ""}${f.status === "active" ? m`<button type="button" class="secondary" @click=${() => this.changeStatus(f.id, "paused")}>${i.pause}</button><button type="button" @click=${() => this.changeStatus(f.id, "completed")}>${i.complete}</button>` : ""}<button type="button" class="secondary" @click=${() => this.toggleTripDetails(f.id)}>${this.selected === f.id ? i.close : i.details}</button></div>`}${this.selected === f.id ? m`<div class="details"><h4>${i.assignedDrives}</h4>${(this.snapshot?.drives ?? []).length ? (this.snapshot?.drives ?? []).map((v) => this.renderDrive(v, f.id, i)) : m`<p class="muted">${i.noDrives}</p>`}<h4>${i.freeDrives}</h4>${(this.snapshot?.available_drives ?? []).length ? (this.snapshot?.available_drives ?? []).map((v) => this.renderDrive(v, f.id, i)) : m`<p class="muted">${i.noDrives}</p>`}<h4>${i.manualDrive}</h4><div class="form-grid"><label>${i.driveStart}<input type="datetime-local" .value=${this.manualOccurredAt} @input=${(v) => this.manualOccurredAt = v.currentTarget.value}></label><input aria-label=${i.startLocation} placeholder=${i.startLocation} .value=${this.manualStartLocation} @input=${(v) => this.manualStartLocation = v.currentTarget.value}><input aria-label=${i.endLocation} placeholder=${i.endLocation} .value=${this.manualEndLocation} @input=${(v) => this.manualEndLocation = v.currentTarget.value}><input aria-label=${i.distanceKm} type="number" min="0" step="0.1" inputmode="decimal" placeholder=${i.distanceKm} .value=${this.manualDistanceKm} @input=${(v) => this.manualDistanceKm = v.currentTarget.value}><input aria-label=${i.durationMinutes} type="number" min="0" step="1" placeholder=${i.durationMinutes} .value=${this.manualDurationMinutes} @input=${(v) => this.manualDurationMinutes = v.currentTarget.value}><button type="button" @click=${() => this.addManualDrive(f.id)} ?disabled=${this.manualSaving}>${this.manualSaving ? i.saving : i.createDrive}</button></div><h4>${i.expenses}</h4><div class="expense-form create-form"><input aria-label=${i.amount} type="number" min="0" step="0.01" inputmode="decimal" placeholder="EUR" .value=${this.amount} @input=${(v) => this.setExpenseAmount(v.currentTarget.value)}><select aria-label=${i.category} .value=${this.category} @change=${(v) => this.setExpenseCategory(v.currentTarget.value)}>${ti.map((v) => m`<option value=${v}>${Yi(v, this.hass)}</option>`)}</select><button type="button" @click=${() => this.addExpense(f.id)}>${i.save}</button></div>${o.map((v) => this.renderExpense(v, i))}<p class="total"><strong>${i.total}: ${d}</strong></p></div>` : ""}</article>`) : m`<p class="muted">${i.noTrip}</p>`}</section></ha-card>`;
+    return f`<ha-card><h2>${i.manager}</h2>${p ? f`<p class="error" role="alert">${p}</p>` : ""}<section class="gpx-import"><h3>${i.gpxImport}</h3><input type="file" accept=".gpx,application/gpx+xml,application/xml" @change=${(m) => this.readGPX(m)} ?disabled=${this.gpxBusy}><p class="muted">${this.gpxName || i.gpxPrivacy}</p>${this.gpxError ? f`<p class="error" role="alert">${this.gpxError}</p>` : ""}${y ? f`<div class="gpx-preview"><strong>${y.drives.length} ${i.gpxSections}, ${y.points.length} ${i.gpxPoints}</strong><ul>${y.drives.map((m) => f`<li><label><input type="checkbox" .checked=${this.gpxSelected.has(m.key)} @change=${(v) => {
+      v.currentTarget.checked ? this.gpxSelected.add(m.key) : this.gpxSelected.delete(m.key), this.requestUpdate();
+    }}> ${W(m.started_at, this.hass)} – ${W(m.ended_at, this.hass)} · ${(m.distance_m / 1e3).toFixed(1)} km · ${It(m.duration_seconds, this.hass)}</label></li>`)}</ul>${y.warnings.length ? f`<p class="muted">${i.gpxWarnings}: ${y.warnings.join(", ")}</p>` : ""}${y.conflicts.duplicate_file ? f`<p class="error" role="alert">${i.gpxDuplicate}</p>` : f`<button type="button" @click=${() => this.confirmGPX()} ?disabled=${this.gpxBusy || this.gpxSelected.size === 0}>${this.gpxBusy ? i.saving : i.gpxConfirm}</button>`}</div>` : ""}</section><section><h3>${i.newTrip}</h3><div class="form-grid"><input aria-label=${i.tripName} placeholder=${i.tripName} .value=${this.tripTitle} @input=${(m) => this.tripTitle = m.target.value}><input aria-label=${i.destination} placeholder=${i.destination} .value=${this.destination} @input=${(m) => this.destination = m.target.value}><label>${i.startDate}<input type="date" .value=${this.tripStartDate} @input=${(m) => this.tripStartDate = m.currentTarget.value}></label><label>${i.endDate}<input type="date" .value=${this.tripEndDate} @input=${(m) => this.tripEndDate = m.currentTarget.value}></label><button type="button" @click=${() => this.addTrip()}>${i.create}</button></div></section><section><h3>${i.trips}</h3>${r.length ? r.map((m) => f`<article class="trip"><div class="row"><strong>${m.title}</strong><span class="muted">${m.destination || ""} · ${Gt(m.status, this.hass)} · ${At(m, this.hass) || i.period}</span></div>${this.editingTripId === m.id ? f`<form class="form-grid" @submit=${(v) => {
+      v.preventDefault(), this.saveTrip(m);
+    }}><input aria-label=${i.tripName} .value=${this.editingTripTitle} @input=${(v) => this.editingTripTitle = v.currentTarget.value}><input aria-label=${i.destination} .value=${this.editingDestination} @input=${(v) => this.editingDestination = v.currentTarget.value}><label>${i.startDate}<input type="date" .value=${this.editingStartDate} @input=${(v) => this.editingStartDate = v.currentTarget.value}></label><label>${i.endDate}<input type="date" .value=${this.editingEndDate} @input=${(v) => this.editingEndDate = v.currentTarget.value}></label><button type="submit">${i.save}</button><button type="button" class="secondary" @click=${() => this.cancelTripEdit()}>${i.cancel}</button></form>` : f`<div class="actions"><button type="button" class="secondary" @click=${() => this.startTripEdit(m)}>${i.edit}</button><button type="button" class="secondary" @click=${() => this.removeTrip(m.id)}>${this.confirmingTripId === m.id ? i.confirmDelete : i.remove}</button>${m.status === "planned" || m.status === "paused" ? f`<button type="button" @click=${() => this.changeStatus(m.id, "active")}>${i.resume}</button>` : ""}${m.status === "active" ? f`<button type="button" class="secondary" @click=${() => this.changeStatus(m.id, "paused")}>${i.pause}</button><button type="button" @click=${() => this.changeStatus(m.id, "completed")}>${i.complete}</button>` : ""}<button type="button" class="secondary" @click=${() => this.toggleTripDetails(m.id)}>${this.selected === m.id ? i.close : i.details}</button></div>`}${this.selected === m.id ? f`<div class="details"><h4>${i.assignedDrives}</h4>${(this.snapshot?.drives ?? []).length ? (this.snapshot?.drives ?? []).map((v) => this.renderDrive(v, m.id, i)) : f`<p class="muted">${i.noDrives}</p>`}<h4>${i.freeDrives}</h4>${(this.snapshot?.available_drives ?? []).length ? (this.snapshot?.available_drives ?? []).map((v) => this.renderDrive(v, m.id, i)) : f`<p class="muted">${i.noDrives}</p>`}<h4>${i.manualDrive}</h4><div class="form-grid"><label>${i.driveStart}<input type="datetime-local" .value=${this.manualOccurredAt} @input=${(v) => this.manualOccurredAt = v.currentTarget.value}></label><input aria-label=${i.startLocation} placeholder=${i.startLocation} .value=${this.manualStartLocation} @input=${(v) => this.manualStartLocation = v.currentTarget.value}><input aria-label=${i.endLocation} placeholder=${i.endLocation} .value=${this.manualEndLocation} @input=${(v) => this.manualEndLocation = v.currentTarget.value}><input aria-label=${i.distanceKm} type="number" min="0" step="0.1" inputmode="decimal" placeholder=${i.distanceKm} .value=${this.manualDistanceKm} @input=${(v) => this.manualDistanceKm = v.currentTarget.value}><input aria-label=${i.durationMinutes} type="number" min="0" step="1" placeholder=${i.durationMinutes} .value=${this.manualDurationMinutes} @input=${(v) => this.manualDurationMinutes = v.currentTarget.value}><button type="button" @click=${() => this.addManualDrive(m.id)} ?disabled=${this.manualSaving}>${this.manualSaving ? i.saving : i.createDrive}</button></div><h4>${i.expenses}</h4><div class="expense-form create-form"><input aria-label=${i.amount} type="number" min="0" step="0.01" inputmode="decimal" placeholder="EUR" .value=${this.amount} @input=${(v) => this.setExpenseAmount(v.currentTarget.value)}><select aria-label=${i.category} .value=${this.category} @change=${(v) => this.setExpenseCategory(v.currentTarget.value)}>${ti.map((v) => f`<option value=${v}>${Xi(v, this.hass)}</option>`)}</select><button type="button" @click=${() => this.addExpense(m.id)}>${i.save}</button></div>${o.map((v) => this.renderExpense(v, i))}<p class="total"><strong>${i.total}: ${d}</strong></p></div>` : ""}</article>`) : f`<p class="muted">${i.noTrip}</p>`}</section></ha-card>`;
   }
   renderLegacyOld() {
     const i = w(this.hass), r = this.snapshot?.trips ?? [];
-    return m`<ha-card><h2>${i.manager}</h2>${this.actionError || this.loadError ? m`<p class="error" role="alert">${this.actionError || this.loadError}</p>` : ""}<section><h3>${i.trips}</h3>${r.length ? r.map((o) => m`<article class="trip"><div class="row"><strong>${o.title}</strong><span class="muted">${o.destination || ""} · ${Gt(o.status, this.hass)} · ${Lt(o, this.hass) || i.period}</span></div><div class="actions compact-actions"><button type="button" class="secondary" @click=${() => this.startTripEdit(o)}>${i.edit}</button><button type="button" class="secondary" @click=${() => this.removeTrip(o.id)}>${this.confirmingTripId === o.id ? i.confirmDelete : i.remove}</button><button type="button" class="secondary" @click=${() => this.toggleTripDetails(o.id)}>${this.selected === o.id ? i.close : i.details}</button></div>${this.selected === o.id ? m`<div class="details"><h4>${i.assignedDrives}</h4>${(this.snapshot?.drives ?? []).map((l) => this.renderDrive(l, o.id, i))}<h4>${i.expenses}</h4>${(this.snapshot?.expenses ?? []).map((l) => this.renderExpense(l, i))}<p class="total"><strong>${i.total}: ${xt(this.snapshot?.expense_summary?.total_minor ?? 0, this.snapshot?.expense_summary?.currency ?? "EUR", this.hass)}</strong></p></div>` : ""}</article>`) : m`<p class="muted">${i.noTrip}</p>`}</section></ha-card>`;
+    return f`<ha-card><h2>${i.manager}</h2>${this.actionError || this.loadError ? f`<p class="error" role="alert">${this.actionError || this.loadError}</p>` : ""}<section><h3>${i.trips}</h3>${r.length ? r.map((o) => f`<article class="trip"><div class="row"><strong>${o.title}</strong><span class="muted">${o.destination || ""} · ${Gt(o.status, this.hass)} · ${At(o, this.hass) || i.period}</span></div><div class="actions compact-actions"><button type="button" class="secondary" @click=${() => this.startTripEdit(o)}>${i.edit}</button><button type="button" class="secondary" @click=${() => this.removeTrip(o.id)}>${this.confirmingTripId === o.id ? i.confirmDelete : i.remove}</button><button type="button" class="secondary" @click=${() => this.toggleTripDetails(o.id)}>${this.selected === o.id ? i.close : i.details}</button></div>${this.selected === o.id ? f`<div class="details"><h4>${i.assignedDrives}</h4>${(this.snapshot?.drives ?? []).map((l) => this.renderDrive(l, o.id, i))}<h4>${i.expenses}</h4>${(this.snapshot?.expenses ?? []).map((l) => this.renderExpense(l, i))}<p class="total"><strong>${i.total}: ${xt(this.snapshot?.expense_summary?.total_minor ?? 0, this.snapshot?.expense_summary?.currency ?? "EUR", this.hass)}</strong></p></div>` : ""}</article>`) : f`<p class="muted">${i.noTrip}</p>`}</section></ha-card>`;
   }
   renderLegacy() {
     const i = w(this.hass);
-    return m`<div class="manager-shell"><div class="editor-toolbar"><button type="button" @click=${() => this.startTripCreate()}>${i.newTrip ?? "Reise hinzufügen"}</button>${this.activeTripId ? m`<button type="button" class="secondary" @click=${() => this.startManualDriveCreate(this.activeTripId)}>${i.createDrive ?? "Fahrt hinzufügen"}</button><button type="button" class="secondary" @click=${() => this.startExpenseCreate(this.activeTripId)}>${i.expenses ?? "Kosten hinzufügen"}</button>` : ""}</div>${this.renderLegacyOld()}${this.renderDriveDeleteDialog(i)}</div>`;
+    return f`<div class="manager-shell"><div class="editor-toolbar"><button type="button" @click=${() => this.startTripCreate()}>${i.newTrip ?? "Reise hinzufügen"}</button>${this.activeTripId ? f`<button type="button" class="secondary" @click=${() => this.startManualDriveCreate(this.activeTripId)}>${i.createDrive ?? "Fahrt hinzufügen"}</button><button type="button" class="secondary" @click=${() => this.startExpenseCreate(this.activeTripId)}>${i.expenses ?? "Kosten hinzufügen"}</button>` : ""}</div>${this.renderLegacyOld()}${this.renderDriveDeleteDialog(i)}</div>`;
   }
 }
 $t.styles = [Nt.styles, gt`section{margin-top:16px}.gpx-preview{padding:8px;background:var(--secondary-background-color)}.trip{display:grid;gap:8px;padding:12px 0;border-bottom:1px solid var(--divider-color)}.row,.drive-row{display:flex;justify-content:space-between;gap:8px;align-items:center;flex-wrap:wrap}.expense-row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;align-items:center;padding:10px 0;border-bottom:1px solid var(--divider-color);min-width:0}.expense-info{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:8px;align-items:baseline;min-width:0;overflow-wrap:anywhere}.expense-date{color:var(--secondary-text-color);font-size:.88em}.expense-amount{white-space:nowrap}.expense-actions{margin-top:0;justify-content:flex-end}.details{padding:8px;background:var(--secondary-background-color)}h4{margin:12px 0 4px}.link{min-height:30px;padding:4px 8px;font-size:.9em}.form-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(9rem,1fr));gap:8px;align-items:end}.form-grid input,.form-grid select{min-width:0;width:100%;box-sizing:border-box}.form-grid label{display:grid;gap:4px;font-size:.9em}.inline-check{display:flex!important;align-items:center;gap:6px;min-height:40px}.inline-check input{width:1.1rem!important;min-height:1.1rem!important;flex:0 0 auto}.expense-form{display:grid;grid-template-columns:minmax(0,1fr) minmax(7rem,10rem) auto;gap:8px;align-items:center;width:100%}.expense-form input,.expense-form select{min-width:0;width:100%;box-sizing:border-box}.create-form{grid-template-columns:minmax(7rem,10rem) minmax(0,1fr) auto}.total{margin:12px 0 0;text-align:right}.editor-toolbar,.compact-actions{display:flex;flex-wrap:wrap;gap:8px}.editor-dialog{width:min(36rem,calc(100vw - 2rem));max-height:calc(100dvh - 2rem);overflow:hidden;padding:0;border:0;border-radius:12px;color:var(--primary-text-color);background:var(--card-background-color)}.editor-dialog::backdrop{background:rgb(0 0 0 / .5)}.editor-dialog form{display:grid;gap:12px;padding:18px;max-height:calc(100dvh - 2rem);overflow-y:auto;overscroll-behavior:contain;scrollbar-gutter:stable}.editor-dialog label{display:grid;gap:5px}.editor-dialog input,.editor-dialog select,.editor-dialog textarea{box-sizing:border-box;width:100%;min-height:40px;padding:8px;color:var(--primary-text-color);background:var(--card-background-color);border:1px solid var(--divider-color);border-radius:7px;font:inherit}.editor-dialog textarea{min-height:5rem}.dialog-actions{display:flex;justify-content:flex-end;gap:8px;flex-wrap:wrap}.editor-dialog button:focus-visible{outline:2px solid var(--primary-color);outline-offset:2px}@media(max-width:650px){.editor-toolbar button,.dialog-actions button{flex:1 1 100%}.editor-dialog{width:calc(100vw - 1rem);max-height:calc(100dvh - 1rem)}.editor-dialog form{padding:14px;max-height:calc(100dvh - 1rem)}.expense-row{grid-template-columns:1fr;gap:6px}.expense-info{grid-template-columns:minmax(0,1fr) auto}.expense-date{grid-column:1 / -1}.expense-actions{justify-content:flex-start}.total{text-align:left}}`];
@@ -2091,8 +2091,8 @@ $t.styles = [...$t.styles, gt`.gpx-import:not(.gpx-explicit){display:none}.gpx-i
 $t.styles = [...$t.styles, gt`.trip-management{margin-top:12px}.trip-actions{margin-top:0}.trip-actions-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:0}.trip-action{box-sizing:border-box;width:100%;min-width:0;min-height:44px;padding:10px 12px;border-radius:8px;font:inherit;font-size:.95rem;line-height:1.2;overflow-wrap:anywhere;white-space:normal}.trip-action-primary{color:var(--text-primary-color,#fff);background:var(--primary-color)}.trip-action-secondary{color:var(--primary-text-color);background:var(--secondary-background-color);border:1px solid var(--divider-color)}.trip-delete-action{margin-top:10px;padding-top:10px;border-top:1px solid var(--divider-color)}.trip-delete-action .trip-action{color:var(--text-primary-color,#fff)!important;background:var(--error-color,#c62828)!important;border-color:transparent}.trip-delete-dialog{width:min(34rem,calc(100vw - 2rem));max-width:calc(100vw - 2rem);padding:0;border:0;border-radius:12px;color:var(--primary-text-color);background:var(--card-background-color)}.trip-delete-dialog::backdrop{background:rgb(0 0 0 / .5)}.trip-delete-dialog form{display:grid;gap:12px;padding:18px}.trip-delete-dialog ul{margin:0;padding-inline-start:1.2rem}.trip-delete-dialog .dialog-actions{margin-top:4px}@media(max-width:420px){.trip-actions-grid{grid-template-columns:1fr}}@media(max-width:650px){.trip-delete-dialog{width:calc(100vw - 1rem);max-width:calc(100vw - 1rem)}}`];
 $t.styles = [...$t.styles, gt`.drive-delete-dialog{width:min(34rem,calc(100vw - 2rem));max-width:calc(100vw - 2rem);padding:0;border:0;border-radius:12px;color:var(--primary-text-color);background:var(--card-background-color)}.drive-delete-dialog::backdrop{background:rgb(0 0 0 / .5)}.drive-delete-dialog form{display:grid;gap:12px;padding:18px}.drive-delete-dialog dl{display:grid;grid-template-columns:auto minmax(0,1fr);gap:4px 12px;margin:0}.drive-delete-dialog dt{color:var(--secondary-text-color)}.drive-delete-dialog dd{margin:0}.danger-link{color:var(--error-color,#c62828)}.danger{color:var(--text-primary-color,#fff);background:var(--error-color,#c62828)}@media(max-width:650px){.drive-delete-dialog{width:calc(100vw - 1rem);max-width:calc(100vw - 1rem)}}`];
 $t.styles = [...$t.styles || [], gt`.expense-note{grid-column:1 / -1;white-space:pre-wrap;overflow-wrap:anywhere;color:var(--primary-text-color);line-height:1.35}`];
-di("camper-travel-journal-manager-card", $t);
-const qo = 1e4;
+ci("camper-travel-journal-manager-card", $t);
+const jo = 1e4;
 function en() {
   return typeof performance < "u" ? performance.now() : Date.now();
 }
@@ -2102,11 +2102,11 @@ function nn(c) {
 function Kr(c) {
   return c?.connection ? c.connection.connected === !0 ? "available" : c.connection.connected === !1 ? "unavailable" : "unknown" : "unavailable";
 }
-function Ho(c) {
+function Go(c) {
   const i = c, r = typeof i?.code == "string" ? i.code.replace(/[^a-zA-Z0-9_.-]/g, "_").slice(0, 80) : "promise_rejected", o = typeof i?.message == "string" ? i.message.replace(/bearer\s+[^\s]+/gi, "Bearer [maskiert]").replace(/(token|cookie|authorization|password)\s*[:=]\s*[^\s,;]+/gi, "$1=[maskiert]").slice(0, 240) : "Die Anfrage wurde abgelehnt.";
   return { errorCode: r, errorMessage: o };
 }
-function jo(c, i) {
+function Ko(c, i) {
   return new Promise((r, o) => {
     const l = setTimeout(() => o(Object.assign(new Error("Zeitüberschreitung"), { code: "timeout" })), i);
     c.then((d) => {
@@ -2119,36 +2119,36 @@ function jo(c, i) {
 async function rn(c, i, r, o) {
   const l = en();
   try {
-    const d = await jo(c.connection.sendMessagePromise(i), o);
+    const d = await Ko(c.connection.sendMessagePromise(i), o);
     return { ...r(d), durationMs: Math.round(en() - l), value: d };
   } catch (d) {
-    return { state: "failed", durationMs: Math.round(en() - l), ...Ho(d) };
+    return { state: "failed", durationMs: Math.round(en() - l), ...Go(d) };
   }
 }
-function Go(c) {
+function Vo(c) {
   return c && typeof c == "object" ? { state: "success", structure: "ok" } : { state: "failed", structure: "invalid" };
 }
-function Ko(c) {
+function Jo(c) {
   const i = c?.vehicles;
   return Array.isArray(i) && i.every((r) => r && typeof r == "object" && typeof r.vehicle_id == "string") ? { state: "success", structure: "ok", count: i.length } : { state: "failed", structure: "invalid", errorCode: "invalid_response", errorMessage: "Fahrzeugantwort hat eine ungültige Struktur." };
 }
-function Vo(c) {
+function Yo(c) {
   const i = c;
   return Array.isArray(i?.trips) && Array.isArray(i?.drives) && Array.isArray(i?.stops) ? { state: "success", structure: "ok", count: i.trips.length, drivesCount: i.drives.length, stopsCount: i.stops.length } : { state: "failed", structure: "invalid", errorCode: "invalid_response", errorMessage: "Reisedatenantwort hat eine ungültige Struktur." };
 }
-async function Jo(c, i, r = qo) {
+async function Xo(c, i, r = jo) {
   const o = { state: "not_run", durationMs: null };
-  if (!c?.connection) return { version: "0.4.0-beta.5", connectionBefore: "unavailable", connectionAfter: "unavailable", authentication: o, vehicles: o, trips: o, vehicleId: nn(i) };
-  const l = Kr(c), d = await rn(c, { type: "auth/current_user" }, Go, r), p = await rn(c, { type: "camper_travel_journal/list_vehicles" }, Ko, r), y = p.value?.vehicles?.filter((H) => typeof H.vehicle_id == "string") ?? [], f = y.length === 1 ? y[0].vehicle_id : void 0, k = await rn(c, { type: "camper_travel_journal/list", vehicle_id: f ?? i }, Vo, r), { value: b, ...D } = d, { value: $, ...I } = p, { value: R, ...E } = k;
+  if (!c?.connection) return { version: "0.4.0-beta.6", connectionBefore: "unavailable", connectionAfter: "unavailable", authentication: o, vehicles: o, trips: o, vehicleId: nn(i) };
+  const l = Kr(c), d = await rn(c, { type: "auth/current_user" }, Vo, r), p = await rn(c, { type: "camper_travel_journal/list_vehicles" }, Jo, r), y = p.value?.vehicles?.filter((H) => typeof H.vehicle_id == "string") ?? [], m = y.length === 1 ? y[0].vehicle_id : void 0, k = await rn(c, { type: "camper_travel_journal/list", vehicle_id: m ?? i }, Yo, r), { value: b, ...D } = d, { value: $, ...A } = p, { value: R, ...E } = k;
   return {
-    version: "0.4.0-beta.5",
+    version: "0.4.0-beta.6",
     connectionBefore: l,
     connectionAfter: Kr(c),
     authentication: D,
-    vehicles: I,
+    vehicles: A,
     trips: E,
     vehicleId: nn(i),
-    ...f ? { resolvedVehicleId: nn(f) } : {}
+    ...m ? { resolvedVehicleId: nn(m) } : {}
   };
 }
 function sn(c) {
@@ -2158,7 +2158,7 @@ function an(c) {
   return c.state === "success" ? "erfolgreich" : c.state === "failed" ? "fehlgeschlagen" : "nicht geprüft";
 }
 const Vr = "01M4XW0KD3GQ0KASAYHQ29840P";
-class Yo extends jt {
+class Qo extends jt {
   static styles = gt`
     :host { display: block; color: var(--primary-text-color); }
     ha-card { padding: 16px; }
@@ -2195,7 +2195,7 @@ class Yo extends jt {
     }
     this.running = !0, this.error = "", this.manualCopy = !1, this.requestUpdate();
     try {
-      this.report = await Jo(this._hass, this.config.vehicle_id);
+      this.report = await Xo(this._hass, this.config.vehicle_id);
     } catch {
       this.error = "Diagnose konnte nicht gestartet werden.";
     } finally {
@@ -2234,10 +2234,10 @@ class Yo extends jt {
   }
   render() {
     const i = this.report;
-    return m`<ha-card><h2>Camper Travel Journal – Diagnose</h2>
-      ${this.error ? m`<p class="error" role="alert">${this.error}</p>` : ""}
-      ${this.running ? m`<p class="muted" aria-live="polite">Diagnose läuft …</p>` : ""}
-      ${i ? m`<dl>
+    return f`<ha-card><h2>Camper Travel Journal – Diagnose</h2>
+      ${this.error ? f`<p class="error" role="alert">${this.error}</p>` : ""}
+      ${this.running ? f`<p class="muted" aria-live="polite">Diagnose läuft …</p>` : ""}
+      ${i ? f`<dl>
         <dt>Version</dt><dd>${i.version}</dd>
         <dt>Verbindung vorher</dt><dd>${i.connectionBefore}</dd>
         <dt>Verbindung nachher</dt><dd>${i.connectionAfter}</dd>
@@ -2245,19 +2245,19 @@ class Yo extends jt {
         <dt>Fahrzeugabfrage</dt><dd>${an(i.vehicles)}${i.vehicles.durationMs === null ? "" : ` (${i.vehicles.durationMs} ms)`}</dd>
         <dt>Reisedatenabfrage</dt><dd>${an(i.trips)}${i.trips.durationMs === null ? "" : ` (${i.trips.durationMs} ms)`}${i.trips.state === "success" ? ` · ${i.trips.count ?? 0} Reisen / ${i.trips.drivesCount ?? 0} Fahrten / ${i.trips.stopsCount ?? 0} Stopps` : ""}</dd>
         <dt>Strukturprüfung</dt><dd>${i.vehicles.structure === "ok" && i.trips.structure === "ok" ? "ok" : "siehe Bericht"}</dd>
-      </dl><pre aria-label="Diagnosebericht">${sn(i)}</pre>${this.manualCopy ? m`<textarea aria-label="Diagnosebericht zum manuellen Kopieren" readonly rows="8" @click=${() => this.selectReport()}>${sn(i)}</textarea>` : ""}` : ""}
-      <div class="actions"><button @click=${() => this.start()} ?disabled=${this.running}>${i ? "Diagnose wiederholen" : "Diagnose starten"}</button>${i ? m`<button class="secondary" @click=${() => this.copyReport()}>Bericht kopieren</button>${this.manualCopy ? m`<button class="secondary" @click=${() => this.selectReport()}>Bericht auswählen</button>` : ""}` : ""}</div>
+      </dl><pre aria-label="Diagnosebericht">${sn(i)}</pre>${this.manualCopy ? f`<textarea aria-label="Diagnosebericht zum manuellen Kopieren" readonly rows="8" @click=${() => this.selectReport()}>${sn(i)}</textarea>` : ""}` : ""}
+      <div class="actions"><button @click=${() => this.start()} ?disabled=${this.running}>${i ? "Diagnose wiederholen" : "Diagnose starten"}</button>${i ? f`<button class="secondary" @click=${() => this.copyReport()}>Bericht kopieren</button>${this.manualCopy ? f`<button class="secondary" @click=${() => this.selectReport()}>Bericht auswählen</button>` : ""}` : ""}</div>
     </ha-card>`;
   }
 }
-typeof customElements < "u" && !customElements.get("camper-travel-journal-diagnostics-card") && customElements.define("camper-travel-journal-diagnostics-card", Yo);
+typeof customElements < "u" && !customElements.get("camper-travel-journal-diagnostics-card") && customElements.define("camper-travel-journal-diagnostics-card", Qo);
 var Pe = { exports: {} };
-var Xo = Pe.exports, Jr;
-function Qo() {
+var tl = Pe.exports, Jr;
+function el() {
   return Jr || (Jr = 1, (function(c, i) {
     (function(r, o) {
       o(i);
-    })(Xo, (function(r) {
+    })(tl, (function(r) {
       var o = "1.9.4";
       function l(t) {
         var e, n, s, a;
@@ -2285,7 +2285,7 @@ function Qo() {
         };
       }
       var y = 0;
-      function f(t) {
+      function m(t) {
         return "_leaflet_id" in t || (t._leaflet_id = ++y), t._leaflet_id;
       }
       function v(t, e, n) {
@@ -2312,7 +2312,7 @@ function Qo() {
       function $(t) {
         return t.trim ? t.trim() : t.replace(/^\s+|\s+$/g, "");
       }
-      function I(t) {
+      function A(t) {
         return $(t).split(/\s+/);
       }
       function R(t, e) {
@@ -2339,14 +2339,14 @@ function Qo() {
       var it = Array.isArray || function(t) {
         return Object.prototype.toString.call(t) === "[object Array]";
       };
-      function pi(t, e) {
+      function fi(t, e) {
         for (var n = 0; n < t.length; n++)
           if (t[n] === e)
             return n;
         return -1;
       }
       var Me = "data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=";
-      function fi(t) {
+      function mi(t) {
         return window["webkit" + t] || window["moz" + t] || window["ms" + t];
       }
       var _n = 0;
@@ -2354,14 +2354,14 @@ function Qo() {
         var e = +/* @__PURE__ */ new Date(), n = Math.max(0, 16 - (e - _n));
         return _n = e + n, window.setTimeout(t, n);
       }
-      var mi = window.requestAnimationFrame || fi("RequestAnimationFrame") || yn, bn = window.cancelAnimationFrame || fi("CancelAnimationFrame") || fi("CancelRequestAnimationFrame") || function(t) {
+      var gi = window.requestAnimationFrame || mi("RequestAnimationFrame") || yn, bn = window.cancelAnimationFrame || mi("CancelAnimationFrame") || mi("CancelRequestAnimationFrame") || function(t) {
         window.clearTimeout(t);
       };
       function rt(t, e, n) {
-        if (n && mi === yn)
+        if (n && gi === yn)
           t.call(e);
         else
-          return mi.call(window, p(t, e));
+          return gi.call(window, p(t, e));
       }
       function ht(t) {
         t && bn.call(window, t);
@@ -2374,20 +2374,20 @@ function Qo() {
         get lastId() {
           return y;
         },
-        stamp: f,
+        stamp: m,
         throttle: v,
         wrapNum: k,
         falseFn: b,
         formatNum: D,
         trim: $,
-        splitWords: I,
+        splitWords: A,
         setOptions: R,
         getParamString: E,
         template: de,
         isArray: it,
-        indexOf: pi,
+        indexOf: fi,
         emptyImageUrl: Me,
-        requestFn: mi,
+        requestFn: gi,
         cancelFn: bn,
         requestAnimFrame: rt,
         cancelAnimFrame: ht
@@ -2439,7 +2439,7 @@ function Qo() {
             for (var s in t)
               this._on(s, t[s], e);
           else {
-            t = I(t);
+            t = A(t);
             for (var a = 0, h = t.length; a < h; a++)
               this._on(t[a], e, n);
           }
@@ -2463,7 +2463,7 @@ function Qo() {
             for (var s in t)
               this._off(s, t[s], e);
           else {
-            t = I(t);
+            t = A(t);
             for (var a = arguments.length === 1, h = 0, u = t.length; h < u; h++)
               a ? this._off(t[h]) : this._off(t[h], e, n);
           }
@@ -2565,7 +2565,7 @@ function Qo() {
             for (var s in t)
               this._on(s, t[s], e, !0);
           else {
-            t = I(t);
+            t = A(t);
             for (var a = 0, h = t.length; a < h; a++)
               this._on(t[a], e, n, !0);
           }
@@ -2574,12 +2574,12 @@ function Qo() {
         // @method addEventParent(obj: Evented): this
         // Adds an event parent - an `Evented` that will receive propagated events
         addEventParent: function(t) {
-          return this._eventParents = this._eventParents || {}, this._eventParents[f(t)] = t, this;
+          return this._eventParents = this._eventParents || {}, this._eventParents[m(t)] = t, this;
         },
         // @method removeEventParent(obj: Evented): this
         // Removes an event parent, so it will stop receiving propagated events
         removeEventParent: function(t) {
-          return this._eventParents && delete this._eventParents[f(t)], this;
+          return this._eventParents && delete this._eventParents[m(t)], this;
         },
         _propagateEvent: function(t) {
           for (var e in this._eventParents)
@@ -2606,7 +2606,7 @@ function Qo() {
         // @method add(otherPoint: Point): Point
         // Returns the result of addition of the current and the given points.
         add: function(t) {
-          return this.clone()._add(A(t));
+          return this.clone()._add(I(t));
         },
         _add: function(t) {
           return this.x += t.x, this.y += t.y, this;
@@ -2614,7 +2614,7 @@ function Qo() {
         // @method subtract(otherPoint: Point): Point
         // Returns the result of subtraction of the given point from the current.
         subtract: function(t) {
-          return this.clone()._subtract(A(t));
+          return this.clone()._subtract(I(t));
         },
         _subtract: function(t) {
           return this.x -= t.x, this.y -= t.y, this;
@@ -2684,19 +2684,19 @@ function Qo() {
         // @method distanceTo(otherPoint: Point): Number
         // Returns the cartesian distance between the current and the given points.
         distanceTo: function(t) {
-          t = A(t);
+          t = I(t);
           var e = t.x - this.x, n = t.y - this.y;
           return Math.sqrt(e * e + n * n);
         },
         // @method equals(otherPoint: Point): Boolean
         // Returns `true` if the given point has the same coordinates.
         equals: function(t) {
-          return t = A(t), t.x === this.x && t.y === this.y;
+          return t = I(t), t.x === this.x && t.y === this.y;
         },
         // @method contains(otherPoint: Point): Boolean
         // Returns `true` if both coordinates of the given point are less than the corresponding current point coordinates (in absolute values).
         contains: function(t) {
-          return t = A(t), Math.abs(t.x) <= Math.abs(this.x) && Math.abs(t.y) <= Math.abs(this.y);
+          return t = I(t), Math.abs(t.x) <= Math.abs(this.x) && Math.abs(t.y) <= Math.abs(this.y);
         },
         // @method toString(): String
         // Returns a string representation of the point for debugging purposes.
@@ -2704,7 +2704,7 @@ function Qo() {
           return "Point(" + D(this.x) + ", " + D(this.y) + ")";
         }
       };
-      function A(t, e, n) {
+      function I(t, e, n) {
         return t instanceof C ? t : it(t) ? new C(t[0], t[1]) : t == null ? t : typeof t == "object" && "x" in t && "y" in t ? new C(t.x, t.y) : new C(t, e, n);
       }
       function j(t, e) {
@@ -2723,7 +2723,7 @@ function Qo() {
           if (!t)
             return this;
           if (t instanceof C || typeof t[0] == "number" || "x" in t)
-            e = n = A(t);
+            e = n = I(t);
           else if (t = st(t), e = t.min, n = t.max, !e || !n)
             return this;
           return !this.min && !this.max ? (this.min = e.clone(), this.max = n.clone()) : (this.min.x = Math.min(e.x, this.min.x), this.max.x = Math.max(n.x, this.max.x), this.min.y = Math.min(e.y, this.min.y), this.max.y = Math.max(n.y, this.max.y)), this;
@@ -2731,7 +2731,7 @@ function Qo() {
         // @method getCenter(round?: Boolean): Point
         // Returns the center point of the bounds.
         getCenter: function(t) {
-          return A(
+          return I(
             (this.min.x + this.max.x) / 2,
             (this.min.y + this.max.y) / 2,
             t
@@ -2740,12 +2740,12 @@ function Qo() {
         // @method getBottomLeft(): Point
         // Returns the bottom-left point of the bounds.
         getBottomLeft: function() {
-          return A(this.min.x, this.max.y);
+          return I(this.min.x, this.max.y);
         },
         // @method getTopRight(): Point
         // Returns the top-right point of the bounds.
         getTopRight: function() {
-          return A(this.max.x, this.min.y);
+          return I(this.max.x, this.min.y);
         },
         // @method getTopLeft(): Point
         // Returns the top-left point of the bounds (i.e. [`this.min`](#bounds-min)).
@@ -2769,7 +2769,7 @@ function Qo() {
         // Returns `true` if the rectangle contains the given point.
         contains: function(t) {
           var e, n;
-          return typeof t[0] == "number" || t instanceof C ? t = A(t) : t = st(t), t instanceof j ? (e = t.min, n = t.max) : e = n = t, e.x >= this.min.x && n.x <= this.max.x && e.y >= this.min.y && n.y <= this.max.y;
+          return typeof t[0] == "number" || t instanceof C ? t = I(t) : t = st(t), t instanceof j ? (e = t.min, n = t.max) : e = n = t, e.x >= this.min.x && n.x <= this.max.x && e.y >= this.min.y && n.y <= this.max.y;
         },
         // @method intersects(otherBounds: Bounds): Boolean
         // Returns `true` if the rectangle intersects the given bounds. Two bounds
@@ -2799,8 +2799,8 @@ function Qo() {
         pad: function(t) {
           var e = this.min, n = this.max, s = Math.abs(e.x - n.x) * t, a = Math.abs(e.y - n.y) * t;
           return st(
-            A(e.x - s, e.y - a),
-            A(n.x + s, n.y + a)
+            I(e.x - s, e.y - a),
+            I(n.x + s, n.y + a)
           );
         },
         // @method equals(otherBounds: Bounds): Boolean
@@ -2962,12 +2962,12 @@ function Qo() {
         // @method distanceTo(otherLatLng: LatLng): Number
         // Returns the distance (in meters) to the given `LatLng` calculated using the [Spherical Law of Cosines](https://en.wikipedia.org/wiki/Spherical_law_of_cosines).
         distanceTo: function(t) {
-          return It.distance(this, N(t));
+          return Lt.distance(this, N(t));
         },
         // @method wrap(): LatLng
         // Returns a new `LatLng` object with the longitude wrapped so it's always between -180 and +180 degrees.
         wrap: function() {
-          return It.wrapLatLng(this);
+          return Lt.wrapLatLng(this);
         },
         // @method toBounds(sizeInMeters: Number): LatLngBounds
         // Returns a new `LatLngBounds` object in which each boundary is `sizeInMeters/2` meters apart from the `LatLng`.
@@ -3067,7 +3067,7 @@ function Qo() {
           var h = t.getSouthWest(), u = t.getNorthEast(), g = new U(h.lat - s, h.lng - a), _ = new U(u.lat - s, u.lng - a);
           return new at(g, _);
         }
-      }, It = l({}, kt, {
+      }, Lt = l({}, kt, {
         wrapLng: [-180, 180],
         // Mean Earth Radius, as recommended for use by
         // the International Union of Geodesy and Geophysics,
@@ -3078,7 +3078,7 @@ function Qo() {
           var n = Math.PI / 180, s = t.lat * n, a = e.lat * n, h = Math.sin((e.lat - t.lat) * n / 2), u = Math.sin((e.lng - t.lng) * n / 2), g = h * h + Math.cos(s) * Math.cos(a) * u * u, _ = 2 * Math.atan2(Math.sqrt(g), Math.sqrt(1 - g));
           return this.R * _;
         }
-      }), wn = 6378137, gi = {
+      }), wn = 6378137, vi = {
         R: wn,
         MAX_LATITUDE: 85.0511287798,
         project: function(t) {
@@ -3100,14 +3100,14 @@ function Qo() {
           return new j([-t, -t], [t, t]);
         })()
       };
-      function vi(t, e, n, s) {
+      function _i(t, e, n, s) {
         if (it(t)) {
           this._a = t[0], this._b = t[1], this._c = t[2], this._d = t[3];
           return;
         }
         this._a = t, this._b = e, this._c = n, this._d = s;
       }
-      vi.prototype = {
+      _i.prototype = {
         // @method transform(point: Point, scale?: Number): Point
         // Returns a transformed point, optionally multiplied by the given scale.
         // Only accepts actual `L.Point` instances, not arrays.
@@ -3129,16 +3129,16 @@ function Qo() {
         }
       };
       function ue(t, e, n, s) {
-        return new vi(t, e, n, s);
+        return new _i(t, e, n, s);
       }
-      var _i = l({}, It, {
+      var yi = l({}, Lt, {
         code: "EPSG:3857",
-        projection: gi,
+        projection: vi,
         transformation: (function() {
-          var t = 0.5 / (Math.PI * gi.R);
+          var t = 0.5 / (Math.PI * vi.R);
           return ue(t, 0.5, -t, 0.5);
         })()
-      }), vs = l({}, _i, {
+      }), vs = l({}, yi, {
         code: "EPSG:900913"
       });
       function $n(t) {
@@ -3153,7 +3153,7 @@ function Qo() {
         }
         return n || "M0 0";
       }
-      var yi = document.documentElement.style, ze = "ActiveXObject" in window, _s = ze && !document.addEventListener, kn = "msLaunchUri" in navigator && !("documentMode" in document), bi = vt("webkit"), En = vt("android"), Pn = vt("android 2") || vt("android 3"), ys = parseInt(/WebKit\/([0-9]+)|$/.exec(navigator.userAgent)[1], 10), bs = En && vt("Google") && ys < 537 && !("AudioNode" in window), xi = !!window.opera, Sn = !kn && vt("chrome"), Dn = vt("gecko") && !bi && !xi && !ze, xs = !Sn && vt("safari"), An = vt("phantom"), Ln = "OTransition" in yi, ws = navigator.platform.indexOf("Win") === 0, In = ze && "transition" in yi, wi = "WebKitCSSMatrix" in window && "m11" in new window.WebKitCSSMatrix() && !Pn, Cn = "MozPerspective" in yi, $s = !window.L_DISABLE_3D && (In || wi || Cn) && !Ln && !An, pe = typeof orientation < "u" || vt("mobile"), Ts = pe && bi, ks = pe && wi, Mn = !window.PointerEvent && window.MSPointerEvent, zn = !!(window.PointerEvent || Mn), On = "ontouchstart" in window || !!window.TouchEvent, Es = !window.L_NO_TOUCH && (On || zn), Ps = pe && xi, Ss = pe && Dn, Ds = (window.devicePixelRatio || window.screen.deviceXDPI / window.screen.logicalXDPI) > 1, As = (function() {
+      var bi = document.documentElement.style, ze = "ActiveXObject" in window, _s = ze && !document.addEventListener, kn = "msLaunchUri" in navigator && !("documentMode" in document), xi = vt("webkit"), En = vt("android"), Pn = vt("android 2") || vt("android 3"), ys = parseInt(/WebKit\/([0-9]+)|$/.exec(navigator.userAgent)[1], 10), bs = En && vt("Google") && ys < 537 && !("AudioNode" in window), wi = !!window.opera, Sn = !kn && vt("chrome"), Dn = vt("gecko") && !xi && !wi && !ze, xs = !Sn && vt("safari"), In = vt("phantom"), An = "OTransition" in bi, ws = navigator.platform.indexOf("Win") === 0, Ln = ze && "transition" in bi, $i = "WebKitCSSMatrix" in window && "m11" in new window.WebKitCSSMatrix() && !Pn, Cn = "MozPerspective" in bi, $s = !window.L_DISABLE_3D && (Ln || $i || Cn) && !An && !In, pe = typeof orientation < "u" || vt("mobile"), Ts = pe && xi, ks = pe && $i, Mn = !window.PointerEvent && window.MSPointerEvent, zn = !!(window.PointerEvent || Mn), On = "ontouchstart" in window || !!window.TouchEvent, Es = !window.L_NO_TOUCH && (On || zn), Ps = pe && wi, Ss = pe && Dn, Ds = (window.devicePixelRatio || window.screen.deviceXDPI / window.screen.logicalXDPI) > 1, Is = (function() {
         var t = !1;
         try {
           var e = Object.defineProperty({}, "passive", {
@@ -3165,12 +3165,12 @@ function Qo() {
         } catch {
         }
         return t;
-      })(), Ls = (function() {
+      })(), As = (function() {
         return !!document.createElement("canvas").getContext;
-      })(), $i = !!(document.createElementNS && $n("svg").createSVGRect), Is = !!$i && (function() {
+      })(), Ti = !!(document.createElementNS && $n("svg").createSVGRect), Ls = !!Ti && (function() {
         var t = document.createElement("div");
         return t.innerHTML = "<svg/>", (t.firstChild && t.firstChild.namespaceURI) === "http://www.w3.org/2000/svg";
-      })(), Cs = !$i && (function() {
+      })(), Cs = !Ti && (function() {
         try {
           var t = document.createElement("div");
           t.innerHTML = '<v:shape adj="1"/>';
@@ -3187,19 +3187,19 @@ function Qo() {
         ie: ze,
         ielt9: _s,
         edge: kn,
-        webkit: bi,
+        webkit: xi,
         android: En,
         android23: Pn,
         androidStock: bs,
-        opera: xi,
+        opera: wi,
         chrome: Sn,
         gecko: Dn,
         safari: xs,
-        phantom: An,
-        opera12: Ln,
+        phantom: In,
+        opera12: An,
         win: ws,
-        ie3d: In,
-        webkit3d: wi,
+        ie3d: Ln,
+        webkit3d: $i,
         gecko3d: Cn,
         any3d: $s,
         mobile: pe,
@@ -3212,14 +3212,14 @@ function Qo() {
         mobileOpera: Ps,
         mobileGecko: Ss,
         retina: Ds,
-        passiveEvents: As,
-        canvas: Ls,
-        svg: $i,
+        passiveEvents: Is,
+        canvas: As,
+        svg: Ti,
         vml: Cs,
-        inlineSvg: Is,
+        inlineSvg: Ls,
         mac: Ms,
         linux: zs
-      }, Rn = P.msPointer ? "MSPointerDown" : "pointerdown", Nn = P.msPointer ? "MSPointerMove" : "pointermove", Bn = P.msPointer ? "MSPointerUp" : "pointerup", Fn = P.msPointer ? "MSPointerCancel" : "pointercancel", Ti = {
+      }, Rn = P.msPointer ? "MSPointerDown" : "pointerdown", Nn = P.msPointer ? "MSPointerMove" : "pointermove", Bn = P.msPointer ? "MSPointerUp" : "pointerup", Fn = P.msPointer ? "MSPointerCancel" : "pointercancel", ki = {
         touchstart: Rn,
         touchmove: Nn,
         touchend: Bn,
@@ -3231,14 +3231,14 @@ function Qo() {
         touchcancel: Oe
       }, Vt = {}, Un = !1;
       function Os(t, e, n) {
-        return e === "touchstart" && Fs(), Zn[e] ? (n = Zn[e].bind(this, n), t.addEventListener(Ti[e], n, !1), n) : (console.warn("wrong event specified:", e), b);
+        return e === "touchstart" && Fs(), Zn[e] ? (n = Zn[e].bind(this, n), t.addEventListener(ki[e], n, !1), n) : (console.warn("wrong event specified:", e), b);
       }
       function Rs(t, e, n) {
-        if (!Ti[e]) {
+        if (!ki[e]) {
           console.warn("wrong event specified:", e);
           return;
         }
-        t.removeEventListener(Ti[e], n, !1);
+        t.removeEventListener(ki[e], n, !1);
       }
       function Ns(t) {
         Vt[t.pointerId] = t;
@@ -3298,7 +3298,7 @@ function Qo() {
       function Hs(t, e) {
         t.removeEventListener("dblclick", e.dblclick), t.removeEventListener("click", e.simDblclick);
       }
-      var ki = Be(
+      var Ei = Be(
         ["transform", "webkitTransform", "OTransform", "MozTransform", "msTransform"]
       ), fe = Be(
         ["webkitTransition", "transition", "OTransition", "MozTransition", "msTransition"]
@@ -3314,7 +3314,7 @@ function Qo() {
         }
         return n === "auto" ? null : n;
       }
-      function F(t, e, n) {
+      function Z(t, e, n) {
         var s = document.createElement(t);
         return s.className = e || "", n && n.appendChild(s), s;
       }
@@ -3334,7 +3334,7 @@ function Qo() {
         var e = t.parentNode;
         e && e.firstChild !== t && e.insertBefore(t, e.firstChild);
       }
-      function Ei(t, e) {
+      function Pi(t, e) {
         if (t.classList !== void 0)
           return t.classList.contains(e);
         var n = Ne(t);
@@ -3342,17 +3342,17 @@ function Qo() {
       }
       function z(t, e) {
         if (t.classList !== void 0)
-          for (var n = I(e), s = 0, a = n.length; s < a; s++)
+          for (var n = A(e), s = 0, a = n.length; s < a; s++)
             t.classList.add(n[s]);
-        else if (!Ei(t, e)) {
+        else if (!Pi(t, e)) {
           var h = Ne(t);
-          Pi(t, (h ? h + " " : "") + e);
+          Si(t, (h ? h + " " : "") + e);
         }
       }
       function K(t, e) {
-        t.classList !== void 0 ? t.classList.remove(e) : Pi(t, $((" " + Ne(t) + " ").replace(" " + e + " ", " ")));
+        t.classList !== void 0 ? t.classList.remove(e) : Si(t, $((" " + Ne(t) + " ").replace(" " + e + " ", " ")));
       }
-      function Pi(t, e) {
+      function Si(t, e) {
         t.className.baseVal === void 0 ? t.className = e : t.className.baseVal = e;
       }
       function Ne(t) {
@@ -3379,7 +3379,7 @@ function Qo() {
       }
       function Bt(t, e, n) {
         var s = e || new C(0, 0);
-        t.style[ki] = (P.ie3d ? "translate(" + s.x + "px," + s.y + "px)" : "translate3d(" + s.x + "px," + s.y + "px,0)") + (n ? " scale(" + n + ")" : "");
+        t.style[Ei] = (P.ie3d ? "translate(" + s.x + "px," + s.y + "px)" : "translate3d(" + s.x + "px," + s.y + "px,0)") + (n ? " scale(" + n + ")" : "");
       }
       function J(t, e) {
         t._leaflet_pos = e, P.any3d ? Bt(t, e) : (t.style.left = e.x + "px", t.style.top = e.y + "px");
@@ -3387,7 +3387,7 @@ function Qo() {
       function Ft(t) {
         return t._leaflet_pos || new C(0, 0);
       }
-      var ge, ve, Si;
+      var ge, ve, Di;
       if ("onselectstart" in document)
         ge = function() {
           M(window, "selectstart", et);
@@ -3401,20 +3401,20 @@ function Qo() {
         ge = function() {
           if (_e) {
             var t = document.documentElement.style;
-            Si = t[_e], t[_e] = "none";
+            Di = t[_e], t[_e] = "none";
           }
         }, ve = function() {
-          _e && (document.documentElement.style[_e] = Si, Si = void 0);
+          _e && (document.documentElement.style[_e] = Di, Di = void 0);
         };
       }
-      function Di() {
+      function Ii() {
         M(window, "dragstart", et);
       }
       function Ai() {
         q(window, "dragstart", et);
       }
       var Fe, Li;
-      function Ii(t) {
+      function Ci(t) {
         for (; t.tabIndex === -1; )
           t = t.parentNode;
         t.style && (Ze(), Fe = t, Li = t.style.outlineStyle, t.style.outlineStyle = "none", M(window, "keydown", Ze));
@@ -3428,7 +3428,7 @@ function Qo() {
         while ((!t.offsetWidth || !t.offsetHeight) && t !== document.body);
         return t;
       }
-      function Ci(t) {
+      function Mi(t) {
         var e = t.getBoundingClientRect();
         return {
           x: e.width / t.offsetWidth || 1,
@@ -3438,20 +3438,20 @@ function Qo() {
       }
       var Gs = {
         __proto__: null,
-        TRANSFORM: ki,
+        TRANSFORM: Ei,
         TRANSITION: fe,
         TRANSITION_END: qn,
         get: Hn,
         getStyle: me,
-        create: F,
+        create: Z,
         remove: G,
         empty: Re,
         toFront: Jt,
         toBack: Yt,
-        hasClass: Ei,
+        hasClass: Pi,
         addClass: z,
         removeClass: K,
-        setClass: Pi,
+        setClass: Si,
         getClass: Ne,
         setOpacity: dt,
         testProp: Be,
@@ -3464,21 +3464,21 @@ function Qo() {
         get enableTextSelection() {
           return ve;
         },
-        disableImageDrag: Di,
+        disableImageDrag: Ii,
         enableImageDrag: Ai,
-        preventOutline: Ii,
+        preventOutline: Ci,
         restoreOutline: Ze,
         getSizedParentNode: jn,
-        getScale: Ci
+        getScale: Mi
       };
       function M(t, e, n, s) {
         if (e && typeof e == "object")
           for (var a in e)
-            zi(t, a, e[a], n);
+            Oi(t, a, e[a], n);
         else {
-          e = I(e);
+          e = A(e);
           for (var h = 0, u = e.length; h < u; h++)
-            zi(t, e[h], n, s);
+            Oi(t, e[h], n, s);
         }
         return this;
       }
@@ -3488,50 +3488,50 @@ function Qo() {
           Gn(t), delete t[_t];
         else if (e && typeof e == "object")
           for (var a in e)
-            Oi(t, a, e[a], n);
-        else if (e = I(e), arguments.length === 2)
+            Ri(t, a, e[a], n);
+        else if (e = A(e), arguments.length === 2)
           Gn(t, function(g) {
-            return pi(e, g) !== -1;
+            return fi(e, g) !== -1;
           });
         else
           for (var h = 0, u = e.length; h < u; h++)
-            Oi(t, e[h], n, s);
+            Ri(t, e[h], n, s);
         return this;
       }
       function Gn(t, e) {
         for (var n in t[_t]) {
           var s = n.split(/\d/)[0];
-          (!e || e(s)) && Oi(t, s, null, null, n);
+          (!e || e(s)) && Ri(t, s, null, null, n);
         }
       }
-      var Mi = {
+      var zi = {
         mouseenter: "mouseover",
         mouseleave: "mouseout",
         wheel: !("onwheel" in window) && "mousewheel"
       };
-      function zi(t, e, n, s) {
-        var a = e + f(n) + (s ? "_" + f(s) : "");
+      function Oi(t, e, n, s) {
+        var a = e + m(n) + (s ? "_" + m(s) : "");
         if (t[_t] && t[_t][a])
           return this;
         var h = function(g) {
           return n.call(s || t, g || window.event);
         }, u = h;
-        !P.touchNative && P.pointer && e.indexOf("touch") === 0 ? h = Os(t, e, h) : P.touch && e === "dblclick" ? h = qs(t, h) : "addEventListener" in t ? e === "touchstart" || e === "touchmove" || e === "wheel" || e === "mousewheel" ? t.addEventListener(Mi[e] || e, h, P.passiveEvents ? { passive: !1 } : !1) : e === "mouseenter" || e === "mouseleave" ? (h = function(g) {
-          g = g || window.event, Ni(t, g) && u(g);
-        }, t.addEventListener(Mi[e], h, !1)) : t.addEventListener(e, u, !1) : t.attachEvent("on" + e, h), t[_t] = t[_t] || {}, t[_t][a] = h;
+        !P.touchNative && P.pointer && e.indexOf("touch") === 0 ? h = Os(t, e, h) : P.touch && e === "dblclick" ? h = qs(t, h) : "addEventListener" in t ? e === "touchstart" || e === "touchmove" || e === "wheel" || e === "mousewheel" ? t.addEventListener(zi[e] || e, h, P.passiveEvents ? { passive: !1 } : !1) : e === "mouseenter" || e === "mouseleave" ? (h = function(g) {
+          g = g || window.event, Bi(t, g) && u(g);
+        }, t.addEventListener(zi[e], h, !1)) : t.addEventListener(e, u, !1) : t.attachEvent("on" + e, h), t[_t] = t[_t] || {}, t[_t][a] = h;
       }
-      function Oi(t, e, n, s, a) {
-        a = a || e + f(n) + (s ? "_" + f(s) : "");
+      function Ri(t, e, n, s, a) {
+        a = a || e + m(n) + (s ? "_" + m(s) : "");
         var h = t[_t] && t[_t][a];
         if (!h)
           return this;
-        !P.touchNative && P.pointer && e.indexOf("touch") === 0 ? Rs(t, e, h) : P.touch && e === "dblclick" ? Hs(t, h) : "removeEventListener" in t ? t.removeEventListener(Mi[e] || e, h, !1) : t.detachEvent("on" + e, h), t[_t][a] = null;
+        !P.touchNative && P.pointer && e.indexOf("touch") === 0 ? Rs(t, e, h) : P.touch && e === "dblclick" ? Hs(t, h) : "removeEventListener" in t ? t.removeEventListener(zi[e] || e, h, !1) : t.detachEvent("on" + e, h), t[_t][a] = null;
       }
       function Zt(t) {
         return t.stopPropagation ? t.stopPropagation() : t.originalEvent ? t.originalEvent._stopped = !0 : t.cancelBubble = !0, this;
       }
-      function Ri(t) {
-        return zi(t, "wheel", Zt), this;
+      function Ni(t) {
+        return Oi(t, "wheel", Zt), this;
       }
       function ye(t) {
         return M(t, "mousedown touchstart dblclick contextmenu", Zt), t._leaflet_disable_click = !0, this;
@@ -3552,7 +3552,7 @@ function Qo() {
       function Vn(t, e) {
         if (!e)
           return new C(t.clientX, t.clientY);
-        var n = Ci(e), s = n.boundingClientRect;
+        var n = Mi(e), s = n.boundingClientRect;
         return new C(
           // offset.left/top values are in page scale (like clientX/Y),
           // whereas clientLeft/Top (border width) values are the original values (before CSS scale applies).
@@ -3588,7 +3588,7 @@ function Qo() {
           )
         );
       }
-      function Ni(t, e) {
+      function Bi(t, e) {
         var n = e.relatedTarget;
         if (!n)
           return !0;
@@ -3605,14 +3605,14 @@ function Qo() {
         on: M,
         off: q,
         stopPropagation: Zt,
-        disableScrollPropagation: Ri,
+        disableScrollPropagation: Ni,
         disableClickPropagation: ye,
         preventDefault: et,
         stop: Ut,
         getPropagationPath: Kn,
         getMousePosition: Vn,
         getWheelDelta: Jn,
-        isExternalTarget: Ni,
+        isExternalTarget: Bi,
         addListener: M,
         removeListener: q
       }, Yn = ce.extend({
@@ -3652,7 +3652,7 @@ function Qo() {
           // @option crs: CRS = L.CRS.EPSG3857
           // The [Coordinate Reference System](#crs) to use. Don't change this if you're not
           // sure what it means.
-          crs: _i,
+          crs: yi,
           // @option center: LatLng = undefined
           // Initial geographic center of the map
           center: void 0,
@@ -3766,7 +3766,7 @@ function Qo() {
         },
         _getBoundsCenterZoom: function(t, e) {
           e = e || {}, t = t.getBounds ? t.getBounds() : V(t);
-          var n = A(e.paddingTopLeft || e.padding || [0, 0]), s = A(e.paddingBottomRight || e.padding || [0, 0]), a = this.getBoundsZoom(t, !1, n.add(s));
+          var n = I(e.paddingTopLeft || e.padding || [0, 0]), s = I(e.paddingBottomRight || e.padding || [0, 0]), a = this.getBoundsZoom(t, !1, n.add(s));
           if (a = typeof e.maxZoom == "number" ? Math.min(e.maxZoom, a) : a, a === 1 / 0)
             return {
               center: t.getCenter(),
@@ -3801,7 +3801,7 @@ function Qo() {
         // @method panBy(offset: Point, options?: Pan options): this
         // Pans the map by a given number of pixels (animated).
         panBy: function(t, e) {
-          if (t = A(t).round(), e = e || {}, !t.x && !t.y)
+          if (t = I(t).round(), e = e || {}, !t.x && !t.y)
             return this.fire("moveend");
           if (e.animate !== !0 && !this.getSize().contains(t))
             return this._resetView(this.unproject(this.project(this.getCenter()).add(t)), this.getZoom()), this;
@@ -3827,7 +3827,7 @@ function Qo() {
           t = N(t), e = e === void 0 ? u : e;
           var g = Math.max(h.x, h.y), _ = g * this.getZoomScale(u, e), x = a.distanceTo(s) || 1, T = 1.42, S = T * T;
           function O(Y) {
-            var Qe = Y ? -1 : 1, Ra = Y ? _ : g, Na = _ * _ - g * g + Qe * S * S * x * x, Ba = 2 * Ra * S * x, Vi = Na / Ba, Lr = Math.sqrt(Vi * Vi + 1) - Vi, Fa = Lr < 1e-9 ? -18 : Math.log(Lr);
+            var Qe = Y ? -1 : 1, Ra = Y ? _ : g, Na = _ * _ - g * g + Qe * S * S * x * x, Ba = 2 * Ra * S * x, Ji = Na / Ba, Ar = Math.sqrt(Ji * Ji + 1) - Ji, Fa = Ar < 1e-9 ? -18 : Math.log(Ar);
             return Fa;
           }
           function nt(Y) {
@@ -3850,15 +3850,15 @@ function Qo() {
             return 1 - Math.pow(1 - Y, 1.5);
           }
           var za = Date.now(), Dr = (O(1) - ot) / T, Oa = n.duration ? 1e3 * n.duration : 1e3 * Dr * 0.8;
-          function Ar() {
+          function Ir() {
             var Y = (Date.now() - za) / Oa, Qe = Ma(Y) * Dr;
-            Y <= 1 ? (this._flyToFrame = rt(Ar, this), this._move(
+            Y <= 1 ? (this._flyToFrame = rt(Ir, this), this._move(
               this.unproject(s.add(a.subtract(s).multiplyBy(Ca(Qe) / x)), u),
               this.getScaleZoom(g / ne(Qe), u),
               { flyTo: !0 }
             )) : this._move(t, e)._moveEnd(!0);
           }
-          return this._moveStart(!0, n.noMoveStart), Ar.call(this), this;
+          return this._moveStart(!0, n.noMoveStart), Ir.call(this), this;
         },
         // @method flyToBounds(bounds: LatLngBounds, options?: fitBounds options): this
         // Sets the view of the map with a smooth animation like [`flyTo`](#map-flyto),
@@ -3898,7 +3898,7 @@ function Qo() {
         // the map will not be panned.
         panInside: function(t, e) {
           e = e || {};
-          var n = A(e.paddingTopLeft || e.padding || [0, 0]), s = A(e.paddingBottomRight || e.padding || [0, 0]), a = this.project(this.getCenter()), h = this.project(t), u = this.getPixelBounds(), g = st([u.min.add(n), u.max.subtract(s)]), _ = g.getSize();
+          var n = I(e.paddingTopLeft || e.padding || [0, 0]), s = I(e.paddingBottomRight || e.padding || [0, 0]), a = this.project(this.getCenter()), h = this.project(t), u = this.getPixelBounds(), g = st([u.min.add(n), u.max.subtract(s)]), _ = g.getSize();
           if (!g.contains(h)) {
             this._enforcingBounds = !0;
             var x = h.subtract(g.getCenter()), T = g.extend(h).getSize().subtract(_);
@@ -4031,7 +4031,7 @@ function Qo() {
         // then returns it. The pane is created as a child of `container`, or
         // as a child of the main map pane if not set.
         createPane: function(t, e) {
-          var n = "leaflet-pane" + (t ? " leaflet-" + t.replace("Pane", "") + "-pane" : ""), s = F("div", n, e || this._mapPane);
+          var n = "leaflet-pane" + (t ? " leaflet-" + t.replace("Pane", "") + "-pane" : ""), s = Z("div", n, e || this._mapPane);
           return t && (this._panes[t] = s), s;
         },
         // @section Methods for Getting Map State
@@ -4067,7 +4067,7 @@ function Qo() {
         // instead returns the minimum zoom level on which the map view fits into
         // the given bounds in its entirety.
         getBoundsZoom: function(t, e, n) {
-          t = V(t), n = A(n || [0, 0]);
+          t = V(t), n = I(n || [0, 0]);
           var s = this.getZoom() || 0, a = this.getMinZoom(), h = this.getMaxZoom(), u = t.getNorthWest(), g = t.getSouthEast(), _ = this.getSize().subtract(n), x = st(this.project(g, s), this.project(u, s)).getSize(), T = P.any3d ? this.options.zoomSnap : 1, S = _.x / x.x, O = _.y / x.y, nt = e ? Math.max(S, O) : Math.min(S, O);
           return s = this.getScaleZoom(nt, s), T && (s = Math.round(s / (T / 100)) * (T / 100), s = e ? Math.ceil(s / T) * T : Math.floor(s / T) * T), Math.max(a, Math.min(h, s));
         },
@@ -4147,13 +4147,13 @@ function Qo() {
         // @method unproject(point: Point, zoom: Number): LatLng
         // Inverse of [`project`](#map-project).
         unproject: function(t, e) {
-          return e = e === void 0 ? this._zoom : e, this.options.crs.pointToLatLng(A(t), e);
+          return e = e === void 0 ? this._zoom : e, this.options.crs.pointToLatLng(I(t), e);
         },
         // @method layerPointToLatLng(point: Point): LatLng
         // Given a pixel coordinate relative to the [origin pixel](#map-getpixelorigin),
         // returns the corresponding geographical coordinate (for the current zoom level).
         layerPointToLatLng: function(t) {
-          var e = A(t).add(this.getPixelOrigin());
+          var e = I(t).add(this.getPixelOrigin());
           return this.unproject(e);
         },
         // @method latLngToLayerPoint(latlng: LatLng): Point
@@ -4191,19 +4191,19 @@ function Qo() {
         // Given a pixel coordinate relative to the map container, returns the corresponding
         // pixel coordinate relative to the [origin pixel](#map-getpixelorigin).
         containerPointToLayerPoint: function(t) {
-          return A(t).subtract(this._getMapPanePos());
+          return I(t).subtract(this._getMapPanePos());
         },
         // @method layerPointToContainerPoint(point: Point): Point
         // Given a pixel coordinate relative to the [origin pixel](#map-getpixelorigin),
         // returns the corresponding pixel coordinate relative to the map container.
         layerPointToContainerPoint: function(t) {
-          return A(t).add(this._getMapPanePos());
+          return I(t).add(this._getMapPanePos());
         },
         // @method containerPointToLatLng(point: Point): LatLng
         // Given a pixel coordinate relative to the map container, returns
         // the corresponding geographical coordinate (for the current zoom level).
         containerPointToLatLng: function(t) {
-          var e = this.containerPointToLayerPoint(A(t));
+          var e = this.containerPointToLayerPoint(I(t));
           return this.layerPointToLatLng(e);
         },
         // @method latLngToContainerPoint(latlng: LatLng): Point
@@ -4237,7 +4237,7 @@ function Qo() {
             if (e._leaflet_id)
               throw new Error("Map container is already initialized.");
           } else throw new Error("Map container not found.");
-          M(e, "scroll", this._onScroll, this), this._containerId = f(e);
+          M(e, "scroll", this._onScroll, this), this._containerId = m(e);
         },
         _initLayout: function() {
           var t = this._container;
@@ -4288,7 +4288,7 @@ function Qo() {
         // DOM event handling
         // @section Interaction events
         _initEvents: function(t) {
-          this._targets = {}, this._targets[f(this._container)] = this;
+          this._targets = {}, this._targets[m(this._container)] = this;
           var e = t ? q : M;
           e(this._container, "click dblclick mousedown mouseup mouseover mouseout mousemove contextmenu keypress keydown keyup", this._handleDOMEvent, this), this.options.trackResize && e(window, "resize", this._onResize, this), P.any3d && this.options.transform3DLimit && (t ? this.off : this.on).call(this, "moveend", this._onMoveEnd);
         },
@@ -4309,11 +4309,11 @@ function Qo() {
         },
         _findEventTargets: function(t, e) {
           for (var n = [], s, a = e === "mouseout" || e === "mouseover", h = t.target || t.srcElement, u = !1; h; ) {
-            if (s = this._targets[f(h)], s && (e === "click" || e === "preclick") && this._draggableMoved(s)) {
+            if (s = this._targets[m(h)], s && (e === "click" || e === "preclick") && this._draggableMoved(s)) {
               u = !0;
               break;
             }
-            if (s && s.listens(e, !0) && (a && !Ni(h, t) || (n.push(s), a)) || h === this._container)
+            if (s && s.listens(e, !0) && (a && !Bi(h, t) || (n.push(s), a)) || h === this._container)
               break;
             h = h.parentNode;
           }
@@ -4330,7 +4330,7 @@ function Qo() {
           var e = t.target || t.srcElement;
           if (!(!this._loaded || e._leaflet_disable_events || t.type === "click" && this._isClickDisabled(e))) {
             var n = t.type;
-            n === "mousedown" && Ii(e), this._fireDOMEvent(t, n);
+            n === "mousedown" && Ci(e), this._fireDOMEvent(t, n);
           }
         },
         _mouseEvents: ["click", "dblclick", "mouseover", "mouseout", "contextmenu"],
@@ -4355,7 +4355,7 @@ function Qo() {
               _.containerPoint = x ? this.latLngToContainerPoint(g.getLatLng()) : this.mouseEventToContainerPoint(t), _.layerPoint = this.containerPointToLayerPoint(_.containerPoint), _.latlng = x ? g.getLatLng() : this.layerPointToLatLng(_.layerPoint);
             }
             for (u = 0; u < a.length; u++)
-              if (a[u].fire(e, _, !0), _.originalEvent._stopped || a[u].options.bubblingMouseEvents === !1 && pi(this._mouseEvents, e) !== -1)
+              if (a[u].fire(e, _, !0), _.originalEvent._stopped || a[u].options.bubblingMouseEvents === !1 && fi(this._mouseEvents, e) !== -1)
                 return;
           }
         },
@@ -4451,9 +4451,9 @@ function Qo() {
           return (e && e.animate) !== !0 && !this.getSize().contains(n) ? !1 : (this.panBy(n, e), !0);
         },
         _createAnimProxy: function() {
-          var t = this._proxy = F("div", "leaflet-proxy leaflet-zoom-animated");
+          var t = this._proxy = Z("div", "leaflet-proxy leaflet-zoom-animated");
           this._panes.mapPane.appendChild(t), this.on("zoomanim", function(e) {
-            var n = ki, s = this._proxy.style[n];
+            var n = Ei, s = this._proxy.style[n];
             Bt(this._proxy, this.project(e.center, e.zoom), this.getZoomScale(e.zoom, 1)), s === this._proxy.style[n] && this._animatingZoom && this._onZoomTransitionEnd();
           }, this), this.on("load moveend", this._animMoveEnd, this), this._on("unload", this._destroyAnimProxy, this);
         },
@@ -4556,10 +4556,10 @@ function Qo() {
           return t.remove(), this;
         },
         _initControlPos: function() {
-          var t = this._controlCorners = {}, e = "leaflet-", n = this._controlContainer = F("div", e + "control-container", this._container);
+          var t = this._controlCorners = {}, e = "leaflet-", n = this._controlContainer = Z("div", e + "control-container", this._container);
           function s(a, h) {
             var u = e + a + " " + e + h;
-            t[a + h] = F("div", u, n);
+            t[a + h] = Z("div", u, n);
           }
           s("top", "left"), s("top", "right"), s("bottom", "left"), s("bottom", "right");
         },
@@ -4632,7 +4632,7 @@ function Qo() {
         // Remove the given layer from the control.
         removeLayer: function(t) {
           t.off("add remove", this._onLayerChange, this);
-          var e = this._getLayer(f(t));
+          var e = this._getLayer(m(t));
           return e && this._layers.splice(this._layers.indexOf(e), 1), this._map ? this._update() : this;
         },
         // @method expand(): this
@@ -4648,14 +4648,14 @@ function Qo() {
           return K(this._container, "leaflet-control-layers-expanded"), this;
         },
         _initLayout: function() {
-          var t = "leaflet-control-layers", e = this._container = F("div", t), n = this.options.collapsed;
-          e.setAttribute("aria-haspopup", !0), ye(e), Ri(e);
-          var s = this._section = F("section", t + "-list");
+          var t = "leaflet-control-layers", e = this._container = Z("div", t), n = this.options.collapsed;
+          e.setAttribute("aria-haspopup", !0), ye(e), Ni(e);
+          var s = this._section = Z("section", t + "-list");
           n && (this._map.on("click", this.collapse, this), M(e, {
             mouseenter: this._expandSafely,
             mouseleave: this.collapse
           }, this));
-          var a = this._layersLink = F("a", t + "-toggle", e);
+          var a = this._layersLink = Z("a", t + "-toggle", e);
           a.href = "#", a.title = "Layers", a.setAttribute("role", "button"), M(a, {
             keydown: function(h) {
               h.keyCode === 13 && this._expandSafely();
@@ -4664,11 +4664,11 @@ function Qo() {
             click: function(h) {
               et(h), this._expandSafely();
             }
-          }, this), n || this.expand(), this._baseLayersList = F("div", t + "-base", s), this._separator = F("div", t + "-separator", s), this._overlaysList = F("div", t + "-overlays", s), e.appendChild(s);
+          }, this), n || this.expand(), this._baseLayersList = Z("div", t + "-base", s), this._separator = Z("div", t + "-separator", s), this._overlaysList = Z("div", t + "-overlays", s), e.appendChild(s);
         },
         _getLayer: function(t) {
           for (var e = 0; e < this._layers.length; e++)
-            if (this._layers[e] && f(this._layers[e].layer) === t)
+            if (this._layers[e] && m(this._layers[e].layer) === t)
               return this._layers[e];
         },
         _addLayer: function(t, e, n) {
@@ -4691,7 +4691,7 @@ function Qo() {
         },
         _onLayerChange: function(t) {
           this._handlingClick || this._update();
-          var e = this._getLayer(f(t.target)), n = e.overlay ? t.type === "add" ? "overlayadd" : "overlayremove" : t.type === "add" ? "baselayerchange" : null;
+          var e = this._getLayer(m(t.target)), n = e.overlay ? t.type === "add" ? "overlayadd" : "overlayremove" : t.type === "add" ? "baselayerchange" : null;
           n && this._map.fire(n, e);
         },
         // IE7 bugs out if you create a radio dynamically, so you have to do it this hacky way (see https://stackoverflow.com/a/119079)
@@ -4701,7 +4701,7 @@ function Qo() {
         },
         _addItem: function(t) {
           var e = document.createElement("label"), n = this._map.hasLayer(t.layer), s;
-          t.overlay ? (s = document.createElement("input"), s.type = "checkbox", s.className = "leaflet-control-layers-selector", s.defaultChecked = n) : s = this._createRadioElement("leaflet-base-layers_" + f(this), n), this._layerControlInputs.push(s), s.layerId = f(t.layer), M(s, "click", this._onInputClick, this);
+          t.overlay ? (s = document.createElement("input"), s.type = "checkbox", s.className = "leaflet-control-layers-selector", s.defaultChecked = n) : s = this._createRadioElement("leaflet-base-layers_" + m(this), n), this._layerControlInputs.push(s), s.layerId = m(t.layer), M(s, "click", this._onInputClick, this);
           var a = document.createElement("span");
           a.innerHTML = " " + t.name;
           var h = document.createElement("span");
@@ -4739,7 +4739,7 @@ function Qo() {
         }
       }), Ys = function(t, e, n) {
         return new Xn(t, e, n);
-      }, Bi = pt.extend({
+      }, Fi = pt.extend({
         // @section
         // @aka Control.Zoom options
         options: {
@@ -4758,7 +4758,7 @@ function Qo() {
           zoomOutTitle: "Zoom out"
         },
         onAdd: function(t) {
-          var e = "leaflet-control-zoom", n = F("div", e + " leaflet-bar"), s = this.options;
+          var e = "leaflet-control-zoom", n = Z("div", e + " leaflet-bar"), s = this.options;
           return this._zoomInButton = this._createButton(
             s.zoomInText,
             s.zoomInTitle,
@@ -4789,7 +4789,7 @@ function Qo() {
           !this._disabled && this._map._zoom > this._map.getMinZoom() && this._map.zoomOut(this._map.options.zoomDelta * (t.shiftKey ? 3 : 1));
         },
         _createButton: function(t, e, n, s, a) {
-          var h = F("a", n, s);
+          var h = Z("a", n, s);
           return h.innerHTML = t, h.href = "#", h.title = e, h.setAttribute("role", "button"), h.setAttribute("aria-label", e), ye(h), M(h, "click", Ut), M(h, "click", a, this), M(h, "click", this._refocusOnMap, this), h;
         },
         _updateDisabled: function() {
@@ -4800,10 +4800,10 @@ function Qo() {
       B.mergeOptions({
         zoomControl: !0
       }), B.addInitHook(function() {
-        this.options.zoomControl && (this.zoomControl = new Bi(), this.addControl(this.zoomControl));
+        this.options.zoomControl && (this.zoomControl = new Fi(), this.addControl(this.zoomControl));
       });
       var Xs = function(t) {
-        return new Bi(t);
+        return new Fi(t);
       }, Qn = pt.extend({
         // @section
         // @aka Control.Scale options
@@ -4822,14 +4822,14 @@ function Qo() {
           // If `true`, the control is updated on [`moveend`](#map-moveend), otherwise it's always up-to-date (updated on [`move`](#map-move)).
         },
         onAdd: function(t) {
-          var e = "leaflet-control-scale", n = F("div", e), s = this.options;
+          var e = "leaflet-control-scale", n = Z("div", e), s = this.options;
           return this._addScales(s, e + "-line", n), t.on(s.updateWhenIdle ? "moveend" : "move", this._update, this), t.whenReady(this._update, this), n;
         },
         onRemove: function(t) {
           t.off(this.options.updateWhenIdle ? "moveend" : "move", this._update, this);
         },
         _addScales: function(t, e, n) {
-          t.metric && (this._mScale = F("div", e, n)), t.imperial && (this._iScale = F("div", e, n));
+          t.metric && (this._mScale = Z("div", e, n)), t.imperial && (this._iScale = Z("div", e, n));
         },
         _update: function() {
           var t = this._map, e = t.getSize().y / 2, n = t.distance(
@@ -4858,7 +4858,7 @@ function Qo() {
         }
       }), Qs = function(t) {
         return new Qn(t);
-      }, ta = '<svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="12" height="8" viewBox="0 0 12 8" class="leaflet-attribution-flag"><path fill="#4C7BE1" d="M0 0h12v4H0z"/><path fill="#FFD500" d="M0 4h12v3H0z"/><path fill="#E0BC00" d="M0 7h12v1H0z"/></svg>', Fi = pt.extend({
+      }, ta = '<svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="12" height="8" viewBox="0 0 12 8" class="leaflet-attribution-flag"><path fill="#4C7BE1" d="M0 0h12v4H0z"/><path fill="#FFD500" d="M0 4h12v3H0z"/><path fill="#E0BC00" d="M0 7h12v1H0z"/></svg>', Zi = pt.extend({
         // @section
         // @aka Control.Attribution options
         options: {
@@ -4871,7 +4871,7 @@ function Qo() {
           R(this, t), this._attributions = {};
         },
         onAdd: function(t) {
-          t.attributionControl = this, this._container = F("div", "leaflet-control-attribution"), ye(this._container);
+          t.attributionControl = this, this._container = Z("div", "leaflet-control-attribution"), ye(this._container);
           for (var e in t._layers)
             t._layers[e].getAttribution && this.addAttribution(t._layers[e].getAttribution());
           return this._update(), t.on("layeradd", this._addAttribution, this), this._container;
@@ -4912,12 +4912,12 @@ function Qo() {
       B.mergeOptions({
         attributionControl: !0
       }), B.addInitHook(function() {
-        this.options.attributionControl && new Fi().addTo(this);
+        this.options.attributionControl && new Zi().addTo(this);
       });
       var ea = function(t) {
-        return new Fi(t);
+        return new Zi(t);
       };
-      pt.Layers = Xn, pt.Zoom = Bi, pt.Scale = Qn, pt.Attribution = Fi, be.layers = Ys, be.zoom = Xs, be.scale = Qs, be.attribution = ea;
+      pt.Layers = Xn, pt.Zoom = Fi, pt.Scale = Qn, pt.Attribution = Zi, be.layers = Ys, be.zoom = Xs, be.scale = Qs, be.attribution = ea;
       var yt = Tt.extend({
         initialize: function(t) {
           this._map = t;
@@ -4972,15 +4972,15 @@ function Qo() {
           this._enabled && (Ct._dragging === this && this.finishDrag(!0), q(this._dragStartTarget, tr, this._onDown, this), this._enabled = !1, this._moved = !1);
         },
         _onDown: function(t) {
-          if (this._enabled && (this._moved = !1, !Ei(this._element, "leaflet-zoom-anim"))) {
+          if (this._enabled && (this._moved = !1, !Pi(this._element, "leaflet-zoom-anim"))) {
             if (t.touches && t.touches.length !== 1) {
               Ct._dragging === this && this.finishDrag();
               return;
             }
-            if (!(Ct._dragging || t.shiftKey || t.which !== 1 && t.button !== 1 && !t.touches) && (Ct._dragging = this, this._preventOutline && Ii(this._element), Di(), ge(), !this._moving)) {
+            if (!(Ct._dragging || t.shiftKey || t.which !== 1 && t.button !== 1 && !t.touches) && (Ct._dragging = this, this._preventOutline && Ci(this._element), Ii(), ge(), !this._moving)) {
               this.fire("down");
               var e = t.touches ? t.touches[0] : t, n = jn(this._element);
-              this._startPoint = new C(e.clientX, e.clientY), this._startPos = Ft(this._element), this._parentScale = Ci(n);
+              this._startPoint = new C(e.clientX, e.clientY), this._startPos = Ft(this._element), this._parentScale = Mi(n);
               var s = t.type === "mousedown";
               M(document, s ? "mousemove" : "touchmove", this._onMove, this), M(document, s ? "mouseup" : "touchend touchcancel", this._onUp, this);
             }
@@ -5029,7 +5029,7 @@ function Qo() {
           throw new Error("latlngs not passed");
         ct(t) || (console.warn("latlngs are not flat! Only the first ring will be used"), t = t[0]);
         var S = N([0, 0]), O = V(t), nt = O.getNorthWest().distanceTo(O.getSouthWest()) * O.getNorthEast().distanceTo(O.getNorthWest());
-        nt < 1700 && (S = Zi(t));
+        nt < 1700 && (S = Ui(t));
         var X = t.length, ut = [];
         for (n = 0; n < X; n++) {
           var ot = N(t[n]);
@@ -5038,10 +5038,10 @@ function Qo() {
         for (g = _ = x = 0, n = 0, s = X - 1; n < X; s = n++)
           a = ut[n], h = ut[s], u = a.y * h.x - h.y * a.x, _ += (a.x + h.x) * u, x += (a.y + h.y) * u, g += u * 3;
         g === 0 ? T = ut[0] : T = [_ / g, x / g];
-        var ne = e.unproject(A(T));
+        var ne = e.unproject(I(T));
         return N([ne.lat + S.lat, ne.lng + S.lng]);
       }
-      function Zi(t) {
+      function Ui(t) {
         for (var e = 0, n = 0, s = 0, a = 0; a < t.length; a++) {
           var h = N(t[a]);
           e += h.lat, n += h.lng, s++;
@@ -5052,7 +5052,7 @@ function Qo() {
         __proto__: null,
         clipPolygon: er,
         polygonCenter: ir,
-        centroid: Zi
+        centroid: Ui
       };
       function nr(t, e) {
         if (!e || !t.length)
@@ -5068,17 +5068,17 @@ function Qo() {
       }
       function sa(t, e) {
         var n = t.length, s = typeof Uint8Array < "u" ? Uint8Array : Array, a = new s(n);
-        a[0] = a[n - 1] = 1, Ui(t, a, e, 0, n - 1);
+        a[0] = a[n - 1] = 1, Wi(t, a, e, 0, n - 1);
         var h, u = [];
         for (h = 0; h < n; h++)
           a[h] && u.push(t[h]);
         return u;
       }
-      function Ui(t, e, n, s, a) {
+      function Wi(t, e, n, s, a) {
         var h = 0, u, g, _;
         for (g = s + 1; g <= a - 1; g++)
           _ = xe(t[g], t[s], t[a], !0), _ > h && (u = g, h = _);
-        h > n && (e[u] = 1, Ui(t, e, n, s, u), Ui(t, e, n, u, a));
+        h > n && (e[u] = 1, Wi(t, e, n, s, u), Wi(t, e, n, u, a));
       }
       function aa(t, e) {
         for (var n = [t[0]], s = 1, a = 0, h = t.length; s < h; s++)
@@ -5124,7 +5124,7 @@ function Qo() {
           throw new Error("latlngs not passed");
         ct(t) || (console.warn("latlngs are not flat! Only the first ring will be used"), t = t[0]);
         var T = N([0, 0]), S = V(t), O = S.getNorthWest().distanceTo(S.getSouthWest()) * S.getNorthEast().distanceTo(S.getNorthWest());
-        O < 1700 && (T = Zi(t));
+        O < 1700 && (T = Ui(t));
         var nt = t.length, X = [];
         for (n = 0; n < nt; n++) {
           var ut = N(t[n]);
@@ -5143,7 +5143,7 @@ function Qo() {
               ];
               break;
             }
-        var ot = e.unproject(A(x));
+        var ot = e.unproject(I(x));
         return N([ot.lat + T.lat, ot.lng + T.lng]);
       }
       var la = {
@@ -5158,7 +5158,7 @@ function Qo() {
         isFlat: ct,
         _flat: or,
         polylineCenter: lr
-      }, Wi = {
+      }, qi = {
         project: function(t) {
           return new C(t.lng, t.lat);
         },
@@ -5166,7 +5166,7 @@ function Qo() {
           return new U(t.y, t.x);
         },
         bounds: new j([-180, -90], [180, 90])
-      }, qi = {
+      }, Hi = {
         R: 6378137,
         R_MINOR: 6356752314245179e-9,
         bounds: new j([-2003750834279e-5, -1549657073972e-5], [2003750834279e-5, 1876465623138e-5]),
@@ -5181,22 +5181,22 @@ function Qo() {
         }
       }, ha = {
         __proto__: null,
-        LonLat: Wi,
-        Mercator: qi,
-        SphericalMercator: gi
-      }, da = l({}, It, {
+        LonLat: qi,
+        Mercator: Hi,
+        SphericalMercator: vi
+      }, da = l({}, Lt, {
         code: "EPSG:3395",
-        projection: qi,
+        projection: Hi,
         transformation: (function() {
-          var t = 0.5 / (Math.PI * qi.R);
+          var t = 0.5 / (Math.PI * Hi.R);
           return ue(t, 0.5, -t, 0.5);
         })()
-      }), hr = l({}, It, {
+      }), hr = l({}, Lt, {
         code: "EPSG:4326",
-        projection: Wi,
+        projection: qi,
         transformation: ue(1 / 180, 1, -1 / 180, 0.5)
       }), ca = l({}, kt, {
-        projection: Wi,
+        projection: qi,
         transformation: ue(1, 0, -1, 0),
         scale: function(t) {
           return Math.pow(2, t);
@@ -5210,7 +5210,7 @@ function Qo() {
         },
         infinite: !0
       });
-      kt.Earth = It, kt.EPSG3395 = da, kt.EPSG3857 = _i, kt.EPSG900913 = vs, kt.EPSG4326 = hr, kt.Simple = ca;
+      kt.Earth = Lt, kt.EPSG3395 = da, kt.EPSG3857 = yi, kt.EPSG900913 = vs, kt.EPSG4326 = hr, kt.Simple = ca;
       var ft = ce.extend({
         // Classes extending `L.Layer` will inherit the following options:
         options: {
@@ -5251,10 +5251,10 @@ function Qo() {
           return this._map.getPane(t ? this.options[t] || t : this.options.pane);
         },
         addInteractiveTarget: function(t) {
-          return this._map._targets[f(t)] = this, this;
+          return this._map._targets[m(t)] = this, this;
         },
         removeInteractiveTarget: function(t) {
-          return delete this._map._targets[f(t)], this;
+          return delete this._map._targets[m(t)], this;
         },
         // @method getAttribution: String
         // Used by the `attribution control`, returns the [attribution option](#gridlayer-attribution).
@@ -5280,19 +5280,19 @@ function Qo() {
         addLayer: function(t) {
           if (!t._layerAdd)
             throw new Error("The provided object is not a Layer.");
-          var e = f(t);
+          var e = m(t);
           return this._layers[e] ? this : (this._layers[e] = t, t._mapToAdd = this, t.beforeAdd && t.beforeAdd(this), this.whenReady(t._layerAdd, t), this);
         },
         // @method removeLayer(layer: Layer): this
         // Removes the given layer from the map.
         removeLayer: function(t) {
-          var e = f(t);
+          var e = m(t);
           return this._layers[e] ? (this._loaded && t.onRemove(this), delete this._layers[e], this._loaded && (this.fire("layerremove", { layer: t }), t.fire("remove")), t._map = t._mapToAdd = null, this) : this;
         },
         // @method hasLayer(layer: Layer): Boolean
         // Returns `true` if the given layer is currently added to the map
         hasLayer: function(t) {
-          return f(t) in this._layers;
+          return m(t) in this._layers;
         },
         /* @method eachLayer(fn: Function, context?: Object): this
          * Iterates over the layers of the map, optionally specifying context of the iterator function.
@@ -5313,10 +5313,10 @@ function Qo() {
             this.addLayer(t[e]);
         },
         _addZoomLimit: function(t) {
-          (!isNaN(t.options.maxZoom) || !isNaN(t.options.minZoom)) && (this._zoomBoundLayers[f(t)] = t, this._updateZoomLevels());
+          (!isNaN(t.options.maxZoom) || !isNaN(t.options.minZoom)) && (this._zoomBoundLayers[m(t)] = t, this._updateZoomLevels());
         },
         _removeZoomLimit: function(t) {
-          var e = f(t);
+          var e = m(t);
           this._zoomBoundLayers[e] && (delete this._zoomBoundLayers[e], this._updateZoomLevels());
         },
         _updateZoomLevels: function() {
@@ -5412,7 +5412,7 @@ function Qo() {
         // @method getLayerId(layer: Layer): Number
         // Returns the internal ID for a layer
         getLayerId: function(t) {
-          return f(t);
+          return m(t);
         }
       }), ua = function(t, e) {
         return new Xt(t, e);
@@ -5526,7 +5526,7 @@ function Qo() {
         _setIconStyles: function(t, e) {
           var n = this.options, s = n[e + "Size"];
           typeof s == "number" && (s = [s, s]);
-          var a = A(s), h = A(e === "shadow" && n.shadowAnchor || n.iconAnchor || a && a.divideBy(2, !0));
+          var a = I(s), h = I(e === "shadow" && n.shadowAnchor || n.iconAnchor || a && a.divideBy(2, !0));
           t.className = "leaflet-marker-" + e + " " + (n.className || ""), h && (t.style.marginLeft = -h.x + "px", t.style.marginTop = -h.y + "px"), a && (t.style.width = a.x + "px", t.style.height = a.y + "px");
         },
         _createImg: function(t, e) {
@@ -5561,7 +5561,7 @@ function Qo() {
           return t = e(t, /^url\((['"])?(.+)\1\)$/, 2), t && e(t, /^(.*)marker-icon\.png$/, 1);
         },
         _detectIconPath: function() {
-          var t = F("div", "leaflet-default-icon-path", document.body), e = me(t, "background-image") || me(t, "backgroundImage");
+          var t = Z("div", "leaflet-default-icon-path", document.body), e = me(t, "background-image") || me(t, "backgroundImage");
           if (document.body.removeChild(t), e = this._stripUrl(e), e)
             return e;
           var n = document.querySelector('link[href$="leaflet.css"]');
@@ -5597,7 +5597,7 @@ function Qo() {
             u.max._subtract(g).subtract(a)
           );
           if (!_.contains(h)) {
-            var x = A(
+            var x = I(
               (Math.max(_.max.x, h.x) - _.max.x) / (u.max.x - _.max.x) - (Math.min(_.min.x, h.x) - _.min.x) / (u.min.x - _.min.x),
               (Math.max(_.max.y, h.y) - _.max.y) / (u.max.y - _.max.y) - (Math.min(_.min.y, h.y) - _.min.y) / (u.min.y - _.min.y)
             ).multiplyBy(s);
@@ -5788,7 +5788,7 @@ function Qo() {
         _panOnFocus: function() {
           var t = this._map;
           if (t) {
-            var e = this.options.icon.options, n = e.iconSize ? A(e.iconSize) : A(0, 0), s = e.iconAnchor ? A(e.iconAnchor) : A(0, 0);
+            var e = this.options.icon.options, n = e.iconSize ? I(e.iconSize) : I(0, 0), s = e.iconAnchor ? I(e.iconAnchor) : I(0, 0);
             t.panInside(this._latlng, {
               paddingTopLeft: s,
               paddingBottomRight: n.subtract(s)
@@ -5952,7 +5952,7 @@ function Qo() {
       function ga(t, e) {
         return new qe(t, e);
       }
-      var Hi = qe.extend({
+      var ji = qe.extend({
         initialize: function(t, e, n) {
           if (typeof e == "number" && (e = l({}, n, { radius: e })), R(this, e), this._latlng = N(t), isNaN(this.options.radius))
             throw new Error("Circle radius cannot be NaN");
@@ -5980,8 +5980,8 @@ function Qo() {
         setStyle: Mt.prototype.setStyle,
         _project: function() {
           var t = this._latlng.lng, e = this._latlng.lat, n = this._map, s = n.options.crs;
-          if (s.distance === It.distance) {
-            var a = Math.PI / 180, h = this._mRadius / It.R / a, u = n.project([e + h, t]), g = n.project([e - h, t]), _ = u.add(g).divideBy(2), x = n.unproject(_).lat, T = Math.acos((Math.cos(h * a) - Math.sin(e * a) * Math.sin(x * a)) / (Math.cos(e * a) * Math.cos(x * a))) / a;
+          if (s.distance === Lt.distance) {
+            var a = Math.PI / 180, h = this._mRadius / Lt.R / a, u = n.project([e + h, t]), g = n.project([e - h, t]), _ = u.add(g).divideBy(2), x = n.unproject(_).lat, T = Math.acos((Math.cos(h * a) - Math.sin(e * a) * Math.sin(x * a)) / (Math.cos(e * a) * Math.cos(x * a))) / a;
             (isNaN(T) || T === 0) && (T = h / Math.cos(Math.PI / 180 * e)), this._point = _.subtract(n.getPixelOrigin()), this._radius = isNaN(T) ? 0 : _.x - n.project([x, t - T]).x, this._radiusY = _.y - u.y;
           } else {
             var S = s.unproject(s.project(this._latlng).subtract([this._mRadius, 0]));
@@ -5991,7 +5991,7 @@ function Qo() {
         }
       });
       function va(t, e, n) {
-        return new Hi(t, e, n);
+        return new ji(t, e, n);
       }
       var Pt = Mt.extend({
         // @section
@@ -6266,7 +6266,7 @@ function Qo() {
         }
       });
       function He(t, e) {
-        var n = t.type === "Feature" ? t.geometry : t, s = n ? n.coordinates : null, a = [], h = e && e.pointToLayer, u = e && e.coordsToLatLng || ji, g, _, x, T;
+        var n = t.type === "Feature" ? t.geometry : t, s = n ? n.coordinates : null, a = [], h = e && e.pointToLayer, u = e && e.coordsToLatLng || Gi, g, _, x, T;
         if (!s && !n)
           return null;
         switch (n.type) {
@@ -6305,20 +6305,20 @@ function Qo() {
       function cr(t, e, n, s) {
         return t ? t(e, n) : new We(n, s && s.markersInheritOptions && s);
       }
-      function ji(t) {
+      function Gi(t) {
         return new U(t[1], t[0], t[2]);
       }
       function je(t, e, n) {
         for (var s = [], a = 0, h = t.length, u; a < h; a++)
-          u = e ? je(t[a], e - 1, n) : (n || ji)(t[a]), s.push(u);
+          u = e ? je(t[a], e - 1, n) : (n || Gi)(t[a]), s.push(u);
         return s;
       }
-      function Gi(t, e) {
+      function Ki(t, e) {
         return t = N(t), t.alt !== void 0 ? [D(t.lng, e), D(t.lat, e), D(t.alt, e)] : [D(t.lng, e), D(t.lat, e)];
       }
       function Ge(t, e, n, s) {
         for (var a = [], h = 0, u = t.length; h < u; h++)
-          a.push(e ? Ge(t[h], ct(t[h]) ? 0 : e - 1, n, s) : Gi(t[h], s));
+          a.push(e ? Ge(t[h], ct(t[h]) ? 0 : e - 1, n, s) : Ki(t[h], s));
         return !e && n && a.length > 0 && a.push(a[0].slice()), a;
       }
       function ee(t, e) {
@@ -6331,15 +6331,15 @@ function Qo() {
           geometry: t
         };
       }
-      var Ki = {
+      var Vi = {
         toGeoJSON: function(t) {
           return ee(this, {
             type: "Point",
-            coordinates: Gi(this.getLatLng(), t)
+            coordinates: Ki(this.getLatLng(), t)
           });
         }
       };
-      We.include(Ki), Hi.include(Ki), qe.include(Ki), Pt.include({
+      We.include(Vi), ji.include(Vi), qe.include(Vi), Pt.include({
         toGeoJSON: function(t) {
           var e = !ct(this._latlngs), n = Ge(this._latlngs, e ? 1 : 0, !1, t);
           return ee(this, {
@@ -6484,7 +6484,7 @@ function Qo() {
           return this._image;
         },
         _initImage: function() {
-          var t = this._url.tagName === "IMG", e = this._image = t ? this._url : F("img");
+          var t = this._url.tagName === "IMG", e = this._image = t ? this._url : Z("img");
           if (z(e, "leaflet-image-layer"), this._zoomAnimated && z(e, "leaflet-zoom-animated"), this.options.className && z(e, this.options.className), e.onselectstart = b, e.onmousemove = b, e.onload = p(this.fire, this, "load"), e.onerror = p(this._overlayOnError, this, "error"), (this.options.crossOrigin || this.options.crossOrigin === "") && (e.crossOrigin = this.options.crossOrigin === !0 ? "" : this.options.crossOrigin), this.options.zIndex && this._updateZIndex(), t) {
             this._url = e.src;
             return;
@@ -6543,7 +6543,7 @@ function Qo() {
           playsInline: !0
         },
         _initImage: function() {
-          var t = this._url.tagName === "VIDEO", e = this._image = t ? this._url : F("video");
+          var t = this._url.tagName === "VIDEO", e = this._image = t ? this._url : Z("video");
           if (z(e, "leaflet-image-layer"), this._zoomAnimated && z(e, "leaflet-zoom-animated"), this.options.className && z(e, this.options.className), e.onselectstart = b, e.onmousemove = b, e.onloadeddata = p(this.fire, this, "load"), t) {
             for (var n = e.getElementsByTagName("source"), s = [], a = 0; a < n.length; a++)
               s.push(n[a].src);
@@ -6552,7 +6552,7 @@ function Qo() {
           }
           it(this._url) || (this._url = [this._url]), !this.options.keepAspectRatio && Object.prototype.hasOwnProperty.call(e.style, "objectFit") && (e.style.objectFit = "fill"), e.autoplay = !!this.options.autoplay, e.loop = !!this.options.loop, e.muted = !!this.options.muted, e.playsInline = !!this.options.playsInline;
           for (var h = 0; h < this._url.length; h++) {
-            var u = F("source");
+            var u = Z("source");
             u.src = this._url[h], e.appendChild(u);
           }
         }
@@ -6722,7 +6722,7 @@ function Qo() {
         },
         _updatePosition: function() {
           if (this._map) {
-            var t = this._map.latLngToLayerPoint(this._latlng), e = A(this.options.offset), n = this._getAnchor();
+            var t = this._map.latLngToLayerPoint(this._latlng), e = I(this.options.offset), n = this._getAnchor();
             this._zoomAnimated ? J(this._container, t.add(n)) : e = e.add(t).add(n);
             var s = this._containerBottom = -e.y, a = this._containerLeft = -Math.round(this._containerWidth / 2) + e.x;
             this._container.style.bottom = s + "px", this._container.style.left = a + "px";
@@ -6820,12 +6820,12 @@ function Qo() {
           return (this.options.closeOnClick !== void 0 ? this.options.closeOnClick : this._map.options.closePopupOnClick) && (t.preclick = this.close), this.options.keepInView && (t.moveend = this._adjustPan), t;
         },
         _initLayout: function() {
-          var t = "leaflet-popup", e = this._container = F(
+          var t = "leaflet-popup", e = this._container = Z(
             "div",
             t + " " + (this.options.className || "") + " leaflet-zoom-animated"
-          ), n = this._wrapper = F("div", t + "-content-wrapper", e);
-          if (this._contentNode = F("div", t + "-content", n), ye(e), Ri(this._contentNode), M(e, "contextmenu", Zt), this._tipContainer = F("div", t + "-tip-container", e), this._tip = F("div", t + "-tip", this._tipContainer), this.options.closeButton) {
-            var s = this._closeButton = F("a", t + "-close-button", e);
+          ), n = this._wrapper = Z("div", t + "-content-wrapper", e);
+          if (this._contentNode = Z("div", t + "-content", n), ye(e), Ni(this._contentNode), M(e, "contextmenu", Zt), this._tipContainer = Z("div", t + "-tip-container", e), this._tip = Z("div", t + "-tip", this._tipContainer), this.options.closeButton) {
+            var s = this._closeButton = Z("a", t + "-close-button", e);
             s.setAttribute("role", "button"), s.setAttribute("aria-label", "Close popup"), s.href = "#close", s.innerHTML = '<span aria-hidden="true">&#215;</span>', M(s, "click", function(a) {
               et(a), this.close();
             }, this);
@@ -6851,12 +6851,12 @@ function Qo() {
             }
             var t = this._map, e = parseInt(me(this._container, "marginBottom"), 10) || 0, n = this._container.offsetHeight + e, s = this._containerWidth, a = new C(this._containerLeft, -n - this._containerBottom);
             a._add(Ft(this._container));
-            var h = t.layerPointToContainerPoint(a), u = A(this.options.autoPanPadding), g = A(this.options.autoPanPaddingTopLeft || u), _ = A(this.options.autoPanPaddingBottomRight || u), x = t.getSize(), T = 0, S = 0;
+            var h = t.layerPointToContainerPoint(a), u = I(this.options.autoPanPadding), g = I(this.options.autoPanPaddingTopLeft || u), _ = I(this.options.autoPanPaddingBottomRight || u), x = t.getSize(), T = 0, S = 0;
             h.x + s + _.x > x.x && (T = h.x + s - x.x + _.x), h.x - T - g.x < 0 && (T = h.x - g.x), h.y + n + _.y > x.y && (S = h.y + n - x.y + _.y), h.y - S - g.y < 0 && (S = h.y - g.y), (T || S) && (this.options.keepInView && (this._autopanning = !0), t.fire("autopanstart").panBy([T, S]));
           }
         },
         _getAnchor: function() {
-          return A(this._source && this._source._getPopupAnchor ? this._source._getPopupAnchor() : [0, 0]);
+          return I(this._source && this._source._getPopupAnchor ? this._source._getPopupAnchor() : [0, 0]);
         }
       }), Ta = function(t, e) {
         return new Je(t, e);
@@ -6986,15 +6986,15 @@ function Qo() {
         },
         _initLayout: function() {
           var t = "leaflet-tooltip", e = t + " " + (this.options.className || "") + " leaflet-zoom-" + (this._zoomAnimated ? "animated" : "hide");
-          this._contentNode = this._container = F("div", e), this._container.setAttribute("role", "tooltip"), this._container.setAttribute("id", "leaflet-tooltip-" + f(this));
+          this._contentNode = this._container = Z("div", e), this._container.setAttribute("role", "tooltip"), this._container.setAttribute("id", "leaflet-tooltip-" + m(this));
         },
         _updateLayout: function() {
         },
         _adjustPan: function() {
         },
         _setPosition: function(t) {
-          var e, n, s = this._map, a = this._container, h = s.latLngToContainerPoint(s.getCenter()), u = s.layerPointToContainerPoint(t), g = this.options.direction, _ = a.offsetWidth, x = a.offsetHeight, T = A(this.options.offset), S = this._getAnchor();
-          g === "top" ? (e = _ / 2, n = x) : g === "bottom" ? (e = _ / 2, n = 0) : g === "center" ? (e = _ / 2, n = x / 2) : g === "right" ? (e = 0, n = x / 2) : g === "left" ? (e = _, n = x / 2) : u.x < h.x ? (g = "right", e = 0, n = x / 2) : (g = "left", e = _ + (T.x + S.x) * 2, n = x / 2), t = t.subtract(A(e, n, !0)).add(T).add(S), K(a, "leaflet-tooltip-right"), K(a, "leaflet-tooltip-left"), K(a, "leaflet-tooltip-top"), K(a, "leaflet-tooltip-bottom"), z(a, "leaflet-tooltip-" + g), J(a, t);
+          var e, n, s = this._map, a = this._container, h = s.latLngToContainerPoint(s.getCenter()), u = s.layerPointToContainerPoint(t), g = this.options.direction, _ = a.offsetWidth, x = a.offsetHeight, T = I(this.options.offset), S = this._getAnchor();
+          g === "top" ? (e = _ / 2, n = x) : g === "bottom" ? (e = _ / 2, n = 0) : g === "center" ? (e = _ / 2, n = x / 2) : g === "right" ? (e = 0, n = x / 2) : g === "left" ? (e = _, n = x / 2) : u.x < h.x ? (g = "right", e = 0, n = x / 2) : (g = "left", e = _ + (T.x + S.x) * 2, n = x / 2), t = t.subtract(I(e, n, !0)).add(T).add(S), K(a, "leaflet-tooltip-right"), K(a, "leaflet-tooltip-left"), K(a, "leaflet-tooltip-top"), K(a, "leaflet-tooltip-bottom"), z(a, "leaflet-tooltip-" + g), J(a, t);
         },
         _updatePosition: function() {
           var t = this._map.latLngToLayerPoint(this._latlng);
@@ -7008,7 +7008,7 @@ function Qo() {
           this._setPosition(e);
         },
         _getAnchor: function() {
-          return A(this._source && this._source._getTooltipAnchor && !this.options.sticky ? this._source._getTooltipAnchor() : [0, 0]);
+          return I(this._source && this._source._getTooltipAnchor && !this.options.sticky ? this._source._getTooltipAnchor() : [0, 0]);
         }
       }), ka = function(t, e) {
         return new Ye(t, e);
@@ -7131,7 +7131,7 @@ function Qo() {
         createIcon: function(t) {
           var e = t && t.tagName === "DIV" ? t : document.createElement("div"), n = this.options;
           if (n.html instanceof Element ? (Re(e), e.appendChild(n.html)) : e.innerHTML = n.html !== !1 ? n.html : "", n.bgPos) {
-            var s = A(n.bgPos);
+            var s = I(n.bgPos);
             e.style.backgroundPosition = -s.x + "px " + -s.y + "px";
           }
           return this._setIconStyles(e, "icon"), e;
@@ -7306,7 +7306,7 @@ function Qo() {
         },
         _onOpaqueTile: b,
         _initContainer: function() {
-          this._container || (this._container = F("div", "leaflet-layer " + (this.options.className || "")), this._updateZIndex(), this.options.opacity < 1 && this._updateOpacity(), this.getPane().appendChild(this._container));
+          this._container || (this._container = Z("div", "leaflet-layer " + (this.options.className || "")), this._updateZIndex(), this.options.opacity < 1 && this._updateOpacity(), this.getPane().appendChild(this._container));
         },
         _updateLevels: function() {
           var t = this._tileZoom, e = this.options.maxZoom;
@@ -7314,7 +7314,7 @@ function Qo() {
             for (var n in this._levels)
               n = Number(n), this._levels[n].el.children.length || n === t ? (this._levels[n].el.style.zIndex = e - Math.abs(t - n), this._onUpdateLevel(n)) : (G(this._levels[n].el), this._removeTilesAtZoom(n), this._onRemoveLevel(n), delete this._levels[n]);
             var s = this._levels[t], a = this._map;
-            return s || (s = this._levels[t] = {}, s.el = F("div", "leaflet-tile-container leaflet-zoom-animated", this._container), s.el.style.zIndex = e, s.origin = a.project(a.unproject(a.getPixelOrigin()), t).round(), s.zoom = t, this._setZoomTransform(s, a.getCenter(), a.getZoom()), b(s.el.offsetWidth), this._onCreateLevel(s)), this._level = s, s;
+            return s || (s = this._levels[t] = {}, s.el = Z("div", "leaflet-tile-container leaflet-zoom-animated", this._container), s.el.style.zIndex = e, s.origin = a.project(a.unproject(a.getPixelOrigin()), t).round(), s.zoom = t, this._setZoomTransform(s, a.getCenter(), a.getZoom()), b(s.el.offsetWidth), this._onCreateLevel(s)), this._level = s, s;
           }
         },
         _onUpdateLevel: b,
@@ -7742,7 +7742,7 @@ function Qo() {
           padding: 0.1
         },
         initialize: function(t) {
-          R(this, t), f(this), this._layers = this._layers || {};
+          R(this, t), m(this), this._layers = this._layers || {};
         },
         onAdd: function() {
           this._container || (this._initContainer(), z(this._container, "leaflet-zoom-animated")), this.getPane().appendChild(this._container), this._update(), this.on("update", this._updatePaths, this);
@@ -7831,7 +7831,7 @@ function Qo() {
           Dt.prototype._reset.call(this), this._postponeUpdatePaths && (this._postponeUpdatePaths = !1, this._updatePaths());
         },
         _initPath: function(t) {
-          this._updateDashArray(t), this._layers[f(t)] = t;
+          this._updateDashArray(t), this._layers[m(t)] = t;
           var e = t._order = {
             layer: t,
             prev: this._drawLast,
@@ -7844,7 +7844,7 @@ function Qo() {
         },
         _removePath: function(t) {
           var e = t._order, n = e.next, s = e.prev;
-          n ? n.prev = s : this._drawLast = s, s ? s.next = n : this._drawFirst = n, delete t._order, delete this._layers[f(t)], this._requestRedraw(t);
+          n ? n.prev = s : this._drawLast = s, s ? s.next = n : this._drawFirst = n, delete t._order, delete this._layers[m(t)], this._requestRedraw(t);
         },
         _updatePath: function(t) {
           this._extendRedrawBounds(t), t._project(), t._update(), this._requestRedraw(t);
@@ -7985,14 +7985,14 @@ function Qo() {
         };
       })(), Da = {
         _initContainer: function() {
-          this._container = F("div", "leaflet-vml-container");
+          this._container = Z("div", "leaflet-vml-container");
         },
         _update: function() {
           this._map._animatingZoom || (Dt.prototype._update.call(this), this.fire("update"));
         },
         _initPath: function(t) {
           var e = t._container = Te("shape");
-          z(e, "leaflet-vml-shape " + (this.options.className || "")), e.coordsize = "1 1", t._path = Te("path"), e.appendChild(t._path), this._updateStyle(t), this._layers[f(t)] = t;
+          z(e, "leaflet-vml-shape " + (this.options.className || "")), e.coordsize = "1 1", t._path = Te("path"), e.appendChild(t._path), this._updateStyle(t), this._layers[m(t)] = t;
         },
         _addPath: function(t) {
           var e = t._container;
@@ -8000,7 +8000,7 @@ function Qo() {
         },
         _removePath: function(t) {
           var e = t._container;
-          G(e), t.removeInteractiveTarget(e), delete this._layers[f(t)];
+          G(e), t.removeInteractiveTarget(e), delete this._layers[m(t)];
         },
         _updateStyle: function(t) {
           var e = t._stroke, n = t._fill, s = t.options, a = t._container;
@@ -8036,13 +8036,13 @@ function Qo() {
         // methods below are called by vector layers implementations
         _initPath: function(t) {
           var e = t._path = Xe("path");
-          t.options.className && z(e, t.options.className), t.options.interactive && z(e, "leaflet-interactive"), this._updateStyle(t), this._layers[f(t)] = t;
+          t.options.className && z(e, t.options.className), t.options.interactive && z(e, "leaflet-interactive"), this._updateStyle(t), this._layers[m(t)] = t;
         },
         _addPath: function(t) {
           this._rootGroup || this._initContainer(), this._rootGroup.appendChild(t._path), t.addInteractiveTarget(t._path);
         },
         _removePath: function(t) {
-          G(t._path), t.removeInteractiveTarget(t._path), delete this._layers[f(t)];
+          G(t._path), t.removeInteractiveTarget(t._path), delete this._layers[m(t)];
         },
         _updatePath: function(t) {
           t._project(), t._update();
@@ -8110,10 +8110,10 @@ function Qo() {
           ];
         }
       });
-      function Aa(t, e) {
+      function Ia(t, e) {
         return new xr(t, e);
       }
-      ke.create = Xe, ke.pointsToPath = Tn, St.geometryToLayer = He, St.coordsToLatLng = ji, St.coordsToLatLngs = je, St.latLngToCoords = Gi, St.latLngsToCoords = Ge, St.getFeature = ee, St.asFeature = Ke, B.mergeOptions({
+      ke.create = Xe, ke.pointsToPath = Tn, St.geometryToLayer = He, St.coordsToLatLng = Gi, St.coordsToLatLngs = je, St.latLngToCoords = Ki, St.latLngsToCoords = Ge, St.getFeature = ee, St.asFeature = Ke, B.mergeOptions({
         // @option boxZoom: Boolean = true
         // Whether the map can be zoomed to a rectangular area specified by
         // dragging the mouse while pressing the shift key.
@@ -8144,7 +8144,7 @@ function Qo() {
         _onMouseDown: function(t) {
           if (!t.shiftKey || t.which !== 1 && t.button !== 1)
             return !1;
-          this._clearDeferredResetState(), this._resetState(), ge(), Di(), this._startPoint = this._map.mouseEventToContainerPoint(t), M(document, {
+          this._clearDeferredResetState(), this._resetState(), ge(), Ii(), this._startPoint = this._map.mouseEventToContainerPoint(t), M(document, {
             contextmenu: Ut,
             mousemove: this._onMouseMove,
             mouseup: this._onMouseUp,
@@ -8152,7 +8152,7 @@ function Qo() {
           }, this);
         },
         _onMouseMove: function(t) {
-          this._moved || (this._moved = !0, this._box = F("div", "leaflet-zoom-box", this._container), z(this._container, "leaflet-crosshair"), this._map.fire("boxzoomstart")), this._point = this._map.mouseEventToContainerPoint(t);
+          this._moved || (this._moved = !0, this._box = Z("div", "leaflet-zoom-box", this._container), z(this._container, "leaflet-crosshair"), this._map.fire("boxzoomstart")), this._point = this._map.mouseEventToContainerPoint(t);
           var e = new j(this._point, this._startPoint), n = e.getSize();
           J(this._box, e.min), this._box.style.width = n.x + "px", this._box.style.height = n.y + "px";
         },
@@ -8395,7 +8395,7 @@ function Qo() {
             var e = t.keyCode, n = this._map, s;
             if (e in this._panKeys) {
               if (!n._panAnim || !n._panAnim._inProgress)
-                if (s = this._panKeys[e], t.shiftKey && (s = A(s).multiplyBy(3)), n.options.maxBounds && (s = n._limitOffset(A(s), n.options.maxBounds)), n.options.worldCopyJump) {
+                if (s = this._panKeys[e], t.shiftKey && (s = I(s).multiplyBy(3)), n.options.maxBounds && (s = n._limitOffset(I(s), n.options.maxBounds)), n.options.worldCopyJump) {
                   var a = n.wrapLatLng(n.unproject(n.project(n.getCenter()).add(s)));
                   n.panTo(a);
                 } else
@@ -8447,7 +8447,7 @@ function Qo() {
         }
       });
       B.addInitHook("addHandler", "scrollWheelZoom", Er);
-      var La = 600;
+      var Aa = 600;
       B.mergeOptions({
         // @section Touch interaction options
         // @option tapHold: Boolean
@@ -8470,7 +8470,7 @@ function Qo() {
             var e = t.touches[0];
             this._startPos = this._newPos = new C(e.clientX, e.clientY), this._holdTimeout = setTimeout(p(function() {
               this._cancel(), this._isTapValid() && (M(document, "touchend", et), M(document, "touchend touchcancel", this._cancelClickPrevent), this._simulateEvent("contextmenu", e));
-            }, this), La), M(document, "touchend touchcancel contextmenu", this._cancel, this), M(document, "touchmove", this._onMove, this);
+            }, this), Aa), M(document, "touchend touchcancel contextmenu", this._cancel, this), M(document, "touchmove", this._onMove, this);
           }
         },
         _cancelClickPrevent: function t() {
@@ -8554,28 +8554,28 @@ function Qo() {
           this._zooming = !1, ht(this._animRequest), q(document, "touchmove", this._onTouchMove, this), q(document, "touchend touchcancel", this._onTouchEnd, this), this._map.options.zoomAnimation ? this._map._animateZoom(this._center, this._map._limitZoom(this._zoom), !0, this._map.options.zoomSnap) : this._map._resetView(this._center, this._map._limitZoom(this._zoom));
         }
       });
-      B.addInitHook("addHandler", "touchZoom", Sr), B.BoxZoom = wr, B.DoubleClickZoom = $r, B.Drag = Tr, B.Keyboard = kr, B.ScrollWheelZoom = Er, B.TapHold = Pr, B.TouchZoom = Sr, r.Bounds = j, r.Browser = P, r.CRS = kt, r.Canvas = _r, r.Circle = Hi, r.CircleMarker = qe, r.Class = Tt, r.Control = pt, r.DivIcon = mr, r.DivOverlay = bt, r.DomEvent = Vs, r.DomUtil = Gs, r.Draggable = Ct, r.Evented = ce, r.FeatureGroup = Et, r.GeoJSON = St, r.GridLayer = $e, r.Handler = yt, r.Icon = Qt, r.ImageOverlay = Ve, r.LatLng = U, r.LatLngBounds = at, r.Layer = ft, r.LayerGroup = Xt, r.LineUtil = la, r.Map = B, r.Marker = We, r.Mixin = ia, r.Path = Mt, r.Point = C, r.PolyUtil = na, r.Polygon = te, r.Polyline = Pt, r.Popup = Je, r.PosAnimation = Yn, r.Projection = ha, r.Rectangle = xr, r.Renderer = Dt, r.SVG = ke, r.SVGOverlay = fr, r.TileLayer = ie, r.Tooltip = Ye, r.Transformation = vi, r.Util = ms, r.VideoOverlay = pr, r.bind = p, r.bounds = st, r.canvas = yr, r.circle = va, r.circleMarker = ga, r.control = be, r.divIcon = Ea, r.extend = l, r.featureGroup = pa, r.geoJSON = ur, r.geoJson = ba, r.gridLayer = Pa, r.icon = fa, r.imageOverlay = xa, r.latLng = N, r.latLngBounds = V, r.layerGroup = ua, r.map = Js, r.marker = ma, r.point = A, r.polygon = ya, r.polyline = _a, r.popup = Ta, r.rectangle = Aa, r.setOptions = R, r.stamp = f, r.svg = br, r.svgOverlay = $a, r.tileLayer = gr, r.tooltip = ka, r.transformation = ue, r.version = o, r.videoOverlay = wa;
-      var Ia = window.L;
+      B.addInitHook("addHandler", "touchZoom", Sr), B.BoxZoom = wr, B.DoubleClickZoom = $r, B.Drag = Tr, B.Keyboard = kr, B.ScrollWheelZoom = Er, B.TapHold = Pr, B.TouchZoom = Sr, r.Bounds = j, r.Browser = P, r.CRS = kt, r.Canvas = _r, r.Circle = ji, r.CircleMarker = qe, r.Class = Tt, r.Control = pt, r.DivIcon = mr, r.DivOverlay = bt, r.DomEvent = Vs, r.DomUtil = Gs, r.Draggable = Ct, r.Evented = ce, r.FeatureGroup = Et, r.GeoJSON = St, r.GridLayer = $e, r.Handler = yt, r.Icon = Qt, r.ImageOverlay = Ve, r.LatLng = U, r.LatLngBounds = at, r.Layer = ft, r.LayerGroup = Xt, r.LineUtil = la, r.Map = B, r.Marker = We, r.Mixin = ia, r.Path = Mt, r.Point = C, r.PolyUtil = na, r.Polygon = te, r.Polyline = Pt, r.Popup = Je, r.PosAnimation = Yn, r.Projection = ha, r.Rectangle = xr, r.Renderer = Dt, r.SVG = ke, r.SVGOverlay = fr, r.TileLayer = ie, r.Tooltip = Ye, r.Transformation = _i, r.Util = ms, r.VideoOverlay = pr, r.bind = p, r.bounds = st, r.canvas = yr, r.circle = va, r.circleMarker = ga, r.control = be, r.divIcon = Ea, r.extend = l, r.featureGroup = pa, r.geoJSON = ur, r.geoJson = ba, r.gridLayer = Pa, r.icon = fa, r.imageOverlay = xa, r.latLng = N, r.latLngBounds = V, r.layerGroup = ua, r.map = Js, r.marker = ma, r.point = I, r.polygon = ya, r.polyline = _a, r.popup = Ta, r.rectangle = Ia, r.setOptions = R, r.stamp = m, r.svg = br, r.svgOverlay = $a, r.tileLayer = gr, r.tooltip = ka, r.transformation = ue, r.version = o, r.videoOverlay = wa;
+      var La = window.L;
       r.noConflict = function() {
-        return window.L = Ia, this;
+        return window.L = La, this;
       }, window.L = r;
     }));
   })(Pe, Pe.exports)), Pe.exports;
 }
-var mt = Qo();
-const tl = '.leaflet-pane,.leaflet-tile,.leaflet-marker-icon,.leaflet-marker-shadow,.leaflet-tile-container,.leaflet-pane>svg,.leaflet-pane>canvas,.leaflet-zoom-box,.leaflet-image-layer,.leaflet-layer{position:absolute;left:0;top:0}.leaflet-container{overflow:hidden}.leaflet-tile,.leaflet-marker-icon,.leaflet-marker-shadow{-webkit-user-select:none;-moz-user-select:none;user-select:none;-webkit-user-drag:none}.leaflet-tile::selection{background:transparent}.leaflet-safari .leaflet-tile{image-rendering:-webkit-optimize-contrast}.leaflet-safari .leaflet-tile-container{width:1600px;height:1600px;-webkit-transform-origin:0 0}.leaflet-marker-icon,.leaflet-marker-shadow{display:block}.leaflet-container .leaflet-overlay-pane svg{max-width:none!important;max-height:none!important}.leaflet-container .leaflet-marker-pane img,.leaflet-container .leaflet-shadow-pane img,.leaflet-container .leaflet-tile-pane img,.leaflet-container img.leaflet-image-layer,.leaflet-container .leaflet-tile{max-width:none!important;max-height:none!important;width:auto;padding:0}.leaflet-container img.leaflet-tile{mix-blend-mode:plus-lighter}.leaflet-container.leaflet-touch-zoom{-ms-touch-action:pan-x pan-y;touch-action:pan-x pan-y}.leaflet-container.leaflet-touch-drag{-ms-touch-action:pinch-zoom;touch-action:none;touch-action:pinch-zoom}.leaflet-container.leaflet-touch-drag.leaflet-touch-zoom{-ms-touch-action:none;touch-action:none}.leaflet-container{-webkit-tap-highlight-color:transparent}.leaflet-container a{-webkit-tap-highlight-color:rgba(51,181,229,.4)}.leaflet-tile{filter:inherit;visibility:hidden}.leaflet-tile-loaded{visibility:inherit}.leaflet-zoom-box{width:0;height:0;-moz-box-sizing:border-box;box-sizing:border-box;z-index:800}.leaflet-overlay-pane svg{-moz-user-select:none}.leaflet-pane{z-index:400}.leaflet-tile-pane{z-index:200}.leaflet-overlay-pane{z-index:400}.leaflet-shadow-pane{z-index:500}.leaflet-marker-pane{z-index:600}.leaflet-tooltip-pane{z-index:650}.leaflet-popup-pane{z-index:700}.leaflet-map-pane canvas{z-index:100}.leaflet-map-pane svg{z-index:200}.leaflet-vml-shape{width:1px;height:1px}.lvml{behavior:url(#default#VML);display:inline-block;position:absolute}.leaflet-control{position:relative;z-index:800;pointer-events:visiblePainted;pointer-events:auto}.leaflet-top,.leaflet-bottom{position:absolute;z-index:1000;pointer-events:none}.leaflet-top{top:0}.leaflet-right{right:0}.leaflet-bottom{bottom:0}.leaflet-left{left:0}.leaflet-control{float:left;clear:both}.leaflet-right .leaflet-control{float:right}.leaflet-top .leaflet-control{margin-top:10px}.leaflet-bottom .leaflet-control{margin-bottom:10px}.leaflet-left .leaflet-control{margin-left:10px}.leaflet-right .leaflet-control{margin-right:10px}.leaflet-fade-anim .leaflet-popup{opacity:0;-webkit-transition:opacity .2s linear;-moz-transition:opacity .2s linear;transition:opacity .2s linear}.leaflet-fade-anim .leaflet-map-pane .leaflet-popup{opacity:1}.leaflet-zoom-animated{-webkit-transform-origin:0 0;-ms-transform-origin:0 0;transform-origin:0 0}svg.leaflet-zoom-animated{will-change:transform}.leaflet-zoom-anim .leaflet-zoom-animated{-webkit-transition:-webkit-transform .25s cubic-bezier(0,0,.25,1);-moz-transition:-moz-transform .25s cubic-bezier(0,0,.25,1);transition:transform .25s cubic-bezier(0,0,.25,1)}.leaflet-zoom-anim .leaflet-tile,.leaflet-pan-anim .leaflet-tile{-webkit-transition:none;-moz-transition:none;transition:none}.leaflet-zoom-anim .leaflet-zoom-hide{visibility:hidden}.leaflet-interactive{cursor:pointer}.leaflet-grab{cursor:-webkit-grab;cursor:-moz-grab;cursor:grab}.leaflet-crosshair,.leaflet-crosshair .leaflet-interactive{cursor:crosshair}.leaflet-popup-pane,.leaflet-control{cursor:auto}.leaflet-dragging .leaflet-grab,.leaflet-dragging .leaflet-grab .leaflet-interactive,.leaflet-dragging .leaflet-marker-draggable{cursor:move;cursor:-webkit-grabbing;cursor:-moz-grabbing;cursor:grabbing}.leaflet-marker-icon,.leaflet-marker-shadow,.leaflet-image-layer,.leaflet-pane>svg path,.leaflet-tile-container{pointer-events:none}.leaflet-marker-icon.leaflet-interactive,.leaflet-image-layer.leaflet-interactive,.leaflet-pane>svg path.leaflet-interactive,svg.leaflet-image-layer.leaflet-interactive path{pointer-events:visiblePainted;pointer-events:auto}.leaflet-container{background:#ddd;outline-offset:1px}.leaflet-container a{color:#0078a8}.leaflet-zoom-box{border:2px dotted #38f;background:#ffffff80}.leaflet-container{font-family:Helvetica Neue,Arial,Helvetica,sans-serif;font-size:12px;font-size:.75rem;line-height:1.5}.leaflet-bar{box-shadow:0 1px 5px #000000a6;border-radius:4px}.leaflet-bar a{background-color:#fff;border-bottom:1px solid #ccc;width:26px;height:26px;line-height:26px;display:block;text-align:center;text-decoration:none;color:#000}.leaflet-bar a,.leaflet-control-layers-toggle{background-position:50% 50%;background-repeat:no-repeat;display:block}.leaflet-bar a:hover,.leaflet-bar a:focus{background-color:#f4f4f4}.leaflet-bar a:first-child{border-top-left-radius:4px;border-top-right-radius:4px}.leaflet-bar a:last-child{border-bottom-left-radius:4px;border-bottom-right-radius:4px;border-bottom:none}.leaflet-bar a.leaflet-disabled{cursor:default;background-color:#f4f4f4;color:#bbb}.leaflet-touch .leaflet-bar a{width:30px;height:30px;line-height:30px}.leaflet-touch .leaflet-bar a:first-child{border-top-left-radius:2px;border-top-right-radius:2px}.leaflet-touch .leaflet-bar a:last-child{border-bottom-left-radius:2px;border-bottom-right-radius:2px}.leaflet-control-zoom-in,.leaflet-control-zoom-out{font:700 18px Lucida Console,Monaco,monospace;text-indent:1px}.leaflet-touch .leaflet-control-zoom-in,.leaflet-touch .leaflet-control-zoom-out{font-size:22px}.leaflet-control-layers{box-shadow:0 1px 5px #0006;background:#fff;border-radius:5px}.leaflet-control-layers-toggle{background-image:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABoAAAAaCAQAAAADQ4RFAAACf0lEQVR4AY1UM3gkARTePdvdoTxXKc+qTl3aU5U6b2Kbkz3Gtq3Zw6ziLGNPzrYx7946Tr6/ee/XeCQ4D3ykPtL5tHno4n0d/h3+xfuWHGLX81cn7r0iTNzjr7LrlxCqPtkbTQEHeqOrTy4Yyt3VCi/IOB0v7rVC7q45Q3Gr5K6jt+3Gl5nCoDD4MtO+j96Wu8atmhGqcNGHObuf8OM/x3AMx38+4Z2sPqzCxRFK2aF2e5Jol56XTLyggAMTL56XOMoS1W4pOyjUcGGQdZxU6qRh7B9Zp+PfpOFlqt0zyDZckPi1ttmIp03jX8gyJ8a/PG2yutpS/Vol7peZIbZcKBAEEheEIAgFbDkz5H6Zrkm2hVWGiXKiF4Ycw0RWKdtC16Q7qe3X4iOMxruonzegJzWaXFrU9utOSsLUmrc0YjeWYjCW4PDMADElpJSSQ0vQvA1Tm6/JlKnqFs1EGyZiFCqnRZTEJJJiKRYzVYzJck2Rm6P4iH+cmSY0YzimYa8l0EtTODFWhcMIMVqdsI2uiTvKmTisIDHJ3od5GILVhBCarCfVRmo4uTjkhrhzkiBV7SsaqS+TzrzM1qpGGUFt28pIySQHR6h7F6KSwGWm97ay+Z+ZqMcEjEWebE7wxCSQwpkhJqoZA5ivCdZDjJepuJ9IQjGGUmuXJdBFUygxVqVsxFsLMbDe8ZbDYVCGKxs+W080max1hFCarCfV+C1KATwcnvE9gRRuMP2prdbWGowm1KB1y+zwMMENkM755cJ2yPDtqhTI6ED1M/82yIDtC/4j4BijjeObflpO9I9MwXTCsSX8jWAFeHr05WoLTJ5G8IQVS/7vwR6ohirYM7f6HzYpogfS3R2OAAAAAElFTkSuQmCC);width:36px;height:36px}.leaflet-retina .leaflet-control-layers-toggle{background-image:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADQAAAA0CAQAAABvcdNgAAAEsklEQVR4AWL4TydIhpZK1kpWOlg0w3ZXP6D2soBtG42jeI6ZmQTHzAxiTbSJsYLjO9HhP+WOmcuhciVnmHVQcJnp7DFvScowZorad/+V/fVzMdMT2g9Cv9guXGv/7pYOrXh2U+RRR3dSd9JRx6bIFc/ekqHI29JC6pJ5ZEh1yWkhkbcFeSjxgx3L2m1cb1C7bceyxA+CNjT/Ifff+/kDk2u/w/33/IeCMOSaWZ4glosqT3DNnNZQ7Cs58/3Ce5HL78iZH/vKVIaYlqzfdLu8Vi7dnvUbEza5Idt36tquZFldl6N5Z/POLof0XLK61mZCmJSWjVF9tEjUluu74IUXvgttuVIHE7YxSkaYhJZam7yiM9Pv82JYfl9nptxZaxMJE4YSPty+vF0+Y2up9d3wwijfjZbabqm/3bZ9ecKHsiGmRflnn1MW4pjHf9oLufyn2z3y1D6n8g8TZhxyzipLNPnAUpsOiuWimg52psrTZYnOWYNDTMuWBWa0tJb4rgq1UvmutpaYEbZlwU3CLJm/ayYjHW5/h7xWLn9Hh1vepDkyf7dE7MtT5LR4e7yYpHrkhOUpEfssBLq2pPhAqoSWKUkk7EDqkmK6RrCEzqDjhNDWNE+XSMvkJRDWlZTmCW0l0PHQGRZY5t1L83kT0Y3l2SItk5JAWHl2dCOBm+fPu3fo5/3v61RMCO9Jx2EEYYhb0rmNQMX/vm7gqOEJLcXTGw3CAuRNeyaPWwjR8PRqKQ1PDA/dpv+on9Shox52WFnx0KY8onHayrJzm87i5h9xGw/tfkev0jGsQizqezUKjk12hBMKJ4kbCqGPVNXudyyrShovGw5CgxsRICxF6aRmSjlBnHRzg7Gx8fKqEubI2rahQYdR1YgDIRQO7JvQyD52hoIQx0mxa0ODtW2Iozn1le2iIRdzwWewedyZzewidueOGqlsn1MvcnQpuVwLGG3/IR1hIKxCjelIDZ8ldqWz25jWAsnldEnK0Zxro19TGVb2ffIZEsIO89EIEDvKMPrzmBOQcKQ+rroye6NgRRxqR4U8EAkz0CL6uSGOm6KQCdWjvjRiSP1BPalCRS5iQYiEIvxuBMJEWgzSoHADcVMuN7IuqqTeyUPq22qFimFtxDyBBJEwNyt6TM88blFHao/6tWWhuuOM4SAK4EI4QmFHA+SEyWlp4EQoJ13cYGzMu7yszEIBOm2rVmHUNqwAIQabISNMRstmdhNWcFLsSm+0tjJH1MdRxO5Nx0WDMhCtgD6OKgZeljJqJKc9po8juskR9XN0Y1lZ3mWjLR9JCO1jRDMd0fpYC2VnvjBSEFg7wBENc0R9HFlb0xvF1+TBEpF68d+DHR6IOWVv2BECtxo46hOFUBd/APU57WIoEwJhIi2CdpyZX0m93BZicktMj1AS9dClteUFAUNUIEygRZCtik5zSxI9MubTBH1GOiHsiLJ3OCoSZkILa9PxiN0EbvhsAo8tdAf9Seepd36lGWHmtNANTv5Jd0z4QYyeo/UEJqxKRpg5LZx6btLPsOaEmdMyxYdlc8LMaJnikDlhclqmPiQnTEpLUIZEwkRagjYkEibQErwhkTAKCLQEbUgkzJQWc/0PstHHcfEdQ+UAAAAASUVORK5CYII=);background-size:26px 26px}.leaflet-touch .leaflet-control-layers-toggle{width:44px;height:44px}.leaflet-control-layers .leaflet-control-layers-list,.leaflet-control-layers-expanded .leaflet-control-layers-toggle{display:none}.leaflet-control-layers-expanded .leaflet-control-layers-list{display:block;position:relative}.leaflet-control-layers-expanded{padding:6px 10px 6px 6px;color:#333;background:#fff}.leaflet-control-layers-scrollbar{overflow-y:scroll;overflow-x:hidden;padding-right:5px}.leaflet-control-layers-selector{margin-top:2px;position:relative;top:1px}.leaflet-control-layers label{display:block;font-size:13px;font-size:1.08333em}.leaflet-control-layers-separator{height:0;border-top:1px solid #ddd;margin:5px -10px 5px -6px}.leaflet-default-icon-path{background-image:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABkAAAApCAYAAADAk4LOAAAFgUlEQVR4Aa1XA5BjWRTN2oW17d3YaZtr2962HUzbDNpjszW24mRt28p47v7zq/bXZtrp/lWnXr337j3nPCe85NcypgSFdugCpW5YoDAMRaIMqRi6aKq5E3YqDQO3qAwjVWrD8Ncq/RBpykd8oZUb/kaJutow8r1aP9II0WmLKLIsJyv1w/kqw9Ch2MYdB++12Onxee/QMwvf4/Dk/Lfp/i4nxTXtOoQ4pW5Aj7wpici1A9erdAN2OH64x8OSP9j3Ft3b7aWkTg/Fm91siTra0f9on5sQr9INejH6CUUUpavjFNq1B+Oadhxmnfa8RfEmN8VNAsQhPqF55xHkMzz3jSmChWU6f7/XZKNH+9+hBLOHYozuKQPxyMPUKkrX/K0uWnfFaJGS1QPRtZsOPtr3NsW0uyh6NNCOkU3Yz+bXbT3I8G3xE5EXLXtCXbbqwCO9zPQYPRTZ5vIDXD7U+w7rFDEoUUf7ibHIR4y6bLVPXrz8JVZEql13trxwue/uDivd3fkWRbS6/IA2bID4uk0UpF1N8qLlbBlXs4Ee7HLTfV1j54APvODnSfOWBqtKVvjgLKzF5YdEk5ewRkGlK0i33Eofffc7HT56jD7/6U+qH3Cx7SBLNntH5YIPvODnyfIXZYRVDPqgHtLs5ABHD3YzLuespb7t79FY34DjMwrVrcTuwlT55YMPvOBnRrJ4VXTdNnYug5ucHLBjEpt30701A3Ts+HEa73u6dT3FNWwflY86eMHPk+Yu+i6pzUpRrW7SNDg5JHR4KapmM5Wv2E8Tfcb1HoqqHMHU+uWDD7zg54mz5/2BSnizi9T1Dg4QQXLToGNCkb6tb1NU+QAlGr1++eADrzhn/u8Q2YZhQVlZ5+CAOtqfbhmaUCS1ezNFVm2imDbPmPng5wmz+gwh+oHDce0eUtQ6OGDIyR0uUhUsoO3vfDmmgOezH0mZN59x7MBi++WDL1g/eEiU3avlidO671bkLfwbw5XV2P8Pzo0ydy4t2/0eu33xYSOMOD8hTf4CrBtGMSoXfPLchX+J0ruSePw3LZeK0juPJbYzrhkH0io7B3k164hiGvawhOKMLkrQLyVpZg8rHFW7E2uHOL888IBPlNZ1FPzstSJM694fWr6RwpvcJK60+0HCILTBzZLFNdtAzJaohze60T8qBzyh5ZuOg5e7uwQppofEmf2++DYvmySqGBuKaicF1blQjhuHdvCIMvp8whTTfZzI7RldpwtSzL+F1+wkdZ2TBOW2gIF88PBTzD/gpeREAMEbxnJcaJHNHrpzji0gQCS6hdkEeYt9DF/2qPcEC8RM28Hwmr3sdNyht00byAut2k3gufWNtgtOEOFGUwcXWNDbdNbpgBGxEvKkOQsxivJx33iow0Vw5S6SVTrpVq11ysA2Rp7gTfPfktc6zhtXBBC+adRLshf6sG2RfHPZ5EAc4sVZ83yCN00Fk/4kggu40ZTvIEm5g24qtU4KjBrx/BTTH8ifVASAG7gKrnWxJDcU7x8X6Ecczhm3o6YicvsLXWfh3Ch1W0k8x0nXF+0fFxgt4phz8QvypiwCCFKMqXCnqXExjq10beH+UUA7+nG6mdG/Pu0f3LgFcGrl2s0kNNjpmoJ9o4B29CMO8dMT4Q5ox8uitF6fqsrJOr8qnwNbRzv6hSnG5wP+64C7h9lp30hKNtKdWjtdkbuPA19nJ7Tz3zR/ibgARbhb4AlhavcBebmTHcFl2fvYEnW0ox9xMxKBS8btJ+KiEbq9zA4RthQXDhPa0T9TEe69gWupwc6uBUphquXgf+/FrIjweHQS4/pduMe5ERUMHUd9xv8ZR98CxkS4F2n3EUrUZ10EYNw7BWm9x1GiPssi3GgiGRDKWRYZfXlON+dfNbM+GgIwYdwAAAAASUVORK5CYII=)}.leaflet-container .leaflet-control-attribution{background:#fff;background:#fffc;margin:0}.leaflet-control-attribution,.leaflet-control-scale-line{padding:0 5px;color:#333;line-height:1.4}.leaflet-control-attribution a{text-decoration:none}.leaflet-control-attribution a:hover,.leaflet-control-attribution a:focus{text-decoration:underline}.leaflet-attribution-flag{display:inline!important;vertical-align:baseline!important;width:1em;height:.6669em}.leaflet-left .leaflet-control-scale{margin-left:5px}.leaflet-bottom .leaflet-control-scale{margin-bottom:5px}.leaflet-control-scale-line{border:2px solid #777;border-top:none;line-height:1.1;padding:2px 5px 1px;white-space:nowrap;-moz-box-sizing:border-box;box-sizing:border-box;background:#fffc;text-shadow:1px 1px #fff}.leaflet-control-scale-line:not(:first-child){border-top:2px solid #777;border-bottom:none;margin-top:-2px}.leaflet-control-scale-line:not(:first-child):not(:last-child){border-bottom:2px solid #777}.leaflet-touch .leaflet-control-attribution,.leaflet-touch .leaflet-control-layers,.leaflet-touch .leaflet-bar{box-shadow:none}.leaflet-touch .leaflet-control-layers,.leaflet-touch .leaflet-bar{border:2px solid rgba(0,0,0,.2);background-clip:padding-box}.leaflet-popup{position:absolute;text-align:center;margin-bottom:20px}.leaflet-popup-content-wrapper{padding:1px;text-align:left;border-radius:12px}.leaflet-popup-content{margin:13px 24px 13px 20px;line-height:1.3;font-size:13px;font-size:1.08333em;min-height:1px}.leaflet-popup-content p{margin:1.3em 0}.leaflet-popup-tip-container{width:40px;height:20px;position:absolute;left:50%;margin-top:-1px;margin-left:-20px;overflow:hidden;pointer-events:none}.leaflet-popup-tip{width:17px;height:17px;padding:1px;margin:-10px auto 0;pointer-events:auto;-webkit-transform:rotate(45deg);-moz-transform:rotate(45deg);-ms-transform:rotate(45deg);transform:rotate(45deg)}.leaflet-popup-content-wrapper,.leaflet-popup-tip{background:#fff;color:#333;box-shadow:0 3px 14px #0006}.leaflet-container a.leaflet-popup-close-button{position:absolute;top:0;right:0;border:none;text-align:center;width:24px;height:24px;font:16px/24px Tahoma,Verdana,sans-serif;color:#757575;text-decoration:none;background:transparent}.leaflet-container a.leaflet-popup-close-button:hover,.leaflet-container a.leaflet-popup-close-button:focus{color:#585858}.leaflet-popup-scrolled{overflow:auto}.leaflet-oldie .leaflet-popup-content-wrapper{-ms-zoom:1}.leaflet-oldie .leaflet-popup-tip{width:24px;margin:0 auto;-ms-filter:"progid:DXImageTransform.Microsoft.Matrix(M11=0.70710678, M12=0.70710678, M21=-0.70710678, M22=0.70710678)";filter:progid:DXImageTransform.Microsoft.Matrix(M11=.70710678,M12=.70710678,M21=-.70710678,M22=.70710678)}.leaflet-oldie .leaflet-control-zoom,.leaflet-oldie .leaflet-control-layers,.leaflet-oldie .leaflet-popup-content-wrapper,.leaflet-oldie .leaflet-popup-tip{border:1px solid #999}.leaflet-div-icon{background:#fff;border:1px solid #666}.leaflet-tooltip{position:absolute;padding:6px;background-color:#fff;border:1px solid #fff;border-radius:3px;color:#222;white-space:nowrap;-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;user-select:none;pointer-events:none;box-shadow:0 1px 3px #0006}.leaflet-tooltip.leaflet-interactive{cursor:pointer;pointer-events:auto}.leaflet-tooltip-top:before,.leaflet-tooltip-bottom:before,.leaflet-tooltip-left:before,.leaflet-tooltip-right:before{position:absolute;pointer-events:none;border:6px solid transparent;background:transparent;content:""}.leaflet-tooltip-bottom{margin-top:6px}.leaflet-tooltip-top{margin-top:-6px}.leaflet-tooltip-bottom:before,.leaflet-tooltip-top:before{left:50%;margin-left:-6px}.leaflet-tooltip-top:before{bottom:0;margin-bottom:-12px;border-top-color:#fff}.leaflet-tooltip-bottom:before{top:0;margin-top:-12px;margin-left:-6px;border-bottom-color:#fff}.leaflet-tooltip-left{margin-left:-6px}.leaflet-tooltip-right{margin-left:6px}.leaflet-tooltip-left:before,.leaflet-tooltip-right:before{top:50%;margin-top:-6px}.leaflet-tooltip-left:before{right:0;margin-right:-12px;border-left-color:#fff}.leaflet-tooltip-right:before{left:0;margin-left:-12px;border-right-color:#fff}@media print{.leaflet-control{-webkit-print-color-adjust:exact;print-color-adjust:exact}}';
-function el(c) {
+var mt = el();
+const il = '.leaflet-pane,.leaflet-tile,.leaflet-marker-icon,.leaflet-marker-shadow,.leaflet-tile-container,.leaflet-pane>svg,.leaflet-pane>canvas,.leaflet-zoom-box,.leaflet-image-layer,.leaflet-layer{position:absolute;left:0;top:0}.leaflet-container{overflow:hidden}.leaflet-tile,.leaflet-marker-icon,.leaflet-marker-shadow{-webkit-user-select:none;-moz-user-select:none;user-select:none;-webkit-user-drag:none}.leaflet-tile::selection{background:transparent}.leaflet-safari .leaflet-tile{image-rendering:-webkit-optimize-contrast}.leaflet-safari .leaflet-tile-container{width:1600px;height:1600px;-webkit-transform-origin:0 0}.leaflet-marker-icon,.leaflet-marker-shadow{display:block}.leaflet-container .leaflet-overlay-pane svg{max-width:none!important;max-height:none!important}.leaflet-container .leaflet-marker-pane img,.leaflet-container .leaflet-shadow-pane img,.leaflet-container .leaflet-tile-pane img,.leaflet-container img.leaflet-image-layer,.leaflet-container .leaflet-tile{max-width:none!important;max-height:none!important;width:auto;padding:0}.leaflet-container img.leaflet-tile{mix-blend-mode:plus-lighter}.leaflet-container.leaflet-touch-zoom{-ms-touch-action:pan-x pan-y;touch-action:pan-x pan-y}.leaflet-container.leaflet-touch-drag{-ms-touch-action:pinch-zoom;touch-action:none;touch-action:pinch-zoom}.leaflet-container.leaflet-touch-drag.leaflet-touch-zoom{-ms-touch-action:none;touch-action:none}.leaflet-container{-webkit-tap-highlight-color:transparent}.leaflet-container a{-webkit-tap-highlight-color:rgba(51,181,229,.4)}.leaflet-tile{filter:inherit;visibility:hidden}.leaflet-tile-loaded{visibility:inherit}.leaflet-zoom-box{width:0;height:0;-moz-box-sizing:border-box;box-sizing:border-box;z-index:800}.leaflet-overlay-pane svg{-moz-user-select:none}.leaflet-pane{z-index:400}.leaflet-tile-pane{z-index:200}.leaflet-overlay-pane{z-index:400}.leaflet-shadow-pane{z-index:500}.leaflet-marker-pane{z-index:600}.leaflet-tooltip-pane{z-index:650}.leaflet-popup-pane{z-index:700}.leaflet-map-pane canvas{z-index:100}.leaflet-map-pane svg{z-index:200}.leaflet-vml-shape{width:1px;height:1px}.lvml{behavior:url(#default#VML);display:inline-block;position:absolute}.leaflet-control{position:relative;z-index:800;pointer-events:visiblePainted;pointer-events:auto}.leaflet-top,.leaflet-bottom{position:absolute;z-index:1000;pointer-events:none}.leaflet-top{top:0}.leaflet-right{right:0}.leaflet-bottom{bottom:0}.leaflet-left{left:0}.leaflet-control{float:left;clear:both}.leaflet-right .leaflet-control{float:right}.leaflet-top .leaflet-control{margin-top:10px}.leaflet-bottom .leaflet-control{margin-bottom:10px}.leaflet-left .leaflet-control{margin-left:10px}.leaflet-right .leaflet-control{margin-right:10px}.leaflet-fade-anim .leaflet-popup{opacity:0;-webkit-transition:opacity .2s linear;-moz-transition:opacity .2s linear;transition:opacity .2s linear}.leaflet-fade-anim .leaflet-map-pane .leaflet-popup{opacity:1}.leaflet-zoom-animated{-webkit-transform-origin:0 0;-ms-transform-origin:0 0;transform-origin:0 0}svg.leaflet-zoom-animated{will-change:transform}.leaflet-zoom-anim .leaflet-zoom-animated{-webkit-transition:-webkit-transform .25s cubic-bezier(0,0,.25,1);-moz-transition:-moz-transform .25s cubic-bezier(0,0,.25,1);transition:transform .25s cubic-bezier(0,0,.25,1)}.leaflet-zoom-anim .leaflet-tile,.leaflet-pan-anim .leaflet-tile{-webkit-transition:none;-moz-transition:none;transition:none}.leaflet-zoom-anim .leaflet-zoom-hide{visibility:hidden}.leaflet-interactive{cursor:pointer}.leaflet-grab{cursor:-webkit-grab;cursor:-moz-grab;cursor:grab}.leaflet-crosshair,.leaflet-crosshair .leaflet-interactive{cursor:crosshair}.leaflet-popup-pane,.leaflet-control{cursor:auto}.leaflet-dragging .leaflet-grab,.leaflet-dragging .leaflet-grab .leaflet-interactive,.leaflet-dragging .leaflet-marker-draggable{cursor:move;cursor:-webkit-grabbing;cursor:-moz-grabbing;cursor:grabbing}.leaflet-marker-icon,.leaflet-marker-shadow,.leaflet-image-layer,.leaflet-pane>svg path,.leaflet-tile-container{pointer-events:none}.leaflet-marker-icon.leaflet-interactive,.leaflet-image-layer.leaflet-interactive,.leaflet-pane>svg path.leaflet-interactive,svg.leaflet-image-layer.leaflet-interactive path{pointer-events:visiblePainted;pointer-events:auto}.leaflet-container{background:#ddd;outline-offset:1px}.leaflet-container a{color:#0078a8}.leaflet-zoom-box{border:2px dotted #38f;background:#ffffff80}.leaflet-container{font-family:Helvetica Neue,Arial,Helvetica,sans-serif;font-size:12px;font-size:.75rem;line-height:1.5}.leaflet-bar{box-shadow:0 1px 5px #000000a6;border-radius:4px}.leaflet-bar a{background-color:#fff;border-bottom:1px solid #ccc;width:26px;height:26px;line-height:26px;display:block;text-align:center;text-decoration:none;color:#000}.leaflet-bar a,.leaflet-control-layers-toggle{background-position:50% 50%;background-repeat:no-repeat;display:block}.leaflet-bar a:hover,.leaflet-bar a:focus{background-color:#f4f4f4}.leaflet-bar a:first-child{border-top-left-radius:4px;border-top-right-radius:4px}.leaflet-bar a:last-child{border-bottom-left-radius:4px;border-bottom-right-radius:4px;border-bottom:none}.leaflet-bar a.leaflet-disabled{cursor:default;background-color:#f4f4f4;color:#bbb}.leaflet-touch .leaflet-bar a{width:30px;height:30px;line-height:30px}.leaflet-touch .leaflet-bar a:first-child{border-top-left-radius:2px;border-top-right-radius:2px}.leaflet-touch .leaflet-bar a:last-child{border-bottom-left-radius:2px;border-bottom-right-radius:2px}.leaflet-control-zoom-in,.leaflet-control-zoom-out{font:700 18px Lucida Console,Monaco,monospace;text-indent:1px}.leaflet-touch .leaflet-control-zoom-in,.leaflet-touch .leaflet-control-zoom-out{font-size:22px}.leaflet-control-layers{box-shadow:0 1px 5px #0006;background:#fff;border-radius:5px}.leaflet-control-layers-toggle{background-image:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABoAAAAaCAQAAAADQ4RFAAACf0lEQVR4AY1UM3gkARTePdvdoTxXKc+qTl3aU5U6b2Kbkz3Gtq3Zw6ziLGNPzrYx7946Tr6/ee/XeCQ4D3ykPtL5tHno4n0d/h3+xfuWHGLX81cn7r0iTNzjr7LrlxCqPtkbTQEHeqOrTy4Yyt3VCi/IOB0v7rVC7q45Q3Gr5K6jt+3Gl5nCoDD4MtO+j96Wu8atmhGqcNGHObuf8OM/x3AMx38+4Z2sPqzCxRFK2aF2e5Jol56XTLyggAMTL56XOMoS1W4pOyjUcGGQdZxU6qRh7B9Zp+PfpOFlqt0zyDZckPi1ttmIp03jX8gyJ8a/PG2yutpS/Vol7peZIbZcKBAEEheEIAgFbDkz5H6Zrkm2hVWGiXKiF4Ycw0RWKdtC16Q7qe3X4iOMxruonzegJzWaXFrU9utOSsLUmrc0YjeWYjCW4PDMADElpJSSQ0vQvA1Tm6/JlKnqFs1EGyZiFCqnRZTEJJJiKRYzVYzJck2Rm6P4iH+cmSY0YzimYa8l0EtTODFWhcMIMVqdsI2uiTvKmTisIDHJ3od5GILVhBCarCfVRmo4uTjkhrhzkiBV7SsaqS+TzrzM1qpGGUFt28pIySQHR6h7F6KSwGWm97ay+Z+ZqMcEjEWebE7wxCSQwpkhJqoZA5ivCdZDjJepuJ9IQjGGUmuXJdBFUygxVqVsxFsLMbDe8ZbDYVCGKxs+W080max1hFCarCfV+C1KATwcnvE9gRRuMP2prdbWGowm1KB1y+zwMMENkM755cJ2yPDtqhTI6ED1M/82yIDtC/4j4BijjeObflpO9I9MwXTCsSX8jWAFeHr05WoLTJ5G8IQVS/7vwR6ohirYM7f6HzYpogfS3R2OAAAAAElFTkSuQmCC);width:36px;height:36px}.leaflet-retina .leaflet-control-layers-toggle{background-image:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADQAAAA0CAQAAABvcdNgAAAEsklEQVR4AWL4TydIhpZK1kpWOlg0w3ZXP6D2soBtG42jeI6ZmQTHzAxiTbSJsYLjO9HhP+WOmcuhciVnmHVQcJnp7DFvScowZorad/+V/fVzMdMT2g9Cv9guXGv/7pYOrXh2U+RRR3dSd9JRx6bIFc/ekqHI29JC6pJ5ZEh1yWkhkbcFeSjxgx3L2m1cb1C7bceyxA+CNjT/Ifff+/kDk2u/w/33/IeCMOSaWZ4glosqT3DNnNZQ7Cs58/3Ce5HL78iZH/vKVIaYlqzfdLu8Vi7dnvUbEza5Idt36tquZFldl6N5Z/POLof0XLK61mZCmJSWjVF9tEjUluu74IUXvgttuVIHE7YxSkaYhJZam7yiM9Pv82JYfl9nptxZaxMJE4YSPty+vF0+Y2up9d3wwijfjZbabqm/3bZ9ecKHsiGmRflnn1MW4pjHf9oLufyn2z3y1D6n8g8TZhxyzipLNPnAUpsOiuWimg52psrTZYnOWYNDTMuWBWa0tJb4rgq1UvmutpaYEbZlwU3CLJm/ayYjHW5/h7xWLn9Hh1vepDkyf7dE7MtT5LR4e7yYpHrkhOUpEfssBLq2pPhAqoSWKUkk7EDqkmK6RrCEzqDjhNDWNE+XSMvkJRDWlZTmCW0l0PHQGRZY5t1L83kT0Y3l2SItk5JAWHl2dCOBm+fPu3fo5/3v61RMCO9Jx2EEYYhb0rmNQMX/vm7gqOEJLcXTGw3CAuRNeyaPWwjR8PRqKQ1PDA/dpv+on9Shox52WFnx0KY8onHayrJzm87i5h9xGw/tfkev0jGsQizqezUKjk12hBMKJ4kbCqGPVNXudyyrShovGw5CgxsRICxF6aRmSjlBnHRzg7Gx8fKqEubI2rahQYdR1YgDIRQO7JvQyD52hoIQx0mxa0ODtW2Iozn1le2iIRdzwWewedyZzewidueOGqlsn1MvcnQpuVwLGG3/IR1hIKxCjelIDZ8ldqWz25jWAsnldEnK0Zxro19TGVb2ffIZEsIO89EIEDvKMPrzmBOQcKQ+rroye6NgRRxqR4U8EAkz0CL6uSGOm6KQCdWjvjRiSP1BPalCRS5iQYiEIvxuBMJEWgzSoHADcVMuN7IuqqTeyUPq22qFimFtxDyBBJEwNyt6TM88blFHao/6tWWhuuOM4SAK4EI4QmFHA+SEyWlp4EQoJ13cYGzMu7yszEIBOm2rVmHUNqwAIQabISNMRstmdhNWcFLsSm+0tjJH1MdRxO5Nx0WDMhCtgD6OKgZeljJqJKc9po8juskR9XN0Y1lZ3mWjLR9JCO1jRDMd0fpYC2VnvjBSEFg7wBENc0R9HFlb0xvF1+TBEpF68d+DHR6IOWVv2BECtxo46hOFUBd/APU57WIoEwJhIi2CdpyZX0m93BZicktMj1AS9dClteUFAUNUIEygRZCtik5zSxI9MubTBH1GOiHsiLJ3OCoSZkILa9PxiN0EbvhsAo8tdAf9Seepd36lGWHmtNANTv5Jd0z4QYyeo/UEJqxKRpg5LZx6btLPsOaEmdMyxYdlc8LMaJnikDlhclqmPiQnTEpLUIZEwkRagjYkEibQErwhkTAKCLQEbUgkzJQWc/0PstHHcfEdQ+UAAAAASUVORK5CYII=);background-size:26px 26px}.leaflet-touch .leaflet-control-layers-toggle{width:44px;height:44px}.leaflet-control-layers .leaflet-control-layers-list,.leaflet-control-layers-expanded .leaflet-control-layers-toggle{display:none}.leaflet-control-layers-expanded .leaflet-control-layers-list{display:block;position:relative}.leaflet-control-layers-expanded{padding:6px 10px 6px 6px;color:#333;background:#fff}.leaflet-control-layers-scrollbar{overflow-y:scroll;overflow-x:hidden;padding-right:5px}.leaflet-control-layers-selector{margin-top:2px;position:relative;top:1px}.leaflet-control-layers label{display:block;font-size:13px;font-size:1.08333em}.leaflet-control-layers-separator{height:0;border-top:1px solid #ddd;margin:5px -10px 5px -6px}.leaflet-default-icon-path{background-image:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABkAAAApCAYAAADAk4LOAAAFgUlEQVR4Aa1XA5BjWRTN2oW17d3YaZtr2962HUzbDNpjszW24mRt28p47v7zq/bXZtrp/lWnXr337j3nPCe85NcypgSFdugCpW5YoDAMRaIMqRi6aKq5E3YqDQO3qAwjVWrD8Ncq/RBpykd8oZUb/kaJutow8r1aP9II0WmLKLIsJyv1w/kqw9Ch2MYdB++12Onxee/QMwvf4/Dk/Lfp/i4nxTXtOoQ4pW5Aj7wpici1A9erdAN2OH64x8OSP9j3Ft3b7aWkTg/Fm91siTra0f9on5sQr9INejH6CUUUpavjFNq1B+Oadhxmnfa8RfEmN8VNAsQhPqF55xHkMzz3jSmChWU6f7/XZKNH+9+hBLOHYozuKQPxyMPUKkrX/K0uWnfFaJGS1QPRtZsOPtr3NsW0uyh6NNCOkU3Yz+bXbT3I8G3xE5EXLXtCXbbqwCO9zPQYPRTZ5vIDXD7U+w7rFDEoUUf7ibHIR4y6bLVPXrz8JVZEql13trxwue/uDivd3fkWRbS6/IA2bID4uk0UpF1N8qLlbBlXs4Ee7HLTfV1j54APvODnSfOWBqtKVvjgLKzF5YdEk5ewRkGlK0i33Eofffc7HT56jD7/6U+qH3Cx7SBLNntH5YIPvODnyfIXZYRVDPqgHtLs5ABHD3YzLuespb7t79FY34DjMwrVrcTuwlT55YMPvOBnRrJ4VXTdNnYug5ucHLBjEpt30701A3Ts+HEa73u6dT3FNWwflY86eMHPk+Yu+i6pzUpRrW7SNDg5JHR4KapmM5Wv2E8Tfcb1HoqqHMHU+uWDD7zg54mz5/2BSnizi9T1Dg4QQXLToGNCkb6tb1NU+QAlGr1++eADrzhn/u8Q2YZhQVlZ5+CAOtqfbhmaUCS1ezNFVm2imDbPmPng5wmz+gwh+oHDce0eUtQ6OGDIyR0uUhUsoO3vfDmmgOezH0mZN59x7MBi++WDL1g/eEiU3avlidO671bkLfwbw5XV2P8Pzo0ydy4t2/0eu33xYSOMOD8hTf4CrBtGMSoXfPLchX+J0ruSePw3LZeK0juPJbYzrhkH0io7B3k164hiGvawhOKMLkrQLyVpZg8rHFW7E2uHOL888IBPlNZ1FPzstSJM694fWr6RwpvcJK60+0HCILTBzZLFNdtAzJaohze60T8qBzyh5ZuOg5e7uwQppofEmf2++DYvmySqGBuKaicF1blQjhuHdvCIMvp8whTTfZzI7RldpwtSzL+F1+wkdZ2TBOW2gIF88PBTzD/gpeREAMEbxnJcaJHNHrpzji0gQCS6hdkEeYt9DF/2qPcEC8RM28Hwmr3sdNyht00byAut2k3gufWNtgtOEOFGUwcXWNDbdNbpgBGxEvKkOQsxivJx33iow0Vw5S6SVTrpVq11ysA2Rp7gTfPfktc6zhtXBBC+adRLshf6sG2RfHPZ5EAc4sVZ83yCN00Fk/4kggu40ZTvIEm5g24qtU4KjBrx/BTTH8ifVASAG7gKrnWxJDcU7x8X6Ecczhm3o6YicvsLXWfh3Ch1W0k8x0nXF+0fFxgt4phz8QvypiwCCFKMqXCnqXExjq10beH+UUA7+nG6mdG/Pu0f3LgFcGrl2s0kNNjpmoJ9o4B29CMO8dMT4Q5ox8uitF6fqsrJOr8qnwNbRzv6hSnG5wP+64C7h9lp30hKNtKdWjtdkbuPA19nJ7Tz3zR/ibgARbhb4AlhavcBebmTHcFl2fvYEnW0ox9xMxKBS8btJ+KiEbq9zA4RthQXDhPa0T9TEe69gWupwc6uBUphquXgf+/FrIjweHQS4/pduMe5ERUMHUd9xv8ZR98CxkS4F2n3EUrUZ10EYNw7BWm9x1GiPssi3GgiGRDKWRYZfXlON+dfNbM+GgIwYdwAAAAASUVORK5CYII=)}.leaflet-container .leaflet-control-attribution{background:#fff;background:#fffc;margin:0}.leaflet-control-attribution,.leaflet-control-scale-line{padding:0 5px;color:#333;line-height:1.4}.leaflet-control-attribution a{text-decoration:none}.leaflet-control-attribution a:hover,.leaflet-control-attribution a:focus{text-decoration:underline}.leaflet-attribution-flag{display:inline!important;vertical-align:baseline!important;width:1em;height:.6669em}.leaflet-left .leaflet-control-scale{margin-left:5px}.leaflet-bottom .leaflet-control-scale{margin-bottom:5px}.leaflet-control-scale-line{border:2px solid #777;border-top:none;line-height:1.1;padding:2px 5px 1px;white-space:nowrap;-moz-box-sizing:border-box;box-sizing:border-box;background:#fffc;text-shadow:1px 1px #fff}.leaflet-control-scale-line:not(:first-child){border-top:2px solid #777;border-bottom:none;margin-top:-2px}.leaflet-control-scale-line:not(:first-child):not(:last-child){border-bottom:2px solid #777}.leaflet-touch .leaflet-control-attribution,.leaflet-touch .leaflet-control-layers,.leaflet-touch .leaflet-bar{box-shadow:none}.leaflet-touch .leaflet-control-layers,.leaflet-touch .leaflet-bar{border:2px solid rgba(0,0,0,.2);background-clip:padding-box}.leaflet-popup{position:absolute;text-align:center;margin-bottom:20px}.leaflet-popup-content-wrapper{padding:1px;text-align:left;border-radius:12px}.leaflet-popup-content{margin:13px 24px 13px 20px;line-height:1.3;font-size:13px;font-size:1.08333em;min-height:1px}.leaflet-popup-content p{margin:1.3em 0}.leaflet-popup-tip-container{width:40px;height:20px;position:absolute;left:50%;margin-top:-1px;margin-left:-20px;overflow:hidden;pointer-events:none}.leaflet-popup-tip{width:17px;height:17px;padding:1px;margin:-10px auto 0;pointer-events:auto;-webkit-transform:rotate(45deg);-moz-transform:rotate(45deg);-ms-transform:rotate(45deg);transform:rotate(45deg)}.leaflet-popup-content-wrapper,.leaflet-popup-tip{background:#fff;color:#333;box-shadow:0 3px 14px #0006}.leaflet-container a.leaflet-popup-close-button{position:absolute;top:0;right:0;border:none;text-align:center;width:24px;height:24px;font:16px/24px Tahoma,Verdana,sans-serif;color:#757575;text-decoration:none;background:transparent}.leaflet-container a.leaflet-popup-close-button:hover,.leaflet-container a.leaflet-popup-close-button:focus{color:#585858}.leaflet-popup-scrolled{overflow:auto}.leaflet-oldie .leaflet-popup-content-wrapper{-ms-zoom:1}.leaflet-oldie .leaflet-popup-tip{width:24px;margin:0 auto;-ms-filter:"progid:DXImageTransform.Microsoft.Matrix(M11=0.70710678, M12=0.70710678, M21=-0.70710678, M22=0.70710678)";filter:progid:DXImageTransform.Microsoft.Matrix(M11=.70710678,M12=.70710678,M21=-.70710678,M22=.70710678)}.leaflet-oldie .leaflet-control-zoom,.leaflet-oldie .leaflet-control-layers,.leaflet-oldie .leaflet-popup-content-wrapper,.leaflet-oldie .leaflet-popup-tip{border:1px solid #999}.leaflet-div-icon{background:#fff;border:1px solid #666}.leaflet-tooltip{position:absolute;padding:6px;background-color:#fff;border:1px solid #fff;border-radius:3px;color:#222;white-space:nowrap;-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;user-select:none;pointer-events:none;box-shadow:0 1px 3px #0006}.leaflet-tooltip.leaflet-interactive{cursor:pointer;pointer-events:auto}.leaflet-tooltip-top:before,.leaflet-tooltip-bottom:before,.leaflet-tooltip-left:before,.leaflet-tooltip-right:before{position:absolute;pointer-events:none;border:6px solid transparent;background:transparent;content:""}.leaflet-tooltip-bottom{margin-top:6px}.leaflet-tooltip-top{margin-top:-6px}.leaflet-tooltip-bottom:before,.leaflet-tooltip-top:before{left:50%;margin-left:-6px}.leaflet-tooltip-top:before{bottom:0;margin-bottom:-12px;border-top-color:#fff}.leaflet-tooltip-bottom:before{top:0;margin-top:-12px;margin-left:-6px;border-bottom-color:#fff}.leaflet-tooltip-left{margin-left:-6px}.leaflet-tooltip-right{margin-left:6px}.leaflet-tooltip-left:before,.leaflet-tooltip-right:before{top:50%;margin-top:-6px}.leaflet-tooltip-left:before{right:0;margin-right:-12px;border-left-color:#fff}.leaflet-tooltip-right:before{left:0;margin-left:-12px;border-right-color:#fff}@media print{.leaflet-control{-webkit-print-color-adjust:exact;print-color-adjust:exact}}';
+function nl(c) {
   return [...c].sort((i, r) => {
     const o = i.started_at ? Date.parse(i.started_at) : Number.POSITIVE_INFINITY, l = r.started_at ? Date.parse(r.started_at) : Number.POSITIVE_INFINITY;
     return o !== l ? o - l : i.id.localeCompare(r.id);
   });
 }
-const Yr = ["#1976d2", "#d32f2f", "#388e3c", "#7b1fa2", "#f57c00", "#00796b"], il = tl.replace(/\s+/g, " ").trim();
-function ii(c, i) {
+const Yr = ["#1976d2", "#d32f2f", "#388e3c", "#7b1fa2", "#f57c00", "#00796b"], rl = il.replace(/\s+/g, " ").trim();
+function ni(c, i) {
   return typeof c == "number" && typeof i == "number" && Number.isFinite(c) && Number.isFinite(i) && c >= -90 && c <= 90 && i >= -180 && i <= 180;
 }
 function on(c) {
-  return ii(c?.latitude, c?.longitude);
+  return ni(c?.latitude, c?.longitude);
 }
 class us extends Nt {
   trips = [];
@@ -8624,16 +8624,16 @@ class us extends Nt {
     if (!(!this.hass || !this.vehicleId)) {
       this.fitMapPending ||= i, this.loading = !0, this.error = "", this.requestUpdate();
       try {
-        const r = await ci(this.hass);
-        this.vehicleName = r.find((f) => f.vehicle_id === this.vehicleId)?.name ?? "";
+        const r = await ui(this.hass);
+        this.vehicleName = r.find((m) => m.vehicle_id === this.vehicleId)?.name ?? "";
         const o = await Rt(this.hass, this.vehicleId);
         this.mapConfig = o.map_config, this.trips = o.trips;
-        const l = this.config.trip_id ?? "", d = ui(this.vehicleId);
-        l && this.trips.some((f) => f.id === l) ? this.selectedTripId = l : d && this.trips.some((f) => f.id === d) && (this.selectedTripId = d), (!this.selectedTripId || !this.trips.some((f) => f.id === this.selectedTripId)) && (this.selectedTripId = this.trips.find((f) => f.status === "active")?.id ?? this.trips[0]?.id ?? ""), this.selectedTripId && !l && Ot({ vehicleId: this.vehicleId, tripId: this.selectedTripId, source: "map" });
+        const l = this.config.trip_id ?? "", d = pi(this.vehicleId);
+        l && this.trips.some((m) => m.id === l) ? this.selectedTripId = l : d && this.trips.some((m) => m.id === d) && (this.selectedTripId = d), (!this.selectedTripId || !this.trips.some((m) => m.id === this.selectedTripId)) && (this.selectedTripId = this.trips.find((m) => m.status === "active")?.id ?? this.trips[0]?.id ?? ""), this.selectedTripId && !l && Ot({ vehicleId: this.vehicleId, tripId: this.selectedTripId, source: "map" });
         const p = this.selectedTripId ? await Rt(this.hass, this.vehicleId, this.selectedTripId) : o;
-        this.mapConfig = p.map_config ?? this.mapConfig, this.drives = el(p.drives), this.places = p.stops ?? [];
-        const y = new Set(this.drives.map((f) => f.id));
-        this.selectedDriveIds = this.selectedDriveIds.filter((f) => y.has(f)), this.driveSelectionInitialized || (this.selectedDriveIds = this.drives.map((f) => f.id), this.driveSelectionInitialized = !0), this.data = await yo(this.hass, this.vehicleId, this.selectedTripId || void 0, this.selectedDriveIds);
+        this.mapConfig = p.map_config ?? this.mapConfig, this.drives = nl(p.drives), this.places = p.stops ?? [];
+        const y = new Set(this.drives.map((m) => m.id));
+        this.selectedDriveIds = this.selectedDriveIds.filter((m) => y.has(m)), this.driveSelectionInitialized || (this.selectedDriveIds = this.drives.map((m) => m.id), this.driveSelectionInitialized = !0), this.data = await yo(this.hass, this.vehicleId, this.selectedTripId || void 0, this.selectedDriveIds);
       } catch {
         this.error = w(this.hass).loadError, this.data = void 0;
       } finally {
@@ -8660,34 +8660,34 @@ class us extends Nt {
     for (const y of this.layers) y.remove();
     this.layers = [];
     const d = mt.latLngBounds([]), p = w(this.hass);
-    for (const [y, f] of (this.data?.segments ?? []).entries()) {
+    for (const [y, m] of (this.data?.segments ?? []).entries()) {
       const v = [];
       let k = [];
-      for (const $ of f.points)
+      for (const $ of m.points)
         on($) ? k.push($) : k.length && (v.push(k), k = []);
       if (k.length && v.push(k), !v.length) continue;
-      const b = this.drives.findIndex(($) => $.id === f.drive_id), D = this.driveColor(b >= 0 ? b : y);
+      const b = this.drives.findIndex(($) => $.id === m.drive_id), D = this.driveColor(b >= 0 ? b : y);
       for (const $ of v) {
-        const I = $.map((H) => mt.latLng(H.latitude, H.longitude));
-        I.length > 1 && this.layers.push(mt.polyline(I, { color: D, weight: 4, opacity: 0.85 }).addTo(this.map)), I.forEach((H) => d.extend(H));
-        const R = mt.circleMarker(I[0], { radius: 6, color: D, fillOpacity: 1 }).bindTooltip(p.mapStart).bindPopup(this.endpointPopup(p.mapStart, $[0])).addTo(this.map), E = mt.circleMarker(I[I.length - 1], { radius: 6, color: "#111", fillColor: D, fillOpacity: 1 }).bindTooltip(p.mapEnd).bindPopup(this.endpointPopup(p.mapEnd, $[$.length - 1])).addTo(this.map);
+        const A = $.map((H) => mt.latLng(H.latitude, H.longitude));
+        A.length > 1 && this.layers.push(mt.polyline(A, { color: D, weight: 4, opacity: 0.85 }).addTo(this.map)), A.forEach((H) => d.extend(H));
+        const R = mt.circleMarker(A[0], { radius: 6, color: D, fillOpacity: 1 }).bindTooltip(p.mapStart).bindPopup(this.endpointPopup(p.mapStart, $[0])).addTo(this.map), E = mt.circleMarker(A[A.length - 1], { radius: 6, color: "#111", fillColor: D, fillOpacity: 1 }).bindTooltip(p.mapEnd).bindPopup(this.endpointPopup(p.mapEnd, $[$.length - 1])).addTo(this.map);
         this.layers.push(R, E);
       }
-      for (const $ of f.gaps) {
-        const I = v.find((H) => H.length);
-        if (!I) continue;
-        const R = mt.latLng(I[Math.max(0, Math.floor(I.length / 2))].latitude, I[Math.max(0, Math.floor(I.length / 2))].longitude), E = mt.circleMarker(R, { radius: 8, color: "#f57c00", fillOpacity: 0.9 }).bindTooltip(`${p.mapGap}: ${$.seconds}s`).addTo(this.map);
+      for (const $ of m.gaps) {
+        const A = v.find((H) => H.length);
+        if (!A) continue;
+        const R = mt.latLng(A[Math.max(0, Math.floor(A.length / 2))].latitude, A[Math.max(0, Math.floor(A.length / 2))].longitude), E = mt.circleMarker(R, { radius: 8, color: "#f57c00", fillOpacity: 0.9 }).bindTooltip(`${p.mapGap}: ${$.seconds}s`).addTo(this.map);
         this.layers.push(E);
       }
     }
     for (const y of this.places) {
-      if (!this.showPlaces || y.confirmed === !1 || !ii(y.latitude, y.longitude)) continue;
-      const f = y.latitude, v = y.longitude, k = ["campsite", "rv_site", "wild_camp", "overnight"].includes(y.place_kind || y.place_type || y.stop_type), b = mt.circleMarker([f, v], { radius: k ? 9 : 7, color: k ? "#7b1fa2" : "#455a64", fillColor: k ? "#ce93d8" : "#90a4ae", fillOpacity: 0.95, weight: 2 }), D = y.rating_overall ? ` · ${y.rating_overall}/5` : "", $ = document.createElement("div"), I = document.createElement("strong");
-      I.textContent = y.name || "Ort", $.append(I, document.createElement("br")), $.append(document.createTextNode(`${y.place_type || y.stop_type}${D}`), document.createElement("br")), $.append(document.createTextNode(y.description || "")), b.bindPopup($), b.addTo(this.map), this.layers.push(b), d.extend([f, v]);
+      if (!this.showPlaces || y.confirmed === !1 || !ni(y.latitude, y.longitude)) continue;
+      const m = y.latitude, v = y.longitude, k = ["campsite", "rv_site", "wild_camp", "overnight"].includes(y.place_kind || y.place_type || y.stop_type), b = mt.circleMarker([m, v], { radius: k ? 9 : 7, color: k ? "#7b1fa2" : "#455a64", fillColor: k ? "#ce93d8" : "#90a4ae", fillOpacity: 0.95, weight: 2 }), D = y.rating_overall ? ` · ${y.rating_overall}/5` : "", $ = document.createElement("div"), A = document.createElement("strong");
+      A.textContent = y.name || "Ort", $.append(A, document.createElement("br")), $.append(document.createTextNode(`${y.place_type || y.stop_type}${D}`), document.createElement("br")), $.append(document.createTextNode(y.description || "")), b.bindPopup($), b.addTo(this.map), this.layers.push(b), d.extend([m, v]);
     }
-    if (this.draftPoint && ii(this.draftPoint.latitude, this.draftPoint.longitude)) {
-      const y = this.draftPoint.latitude, f = this.draftPoint.longitude, v = mt.circleMarker([y, f], { radius: 10, color: "#f57c00", fillColor: "#ffcc80", fillOpacity: 0.9, weight: 3 }).bindTooltip(p.mapAddPlace ?? "Ort hinzufügen").addTo(this.map);
-      this.layers.push(v), d.extend([y, f]);
+    if (this.draftPoint && ni(this.draftPoint.latitude, this.draftPoint.longitude)) {
+      const y = this.draftPoint.latitude, m = this.draftPoint.longitude, v = mt.circleMarker([y, m], { radius: 10, color: "#f57c00", fillColor: "#ffcc80", fillOpacity: 0.9, weight: 3 }).bindTooltip(p.mapAddPlace ?? "Ort hinzufügen").addTo(this.map);
+      this.layers.push(v), d.extend([y, m]);
     }
     if (this.fitMapPending && d.isValid()) {
       const y = this.map;
@@ -8773,33 +8773,33 @@ class us extends Nt {
   }
   driveRow(i, r) {
     const o = w(this.hass), l = i.source === "manual" ? o.sourceManual : i.source === "gpx" ? o.sourceGpx ?? o.sourceGps : o.sourceGps;
-    return m`<label class="drive-row" style=${`--drive-color:${this.driveColor(r)}`}>
+    return f`<label class="drive-row" style=${`--drive-color:${this.driveColor(r)}`}>
       <input type="checkbox" value=${i.id} .checked=${this.selectedDriveIds.includes(i.id)} @change=${(d) => {
       this.toggleDrive(d);
     }}>
-      <span class="drive-info"><strong>${se(i.started_at, this.hass)} · ${ai(i.started_at, this.hass)} → ${i.ended_at ? `${se(i.ended_at, this.hass)} · ${ai(i.ended_at, this.hass)}` : "–"}</strong><span>${(i.distance_m / 1e3).toFixed(1)} km · ${i.duration_seconds ? At(i.duration_seconds, this.hass) : "–"} · ${l}</span></span>
+      <span class="drive-info"><strong>${se(i.started_at, this.hass)} · ${oi(i.started_at, this.hass)} → ${i.ended_at ? `${se(i.ended_at, this.hass)} · ${oi(i.ended_at, this.hass)}` : "–"}</strong><span>${(i.distance_m / 1e3).toFixed(1)} km · ${i.duration_seconds ? It(i.duration_seconds, this.hass) : "–"} · ${l}</span></span>
     </label>`;
   }
   renderPlaceCapture(i, r) {
-    return r ? this.addPlaceMode ? this.draftPoint ? m`<section class="map-place-capture"><button type="button" @click=${() => this.toggleAddPlace()}>${i.mapCancelPlace ?? "Ortserfassung abbrechen"}</button><p class="muted">${i.mapPlaceHint}</p><form class="form-grid" @submit=${(o) => {
+    return r ? this.addPlaceMode ? this.draftPoint ? f`<section class="map-place-capture"><button type="button" @click=${() => this.toggleAddPlace()}>${i.mapCancelPlace ?? "Ortserfassung abbrechen"}</button><p class="muted">${i.mapPlaceHint}</p><form class="form-grid" @submit=${(o) => {
       o.preventDefault(), this.saveDraftPlace();
-    }}><input aria-label=${i.placeName ?? "Name"} placeholder=${i.placeName ?? "Name"} .value=${this.draftName} @input=${(o) => this.draftName = o.currentTarget.value} required><select aria-label=${i.placeCategory ?? "Kategorie"} .value=${this.draftType} @change=${(o) => this.draftType = o.currentTarget.value}><option value="other">${i.placeOther ?? "Sonstiger Ort"}</option><option value="fuel_stop">${i.placeFuel ?? "Tankpause"}</option><option value="restaurant">${i.placeRestaurant ?? "Restaurant"}</option><option value="attraction">${i.placeAttraction ?? "Sehenswürdigkeit"}</option><option value="ferry">${i.placeFerry ?? "Fähre"}</option><option value="campsite">${i.placeCampsite ?? "Campingplatz"}</option><option value="rv_site">${i.placeRvSite ?? "Wohnmobilstellplatz"}</option><option value="wild_camp">${i.placeWildCamp ?? "Freistehplatz"}</option></select><label>${i.placeArrived ?? "Ankunft"}<input type="datetime-local" .value=${this.draftArrived} @input=${(o) => this.draftArrived = o.currentTarget.value} required></label><textarea aria-label=${i.placeDescription ?? "Beschreibung"} placeholder=${i.placeDescription ?? "Beschreibung"} .value=${this.draftDescription} @input=${(o) => this.draftDescription = o.currentTarget.value}></textarea><button type="submit" ?disabled=${this.draftSaving}>${this.draftSaving ? i.saving : i.save}</button></form></section>` : m`<section class="map-place-capture"><button type="button" @click=${() => this.toggleAddPlace()}>${i.mapCancelPlace ?? "Ortserfassung abbrechen"}</button><p class="muted">${i.mapPlaceHint}</p></section>` : m`<section class="map-place-capture"><button type="button" @click=${() => this.toggleAddPlace()}>${i.mapAddPlace ?? "Ort hinzufügen"}</button></section>` : "";
+    }}><input aria-label=${i.placeName ?? "Name"} placeholder=${i.placeName ?? "Name"} .value=${this.draftName} @input=${(o) => this.draftName = o.currentTarget.value} required><select aria-label=${i.placeCategory ?? "Kategorie"} .value=${this.draftType} @change=${(o) => this.draftType = o.currentTarget.value}><option value="other">${i.placeOther ?? "Sonstiger Ort"}</option><option value="fuel_stop">${i.placeFuel ?? "Tankpause"}</option><option value="restaurant">${i.placeRestaurant ?? "Restaurant"}</option><option value="attraction">${i.placeAttraction ?? "Sehenswürdigkeit"}</option><option value="ferry">${i.placeFerry ?? "Fähre"}</option><option value="campsite">${i.placeCampsite ?? "Campingplatz"}</option><option value="rv_site">${i.placeRvSite ?? "Wohnmobilstellplatz"}</option><option value="wild_camp">${i.placeWildCamp ?? "Freistehplatz"}</option></select><label>${i.placeArrived ?? "Ankunft"}<input type="datetime-local" .value=${this.draftArrived} @input=${(o) => this.draftArrived = o.currentTarget.value} required></label><textarea aria-label=${i.placeDescription ?? "Beschreibung"} placeholder=${i.placeDescription ?? "Beschreibung"} .value=${this.draftDescription} @input=${(o) => this.draftDescription = o.currentTarget.value}></textarea><button type="submit" ?disabled=${this.draftSaving}>${this.draftSaving ? i.saving : i.save}</button></form></section>` : f`<section class="map-place-capture"><button type="button" @click=${() => this.toggleAddPlace()}>${i.mapCancelPlace ?? "Ortserfassung abbrechen"}</button><p class="muted">${i.mapPlaceHint}</p></section>` : f`<section class="map-place-capture"><button type="button" @click=${() => this.toggleAddPlace()}>${i.mapAddPlace ?? "Ort hinzufügen"}</button></section>` : "";
   }
   render() {
-    const i = w(this.hass), r = this.config, o = this.selectedTrip(), l = this.selectedDrives(), d = l.reduce((v, k) => v + k.distance_m, 0) / 1e3, p = r.tile_attribution ?? this.mapConfig?.tile_attribution ?? void 0, y = (this.data?.segments ?? []).some((v) => v.points.some(on)), f = this.showPlaces && this.places.some((v) => v.confirmed !== !1 && ii(v.latitude, v.longitude));
-    return m`<ha-card>
+    const i = w(this.hass), r = this.config, o = this.selectedTrip(), l = this.selectedDrives(), d = l.reduce((v, k) => v + k.distance_m, 0) / 1e3, p = r.tile_attribution ?? this.mapConfig?.tile_attribution ?? void 0, y = (this.data?.segments ?? []).some((v) => v.points.some(on)), m = this.showPlaces && this.places.some((v) => v.confirmed !== !1 && ni(v.latitude, v.longitude));
+    return f`<ha-card>
       <header class="map-header">
         <div><h2>${i.mapTitle}</h2><p class="vehicle-context">${this.vehicleName || i.mapVehicle}</p></div>
-        ${this.trips.length && !r.trip_id ? m`<label class="trip-picker"><span>${i.mapTrip}</span><select @change=${(v) => {
+        ${this.trips.length && !r.trip_id ? f`<label class="trip-picker"><span>${i.mapTrip}</span><select @change=${(v) => {
       this.selectTrip(v);
-    }} .value=${this.selectedTripId}>${this.trips.map((v) => m`<option value=${v.id}>${v.title}</option>`)}</select></label>` : ""}
+    }} .value=${this.selectedTripId}>${this.trips.map((v) => f`<option value=${v.id}>${v.title}</option>`)}</select></label>` : ""}
       </header>
-      ${o ? m`<div class="metrics" aria-label=${i.mapTrip}>
+      ${o ? f`<div class="metrics" aria-label=${i.mapTrip}>
         <div class="metric"><span>${i.mapTotalDistance}</span><strong>${d.toFixed(1)} km</strong></div>
         <div class="metric"><span>${i.mapSelectedDrives}</span><strong>${l.length} / ${this.drives.length}</strong></div>
         <div class="metric"><span>${i.mapTripPeriod}</span><strong>${po(o, this.hass) || "–"}</strong></div>
       </div>` : ""}
-      ${this.drives.length ? m`<details class="drive-details" .open=${this.driveSectionsOpen} @toggle=${(v) => this.onDriveSectionsToggle(v)}>
+      ${this.drives.length ? f`<details class="drive-details" .open=${this.driveSectionsOpen} @toggle=${(v) => this.onDriveSectionsToggle(v)}>
         <summary><span>${i.mapDriveSegments}</span><span class="summary-count">${l.length} / ${this.drives.length}</span></summary>
         <div class="drive-actions"><button class="secondary" type="button" @click=${() => {
       this.selectAllDrives();
@@ -8812,17 +8812,17 @@ class us extends Nt {
       this.showPlaces = v.currentTarget.checked, this.queueMapRender(), this.requestUpdate();
     }}> ${i.mapPlaces ?? "Orte anzeigen"}</label>
       ${this.renderPlaceCapture(i, o)}
-      ${this.error ? m`<p class="error" role="alert">${this.error}</p>` : ""}
-      ${this.tileError ? m`<p class="error" role="alert">${w(this.hass).mapTilesUnavailable ?? (this.hass?.locale?.language?.toLowerCase().startsWith("de") ? "Die Hintergrundkarte konnte nicht geladen werden. Die GPS-Route bleibt sichtbar." : "The background map could not be loaded. The GPS route remains visible.")}</p>` : !r.tile_url && !this.mapConfig?.tile_url ? m`<p class="muted" role="status">${w(this.hass).mapTilesNotConfigured ?? (this.hass?.locale?.language?.toLowerCase().startsWith("de") ? "Keine Hintergrundkarte konfiguriert. Die GPS-Route bleibt sichtbar." : "No background map is configured. The GPS route remains visible.")}</p>` : ""}
-      ${this.data?.truncated ? m`<p class="muted">${i.mapTruncated}: ${this.data.returned_points} / ${this.data.total_points}</p>` : ""}
-      ${!this.loading && !y ? m`<p class="muted" role="status">${f ? i.mapNoRouteWithPlaces ?? "No valid GPS route is available; saved places are shown." : i.mapNoValidPoints ?? "No valid GPS points are available for this trip."}</p>` : ""}
+      ${this.error ? f`<p class="error" role="alert">${this.error}</p>` : ""}
+      ${this.tileError ? f`<p class="error" role="alert">${w(this.hass).mapTilesUnavailable ?? (this.hass?.locale?.language?.toLowerCase().startsWith("de") ? "Die Hintergrundkarte konnte nicht geladen werden. Die GPS-Route bleibt sichtbar." : "The background map could not be loaded. The GPS route remains visible.")}</p>` : !r.tile_url && !this.mapConfig?.tile_url ? f`<p class="muted" role="status">${w(this.hass).mapTilesNotConfigured ?? (this.hass?.locale?.language?.toLowerCase().startsWith("de") ? "Keine Hintergrundkarte konfiguriert. Die GPS-Route bleibt sichtbar." : "No background map is configured. The GPS route remains visible.")}</p>` : ""}
+      ${this.data?.truncated ? f`<p class="muted">${i.mapTruncated}: ${this.data.returned_points} / ${this.data.total_points}</p>` : ""}
+      ${!this.loading && !y ? f`<p class="muted" role="status">${m ? i.mapNoRouteWithPlaces ?? "No valid GPS route is available; saved places are shown." : i.mapNoValidPoints ?? "No valid GPS points are available for this trip."}</p>` : ""}
       <div class="map" role="img" aria-label=${i.mapRouteImageAlt}></div>
-      ${p ? m`<p class="attribution">${p}</p>` : ""}
-      ${this.loading ? m`<p class="muted">${i.loading}</p>` : ""}
+      ${p ? f`<p class="attribution">${p}</p>` : ""}
+      ${this.loading ? f`<p class="muted">${i.loading}</p>` : ""}
     </ha-card>`;
   }
 }
-us.styles = [Nt.styles, ts(il), gt`
+us.styles = [Nt.styles, ts(rl), gt`
   :host { min-width: 0; }
   ha-card { overflow: hidden; }
   .map-header { display: flex; align-items: end; justify-content: space-between; gap: 12px; margin-bottom: 12px; }
@@ -8861,7 +8861,7 @@ us.styles = [Nt.styles, ts(il), gt`
     .map { height: clamp(300px, 62vh, 560px); }
   }
 `];
-di("camper-travel-journal-map-card", us);
+ci("camper-travel-journal-map-card", us);
 const ps = [
   "overview",
   "drives",
@@ -8871,7 +8871,7 @@ const ps = [
   "gpx",
   "pdf",
   "tankbook"
-], nl = [
+], sl = [
   "overview",
   "drives",
   "stays",
@@ -8889,19 +8889,19 @@ function oe(c, i) {
   const r = cn(c), o = cn(i), l = r.length ? r : o;
   return [...l, ...ps.filter((d) => !l.includes(d))];
 }
-function ni(c) {
-  return Array.isArray(c) ? cn(c) : [...nl];
+function ri(c) {
+  return Array.isArray(c) ? cn(c) : [...sl];
 }
-function oi(c, i) {
-  const r = new Set(ni(c));
+function li(c, i) {
+  const r = new Set(ri(c));
   return oe(i, c).filter((o) => r.has(o));
 }
-function rl(c, i, r, o) {
+function al(c, i, r, o) {
   const l = oe(c, r), d = oe(i, o);
   return l.length === d.length && l.every((p, y) => p === d[y]);
 }
-function sl(c, i, r, o) {
-  const l = oi(c, r), d = oi(i, o);
+function ol(c, i, r, o) {
+  const l = li(c, r), d = li(i, o);
   return l.length === d.length && l.every((p, y) => p === d[y]);
 }
 const Xr = /* @__PURE__ */ new Set(["campsite", "rv_site", "wild_camp", "overnight"]);
@@ -8933,14 +8933,17 @@ class fs extends Nt {
   overviewRequest = 0;
   detailRequest = 0;
   tankbook;
+  fuelExpenses = [];
+  fuelImportDialogOpen = !1;
+  tankbookExpenseId = "";
   tankbookEditingId = "";
   tankbookSaving = !1;
   tankbookForm = { occurred_at: "", fuel_type: "diesel", liters: "", price_per_liter: "", amount_minor: "", odometer_km: "", fill_level: "unknown", station: "", note: "" };
   connectedCallback() {
-    super.connectedCallback(), window.addEventListener(wt, this.onActiveTripChanged), window.addEventListener(Ie, this.onTravelDataChanged), this.refreshOverview();
+    super.connectedCallback(), window.addEventListener(wt, this.onActiveTripChanged), window.addEventListener(Le, this.onTravelDataChanged), this.refreshOverview();
   }
   disconnectedCallback() {
-    window.removeEventListener(wt, this.onActiveTripChanged), window.removeEventListener(Ie, this.onTravelDataChanged), super.disconnectedCallback();
+    window.removeEventListener(wt, this.onActiveTripChanged), window.removeEventListener(Le, this.onTravelDataChanged), super.disconnectedCallback();
   }
   onHassConnectionChanged() {
     this.refreshOverview();
@@ -8953,6 +8956,8 @@ class fs extends Nt {
     i && (this.interruptionDialog && !i.open && i.showModal(), !this.interruptionDialog && i.open && i.close());
     const r = this.renderRoot.querySelector("dialog.drive-delete-dialog");
     r && (this.deletingDrive && !r.open && r.showModal(), !this.deletingDrive && r.open && r.close());
+    const o = this.renderRoot.querySelector("dialog.fuel-import-dialog");
+    o && (this.fuelImportDialogOpen && !o.open && o.showModal(), !this.fuelImportDialogOpen && o.open && o.close());
   }
   async refreshOverview() {
     if (!this.hass || !this.vehicleId) return !1;
@@ -8963,11 +8968,11 @@ class fs extends Nt {
       if (i !== this.overviewRequest) return !1;
       this.overview = r, this.openTripId && !r.trips.some((l) => l.id === this.openTripId) && (this.openTripId = "", this.detail = void 0, jr(this.vehicleId, "journal"));
       try {
-        this.vehicleName = (await ci(this.hass)).find((l) => l.vehicle_id === this.vehicleId)?.name ?? "";
+        this.vehicleName = (await ui(this.hass)).find((l) => l.vehicle_id === this.vehicleId)?.name ?? "";
       } catch {
         this.vehicleName = "";
       }
-      const o = ui(this.vehicleId);
+      const o = pi(this.vehicleId);
       return this.selectedTripId = this.overview.trips.some((l) => l.id === (this.openTripId || o)) ? this.openTripId || o : "", this.openTripId && this.overview.trips.some((l) => l.id === this.openTripId) && await this.loadDetail(this.openTripId), !0;
     } catch {
       return i === this.overviewRequest && (this.error = w(this.hass).loadError), !1;
@@ -8977,34 +8982,61 @@ class fs extends Nt {
   }
   async loadDetail(i) {
     if (!this.hass || !i) return;
-    const r = ++this.detailRequest, o = await Rt(this.hass, this.vehicleId, i), l = this.tankbookEnabled() ? await Xi(this.hass, this.vehicleId) : void 0;
+    const r = ++this.detailRequest, o = await Rt(this.hass, this.vehicleId, i), l = this.tankbookEnabled() ? await ei(this.hass, this.vehicleId) : void 0;
     r === this.detailRequest && this.openTripId === i && (this.detail = o, this.tankbook = l);
   }
   tankbookEnabled() {
-    return oi(this.config.modules, this.config.module_order).includes("tankbook");
+    return li(this.config.modules, this.config.module_order).includes("tankbook");
   }
   editTankEvent(i) {
-    this.tankbookEditingId = i.id, this.tankbookForm = { occurred_at: i.occurred_at.slice(0, 16), fuel_type: i.fuel_type, liters: String(i.liters), price_per_liter: i.price_per_liter == null ? "" : String(i.price_per_liter), amount_minor: i.amount_minor == null ? "" : String(i.amount_minor / 100), odometer_km: i.odometer_km == null ? "" : String(i.odometer_km), fill_level: i.fill_level, station: i.station ?? "", note: i.note ?? "" }, this.requestUpdate();
+    this.tankbookEditingId = i.id, this.tankbookExpenseId = i.expense_id ?? "", this.tankbookForm = { occurred_at: i.occurred_at.slice(0, 16), fuel_type: i.fuel_type, liters: String(i.liters), price_per_liter: i.price_per_liter == null ? "" : String(i.price_per_liter), amount_minor: i.amount_minor == null ? "" : String(i.amount_minor / 100), odometer_km: i.odometer_km == null ? "" : String(i.odometer_km), fill_level: i.fill_level, station: i.station ?? "", note: i.note ?? "" }, this.requestUpdate();
   }
   resetTankEventForm() {
-    this.tankbookEditingId = "", this.tankbookForm = { occurred_at: (/* @__PURE__ */ new Date()).toISOString().slice(0, 16), fuel_type: "diesel", liters: "", price_per_liter: "", amount_minor: "", odometer_km: "", fill_level: "unknown", station: "", note: "" };
+    this.tankbookEditingId = "", this.tankbookExpenseId = "", this.tankbookForm = { occurred_at: (/* @__PURE__ */ new Date()).toISOString().slice(0, 16), fuel_type: "diesel", liters: "", price_per_liter: "", amount_minor: "", odometer_km: "", fill_level: "unknown", station: "", note: "" };
   }
   async saveTankEvent() {
     if (!this.hass || this.tankbookSaving || !this.tankbookForm.occurred_at) return;
     this.tankbookSaving = !0, this.requestUpdate();
-    const i = { occurred_at: new Date(this.tankbookForm.occurred_at).toISOString(), fuel_type: this.tankbookForm.fuel_type, liters: Number(this.tankbookForm.liters), fill_level: this.tankbookForm.fill_level, price_per_liter: this.tankbookForm.price_per_liter ? Number(this.tankbookForm.price_per_liter) : void 0, amount_minor: this.tankbookForm.amount_minor ? Math.round(Number(this.tankbookForm.amount_minor) * 100) : void 0, odometer_km: this.tankbookForm.odometer_km ? Number(this.tankbookForm.odometer_km) : void 0, station: this.tankbookForm.station.trim() || void 0, note: this.tankbookForm.note.trim() || void 0 };
+    const i = { occurred_at: new Date(this.tankbookForm.occurred_at).toISOString(), fuel_type: this.tankbookForm.fuel_type, liters: Number(this.tankbookForm.liters), fill_level: this.tankbookForm.fill_level, price_per_liter: this.tankbookForm.price_per_liter ? Number(this.tankbookForm.price_per_liter) : void 0, amount_minor: this.tankbookForm.amount_minor ? Math.round(Number(this.tankbookForm.amount_minor) * 100) : void 0, odometer_km: this.tankbookForm.odometer_km ? Number(this.tankbookForm.odometer_km) : void 0, station: this.tankbookForm.station.trim() || void 0, note: this.tankbookForm.note.trim() || void 0, expense_id: this.tankbookExpenseId || void 0 };
     try {
-      this.tankbookEditingId ? await Uo(this.hass, this.vehicleId, this.tankbookEditingId, i) : await Zo(this.hass, this.vehicleId, i), this.tankbook = await Xi(this.hass, this.vehicleId), this.resetTankEventForm();
+      this.tankbookEditingId ? await Wo(this.hass, this.vehicleId, this.tankbookEditingId, i) : await Uo(this.hass, this.vehicleId, i), this.tankbook = await ei(this.hass, this.vehicleId), this.resetTankEventForm();
     } catch (r) {
       this.error = r instanceof Error ? r.message : w(this.hass).loadError;
     } finally {
       this.tankbookSaving = !1, this.requestUpdate();
     }
   }
+  async openFuelImportDialog() {
+    if (!(!this.hass || this.fuelImportDialogOpen)) {
+      this.fuelImportDialogOpen = !0, this.fuelExpenses = [], this.requestUpdate();
+      try {
+        this.fuelExpenses = await Zo(this.hass, this.vehicleId);
+      } catch (i) {
+        this.error = i instanceof Error ? i.message : w(this.hass).loadError, this.fuelImportDialogOpen = !1;
+      } finally {
+        this.requestUpdate();
+      }
+    }
+  }
+  closeFuelImportDialog() {
+    this.fuelImportDialogOpen = !1, this.requestUpdate();
+  }
+  importFuelExpense(i) {
+    const r = i.occurred_on || i.occurred_at.slice(0, 10), o = i.occurred_time || i.occurred_at.slice(11, 16);
+    this.tankbookExpenseId = i.id, this.tankbookForm = { occurred_at: `${r}T${o}`, fuel_type: "other", liters: i.fuel_liters == null ? "" : String(i.fuel_liters), price_per_liter: i.fuel_price_per_liter == null ? "" : String(i.fuel_price_per_liter), amount_minor: String(i.amount_minor / 100), odometer_km: i.odometer_km == null ? "" : String(i.odometer_km), fill_level: "unknown", station: "", note: i.note ?? "" }, this.closeFuelImportDialog();
+  }
+  async unlinkTankEventLink(i) {
+    if (!(!this.hass || !i.expense_id || !window.confirm("Verknüpfung zwischen Kosten und Tankbuch wirklich lösen?")))
+      try {
+        await Ho(this.hass, this.vehicleId, i.id), this.tankbook = await ei(this.hass, this.vehicleId), this.tankbookExpenseId = "", this.requestUpdate();
+      } catch (r) {
+        this.error = r instanceof Error ? r.message : w(this.hass).loadError, this.requestUpdate();
+      }
+  }
   async removeTankEvent(i) {
     if (!(!this.hass || !window.confirm(`Tankvorgang vom ${W(i.occurred_at, this.hass)} löschen?`)))
       try {
-        await Wo(this.hass, this.vehicleId, i.id), this.tankbook = await Xi(this.hass, this.vehicleId), this.tankbookEditingId === i.id && this.resetTankEventForm(), this.requestUpdate();
+        await qo(this.hass, this.vehicleId, i.id), this.tankbook = await ei(this.hass, this.vehicleId), this.tankbookEditingId === i.id && this.resetTankEventForm(), this.requestUpdate();
       } catch (r) {
         this.error = r instanceof Error ? r.message : w(this.hass).loadError, this.requestUpdate();
       }
@@ -9096,7 +9128,7 @@ class fs extends Nt {
     }
   }
   section(i, r, o, l, d = !1) {
-    return m`<section class="journal-section"><details ?open=${d} @toggle=${(p) => this.onSectionToggle(p)}><summary><span class="section-title"><span aria-hidden="true">${r}</span><strong>${i}</strong></span>${o === void 0 ? "" : m`<span class="count">${o}</span>`}</summary><div class="section-content">${l}</div></details></section>`;
+    return f`<section class="journal-section"><details ?open=${d} @toggle=${(p) => this.onSectionToggle(p)}><summary><span class="section-title"><span aria-hidden="true">${r}</span><strong>${i}</strong></span>${o === void 0 ? "" : f`<span class="count">${o}</span>`}</summary><div class="section-content">${l}</div></details></section>`;
   }
   onSectionToggle(i) {
     const r = i.currentTarget;
@@ -9106,13 +9138,22 @@ class fs extends Nt {
   }
   renderTankbook(i) {
     const r = this.tankbook?.events ?? [], o = this.tankbook?.consumption?.intervals?.diesel ?? [], l = (d) => d === "measured" ? "gemessen" : d === "estimated" ? "geschätzt" : d === "incomplete" ? "unvollständig" : "nicht berechenbar";
-    return m`<div class="tankbook"><form class="form-grid tankbook-form" @submit=${(d) => {
+    return f`<div class="tankbook"><form class="form-grid tankbook-form" @submit=${(d) => {
       d.preventDefault(), this.saveTankEvent();
-    }}><label>Datum/Zeit<input type="datetime-local" .value=${this.tankbookForm.occurred_at} @input=${(d) => this.tankbookForm.occurred_at = d.currentTarget.value} required></label><label>Betriebsstoff<select .value=${this.tankbookForm.fuel_type} @change=${(d) => this.tankbookForm.fuel_type = d.currentTarget.value}><option value="diesel">Diesel</option><option value="adblue">AdBlue</option><option value="other">Sonstiges</option></select></label><label>Liter<input type="number" min="0.001" step="0.001" .value=${this.tankbookForm.liters} @input=${(d) => this.tankbookForm.liters = d.currentTarget.value} required></label><label>Füllstand<select .value=${this.tankbookForm.fill_level} @change=${(d) => this.tankbookForm.fill_level = d.currentTarget.value}><option value="full">Volltankung</option><option value="partial">Teilbetankung</option><option value="unknown">Unbekannt</option></select></label><label>Kilometerstand<input type="number" min="0" step="0.1" .value=${this.tankbookForm.odometer_km} @input=${(d) => this.tankbookForm.odometer_km = d.currentTarget.value}></label><label>Preis/Liter<input type="number" min="0" step="0.001" .value=${this.tankbookForm.price_per_liter} @input=${(d) => this.tankbookForm.price_per_liter = d.currentTarget.value}></label><label>Gesamtbetrag €<input type="number" min="0" step="0.01" .value=${this.tankbookForm.amount_minor} @input=${(d) => this.tankbookForm.amount_minor = d.currentTarget.value}></label><label>Tankstelle<input .value=${this.tankbookForm.station} @input=${(d) => this.tankbookForm.station = d.currentTarget.value}></label><label class="full-width">Bemerkung<textarea .value=${this.tankbookForm.note} @input=${(d) => this.tankbookForm.note = d.currentTarget.value}></textarea></label><div class="actions full-width"><button type="submit" ?disabled=${this.tankbookSaving}>${this.tankbookEditingId ? "Tankvorgang aktualisieren" : "Tankvorgang hinzufügen"}</button>${this.tankbookEditingId ? m`<button type="button" class="secondary" @click=${() => {
+    }}><div class="actions full-width"><button type="button" class="secondary" @click=${() => {
+      this.openFuelImportDialog();
+    }}>Aus Kosten übernehmen</button>${this.tankbookExpenseId ? f`<span class="muted">Aus Kosten übernommen</span>` : ""}</div><label>Datum/Zeit<input type="datetime-local" .value=${this.tankbookForm.occurred_at} @input=${(d) => this.tankbookForm.occurred_at = d.currentTarget.value} required></label><label>Betriebsstoff<select .value=${this.tankbookForm.fuel_type} @change=${(d) => this.tankbookForm.fuel_type = d.currentTarget.value}><option value="diesel">Diesel</option><option value="adblue">AdBlue</option><option value="other">Sonstiges</option></select></label><label>Liter<input type="number" min="0.001" step="0.001" .value=${this.tankbookForm.liters} @input=${(d) => this.tankbookForm.liters = d.currentTarget.value} required></label><label>Füllstand<select .value=${this.tankbookForm.fill_level} @change=${(d) => this.tankbookForm.fill_level = d.currentTarget.value}><option value="full">Volltankung</option><option value="partial">Teilbetankung</option><option value="unknown">Unbekannt</option></select></label><label>Kilometerstand<input type="number" min="0" step="0.1" .value=${this.tankbookForm.odometer_km} @input=${(d) => this.tankbookForm.odometer_km = d.currentTarget.value}></label><label>Preis/Liter<input type="number" min="0" step="0.001" .value=${this.tankbookForm.price_per_liter} @input=${(d) => this.tankbookForm.price_per_liter = d.currentTarget.value}></label><label>Gesamtbetrag €<input type="number" min="0" step="0.01" .value=${this.tankbookForm.amount_minor} @input=${(d) => this.tankbookForm.amount_minor = d.currentTarget.value}></label><label>Tankstelle<input .value=${this.tankbookForm.station} @input=${(d) => this.tankbookForm.station = d.currentTarget.value}></label><label class="full-width">Bemerkung<textarea .value=${this.tankbookForm.note} @input=${(d) => this.tankbookForm.note = d.currentTarget.value}></textarea></label><div class="actions full-width"><button type="submit" ?disabled=${this.tankbookSaving}>${this.tankbookEditingId ? "Tankvorgang aktualisieren" : "Tankvorgang hinzufügen"}</button>${this.tankbookEditingId ? f`<button type="button" class="secondary" @click=${() => {
       this.resetTankEventForm(), this.requestUpdate();
-    }}>Abbrechen</button>` : ""}</div></form><p class="muted">Tankausgaben werden nicht automatisch als neue Kosten gebucht. Heizungsverbrauch: unbekannt, solange keine belastbaren Webasto-Daten hinterlegt sind.</p>${o.map((d) => m`<article class="tankbook-interval"><strong>${d.combined_l_per_100km == null ? "Verbrauch nicht berechenbar" : `${d.combined_l_per_100km.toFixed(2)} l/100 km`}</strong><span>${d.distance_source === "gps_drives" ? "Strecke aus GPS-Daten" : "Strecke aus Kilometerständen"} · ${l(d.quality)}</span><span>Gemessene Dieselmenge: ${d.liters.toFixed(3)} l · ${d.heater_quality === "unknown" ? "Heizungsverbrauch unbekannt" : "Heizungsverbrauch geschätzt"}</span></article>`)}<div class="tankbook-events">${r.map((d) => m`<article class="tankbook-event"><div><strong>${d.fuel_type === "diesel" ? "Diesel" : d.fuel_type === "adblue" ? "AdBlue" : "Sonstiges"} · ${d.liters.toFixed(3)} l</strong><span>${W(d.occurred_at, this.hass)} · ${d.fill_level === "full" ? "Volltankung" : d.fill_level === "partial" ? "Teilbetankung" : "Füllstand unbekannt"}</span><span>${d.odometer_km == null ? "Kilometerstand fehlt" : `${d.odometer_km.toFixed(1)} km`}${d.amount_minor == null ? " · Belegbetrag fehlt" : ` · ${(d.amount_minor / 100).toFixed(2)} €`}</span></div><span class="actions"><button type="button" class="secondary" @click=${() => this.editTankEvent(d)}>Bearbeiten</button><button type="button" class="danger" @click=${() => {
+    }}>Abbrechen</button>` : ""}</div></form><p class="muted">Tankausgaben werden nicht automatisch als neue Kosten gebucht. Heizungsverbrauch: unbekannt, solange keine belastbaren Webasto-Daten hinterlegt sind.</p>${o.map((d) => f`<article class="tankbook-interval"><strong>${d.combined_l_per_100km == null ? "Verbrauch nicht berechenbar" : `${d.combined_l_per_100km.toFixed(2)} l/100 km`}</strong><span>${d.distance_source === "gps_drives" ? "Strecke aus GPS-Daten" : "Strecke aus Kilometerständen"} · ${l(d.quality)}</span><span>Gemessene Dieselmenge: ${d.liters.toFixed(3)} l · ${d.heater_quality === "unknown" ? "Heizungsverbrauch unbekannt" : "Heizungsverbrauch geschätzt"}</span></article>`)}<div class="tankbook-events">${r.map((d) => f`<article class="tankbook-event"><div><strong>${d.fuel_type === "diesel" ? "Diesel" : d.fuel_type === "adblue" ? "AdBlue" : "Sonstiges"} · ${d.liters.toFixed(3)} l</strong><span>${W(d.occurred_at, this.hass)} · ${d.fill_level === "full" ? "Volltankung" : d.fill_level === "partial" ? "Teilbetankung" : "Füllstand unbekannt"}</span><span>${d.odometer_km == null ? "Kilometerstand fehlt" : `${d.odometer_km.toFixed(1)} km`}${d.amount_minor == null ? " · Belegbetrag fehlt" : ` · ${(d.amount_minor / 100).toFixed(2)} €`}</span>${d.expense_id ? f`<span>Aus Kosten übernommen</span>` : ""}</div><span class="actions"><button type="button" class="secondary" @click=${() => this.editTankEvent(d)}>Bearbeiten</button>${d.expense_id ? f`<button type="button" class="secondary" @click=${() => {
+      this.unlinkTankEventLink(d);
+    }}>Verknüpfung lösen</button>` : ""}<button type="button" class="danger" @click=${() => {
       this.removeTankEvent(d);
-    }}>Löschen</button></span></article>`)}</div></div>`;
+    }}>Löschen</button></span></article>`)}</div>${this.renderFuelImportDialog()}</div>`;
+  }
+  renderFuelImportDialog() {
+    return f`<dialog class="fuel-import-dialog" @cancel=${(i) => {
+      i.preventDefault(), this.closeFuelImportDialog();
+    }}><form @submit=${(i) => i.preventDefault()}><h3>Aus Kosten übernehmen</h3><p class="muted">Vorhandene Kraftstoffausgaben des Fahrzeugs. Bereits übernommene Einträge sind sichtbar, aber nicht erneut auswählbar.</p><div class="fuel-expense-list">${this.fuelExpenses.length ? this.fuelExpenses.map((i) => f`<article><div><strong>${i.occurred_on || i.occurred_at.slice(0, 10)}${i.occurred_time ? ` · ${i.occurred_time}` : ""}</strong><span>${i.fuel_liters == null ? "Liter fehlen" : `${i.fuel_liters.toFixed(3)} l`} · ${i.fuel_price_per_liter == null ? "Literpreis fehlt" : `${i.fuel_price_per_liter.toFixed(3)} €/l`} · ${(i.amount_minor / 100).toFixed(2)} €</span><span>${i.note || ""}${i.tank_event_id ? " · Bereits übernommen" : ""}</span></div><button type="button" ?disabled=${!!i.tank_event_id} @click=${() => this.importFuelExpense(i)}>${i.tank_event_id ? "Bereits übernommen" : "Übernehmen"}</button></article>`) : f`<p class="muted">Keine Kraftstoffausgaben gefunden.</p>`}</div><div class="dialog-actions"><button type="button" class="secondary" @click=${() => this.closeFuelImportDialog()}>Abbrechen</button></div></form></dialog>`;
   }
   renderModule(i, r, o, l, d) {
     const p = {
@@ -9124,65 +9165,65 @@ class fs extends Nt {
       gpx: [r.gpxImport, "⇧"],
       pdf: [r.pdfExportTitle, "▤"],
       tankbook: [r.module_tankbook ?? "Fuel log", "⛽"]
-    }, [y, f] = p[i];
-    if (i === "tankbook") return this.section(y, f, d[i], this.renderTankbook(r));
+    }, [y, m] = p[i];
+    if (i === "tankbook") return this.section(y, m, d[i], this.renderTankbook(r));
     const v = l;
-    return this.section(y, f, d[i], v[i]);
+    return this.section(y, m, d[i], v[i]);
   }
   renderDriveDeleteDialog(i) {
     const r = this.deletingDrive, o = uo(this.hass);
-    return m`<dialog class="drive-delete-dialog" @cancel=${(l) => {
+    return f`<dialog class="drive-delete-dialog" @cancel=${(l) => {
       l.preventDefault(), this.closeDriveDeleteDialog();
     }}><form method="dialog" @submit=${(l) => {
       l.preventDefault(), this.confirmDriveDelete();
-    }}><h3>${o.title}</h3>${r ? m`<p>${o.question}</p><dl><dt>${o.date}</dt><dd>${W(r.started_at, this.hass)}${r.ended_at ? ` → ${W(r.ended_at, this.hass)}` : ""}</dd><dt>${i.distance}</dt><dd>${(r.distance_m / 1e3).toFixed(1)} km</dd></dl><p class="muted">${o.effects}</p>` : ""}<div class="dialog-actions"><button type="button" class="secondary" @click=${() => this.closeDriveDeleteDialog()}>${i.cancel}</button><button type="submit" class="danger" ?disabled=${this.driveDeleting}>${this.driveDeleting ? i.saving : o.confirm}</button></div></form></dialog>`;
+    }}><h3>${o.title}</h3>${r ? f`<p>${o.question}</p><dl><dt>${o.date}</dt><dd>${W(r.started_at, this.hass)}${r.ended_at ? ` → ${W(r.ended_at, this.hass)}` : ""}</dd><dt>${i.distance}</dt><dd>${(r.distance_m / 1e3).toFixed(1)} km</dd></dl><p class="muted">${o.effects}</p>` : ""}<div class="dialog-actions"><button type="button" class="secondary" @click=${() => this.closeDriveDeleteDialog()}>${i.cancel}</button><button type="submit" class="danger" ?disabled=${this.driveDeleting}>${this.driveDeleting ? i.saving : o.confirm}</button></div></form></dialog>`;
   }
   renderPicker(i) {
     const r = this.overview?.trips ?? [];
-    return m`<section class="entry" aria-labelledby="journal-entry-title"><div class="entry-icon" aria-hidden="true">🚐</div><h2 id="journal-entry-title">${i.journalEntry ?? "Reise auswählen oder neu anlegen"}</h2><p class="muted">${i.journalEntryHint ?? "Öffne eine Reise, um ihre Fahrten, Orte, Karte und Exporte zu sehen."}</p>${r.length ? m`<label class="picker-label">${i.journalSelect ?? "Reise auswählen"}<select aria-label=${i.journalSelect ?? "Reise auswählen"} .value=${this.selectedTripId} @change=${(o) => {
+    return f`<section class="entry" aria-labelledby="journal-entry-title"><div class="entry-icon" aria-hidden="true">🚐</div><h2 id="journal-entry-title">${i.journalEntry ?? "Reise auswählen oder neu anlegen"}</h2><p class="muted">${i.journalEntryHint ?? "Öffne eine Reise, um ihre Fahrten, Orte, Karte und Exporte zu sehen."}</p>${r.length ? f`<label class="picker-label">${i.journalSelect ?? "Reise auswählen"}<select aria-label=${i.journalSelect ?? "Reise auswählen"} .value=${this.selectedTripId} @change=${(o) => {
       this.selectedTripId = o.currentTarget.value, this.requestUpdate();
-    }}><option value="">${i.journalChoose ?? "Bitte auswählen …"}</option>${r.map((o) => m`<option value=${o.id}>${o.title} · ${Gt(o.status, this.hass)} · ${Lt(o, this.hass)}</option>`)}</select></label>` : m`<p class="muted">${i.noTrip}</p>`}<div class="actions"><button type="button" @click=${() => {
+    }}><option value="">${i.journalChoose ?? "Bitte auswählen …"}</option>${r.map((o) => f`<option value=${o.id}>${o.title} · ${Gt(o.status, this.hass)} · ${At(o, this.hass)}</option>`)}</select></label>` : f`<p class="muted">${i.noTrip}</p>`}<div class="actions"><button type="button" @click=${() => {
       this.openTrip();
     }} ?disabled=${!this.selectedTripId || this.loading}>${i.journalOpen ?? "Reise öffnen"}</button><button type="button" class="secondary" @click=${() => this.openTripCreateDialog()}>${i.newTrip}</button></div><camper-travel-journal-manager-card .config=${{ vehicle_id: this.vehicleId, journal_section: "trip-create" }} .hass=${this.hass} @trip-created=${(o) => {
       this.onTripCreated(o);
     }}></camper-travel-journal-manager-card></section>`;
   }
   renderOpenTrip(i, r) {
-    const o = this.detail, l = (o?.stops ?? []).filter((E) => E.confirmed !== !1), d = l.filter((E) => Xr.has(E.place_kind || E.place_type || E.stop_type)), p = (o?.drives ?? []).reduce((E, H) => E + H.distance_m, 0) / 1e3, y = o?.expense_summary, f = y?.mixed_currency ? i.mixedCurrency : y?.total_minor !== void 0 && y.currency ? xt(y.total_minor, y.currency, this.hass) : xt(0, "EUR", this.hass), v = (E) => m`<camper-travel-journal-manager-card .config=${{ vehicle_id: this.vehicleId, trip_id: r.id, journal_section: E }} .hass=${this.hass}></camper-travel-journal-manager-card>`, k = m`<camper-travel-journal-map-card .config=${{ vehicle_id: this.vehicleId, trip_id: r.id }} .hass=${this.hass}></camper-travel-journal-map-card>`, b = o?.interruptions ?? [], D = [...o?.drives ?? []].sort((E, H) => E.started_at.localeCompare(H.started_at)).flatMap((E) => {
+    const o = this.detail, l = (o?.stops ?? []).filter((E) => E.confirmed !== !1), d = l.filter((E) => Xr.has(E.place_kind || E.place_type || E.stop_type)), p = (o?.drives ?? []).reduce((E, H) => E + H.distance_m, 0) / 1e3, y = o?.expense_summary, m = y?.mixed_currency ? i.mixedCurrency : y?.total_minor !== void 0 && y.currency ? xt(y.total_minor, y.currency, this.hass) : xt(0, "EUR", this.hass), v = (E) => f`<camper-travel-journal-manager-card .config=${{ vehicle_id: this.vehicleId, trip_id: r.id, journal_section: E }} .hass=${this.hass}></camper-travel-journal-manager-card>`, k = f`<camper-travel-journal-map-card .config=${{ vehicle_id: this.vehicleId, trip_id: r.id }} .hass=${this.hass}></camper-travel-journal-map-card>`, b = o?.interruptions ?? [], D = [...o?.drives ?? []].sort((E, H) => E.started_at.localeCompare(H.started_at)).flatMap((E) => {
       const H = b.find((it) => it.previous_drive_id === E.id), de = (o?.stops ?? []).find((it) => it.id === H?.existing_place_id);
-      return [m`<article class="drive-item"><div class="drive-heading"><strong>${i.drive ?? "Fahrt"}</strong><button type="button" class="drive-delete-icon" aria-label=${i.driveDelete ?? "Fahrt löschen"} title=${i.driveDelete ?? "Fahrt löschen"} ?disabled=${this.driveDeleting} @click=${() => this.openDriveDeleteDialog(E)}>🗑️</button></div><span>${W(E.started_at, this.hass)} → ${E.ended_at ? W(E.ended_at, this.hass) : i.notAvailable ?? "Nicht verfügbar"}</span><span>${(E.distance_m / 1e3).toFixed(1)} km · ${E.duration_seconds ? At(E.duration_seconds, this.hass) : "–"} · ${E.source === "gpx" ? i.sourceGpx ?? "GPX-importiert" : E.source === "manual" ? i.sourceManual : i.sourceGps}</span></article>`, ...H ? [m`<article class="interruption-item"><strong>${H.status === "pause" ? i.drivePause ?? "Fahrtpause" : H.status === "ignored" ? i.interruptionIgnored ?? "Ignoriert" : de ? `${i.assignedStay ?? "Aufenthalt"}: ${de.name}` : i.interruptionUnassigned ?? "Nicht zugeordnet"}</strong><span>${W(H.started_at, this.hass)} → ${W(H.ended_at, this.hass)} · ${At(H.duration_seconds, this.hass)}</span>${H.status === "unassigned" ? m`<button type="button" class="compact-action" @click=${() => this.openInterruptionDialog(H)}>${i.assignStay ?? "Aufenthalt zuordnen"}</button>` : ""}</article>`] : []];
+      return [f`<article class="drive-item"><div class="drive-heading"><strong>${i.drive ?? "Fahrt"}</strong><button type="button" class="drive-delete-icon" aria-label=${i.driveDelete ?? "Fahrt löschen"} title=${i.driveDelete ?? "Fahrt löschen"} ?disabled=${this.driveDeleting} @click=${() => this.openDriveDeleteDialog(E)}>🗑️</button></div><span>${W(E.started_at, this.hass)} → ${E.ended_at ? W(E.ended_at, this.hass) : i.notAvailable ?? "Nicht verfügbar"}</span><span>${(E.distance_m / 1e3).toFixed(1)} km · ${E.duration_seconds ? It(E.duration_seconds, this.hass) : "–"} · ${E.source === "gpx" ? i.sourceGpx ?? "GPX-importiert" : E.source === "manual" ? i.sourceManual : i.sourceGps}</span></article>`, ...H ? [f`<article class="interruption-item"><strong>${H.status === "pause" ? i.drivePause ?? "Fahrtpause" : H.status === "ignored" ? i.interruptionIgnored ?? "Ignoriert" : de ? `${i.assignedStay ?? "Aufenthalt"}: ${de.name}` : i.interruptionUnassigned ?? "Nicht zugeordnet"}</strong><span>${W(H.started_at, this.hass)} → ${W(H.ended_at, this.hass)} · ${It(H.duration_seconds, this.hass)}</span>${H.status === "unassigned" ? f`<button type="button" class="compact-action" @click=${() => this.openInterruptionDialog(H)}>${i.assignStay ?? "Aufenthalt zuordnen"}</button>` : ""}</article>`] : []];
     }), $ = {
-      overview: m`<div class="metric-grid"><div><span>${i.distance}</span><strong>${p.toFixed(1)} km</strong></div><div><span>${i.drives}</span><strong>${o?.drives.length ?? 0}</strong></div><div><span>${i.stops}</span><strong>${l.filter((E) => !Xr.has(E.place_kind || E.place_type || E.stop_type)).length}</strong></div><div><span>${i.overnights ?? "Übernachtungsplätze"}</span><strong>${d.length}</strong></div><div><span>${i.costs}</span><strong>${f}</strong></div></div>`,
-      drives: m`${D.length ? D : m`<p class="muted">${i.noDrives ?? "Keine Fahrten erfasst."}</p>`}`,
-      stays: m`<p class="muted">${i.journalStopsHint ?? "Bestätigte Aufenthalte dieser Reise."}</p>${v("places")}`,
-      expenses: m`${v("expenses")}`,
+      overview: f`<div class="metric-grid"><div><span>${i.distance}</span><strong>${p.toFixed(1)} km</strong></div><div><span>${i.drives}</span><strong>${o?.drives.length ?? 0}</strong></div><div><span>${i.stops}</span><strong>${l.filter((E) => !Xr.has(E.place_kind || E.place_type || E.stop_type)).length}</strong></div><div><span>${i.overnights ?? "Übernachtungsplätze"}</span><strong>${d.length}</strong></div><div><span>${i.costs}</span><strong>${m}</strong></div></div>`,
+      drives: f`${D.length ? D : f`<p class="muted">${i.noDrives ?? "Keine Fahrten erfasst."}</p>`}`,
+      stays: f`<p class="muted">${i.journalStopsHint ?? "Bestätigte Aufenthalte dieser Reise."}</p>${v("places")}`,
+      expenses: f`${v("expenses")}`,
       map: k,
-      gpx: m`${v("gpx")}`,
-      pdf: m`${v("pdf")}`,
+      gpx: f`${v("gpx")}`,
+      pdf: f`${v("pdf")}`,
       tankbook: this.renderTankbook(i)
-    }, I = oi(this.config.modules, this.config.module_order), R = {
+    }, A = li(this.config.modules, this.config.module_order), R = {
       drives: (o?.drives.length ?? 0) + b.length,
       stays: l.length,
       expenses: o?.expenses?.length ?? 0,
       tankbook: this.tankbook?.events.length ?? 0
     };
-    return m`<header class="trip-header"><div><p class="eyebrow">${i.journalOpenTrip ?? "Geöffnete Reise"}</p><h2>${r.title}</h2><p class="muted">${r.destination || i.noDestination} · ${Lt(r, this.hass)} · ${Gt(r.status, this.hass)}${this.vehicleName ? ` · ${this.vehicleName}` : ""}</p><div class="trip-management" @trip-switch=${() => this.closeTrip()}>${v("trip-actions")}</div></div></header>
-      ${I.map((E) => this.renderModule(E, i, r, $, R))}
-      ${this.error ? m`<p class="error" role="alert">${this.error}</p>` : ""}${this.loading ? m`<p class="muted" role="status">${i.loading}</p>` : ""}
+    return f`<header class="trip-header"><div><p class="eyebrow">${i.journalOpenTrip ?? "Geöffnete Reise"}</p><h2>${r.title}</h2><p class="muted">${r.destination || i.noDestination} · ${At(r, this.hass)} · ${Gt(r.status, this.hass)}${this.vehicleName ? ` · ${this.vehicleName}` : ""}</p><div class="trip-management" @trip-switch=${() => this.closeTrip()}>${v("trip-actions")}</div></div></header>
+      ${A.map((E) => this.renderModule(E, i, r, $, R))}
+      ${this.error ? f`<p class="error" role="alert">${this.error}</p>` : ""}${this.loading ? f`<p class="muted" role="status">${i.loading}</p>` : ""}
       <dialog class="interruption-dialog" @cancel=${(E) => {
       E.preventDefault(), this.closeInterruptionDialog();
     }}><form method="dialog" @submit=${(E) => {
       E.preventDefault(), this.saveInterruption();
     }}><h3>${i.assignStay ?? "Aufenthalt zuordnen"}</h3><p class="muted">${this.interruptionDialog ? `${W(this.interruptionDialog.started_at, this.hass)} → ${W(this.interruptionDialog.ended_at, this.hass)}` : ""}</p><label>${i.interruptionAction ?? "Aktion"}<select .value=${this.interruptionAction} @change=${(E) => {
       this.interruptionAction = E.currentTarget.value, this.requestUpdate();
-    }}><option value="stop">${i.assignStop ?? "Zwischenstopp zuordnen"}</option><option value="overnight">${i.assignOvernight ?? "Übernachtungsplatz zuordnen"}</option><option value="pause">${i.drivePause ?? "Als Fahrtpause kennzeichnen"}</option><option value="ignored">${i.interruptionIgnored ?? "Als nicht relevant markieren"}</option></select></label>${this.interruptionAction === "stop" || this.interruptionAction === "overnight" ? m`<label>${i.existingPlace ?? "Bestehender Ort"}<select .value=${this.interruptionPlaceId} @change=${(E) => {
+    }}><option value="stop">${i.assignStop ?? "Zwischenstopp zuordnen"}</option><option value="overnight">${i.assignOvernight ?? "Übernachtungsplatz zuordnen"}</option><option value="pause">${i.drivePause ?? "Als Fahrtpause kennzeichnen"}</option><option value="ignored">${i.interruptionIgnored ?? "Als nicht relevant markieren"}</option></select></label>${this.interruptionAction === "stop" || this.interruptionAction === "overnight" ? f`<label>${i.existingPlace ?? "Bestehender Ort"}<select .value=${this.interruptionPlaceId} @change=${(E) => {
       this.interruptionPlaceId = E.currentTarget.value, this.requestUpdate();
-    }}><option value="">${i.createNewPlace ?? "Neuen Eintrag erstellen …"}</option>${l.map((E) => m`<option value=${E.id}>${E.name}</option>`)}</select></label>${this.interruptionPlaceId ? "" : m`<input aria-label=${i.placeName} placeholder=${i.placeName} .value=${this.interruptionName} @input=${(E) => this.interruptionName = E.currentTarget.value} required><select aria-label=${i.placeCategory} .value=${this.interruptionType} @change=${(E) => this.interruptionType = E.currentTarget.value}><option value="other">${i.placeOther}</option><option value="rv_site">${i.placeRvSite}</option><option value="parking">${i.placeParking ?? "Raststätte / Parkplatz"}</option></select><input aria-label=${i.placeAddress} placeholder=${i.placeAddress} .value=${this.interruptionAddress} @input=${(E) => this.interruptionAddress = E.currentTarget.value}><input aria-label=${i.placeWebsite ?? "Webseite"} type="url" placeholder=${i.placeWebsite ?? "Webseite (optional)"} .value=${this.interruptionWebsite} @input=${(E) => this.interruptionWebsite = E.currentTarget.value}><textarea aria-label=${i.placeDescription} placeholder=${i.placeDescription} .value=${this.interruptionDescription} @input=${(E) => this.interruptionDescription = E.currentTarget.value}></textarea>`}` : ""}<div class="dialog-actions"><button type="button" class="secondary" @click=${() => this.closeInterruptionDialog()}>${i.cancel}</button><button type="submit" ?disabled=${this.interruptionSaving}>${this.interruptionSaving ? i.saving : i.save}</button></div></form></dialog>`;
+    }}><option value="">${i.createNewPlace ?? "Neuen Eintrag erstellen …"}</option>${l.map((E) => f`<option value=${E.id}>${E.name}</option>`)}</select></label>${this.interruptionPlaceId ? "" : f`<input aria-label=${i.placeName} placeholder=${i.placeName} .value=${this.interruptionName} @input=${(E) => this.interruptionName = E.currentTarget.value} required><select aria-label=${i.placeCategory} .value=${this.interruptionType} @change=${(E) => this.interruptionType = E.currentTarget.value}><option value="other">${i.placeOther}</option><option value="rv_site">${i.placeRvSite}</option><option value="parking">${i.placeParking ?? "Raststätte / Parkplatz"}</option></select><input aria-label=${i.placeAddress} placeholder=${i.placeAddress} .value=${this.interruptionAddress} @input=${(E) => this.interruptionAddress = E.currentTarget.value}><input aria-label=${i.placeWebsite ?? "Webseite"} type="url" placeholder=${i.placeWebsite ?? "Webseite (optional)"} .value=${this.interruptionWebsite} @input=${(E) => this.interruptionWebsite = E.currentTarget.value}><textarea aria-label=${i.placeDescription} placeholder=${i.placeDescription} .value=${this.interruptionDescription} @input=${(E) => this.interruptionDescription = E.currentTarget.value}></textarea>`}` : ""}<div class="dialog-actions"><button type="button" class="secondary" @click=${() => this.closeInterruptionDialog()}>${i.cancel}</button><button type="submit" ?disabled=${this.interruptionSaving}>${this.interruptionSaving ? i.saving : i.save}</button></div></form></dialog>`;
   }
   vehicleName = "";
   render() {
     const i = w(this.hass), r = this.trip();
-    return m`<ha-card><h1>${i.title}</h1>${r ? this.renderOpenTrip(i, r) : this.renderPicker(i)}${this.error && !r ? m`<p class="error" role="alert">${this.error}</p>` : ""}${this.loading && !r ? m`<p class="muted" role="status">${i.loading}</p>` : ""}</ha-card>${this.renderDriveDeleteDialog(i)}`;
+    return f`<ha-card><h1>${i.title}</h1>${r ? this.renderOpenTrip(i, r) : this.renderPicker(i)}${this.error && !r ? f`<p class="error" role="alert">${this.error}</p>` : ""}${this.loading && !r ? f`<p class="muted" role="status">${i.loading}</p>` : ""}</ha-card>${this.renderDriveDeleteDialog(i)}`;
   }
 }
 fs.styles = [Nt.styles, gt`
@@ -9206,21 +9247,28 @@ fs.styles = [Nt.styles, gt`
   dialog textarea { min-height: 4rem; }
   .dialog-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 4px; }
   .tankbook { display:grid; gap:12px; min-width:0; }
+  .fuel-import-dialog { width:min(38rem,calc(100vw - 1rem)); max-width:calc(100vw - 1rem); max-height:calc(100dvh - 1rem); overflow:hidden; border:0; border-radius:12px; padding:0; color:var(--primary-text-color); background:var(--card-background-color); }
+  .fuel-import-dialog::backdrop { background:rgb(0 0 0 / .48); }
+  .fuel-import-dialog form { display:grid; gap:12px; padding:16px; max-height:calc(100dvh - 1rem); overflow-y:auto; overscroll-behavior:contain; scrollbar-gutter:stable; }
+  .fuel-expense-list { display:grid; gap:8px; }
+  .fuel-expense-list article { display:flex; justify-content:space-between; align-items:flex-start; gap:10px; padding:10px; border-radius:9px; background:var(--secondary-background-color); }
+  .fuel-expense-list article > div { display:grid; gap:3px; min-width:0; }
+  .fuel-expense-list span { color:var(--secondary-text-color); overflow-wrap:anywhere; }
   .tankbook-form { padding:12px; border:1px solid var(--divider-color); border-radius:10px; }
   .tankbook-event, .tankbook-interval { display:flex; justify-content:space-between; align-items:flex-start; gap:10px; padding:10px; margin-top:7px; border-radius:9px; background:var(--secondary-background-color); }
   .tankbook-event > div, .tankbook-interval { display:grid; gap:3px; min-width:0; }
   .tankbook-event span, .tankbook-interval span { color:var(--secondary-text-color); font-size:.88em; overflow-wrap:anywhere; }
   .full-width { grid-column:1/-1; }
-  @media(max-width:600px) { .tankbook-event { flex-direction:column; } .tankbook-event .actions { width:100%; } .tankbook-event .actions button { flex:1; } }
+  @media(max-width:600px) { .tankbook-event { flex-direction:column; } .tankbook-event .actions { width:100%; } .tankbook-event .actions button { flex:1; } .fuel-expense-list article { flex-direction:column; } .fuel-expense-list article button { width:100%; } }
 `];
-di("camper-travel-journal-journal-card", fs);
-function al(c, i) {
+ci("camper-travel-journal-journal-card", fs);
+function ll(c, i) {
   return c.vehicle_id || i.length !== 1 ? c : { ...c, vehicle_id: i[0].vehicle_id };
 }
-function ol(c, i) {
-  return c.type === i.type && c.vehicle_id === i.vehicle_id && sl(c.modules, i.modules, c.module_order, i.module_order) && rl(c.module_order, i.module_order, c.modules, i.modules);
+function hl(c, i) {
+  return c.type === i.type && c.vehicle_id === i.vehicle_id && ol(c.modules, i.modules, c.module_order, i.module_order) && al(c.module_order, i.module_order, c.modules, i.modules);
 }
-class ll extends jt {
+class dl extends jt {
   static styles = gt`
     :host { display: block; color: var(--primary-text-color); }
     .field { display: flex; flex-direction: column; gap: 6px; margin: 8px 0; }
@@ -9254,7 +9302,7 @@ class ll extends jt {
     return this._hass;
   }
   setConfig(i) {
-    ol(this._config, i) || (this._config = { ...i }, this._hass && !this.loadedConnection && this.loadVehicles(), this.requestUpdate());
+    hl(this._config, i) || (this._config = { ...i }, this._hass && !this.loadedConnection && this.loadVehicles(), this.requestUpdate());
   }
   async loadVehicles() {
     if (!this._hass) return;
@@ -9264,8 +9312,8 @@ class ll extends jt {
     const i = this._hass;
     return this.loadingPromise = (async () => {
       try {
-        this.vehicles = await ci(i), this.loadedConnection = i.connection;
-        const r = al(this._config, this.vehicles);
+        this.vehicles = await ui(i), this.loadedConnection = i.connection;
+        const r = ll(this._config, this.vehicles);
         r.vehicle_id !== this._config.vehicle_id && (this._config = r, this.fireConfigChanged());
       } catch {
         this.error = w(i).editorLoadError;
@@ -9282,14 +9330,14 @@ class ll extends jt {
     this._config = { ...this._config, vehicle_id: r }, this.fireConfigChanged();
   }
   toggleModule(i, r) {
-    const o = r.currentTarget.checked, l = oe(this._config.module_order, this._config.modules), d = ni(this._config.modules), p = o ? [...d, i] : d.filter((y) => y !== i);
+    const o = r.currentTarget.checked, l = oe(this._config.module_order, this._config.modules), d = ri(this._config.modules), p = o ? [...d, i] : d.filter((y) => y !== i);
     this._config = { ...this._config, modules: l.filter((y) => p.includes(y)), module_order: l }, this.fireConfigChanged(), this.requestUpdate();
   }
   moveModule(i, r) {
     const o = oe(this._config.module_order, this._config.modules), l = o.indexOf(i), d = l + r;
     if (l < 0 || d < 0 || d >= o.length) return;
     [o[l], o[d]] = [o[d], o[l]];
-    const p = ni(this._config.modules);
+    const p = ri(this._config.modules);
     this._config = { ...this._config, modules: o.filter((y) => p.includes(y)), module_order: o }, this.highlightedModule = i, this.fireConfigChanged(), this.requestUpdate(), this.updateComplete.then(() => {
       const y = this.renderRoot.querySelector(`.module-row[data-module="${i}"]`);
       y && (y.focus({ preventScroll: !0 }), y.scrollIntoView({ block: "nearest", inline: "nearest" }), window.setTimeout(() => {
@@ -9298,18 +9346,18 @@ class ll extends jt {
     });
   }
   render() {
-    const i = w(this._hass), r = ni(this._config.modules), o = oe(this._config.module_order, this._config.modules);
-    return m`
+    const i = w(this._hass), r = ri(this._config.modules), o = oe(this._config.module_order, this._config.modules);
+    return f`
       <div class="field">
         <label for="vehicle">${i.editorVehicle}</label>
-        ${this.loading ? m`<span class="muted">${i.editorLoading}</span>` : m`
+        ${this.loading ? f`<span class="muted">${i.editorLoading}</span>` : f`
           <select id="vehicle" aria-label=${i.editorVehicle} @change=${this.selectVehicle}>
             <option value="" ?selected=${!this._config.vehicle_id}>${i.editorChooseVehicle}</option>
-            ${this.vehicles.map((l) => m`<option value=${l.vehicle_id} ?selected=${l.vehicle_id === this._config.vehicle_id}>${l.name || l.title}</option>`)}
+            ${this.vehicles.map((l) => f`<option value=${l.vehicle_id} ?selected=${l.vehicle_id === this._config.vehicle_id}>${l.name || l.title}</option>`)}
           </select>
         `}
-        ${this.error ? m`<span class="error" role="alert">${this.error}</span>` : ""}
-        ${!this.loading && !this.error && !this.vehicles.length ? m`<span class="error" role="alert">${i.editorNoVehicle}</span>` : ""}
+        ${this.error ? f`<span class="error" role="alert">${this.error}</span>` : ""}
+        ${!this.loading && !this.error && !this.vehicles.length ? f`<span class="error" role="alert">${i.editorNoVehicle}</span>` : ""}
       </div>
       <div class="field">
         <label>${i.editorModules ?? "Journal modules"}</label>
@@ -9317,7 +9365,7 @@ class ll extends jt {
         <div class="module-list" role="list">
           ${o.map((l, d) => {
       const p = r.includes(l);
-      return m`<div class="module-row ${this.highlightedModule === l ? "moved" : ""}" data-module=${l} role="listitem" tabindex="-1">
+      return f`<div class="module-row ${this.highlightedModule === l ? "moved" : ""}" data-module=${l} role="listitem" tabindex="-1">
               <label><input type="checkbox" .checked=${p} @change=${(y) => this.toggleModule(l, y)}> ${i[`module_${l}`] ?? l}</label>
               <span class="module-position" aria-label=${`${i.modulePosition ?? "Position"}: ${d + 1} ${i.moduleOf ?? "of"} ${o.length}`}>${d + 1} ${i.moduleOf ?? "of"} ${o.length}</span>
               <span><button type="button" aria-label=${i.moduleMoveUp ?? "Move up"} title=${i.moduleMoveUp ?? "Move up"} ?disabled=${d <= 0} @click=${() => this.moveModule(l, -1)}>↑</button>
@@ -9329,10 +9377,10 @@ class ll extends jt {
     `;
   }
 }
-typeof customElements < "u" && !customElements.get("camper-travel-journal-card-editor") && customElements.define("camper-travel-journal-card-editor", ll);
-const hl = [
+typeof customElements < "u" && !customElements.get("camper-travel-journal-card-editor") && customElements.define("camper-travel-journal-card-editor", dl);
+const cl = [
   { type: "camper-travel-journal-journal-card", name: "Camper Travel Journal – Journal", description: "Zentraler Einstieg: Reise öffnen und alle Funktionen in einem Reisebereich nutzen.", documentationURL: "https://github.com/balronu/ha-camper-travel-journal" },
   { type: "camper-travel-journal-diagnostics-card", name: "Camper Travel Journal – Diagnose", description: "Eigenständige Diagnosekarte für die Verbindung und Datenanbindung.", documentationURL: "https://github.com/balronu/ha-camper-travel-journal" }
 ];
 window.customCards ??= [];
-for (const c of hl) window.customCards.some((i) => i.type === c.type) || window.customCards.push(c);
+for (const c of cl) window.customCards.some((i) => i.type === c.type) || window.customCards.push(c);

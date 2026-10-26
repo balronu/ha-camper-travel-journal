@@ -6,7 +6,7 @@
 
 <h1 align="center">Camper Travel Journal</h1>
 <p align="center">Your digital camper travel journal for Home Assistant</p>
-<p align="center"><strong>Stable: v0.3.13</strong> · <strong>Beta: v0.4.0-beta.5</strong></p>
+<p align="center"><strong>Stable: v0.3.13</strong> · <strong>Beta: v0.4.0-beta.6</strong></p>
 
 <p align="center">
   <a href="https://github.com/balronu/ha-camper-travel-journal/releases/latest"><img src="https://img.shields.io/github/v/release/balronu/ha-camper-travel-journal?label=Release" alt="Release"></a>
@@ -67,6 +67,11 @@ The integration registers its versioned frontend bundle automatically. Do not
 add a second Lovelace resource for the same JavaScript file. See
 [docs/HACS_RELEASE_STRATEGY.md](docs/HACS_RELEASE_STRATEGY.md) for release and
 HACS guidance.
+
+The optional fuel-log module can import existing fuel expenses through **Import
+from expenses** as an editable tank-event preview. The original expense is
+linked one-to-one, so no second cost record is created. Imported expenses stay
+visible and cannot be selected again.
 
 ### Historical GPS stop suggestions
 
