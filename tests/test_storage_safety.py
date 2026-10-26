@@ -1,4 +1,7 @@
+import os
 import sqlite3
+import subprocess
+import sys
 import tempfile
 import unittest
 from datetime import datetime, timezone
@@ -82,6 +85,37 @@ class StorageSafetyTests(unittest.TestCase):
         self.assertEqual(self.store.connection.execute("PRAGMA integrity_check").fetchone()[0], "ok")
         self.assertEqual(self.store.connection.execute("PRAGMA foreign_key_check").fetchall(), [])
         self.assertEqual(self.store.connection.execute("SELECT count(*) FROM gps_points").fetchone()[0], 1)
+
+    def test_real_child_process_abort_rolls_back_and_restarts(self):
+        """Exercise the crash boundary, not only an in-process exception."""
+        with self.store.transaction() as connection:
+            connection.execute("UPDATE schema_meta SET value='5' WHERE key='version'")
+            connection.execute("DROP TABLE gpx_import_drives")
+            connection.execute("DROP TABLE gpx_import_points")
+            connection.execute("DROP TABLE gpx_imports")
+        self.store.close()
+        script = """
+import os
+from custom_components.camper_travel_journal.storage import SQLiteStore
+store = SQLiteStore(r'''%s''')
+def crash(script):
+    first = next(statement for statement in script.split(';') if statement.strip()) + ';'
+    store.connection.execute(first)
+    store.connection.execute("CREATE TABLE process_abort_marker(value TEXT)")
+    os._exit(73)
+store._execute_migration_script = crash
+store.open()
+""" % str(self.path)
+        result = subprocess.run([sys.executable, "-c", script], check=False)
+        self.assertEqual(result.returncode, 73)
+        with sqlite3.connect(self.path) as connection:
+            self.assertEqual(connection.execute("SELECT value FROM schema_meta WHERE key='version'").fetchone()[0], "5")
+            self.assertIsNone(connection.execute("SELECT name FROM sqlite_master WHERE name='process_abort_marker'").fetchone())
+            self.assertIsNotNone(connection.execute("SELECT name FROM sqlite_master WHERE name='vehicles'").fetchone())
+        self.store.open()
+        self.assertEqual(self.store.connection.execute("SELECT value FROM schema_meta WHERE key='version'").fetchone()[0], str(SCHEMA_VERSION))
+        self.assertEqual(self.store.connection.execute("PRAGMA integrity_check").fetchone()[0], "ok")
+        self.assertEqual(self.store.connection.execute("PRAGMA foreign_key_check").fetchall(), [])
 
     def test_all_migrations_rollback_when_transaction_fails(self):
         before = self._snapshot()

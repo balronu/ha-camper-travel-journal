@@ -1,5 +1,25 @@
 # Änderungsprotokoll
 
+## 0.4.0-beta.4 – Tankbuch und Verbrauchsqualität
+
+### Deutsch
+
+- Additive Schema-15-Migration für Tankvorgänge; bestehende Fahrten, Aufenthalte, Reisen, GPS-Rohdaten, Kosten und Ausschlüsse bleiben erhalten.
+- Tankbuchmodul mit Diesel, AdBlue und sonstigen Betriebsstoffen, Voll-/Teilbetankungen, Belegen, Kilometerständen und optionaler Verknüpfung bestehender Kraftstoffkosten.
+- Volltank-zu-Volltank-Verbrauch berücksichtigt Teilbetankungen und erzeugt keine zusätzlichen Expense-Datensätze.
+- GPS-Fahrstrecken können ohne Kilometerstände nur als geschätzte Strecke verwendet werden; unvollständige GPS-Abdeckung liefert keinen scheinbar genauen Verbrauch.
+- Dieselverbrauch bleibt als kombinierter Fahr-/Heizungsverbrauch gekennzeichnet. Webasto-Werte sind unbekannt, bis belastbare Betriebsstunden oder manuelle Schätzwerte vorliegen.
+- Beta-Release; v0.3.13 bleibt Stable. Keine produktive Datenbankmigration.
+
+### English
+
+- Additive schema-15 migration for fuel-log events; existing drives, stays, trips, raw GPS points, expenses and exclusions are preserved.
+- Fuel-log module for diesel, AdBlue and other fluids with full/partial fills, receipts, odometers and optional links to existing fuel expenses.
+- Full-to-full consumption includes partial fills and never creates additional expense records.
+- Existing GPS drives can provide an estimated distance when odometers are missing; incomplete GPS coverage never produces a falsely precise rate.
+- Diesel remains labelled as combined driving/heating consumption. Webasto data stays unknown until supported hours or a documented manual estimate is supplied.
+- Beta release; v0.3.13 remains Stable. No productive database migration.
+
 ## 0.4.0-beta.3 – SQLite-Migrationssicherheit und Backup
 
 ### Deutsch
