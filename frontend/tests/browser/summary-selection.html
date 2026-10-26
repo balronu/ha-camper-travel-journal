@@ -43,7 +43,7 @@ const waitFor = async (predicate) => {
 await waitFor(() => summary.shadowRoot.querySelector("select")?.value === "active-latest");
 const selector = () => summary.shadowRoot.querySelector("select");
 const text = () => summary.shadowRoot.textContent ?? "";
-const initial = { selected: selector()?.value, title: text().includes("Länderspiel Deutschland – Japan"), distance: text().includes("1118,7 km"), costs: text().includes("123,45"), actions: text().includes("Pausieren") && text().includes("Abschließen") };
+const initial = { selected: selector()?.value, title: text().includes("Länderspiel Deutschland – Japan"), distance: text().includes("1.118,7 km"), costs: text().includes("123,45"), actions: text().includes("Pausieren") && text().includes("Abschließen") };
 const allTripsSelectable = selector()?.options.length === 5;
 selector().value = "planned";
 selector().dispatchEvent(new Event("change", { bubbles: true }));
