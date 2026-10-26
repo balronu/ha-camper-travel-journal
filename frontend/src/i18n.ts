@@ -193,6 +193,27 @@ export function formatMoneyMinor(amountMinor: number, currency: string, hass?: H
   const language = (hass?.locale?.language ?? "").toLowerCase().startsWith("de") ? "de-DE" : "en-US";
   return new Intl.NumberFormat(language, { style: "currency", currency, minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(amountMinor / 100);
 }
+export function formatDecimal(value: number, fractionDigits: number, hass?: Hass): string {
+  const language = (hass?.locale?.language ?? "").toLowerCase().startsWith("de") ? "de-DE" : "en-US";
+  return new Intl.NumberFormat(language, { minimumFractionDigits: fractionDigits, maximumFractionDigits: fractionDigits }).format(value);
+}
+export function parseLocalizedDecimal(value: string): number | null {
+  const raw = value.trim().replace(/\s/g, "");
+  if (!raw) return null;
+  const lastComma = raw.lastIndexOf(",");
+  const lastDot = raw.lastIndexOf(".");
+  let normalized = raw;
+  if (lastComma >= 0 && lastDot >= 0) {
+    const decimalSeparator = lastComma > lastDot ? "," : ".";
+    const groupingSeparator = decimalSeparator === "," ? "." : ",";
+    normalized = raw.replaceAll(groupingSeparator, "").replace(decimalSeparator, ".");
+  } else if (lastComma >= 0) {
+    normalized = raw.replace(",", ".");
+  }
+  if (!/^\d+(?:\.\d+)?$/.test(normalized)) return null;
+  const parsed = Number(normalized);
+  return Number.isFinite(parsed) ? parsed : null;
+}
 export function parseAmountMinor(value: string): number | null {
   const normalized = value.trim().replace(",", ".");
   if (!/^\d+(?:\.\d{1,2})?$/.test(normalized)) return null;

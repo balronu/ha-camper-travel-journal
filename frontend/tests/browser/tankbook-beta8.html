@@ -37,5 +37,5 @@ const german = { note: intervalText.includes("Hinweis: Fahrstrecke anhand von GP
 hass.locale.language = "en-US"; card.hass = hass; card.requestUpdate(); await new Promise((resolve) => setTimeout(resolve, 80));
 const englishText = card.shadowRoot.textContent;
 const english = { note: englishText.includes("Note: Distance estimated from GPS data"), noRawCode: !englishText.includes("gps_distance_is_estimated") };
-result.textContent = JSON.stringify({ german, english, consumption: intervalText.includes("11.16 l/100 km"), webasto: intervalText.includes("Heizungsverbrauch unbekannt"), linkedActions: actionNames, visibleTemplateLeak: /lit\$\d|=>\s*this\./.test(intervalText) }, null, 2);
+result.textContent = JSON.stringify({ german, english, consumption: intervalText.includes("11,16 l/100 km"), webasto: intervalText.includes("Heizungsverbrauch unbekannt"), linkedActions: actionNames, visibleTemplateLeak: /lit\$\d|=>\s*this\./.test(intervalText) }, null, 2);
 </script>

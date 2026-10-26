@@ -1,6 +1,6 @@
 # Camper Travel Journal – Deutsch
 
-**Stable: v0.3.13**
+**Stable: v0.4.0**
 
 Die vollständige deutsche Produktdokumentation steht in der
 [deutschen Haupt-README](README.md).
@@ -11,7 +11,7 @@ lokal in einer eigenen SQLite-Datenbank.
 
 [🇬🇧 English](README.en.md) · [🇩🇪 Deutsche Hauptdokumentation](README.md)
 
-**Stable: v0.3.13**
+**Stable: v0.4.0**
 
 Für neue Dashboards wird die zentrale Journal Card empfohlen. Im geöffneten
 Reisekontext stehen Bearbeiten, Fortsetzen, Pausieren, Beenden, Löschen und

@@ -43,12 +43,12 @@ const waitFor = async (predicate) => {
 await waitFor(() => summary.shadowRoot.querySelector("select")?.value === "active-latest");
 const selector = () => summary.shadowRoot.querySelector("select");
 const text = () => summary.shadowRoot.textContent ?? "";
-const initial = { selected: selector()?.value, title: text().includes("Länderspiel Deutschland – Japan"), distance: text().includes("1118.7 km"), costs: text().includes("123,45"), actions: text().includes("Pausieren") && text().includes("Abschließen") };
+const initial = { selected: selector()?.value, title: text().includes("Länderspiel Deutschland – Japan"), distance: text().includes("1.118,7 km"), costs: text().includes("123,45"), actions: text().includes("Pausieren") && text().includes("Abschließen") };
 const allTripsSelectable = selector()?.options.length === 5;
 selector().value = "planned";
 selector().dispatchEvent(new Event("change", { bubbles: true }));
 await waitFor(() => selector()?.value === "planned" && summary.shadowRoot.querySelector("h2")?.textContent === "Ligaspiel Hoffenheim – Mainz");
-const planned = { selected: selector()?.value, zeroDistance: text().includes("0.0 km"), startOnly: text().includes("Reise starten") && !text().includes("Reise fortsetzen") && !text().includes("Pausieren") && !text().includes("Abschließen") };
+const planned = { selected: selector()?.value, zeroDistance: text().includes("0,0 km"), startOnly: text().includes("Reise starten") && !text().includes("Reise fortsetzen") && !text().includes("Pausieren") && !text().includes("Abschließen") };
 window.dispatchEvent(new CustomEvent("camper-travel-journal-data-changed", { detail: { vehicleId: "entry-wohnmobil", tripId: "planned" } }));
 await waitFor(() => listCalls >= 6 && selector()?.value === "planned" && summary.shadowRoot.querySelector("h2")?.textContent === "Ligaspiel Hoffenheim – Mainz");
 trips = trips.filter((trip) => trip.id !== "planned").map((trip) => ({ ...trip, status: trip.status === "active" ? "completed" : trip.status }));
