@@ -44,6 +44,19 @@ class Phase3Tests(unittest.TestCase):
         self.assertEqual(row["occurred_time"], "07:15")
         self.assertEqual(row["created_at"], self.now.isoformat())
 
+    def test_expenses_sort_by_actual_date_then_time_not_creation_order(self):
+        trip = self.store.create_trip("v1", "Sortierung", self.now, self.now)
+        entries = [
+            ("old", "2026-10-23", "17:00"),
+            ("latest", "2026-10-26", "11:04"),
+            ("day-only", "2026-10-25", None),
+            ("late", "2026-10-24", "19:00"),
+            ("early", "2026-10-24", "12:00"),
+        ]
+        for label, date, time in entries:
+            self.store.create_expense(Expense("", trip, self.now, "other", 100, "EUR", note=label, occurred_on=date, occurred_time=time), self.now)
+        self.assertEqual([row["note"] for row in self.store.list_expenses(trip)], ["latest", "day-only", "late", "early", "old"])
+
     def test_expense_time_update_distinguishes_omit_from_explicit_null(self):
         trip = self.store.create_trip("v1", "Uhrzeit", self.now, self.now)
         expense = self.store.create_expense(

@@ -98,7 +98,6 @@ export class TravelCardEditor extends LitElement {
   }
 
   private toggleModule(module: JournalModuleId, event: Event) {
-    if (module === "tankbook") return;
     const checked = (event.currentTarget as HTMLInputElement).checked;
     const order = normalizeJournalModuleOrder(this._config.module_order, this._config.modules);
     const current = normalizeJournalModules(this._config.modules);
@@ -150,9 +149,8 @@ export class TravelCardEditor extends LitElement {
         <div class="module-list" role="list">
           ${order.map((module, index) => {
             const enabled = modules.includes(module);
-            const planned = module === "tankbook";
             return html`<div class="module-row ${this.highlightedModule === module ? "moved" : ""}" data-module=${module} role="listitem" tabindex="-1">
-              <label><input type="checkbox" .checked=${enabled} ?disabled=${planned} @change=${(event: Event) => this.toggleModule(module, event)}> ${lang[`module_${module}`] ?? module}${planned ? html` <span class="planned">(${lang.modulePlanned ?? "planned"})</span>` : ""}</label>
+              <label><input type="checkbox" .checked=${enabled} @change=${(event: Event) => this.toggleModule(module, event)}> ${lang[`module_${module}`] ?? module}</label>
               <span class="module-position" aria-label=${`${lang.modulePosition ?? "Position"}: ${index + 1} ${lang.moduleOf ?? "of"} ${order.length}`}>${index + 1} ${lang.moduleOf ?? "of"} ${order.length}</span>
               <span><button type="button" aria-label=${lang.moduleMoveUp ?? "Move up"} title=${lang.moduleMoveUp ?? "Move up"} ?disabled=${index <= 0} @click=${() => this.moveModule(module, -1)}>↑</button>
               <button type="button" aria-label=${lang.moduleMoveDown ?? "Move down"} title=${lang.moduleMoveDown ?? "Move down"} ?disabled=${index >= order.length - 1} @click=${() => this.moveModule(module, 1)}>↓</button></span>
