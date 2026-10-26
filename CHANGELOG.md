@@ -1,5 +1,23 @@
 # Änderungsprotokoll
 
+## 0.4.0-beta.1 – Modulare Journal Card
+
+### Deutsch
+
+- Die zentrale Journal Card verwendet intern ein versioniertes Modul-Registry.
+- Bestehende YAML-Konfigurationen und die bisherige Standarddarstellung bleiben kompatibel.
+- Der Karteneditor kann Journal-Bereiche aktivieren, deaktivieren und mit mobilen Bedienelementen sortieren.
+- Das zukünftige Tankbuch ist als geplanter Bereich sichtbar, verwendet in dieser Beta aber weder Datenbankdaten noch Providerabfragen.
+- GPS-Erkennung, Aufenthaltsabschluss, Reisen, Kosten, GPX- und PDF-Export bleiben unverändert.
+
+### English
+
+- The central Journal Card now uses an internal versioned module registry.
+- Existing YAML configurations and the previous default presentation remain compatible.
+- The card editor can enable, disable and reorder journal sections with mobile-friendly controls.
+- The future fuel log is represented as a planned section, but this beta performs no fuel-database or provider requests.
+- GPS detection, stay completion, trips, expenses, GPX and PDF exports remain unchanged.
+
 ## 0.3.13 – Stable laufende Aufenthalte
 
 ### Deutsch

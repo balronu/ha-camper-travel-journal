@@ -6,7 +6,7 @@
 
 <h1 align="center">Camper Travel Journal</h1>
 <p align="center">Your digital camper travel journal for Home Assistant</p>
-<p align="center"><strong>Stable: v0.3.13</strong></p>
+<p align="center"><strong>Stable: v0.3.13</strong> · <strong>Beta: v0.4.0-beta.1</strong></p>
 
 <p align="center">
   <a href="https://github.com/balronu/ha-camper-travel-journal/releases/latest"><img src="https://img.shields.io/github/v/release/balronu/ha-camper-travel-journal?label=Release" alt="Release"></a>
@@ -51,8 +51,8 @@ mobile browsers and Home Assistant setups is important.
 - A central Journal Card for new dashboards: select, open, edit, resume,
   pause, complete, delete or switch a trip while all trip sections use the
   same trip context.
-- A running stay is automatically completed when the next drive starts. A
-  renewed real-world practical test of this flow is still outstanding.
+- A running stay is automatically completed when the next drive starts. This
+  flow was confirmed in a real-world practical test on 2026-10-25.
 
 ## HACS installation
 

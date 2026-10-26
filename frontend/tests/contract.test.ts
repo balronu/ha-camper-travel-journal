@@ -5,6 +5,7 @@ import { categoryLabel, EXPENSE_CATEGORIES, EXPENSE_CATEGORY_IDS, formatDate, fo
 import { autoSelectVehicle, sameCardConfig } from "../src/card-editor";
 import { listVehicles } from "../src/api";
 import { sortDrivesChronologically } from "../src/map-utils";
+import { DEFAULT_JOURNAL_MODULES, normalizeJournalModules, sameJournalModules } from "../src/journal-modules";
 
 const root = resolve(import.meta.dirname, "..");
 const manifest = JSON.parse(readFileSync(resolve(root, "../custom_components/camper_travel_journal/manifest.json"), "utf8"));
@@ -13,10 +14,10 @@ const bundle = resolve(root, "../custom_components/camper_travel_journal/fronten
 
 describe("frontend release contract", () => {
   it("keeps backend, npm metadata and stable bundle aligned", () => {
-    expect(manifest.version).toBe("0.3.13");
+    expect(manifest.version).toBe("0.4.0-beta.1");
     expect(pkg.version).toBe(manifest.version);
     expect(existsSync(bundle)).toBe(true);
-    expect(readFileSync(resolve(root, "../custom_components/camper_travel_journal/const.py"), "utf8")).toContain('FRONTEND_VERSION = "0.3.13"');
+    expect(readFileSync(resolve(root, "../custom_components/camper_travel_journal/const.py"), "utf8")).toContain('FRONTEND_VERSION = "0.4.0-beta.1"');
   });
   it("registers the central card in the catalog while retaining legacy elements", () => {
     const source = readFileSync(resolve(root, "src/index.ts"), "utf8");
@@ -65,6 +66,17 @@ describe("frontend release contract", () => {
     await expect(listVehicles(empty)).resolves.toEqual([]);
     const broken = { connection: { sendMessagePromise: async () => { throw new Error("websocket failed"); } } } as any;
     await expect(listVehicles(broken)).rejects.toThrow("websocket failed");
+  });
+  it("keeps journal module configuration backward compatible and deterministic", () => {
+    expect(normalizeJournalModules(undefined)).toEqual([...DEFAULT_JOURNAL_MODULES]);
+    expect(normalizeJournalModules(["drives", "tankbook", "drives", "unknown"])).toEqual(["drives", "tankbook"]);
+    expect(sameJournalModules(undefined, [...DEFAULT_JOURNAL_MODULES])).toBe(true);
+    expect(sameJournalModules(["overview", "drives"], ["overview", "drives"])).toBe(true);
+    expect(sameJournalModules(["overview", "drives"], ["drives", "overview"])).toBe(false);
+    const editor = readFileSync(resolve(root, "src/card-editor.ts"), "utf8");
+    expect(editor).toContain("editorModules");
+    expect(readFileSync(resolve(root, "src/journal-modules.ts"), "utf8")).toContain("tankbook");
+    expect(editor).toContain("moveModule");
   });
   it("keeps the hub editor texts in German and English", () => {
     expect(messages({ locale: { language: "de-DE" } } as any).editorChooseVehicle).toBe("Wohnmobil auswählen");
@@ -199,6 +211,13 @@ describe("frontend release contract", () => {
     expect(manager).toContain("starPicker");
     expect(manager).toContain('role="radio"');
     expect(map).toContain("embeddedTripId");
+  });
+  it("renders the journal through the internal module registry without provider calls", () => {
+    const journal = readFileSync(resolve(root, "src/journal-card.ts"), "utf8");
+    expect(journal).toContain("normalizeJournalModules");
+    expect(journal).toContain("renderModule");
+    expect(journal).toContain("module_tankbook");
+    expect(journal).toContain("No tank data or provider request");
   });
   it("keeps legacy cards visible without advertising them as new cards", () => {
     const base = readFileSync(resolve(root, "src/base-card.ts"), "utf8");

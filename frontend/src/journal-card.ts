@@ -4,8 +4,9 @@ import { assignInterruption, createStopFromInterruption, deleteDrive, list, list
 import { clearActiveTrip, publishActiveTrip, readActiveTrip, type TripContextDetail, ACTIVE_TRIP_CHANGED_EVENT } from "./trip-context";
 import { notifyTravelChanged, TRAVEL_DATA_CHANGED_EVENT } from "./expense-events";
 import { driveDeleteMessages, formatDateTime, formatDuration, formatMoneyMinor, formatTripPeriod, messages, statusLabel } from "./i18n";
+import { normalizeJournalModules, type JournalModuleId } from "./journal-modules";
 
-type JournalConfig = { vehicle_id: string };
+type JournalConfig = { vehicle_id: string; modules?: string[] };
 
 const overnightKinds = new Set(["campsite", "rv_site", "wild_camp", "overnight"]);
 
@@ -192,6 +193,22 @@ export class JournalCard extends TravelCard {
     if (!current.open) return;
     this.shadowRoot?.querySelectorAll<HTMLDetailsElement>(".journal-section details").forEach((details) => { if (details !== current) details.open = false; });
   }
+  private renderModule(module: JournalModuleId, lang: ReturnType<typeof messages>, trip: Trip, content: { overview: unknown; drives: unknown; stays: unknown; expenses: unknown; map: unknown; gpx: unknown; pdf: unknown }, counts: Partial<Record<JournalModuleId, number>>) {
+    const labels: Record<JournalModuleId, [string, string]> = {
+      overview: [lang.journalOverview ?? "Trip overview", "▣"],
+      drives: [lang.journalDrives ?? "Drives and interruptions", "↔"],
+      stays: [lang.placesAndStays ?? "Places & stays", "●"],
+      expenses: [lang.expenses, "€"],
+      map: [lang.mapTitle ?? "Travel map", "⌖"],
+      gpx: [lang.gpxImport, "⇧"],
+      pdf: [lang.pdfExportTitle, "▤"],
+      tankbook: [lang.module_tankbook ?? "Fuel log", "⛽"],
+    };
+    const [title, icon] = labels[module];
+    if (module === "tankbook") return this.section(title, icon, undefined, html`<p class="muted">${lang.modulePlannedHint ?? "This module is reserved for a future release. No tank data or provider request is used in this beta."}</p>`);
+    const values: Record<string, unknown> = content;
+    return this.section(title, icon, counts[module], values[module]);
+  }
   private renderDriveDeleteDialog(lang: ReturnType<typeof messages>) {
     const drive = this.deletingDrive;
     const text = driveDeleteMessages(this.hass);
@@ -216,14 +233,23 @@ export class JournalCard extends TravelCard {
       const assigned = (snapshot?.stops ?? []).find((stop) => stop.id === following?.existing_place_id);
       return [html`<article class="drive-item"><div class="drive-heading"><strong>${lang.drive ?? "Fahrt"}</strong><button type="button" class="drive-delete-icon" aria-label=${lang.driveDelete ?? "Fahrt löschen"} title=${lang.driveDelete ?? "Fahrt löschen"} ?disabled=${this.driveDeleting} @click=${() => this.openDriveDeleteDialog(drive)}>🗑️</button></div><span>${formatDateTime(drive.started_at, this.hass)} → ${drive.ended_at ? formatDateTime(drive.ended_at, this.hass) : (lang.notAvailable ?? "Nicht verfügbar")}</span><span>${(drive.distance_m / 1000).toFixed(1)} km · ${drive.duration_seconds ? formatDuration(drive.duration_seconds, this.hass) : "–"} · ${drive.source === "gpx" ? (lang.sourceGpx ?? "GPX-importiert") : drive.source === "manual" ? lang.sourceManual : lang.sourceGps}</span></article>`, ...(following ? [html`<article class="interruption-item"><strong>${following.status === "pause" ? (lang.drivePause ?? "Fahrtpause") : following.status === "ignored" ? (lang.interruptionIgnored ?? "Ignoriert") : assigned ? `${lang.assignedStay ?? "Aufenthalt"}: ${assigned.name}` : (lang.interruptionUnassigned ?? "Nicht zugeordnet")}</strong><span>${formatDateTime(following.started_at, this.hass)} → ${formatDateTime(following.ended_at, this.hass)} · ${formatDuration(following.duration_seconds, this.hass)}</span>${following.status === "unassigned" ? html`<button type="button" class="compact-action" @click=${() => this.openInterruptionDialog(following)}>${lang.assignStay ?? "Aufenthalt zuordnen"}</button>` : ""}</article>`] : [])];
     });
+    const moduleContent = {
+      overview: html`<div class="metric-grid"><div><span>${lang.distance}</span><strong>${km.toFixed(1)} km</strong></div><div><span>${lang.drives}</span><strong>${snapshot?.drives.length ?? 0}</strong></div><div><span>${lang.stops}</span><strong>${confirmed.filter((stop) => !overnightKinds.has(stop.place_kind || stop.place_type || stop.stop_type)).length}</strong></div><div><span>${lang.overnights ?? "Übernachtungsplätze"}</span><strong>${overnights.length}</strong></div><div><span>${lang.costs}</span><strong>${total}</strong></div></div>`,
+      drives: html`${timeline.length ? timeline : html`<p class="muted">${lang.noDrives ?? "Keine Fahrten erfasst."}</p>`}`,
+      stays: html`<p class="muted">${lang.journalStopsHint ?? "Bestätigte Aufenthalte dieser Reise."}</p>${manager("places")}`,
+      expenses: html`${manager("expenses")}`,
+      map,
+      gpx: html`${manager("gpx")}`,
+      pdf: html`${manager("pdf")}`,
+    };
+    const modules = normalizeJournalModules(this.config.modules);
+    const moduleCounts: Partial<Record<JournalModuleId, number>> = {
+      drives: (snapshot?.drives.length ?? 0) + interruptions.length,
+      stays: confirmed.length,
+      expenses: snapshot?.expenses?.length ?? 0,
+    };
     return html`<header class="trip-header"><div><p class="eyebrow">${lang.journalOpenTrip ?? "Geöffnete Reise"}</p><h2>${trip.title}</h2><p class="muted">${trip.destination || lang.noDestination} · ${formatTripPeriod(trip, this.hass)} · ${statusLabel(trip.status, this.hass)}${this.vehicleName ? ` · ${this.vehicleName}` : ""}</p><div class="trip-management" @trip-switch=${() => this.closeTrip()}>${manager("trip-actions")}</div></div></header>
-      ${this.section(lang.journalOverview ?? "Reiseübersicht", "▣", undefined, html`<div class="metric-grid"><div><span>${lang.distance}</span><strong>${km.toFixed(1)} km</strong></div><div><span>${lang.drives}</span><strong>${snapshot?.drives.length ?? 0}</strong></div><div><span>${lang.stops}</span><strong>${confirmed.filter((stop) => !overnightKinds.has(stop.place_kind || stop.place_type || stop.stop_type)).length}</strong></div><div><span>${lang.overnights ?? "Übernachtungsplätze"}</span><strong>${overnights.length}</strong></div><div><span>${lang.costs}</span><strong>${total}</strong></div></div>`)}
-      ${this.section(lang.journalDrives ?? "Fahrten und Unterbrechungen", "↔", (snapshot?.drives.length ?? 0) + interruptions.length, html`${timeline.length ? timeline : html`<p class="muted">${lang.noDrives ?? "Keine Fahrten erfasst."}</p>`}`)}
-      ${this.section(lang.placesAndStays ?? "Orte & Aufenthalte", "●", confirmed.length, html`<p class="muted">${lang.journalStopsHint ?? "Bestätigte Aufenthalte dieser Reise."}</p>${manager("places")}`)}
-      ${this.section(lang.expenses, "€", snapshot?.expenses?.length ?? 0, html`${manager("expenses")}`)}
-      ${this.section(lang.mapTitle ?? "Reisekarte", "⌖", undefined, map)}
-      ${this.section(lang.gpxImport, "⇧", undefined, html`${manager("gpx")}`)}
-      ${this.section(lang.pdfExportTitle, "▤", undefined, html`${manager("pdf")}`)}
+      ${modules.map((module) => this.renderModule(module, lang, trip, moduleContent, moduleCounts))}
       ${this.error ? html`<p class="error" role="alert">${this.error}</p>` : ""}${this.loading ? html`<p class="muted" role="status">${lang.loading}</p>` : ""}
       <dialog class="interruption-dialog" @cancel=${(event: Event) => { event.preventDefault(); this.closeInterruptionDialog(); }}><form method="dialog" @submit=${(event: SubmitEvent) => { event.preventDefault(); void this.saveInterruption(); }}><h3>${lang.assignStay ?? "Aufenthalt zuordnen"}</h3><p class="muted">${this.interruptionDialog ? `${formatDateTime(this.interruptionDialog.started_at, this.hass)} → ${formatDateTime(this.interruptionDialog.ended_at, this.hass)}` : ""}</p><label>${lang.interruptionAction ?? "Aktion"}<select .value=${this.interruptionAction} @change=${(event: Event) => { this.interruptionAction = (event.currentTarget as HTMLSelectElement).value as typeof this.interruptionAction; this.requestUpdate(); }}><option value="stop">${lang.assignStop ?? "Zwischenstopp zuordnen"}</option><option value="overnight">${lang.assignOvernight ?? "Übernachtungsplatz zuordnen"}</option><option value="pause">${lang.drivePause ?? "Als Fahrtpause kennzeichnen"}</option><option value="ignored">${lang.interruptionIgnored ?? "Als nicht relevant markieren"}</option></select></label>${this.interruptionAction === "stop" || this.interruptionAction === "overnight" ? html`<label>${lang.existingPlace ?? "Bestehender Ort"}<select .value=${this.interruptionPlaceId} @change=${(event: Event) => { this.interruptionPlaceId = (event.currentTarget as HTMLSelectElement).value; this.requestUpdate(); }}><option value="">${lang.createNewPlace ?? "Neuen Eintrag erstellen …"}</option>${confirmed.map((place) => html`<option value=${place.id}>${place.name}</option>`)}</select></label>${!this.interruptionPlaceId ? html`<input aria-label=${lang.placeName} placeholder=${lang.placeName} .value=${this.interruptionName} @input=${(event: InputEvent) => this.interruptionName = (event.currentTarget as HTMLInputElement).value} required><select aria-label=${lang.placeCategory} .value=${this.interruptionType} @change=${(event: Event) => this.interruptionType = (event.currentTarget as HTMLSelectElement).value}><option value="other">${lang.placeOther}</option><option value="rv_site">${lang.placeRvSite}</option><option value="parking">${lang.placeParking ?? "Raststätte / Parkplatz"}</option></select><input aria-label=${lang.placeAddress} placeholder=${lang.placeAddress} .value=${this.interruptionAddress} @input=${(event: InputEvent) => this.interruptionAddress = (event.currentTarget as HTMLInputElement).value}><input aria-label=${lang.placeWebsite ?? "Webseite"} type="url" placeholder=${lang.placeWebsite ?? "Webseite (optional)"} .value=${this.interruptionWebsite} @input=${(event: InputEvent) => this.interruptionWebsite = (event.currentTarget as HTMLInputElement).value}><textarea aria-label=${lang.placeDescription} placeholder=${lang.placeDescription} .value=${this.interruptionDescription} @input=${(event: InputEvent) => this.interruptionDescription = (event.currentTarget as HTMLTextAreaElement).value}></textarea>` : ""}` : ""}<div class="dialog-actions"><button type="button" class="secondary" @click=${() => this.closeInterruptionDialog()}>${lang.cancel}</button><button type="submit" ?disabled=${this.interruptionSaving}>${this.interruptionSaving ? lang.saving : lang.save}</button></div></form></dialog>`;
   }
