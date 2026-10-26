@@ -1,5 +1,19 @@
 # Änderungsprotokoll
 
+## 0.4.0-beta.3 – SQLite-Migrationssicherheit und Backup
+
+### Deutsch
+
+- Versionierte SQLite-Migrationen v3–v14 laufen ohne implizite `executescript()`-Commits in einer kontrollierten Transaktion.
+- Fehlerpfade, historische Schema-10-Datenbanken sowie WAL-Online-Backup und Restore werden automatisiert geprüft.
+- Keine Tankbuch- oder Journal-Card-Änderung; v0.3.13 bleibt Stable.
+
+### English
+
+- Versioned SQLite migrations v3–v14 run without implicit `executescript()` commits inside a controlled transaction.
+- Failure paths, historical schema-10 databases, and WAL Online Backup/restore are covered by automated checks.
+- No fuel-log or Journal Card change; v0.3.13 remains Stable.
+
 ## 0.4.0-beta.2 – UX-Hotfix für den modularen Karteneditor
 
 ### Deutsch
