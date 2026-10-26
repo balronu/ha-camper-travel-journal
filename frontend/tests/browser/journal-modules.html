@@ -31,7 +31,12 @@ if (!ready) { result.textContent = JSON.stringify({ error: "module editor did no
 const initialOrder = rows().map((item) => item.dataset.module);
 const tankbook = row("Tankbuch");
 const tankbookInput = tankbook.querySelector("input");
-const tankbookRejected = tankbookInput.disabled;
+const tankbookActivatable = !tankbookInput.disabled;
+tankbookInput.click();
+await waitFor(() => latestConfig?.modules?.includes("tankbook"));
+const tankbookEnabled = latestConfig?.modules?.includes("tankbook") === true;
+tankbookInput.click();
+await waitFor(() => !latestConfig?.modules?.includes("tankbook"));
 const drives = row("Fahrten");
 touchClick(drives.querySelectorAll("button")[1]);
 await waitFor(() => latestConfig?.module_order?.[2] === "drives" && row("Fahrten")?.classList.contains("moved"));
@@ -84,8 +89,8 @@ result.textContent = JSON.stringify({
   firstUpDisabled: firstRow.querySelectorAll("button")[0].disabled,
   lastDownDisabled: lastRow.querySelectorAll("button")[1].disabled,
   activeCount: active.length,
-  tankbookPlanned: tankbook.textContent.includes("geplant"),
-  tankbookRejected,
+  tankbookActivatable,
+  tankbookEnabled,
   noProviderRequest: true,
   noHorizontalOverflow: document.documentElement.scrollWidth <= window.innerWidth + 1,
 }, null, 2);
