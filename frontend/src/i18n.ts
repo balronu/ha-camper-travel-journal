@@ -76,6 +76,30 @@ export function messages(hass?: Hass): Messages {
   return { ...(language.startsWith("de") ? de : en), ...(language.startsWith("de") ? mapLabels.de : mapLabels.en) };
 }
 
+/** Translate backend tankbook diagnostics without exposing internal reason codes. */
+export function tankbookDiagnostic(note: string | undefined, hass?: Hass, validResult = false): { prefix: string; text: string } | undefined {
+  if (!note) return undefined;
+  const german = (hass?.locale?.language ?? "").toLowerCase().startsWith("de");
+  const [code, detail = ""] = note.split(":", 2);
+  const gaps = detail.split(",").filter(Boolean).map((gap) => ({
+    start_boundary: german ? "am Intervallbeginn" : "at the interval start",
+    end_boundary: german ? "am Intervallende" : "at the interval end",
+    drive_boundary: german ? "bei einer Grenzfahrt" : "on a boundary-crossing drive",
+  }[gap] ?? (german ? "in einem Teilbereich" : "in part of the interval")));
+  const labels: Record<string, string> = german ? {
+    gps_distance_is_estimated: "Fahrstrecke anhand von GPS-Daten geschätzt",
+    gps_coverage_incomplete: gaps.length ? `GPS-Daten unvollständig (${gaps.join(", ")})` : "GPS-Daten unvollständig",
+    distance_missing: "Keine geeigneten GPS-Fahrten vorhanden",
+    odometer_invalid: "Unplausible Kilometerstände",
+  } : {
+    gps_distance_is_estimated: "Distance estimated from GPS data",
+    gps_coverage_incomplete: gaps.length ? `GPS data incomplete (${gaps.join(", ")})` : "GPS data incomplete",
+    distance_missing: "No suitable GPS drives available",
+    odometer_invalid: "Odometer readings are implausible",
+  };
+  return { prefix: validResult && code === "gps_distance_is_estimated" ? (german ? "Hinweis" : "Note") : (german ? "Grund" : "Reason"), text: labels[code] ?? (german ? "Verbrauch nicht zuverlässig bestimmbar" : "Consumption cannot be determined reliably") };
+}
+
 export function driveDeleteMessages(hass?: Hass) {
   return (hass?.locale?.language ?? "").toLowerCase().startsWith("de")
     ? { label: "Fahrt löschen", title: "Fahrt löschen?", question: "Möchtest du diese Fahrt wirklich löschen?", confirm: "Fahrt löschen", effects: "Die Fahrt wird entfernt. GPS-Rohpunkte, Kosten, Aufenthalte und Reisen bleiben erhalten; dieselbe Fahrt wird nicht automatisch neu erzeugt.", date: "Datum / Uhrzeit" }

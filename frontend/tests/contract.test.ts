@@ -1,7 +1,7 @@
 import { existsSync, readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { describe, expect, it } from "vitest";
-import { categoryLabel, EXPENSE_CATEGORIES, EXPENSE_CATEGORY_IDS, formatDate, formatMoneyMinor, formatTripPeriod, isExpenseCategory, messages, normalizeExpenseCategory, parseAmountMinor, statusLabel } from "../src/i18n";
+import { categoryLabel, EXPENSE_CATEGORIES, EXPENSE_CATEGORY_IDS, formatDate, formatMoneyMinor, formatTripPeriod, isExpenseCategory, messages, normalizeExpenseCategory, parseAmountMinor, statusLabel, tankbookDiagnostic } from "../src/i18n";
 import { autoSelectVehicle, sameCardConfig } from "../src/card-editor";
 import { listVehicles } from "../src/api";
 import { sortDrivesChronologically } from "../src/map-utils";
@@ -14,15 +14,17 @@ const bundle = resolve(root, "../custom_components/camper_travel_journal/fronten
 
 describe("frontend release contract", () => {
   it("keeps backend, npm metadata and stable bundle aligned", () => {
-    expect(manifest.version).toBe("0.4.0-beta.7");
+    expect(manifest.version).toBe("0.4.0-beta.8");
     expect(pkg.version).toBe(manifest.version);
     expect(existsSync(bundle)).toBe(true);
-  expect(readFileSync(resolve(root, "../custom_components/camper_travel_journal/const.py"), "utf8")).toContain('FRONTEND_VERSION = "0.4.0-beta.7"');
+  expect(readFileSync(resolve(root, "../custom_components/camper_travel_journal/const.py"), "utf8")).toContain('FRONTEND_VERSION = "0.4.0-beta.8"');
   const journal = readFileSync(resolve(root, "src/journal-card.ts"), "utf8");
   expect(journal).toContain("Aus Kosten übernehmen");
   expect(journal).toContain("listFuelExpenses");
   expect(journal).toContain("expense_id: this.tankbookExpenseId");
   expect(journal).toContain("Verknüpfung lösen");
+  expect(journal).toContain('data-action="unlink"');
+  expect(journal).toContain("grid-template-columns:repeat(2");
 });
   it("registers the central card in the catalog while retaining legacy elements", () => {
     const source = readFileSync(resolve(root, "src/index.ts"), "utf8");
@@ -105,6 +107,14 @@ describe("frontend release contract", () => {
     expect(messages({ locale: { language: "de-DE" } } as any).gpxGapBoundary).toContain("GPS-Lücke");
     expect(messages({ locale: { language: "en-US" } } as any).gpxTargetTrip).toBe("Target trip");
     expect(messages({ locale: { language: "en-US" } } as any).gpxNoTrip).toContain("unassigned");
+  });
+  it("translates tankbook diagnostics without exposing internal codes", () => {
+    const german = { locale: { language: "de-DE" } } as any;
+    const english = { locale: { language: "en-US" } } as any;
+    expect(tankbookDiagnostic("gps_distance_is_estimated", german, true)).toEqual({ prefix: "Hinweis", text: "Fahrstrecke anhand von GPS-Daten geschätzt" });
+    expect(tankbookDiagnostic("gps_distance_is_estimated", english, true)).toEqual({ prefix: "Note", text: "Distance estimated from GPS data" });
+    expect(tankbookDiagnostic("gps_coverage_incomplete:start_boundary,end_boundary", german, false)?.text).toContain("GPS-Daten unvollständig");
+    expect(tankbookDiagnostic("future_internal_code", english, false)?.text).toBe("Consumption cannot be determined reliably");
   });
   it("guards reload loops and repeated state updates in card sources", () => {
     const editor = readFileSync(resolve(root, "src/card-editor.ts"), "utf8");
