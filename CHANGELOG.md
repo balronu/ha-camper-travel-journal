@@ -1,5 +1,27 @@
 # Änderungsprotokoll
 
+## 0.4.0-beta.8 – Verbrauchsdiagnose und mobile Tankbuch-Aktionen
+
+### Deutsch
+
+- Interne Verbrauchsdiagnosen werden zentral auf Deutsch und Englisch übersetzt; technische Codes erscheinen nicht mehr in der Journal Card.
+- Gültige GPS-Schätzungen werden als Hinweis, tatsächliche Nichtberechenbarkeit als Grund bezeichnet.
+- Tankbuch-Aktionen sind auf schmalen Displays als zugängliches responsives Raster mit ausreichend großen Touchflächen angeordnet.
+- Löschen bleibt destruktiv, ist aber optisch zurückhaltender; die bestehende Bestätigung und die Kosten-Sicherheit bleiben erhalten.
+- Der reale Beta-7-Fall mit 42,420 l, 380,0 GPS-km und 11,16 l/100 km bleibt unverändert abgedeckt.
+- Schema 15, Verbrauchsformeln, Webasto-Behandlung und produktive Daten bleiben unverändert. v0.3.13 bleibt Stable.
+- Beta-Release; ein Stable-Readiness-Audit folgt rein prüfend und veröffentlicht keinen Stable-Release.
+
+### English
+
+- Internal consumption diagnostics are centrally translated into German and English; technical codes no longer appear in the Journal Card.
+- Valid GPS estimates are labelled as a note, while actual non-calculability is labelled as a reason.
+- Tankbook actions use an accessible responsive layout with sufficiently large touch targets on narrow screens.
+- Delete remains destructive but is visually less dominant; the existing confirmation and expense-safety behavior remain intact.
+- The real Beta-7 case with 42.420 l, 380.0 GPS km and 11.16 l/100 km remains covered unchanged.
+- Schema 15, consumption formulas, Webasto handling and productive data remain unchanged. v0.3.13 remains Stable.
+- Beta release; a read-only Stable Readiness audit follows and does not publish a Stable release.
+
 ## 0.4.0-beta.7 – GPS-Verbrauchsdiagnose
 
 ### Deutsch

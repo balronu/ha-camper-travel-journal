@@ -59,6 +59,24 @@ class TankbookTests(unittest.TestCase):
         self.assertEqual(interval["quality"], "estimated")
         self.assertAlmostEqual(interval["distance_km"], 90.0)
 
+    def test_real_beta7_consumption_case_is_preserved_in_isolated_fixture(self):
+        first = datetime(2026, 10, 23, 9, 26, tzinfo=UTC)
+        second = datetime(2026, 10, 26, 11, 4, tzinfo=UTC)
+        self.event(first, liters=60.792, fill_level="full", amount=13125)
+        self.event(second, liters=42.420, fill_level="full", amount=9201)
+        with self.store.transaction() as connection:
+            connection.execute(
+                "INSERT INTO drives(id,vehicle_id,started_at,ended_at,distance_m,end_reason,created_at) VALUES(?,?,?,?,?,?,?)",
+                ("beta7-real-case", "v1", first.isoformat(), second.isoformat(), 380000, "stop", first.isoformat()),
+            )
+        interval = self.store.tankbook_snapshot("v1")["consumption"]["intervals"]["diesel"][0]
+        self.assertEqual(interval["liters"], 42.42)
+        self.assertEqual(interval["distance_km"], 380.0)
+        self.assertEqual(interval["distance_source"], "gps_drives")
+        self.assertEqual(interval["quality"], "estimated")
+        self.assertAlmostEqual(interval["combined_l_per_100km"], 11.163, places=3)
+        self.assertEqual(interval["heater_quality"], "unknown")
+
     def test_gps_gap_does_not_produce_a_precise_value(self):
         self.event(self.now, liters=50, fill_level="full")
         self.event(self.now + timedelta(days=1), liters=40, fill_level="full")

@@ -79,6 +79,25 @@ jobs:
           if (!result.noProviderRequest || !result.noHorizontalOverflow) throw new Error(`module editor mobile regression failed: ${JSON.stringify(result)}`);
           console.log(JSON.stringify(result));
           NODE
+      - name: Run Beta 8 tankbook and diagnostic regression
+        run: |
+          python3 -m http.server 8765 --bind 127.0.0.1 >/tmp/camper-travel-journal-tankbook-http.log 2>&1 &
+          server_pid=$!
+          trap 'kill "$server_pid"' EXIT
+          sleep 0.3
+          chromium --headless --no-sandbox --disable-gpu --window-size=390,900 --virtual-time-budget=6000 \
+            --dump-dom http://127.0.0.1:8765/frontend/tests/browser/tankbook-beta8.html >/tmp/camper-travel-journal-tankbook-dom.html
+          node - <<'NODE'
+          const fs = require('fs');
+          const html = fs.readFileSync('/tmp/camper-travel-journal-tankbook-dom.html', 'utf8');
+          const match = html.match(/<pre id="result">([\s\S]*?)<\/pre>/);
+          if (!match) throw new Error('tankbook harness returned no result');
+          const result = JSON.parse(match[1]);
+          if (!result.german.note || result.german.noRawCode || result.german.actions !== true || !result.german.touch || !result.german.noHorizontalOverflow) throw new Error(`German tankbook regression failed: ${JSON.stringify(result)}`);
+          if (!result.english.note || result.english.noRawCode) throw new Error(`English tankbook regression failed: ${JSON.stringify(result)}`);
+          if (!result.consumption || !result.webasto || result.visibleTemplateLeak) throw new Error(`tankbook result regression failed: ${JSON.stringify(result)}`);
+          console.log(JSON.stringify(result));
+          NODE
       - name: Run expense category interaction regression
         run: |
           python3 -m http.server 8765 --bind 127.0.0.1 >/tmp/camper-travel-journal-expense-http.log 2>&1 &
