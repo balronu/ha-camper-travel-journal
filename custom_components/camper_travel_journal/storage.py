@@ -1749,7 +1749,21 @@ class SQLiteStore:
     def tankbook_snapshot(self, vehicle_id: str, *, heater: dict | None = None) -> dict:
         events = self.list_tank_events(vehicle_id)
         drives = self.list_drives(vehicle_id)
-        return {"events": events, "consumption": calculate_consumption(events, drives, heater=heater)}
+        for drive in drives:
+            drive["gps_points"] = [dict(row) for row in self.connection.execute(
+                "SELECT p.recorded_at,p.latitude,p.longitude FROM drive_gps_points dgp "
+                "JOIN gps_points p ON p.id=dgp.gps_point_id WHERE dgp.drive_id=? ORDER BY dgp.ordinal",
+                (drive["id"],),
+            ).fetchall()]
+        gps_points: list[dict] = []
+        if events:
+            stamps = [event["occurred_at"] for event in events]
+            first, last = min(stamps), max(stamps)
+            gps_points = [dict(row) for row in self.connection.execute(
+                "SELECT recorded_at,latitude,longitude FROM gps_points WHERE vehicle_id=? "
+                "AND recorded_at BETWEEN ? AND ? ORDER BY recorded_at,id", (vehicle_id, first, last)
+            ).fetchall()]
+        return {"events": events, "consumption": calculate_consumption(events, drives, heater=heater, gps_points=gps_points)}
 
     def delete_expense(self, expense_id: str) -> None:
         with self.transaction() as connection:
