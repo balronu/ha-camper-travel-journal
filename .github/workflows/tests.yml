@@ -93,8 +93,8 @@ jobs:
           const match = html.match(/<pre id="result">([\s\S]*?)<\/pre>/);
           if (!match) throw new Error('tankbook harness returned no result');
           const result = JSON.parse(match[1]);
-          if (!result.german.note || result.german.noRawCode || result.german.actions !== true || !result.german.touch || !result.german.noHorizontalOverflow) throw new Error(`German tankbook regression failed: ${JSON.stringify(result)}`);
-          if (!result.english.note || result.english.noRawCode) throw new Error(`English tankbook regression failed: ${JSON.stringify(result)}`);
+          if (!result.german.note || !result.german.noRawCode || result.german.actions !== true || !result.german.touch || !result.german.noHorizontalOverflow) throw new Error(`German tankbook regression failed: ${JSON.stringify(result)}`);
+          if (!result.english.note || !result.english.noRawCode) throw new Error(`English tankbook regression failed: ${JSON.stringify(result)}`);
           if (!result.consumption || !result.webasto || result.visibleTemplateLeak) throw new Error(`tankbook result regression failed: ${JSON.stringify(result)}`);
           console.log(JSON.stringify(result));
           NODE
