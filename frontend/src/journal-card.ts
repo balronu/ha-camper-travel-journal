@@ -1,6 +1,6 @@
 import { css, html } from "lit";
 import { TravelCard, defineOnce } from "./base-card";
-import { assignInterruption, createStopFromInterruption, deleteDrive, list, listVehicles, type Drive, type Snapshot, type Trip, type TripInterruption } from "./api";
+import { assignInterruption, createStopFromInterruption, createTankEvent, deleteDrive, deleteTankEvent, list, listTankbook, listVehicles, updateTankEvent, type ConsumptionInterval, type Drive, type Snapshot, type TankbookSnapshot, type TankEvent, type Trip, type TripInterruption } from "./api";
 import { clearActiveTrip, publishActiveTrip, readActiveTrip, type TripContextDetail, ACTIVE_TRIP_CHANGED_EVENT } from "./trip-context";
 import { notifyTravelChanged, TRAVEL_DATA_CHANGED_EVENT } from "./expense-events";
 import { driveDeleteMessages, formatDateTime, formatDuration, formatMoneyMinor, formatTripPeriod, messages, statusLabel } from "./i18n";
@@ -44,6 +44,10 @@ export class JournalCard extends TravelCard {
   private driveDeleting = false;
   private overviewRequest = 0;
   private detailRequest = 0;
+  private tankbook?: TankbookSnapshot;
+  private tankbookEditingId = "";
+  private tankbookSaving = false;
+  private tankbookForm = { occurred_at: "", fuel_type: "diesel", liters: "", price_per_liter: "", amount_minor: "", odometer_km: "", fill_level: "unknown", station: "", note: "" };
 
   connectedCallback() {
     super.connectedCallback();
@@ -57,7 +61,7 @@ export class JournalCard extends TravelCard {
     super.disconnectedCallback();
   }
   protected onHassConnectionChanged() { void this.refreshOverview(); }
-  protected onConfigChanged() { this.closeTrip(false); void this.refreshOverview(); }
+  protected onConfigChanged() { this.closeTrip(false); this.tankbook = undefined; void this.refreshOverview(); }
   protected updated() {
     const dialog = this.renderRoot.querySelector("dialog.interruption-dialog") as HTMLDialogElement | null;
     if (dialog) {
@@ -95,7 +99,34 @@ export class JournalCard extends TravelCard {
     if (!this.hass || !tripId) return;
     const request = ++this.detailRequest;
     const detail = await list(this.hass, this.vehicleId, tripId);
-    if (request === this.detailRequest && this.openTripId === tripId) this.detail = detail;
+    const tankbook = this.tankbookEnabled() ? await listTankbook(this.hass, this.vehicleId) : undefined;
+    if (request === this.detailRequest && this.openTripId === tripId) { this.detail = detail; this.tankbook = tankbook; }
+  }
+  private tankbookEnabled() { return orderedJournalModules(this.config.modules, this.config.module_order).includes("tankbook"); }
+  private editTankEvent(event: TankEvent) {
+    this.tankbookEditingId = event.id;
+    this.tankbookForm = { occurred_at: event.occurred_at.slice(0, 16), fuel_type: event.fuel_type, liters: String(event.liters), price_per_liter: event.price_per_liter == null ? "" : String(event.price_per_liter), amount_minor: event.amount_minor == null ? "" : String(event.amount_minor / 100), odometer_km: event.odometer_km == null ? "" : String(event.odometer_km), fill_level: event.fill_level, station: event.station ?? "", note: event.note ?? "" };
+    this.requestUpdate();
+  }
+  private resetTankEventForm() {
+    this.tankbookEditingId = "";
+    this.tankbookForm = { occurred_at: new Date().toISOString().slice(0, 16), fuel_type: "diesel", liters: "", price_per_liter: "", amount_minor: "", odometer_km: "", fill_level: "unknown", station: "", note: "" };
+  }
+  private async saveTankEvent() {
+    if (!this.hass || this.tankbookSaving || !this.tankbookForm.occurred_at) return;
+    this.tankbookSaving = true; this.requestUpdate();
+    const data: Record<string, unknown> = { occurred_at: new Date(this.tankbookForm.occurred_at).toISOString(), fuel_type: this.tankbookForm.fuel_type, liters: Number(this.tankbookForm.liters), fill_level: this.tankbookForm.fill_level, price_per_liter: this.tankbookForm.price_per_liter ? Number(this.tankbookForm.price_per_liter) : undefined, amount_minor: this.tankbookForm.amount_minor ? Math.round(Number(this.tankbookForm.amount_minor) * 100) : undefined, odometer_km: this.tankbookForm.odometer_km ? Number(this.tankbookForm.odometer_km) : undefined, station: this.tankbookForm.station.trim() || undefined, note: this.tankbookForm.note.trim() || undefined };
+    try {
+      if (this.tankbookEditingId) await updateTankEvent(this.hass, this.vehicleId, this.tankbookEditingId, data);
+      else await createTankEvent(this.hass, this.vehicleId, data);
+      this.tankbook = await listTankbook(this.hass, this.vehicleId);
+      this.resetTankEventForm();
+    } catch (error) { this.error = error instanceof Error ? error.message : messages(this.hass).loadError; }
+    finally { this.tankbookSaving = false; this.requestUpdate(); }
+  }
+  private async removeTankEvent(event: TankEvent) {
+    if (!this.hass || !window.confirm(`Tankvorgang vom ${formatDateTime(event.occurred_at, this.hass)} löschen?`)) return;
+    try { await deleteTankEvent(this.hass, this.vehicleId, event.id); this.tankbook = await listTankbook(this.hass, this.vehicleId); if (this.tankbookEditingId === event.id) this.resetTankEventForm(); this.requestUpdate(); } catch (error) { this.error = error instanceof Error ? error.message : messages(this.hass).loadError; this.requestUpdate(); }
   }
   private async openTrip(tripId = this.selectedTripId) {
     if (!tripId || !this.overview?.trips.some((trip) => trip.id === tripId)) return;
@@ -193,7 +224,13 @@ export class JournalCard extends TravelCard {
     if (!current.open) return;
     this.shadowRoot?.querySelectorAll<HTMLDetailsElement>(".journal-section details").forEach((details) => { if (details !== current) details.open = false; });
   }
-  private renderModule(module: JournalModuleId, lang: ReturnType<typeof messages>, trip: Trip, content: { overview: unknown; drives: unknown; stays: unknown; expenses: unknown; map: unknown; gpx: unknown; pdf: unknown }, counts: Partial<Record<JournalModuleId, number>>) {
+  private renderTankbook(lang: ReturnType<typeof messages>) {
+    const events = this.tankbook?.events ?? [];
+    const intervals = this.tankbook?.consumption?.intervals?.diesel ?? [];
+    const qualityLabel = (quality: string) => quality === "measured" ? "gemessen" : quality === "estimated" ? "geschätzt" : quality === "incomplete" ? "unvollständig" : "nicht berechenbar";
+    return html`<div class="tankbook"><form class="form-grid tankbook-form" @submit=${(event: SubmitEvent) => { event.preventDefault(); void this.saveTankEvent(); }}><label>Datum/Zeit<input type="datetime-local" .value=${this.tankbookForm.occurred_at} @input=${(event: Event) => this.tankbookForm.occurred_at = (event.currentTarget as HTMLInputElement).value} required></label><label>Betriebsstoff<select .value=${this.tankbookForm.fuel_type} @change=${(event: Event) => this.tankbookForm.fuel_type = (event.currentTarget as HTMLSelectElement).value}><option value="diesel">Diesel</option><option value="adblue">AdBlue</option><option value="other">Sonstiges</option></select></label><label>Liter<input type="number" min="0.001" step="0.001" .value=${this.tankbookForm.liters} @input=${(event: Event) => this.tankbookForm.liters = (event.currentTarget as HTMLInputElement).value} required></label><label>Füllstand<select .value=${this.tankbookForm.fill_level} @change=${(event: Event) => this.tankbookForm.fill_level = (event.currentTarget as HTMLSelectElement).value}><option value="full">Volltankung</option><option value="partial">Teilbetankung</option><option value="unknown">Unbekannt</option></select></label><label>Kilometerstand<input type="number" min="0" step="0.1" .value=${this.tankbookForm.odometer_km} @input=${(event: Event) => this.tankbookForm.odometer_km = (event.currentTarget as HTMLInputElement).value}></label><label>Preis/Liter<input type="number" min="0" step="0.001" .value=${this.tankbookForm.price_per_liter} @input=${(event: Event) => this.tankbookForm.price_per_liter = (event.currentTarget as HTMLInputElement).value}></label><label>Gesamtbetrag €<input type="number" min="0" step="0.01" .value=${this.tankbookForm.amount_minor} @input=${(event: Event) => this.tankbookForm.amount_minor = (event.currentTarget as HTMLInputElement).value}></label><label>Tankstelle<input .value=${this.tankbookForm.station} @input=${(event: Event) => this.tankbookForm.station = (event.currentTarget as HTMLInputElement).value}></label><label class="full-width">Bemerkung<textarea .value=${this.tankbookForm.note} @input=${(event: Event) => this.tankbookForm.note = (event.currentTarget as HTMLTextAreaElement).value}></textarea></label><div class="actions full-width"><button type="submit" ?disabled=${this.tankbookSaving}>${this.tankbookEditingId ? "Tankvorgang aktualisieren" : "Tankvorgang hinzufügen"}</button>${this.tankbookEditingId ? html`<button type="button" class="secondary" @click=${() => { this.resetTankEventForm(); this.requestUpdate(); }}>Abbrechen</button>` : ""}</div></form><p class="muted">Tankausgaben werden nicht automatisch als neue Kosten gebucht. Heizungsverbrauch: unbekannt, solange keine belastbaren Webasto-Daten hinterlegt sind.</p>${intervals.map((interval: ConsumptionInterval) => html`<article class="tankbook-interval"><strong>${interval.combined_l_per_100km == null ? "Verbrauch nicht berechenbar" : `${interval.combined_l_per_100km.toFixed(2)} l/100 km`}</strong><span>${interval.distance_source === "gps_drives" ? "Strecke aus GPS-Daten" : "Strecke aus Kilometerständen"} · ${qualityLabel(interval.quality)}</span><span>Gemessene Dieselmenge: ${interval.liters.toFixed(3)} l · ${interval.heater_quality === "unknown" ? "Heizungsverbrauch unbekannt" : "Heizungsverbrauch geschätzt"}</span></article>`)}<div class="tankbook-events">${events.map((event) => html`<article class="tankbook-event"><div><strong>${event.fuel_type === "diesel" ? "Diesel" : event.fuel_type === "adblue" ? "AdBlue" : "Sonstiges"} · ${event.liters.toFixed(3)} l</strong><span>${formatDateTime(event.occurred_at, this.hass)} · ${event.fill_level === "full" ? "Volltankung" : event.fill_level === "partial" ? "Teilbetankung" : "Füllstand unbekannt"}</span><span>${event.odometer_km == null ? "Kilometerstand fehlt" : `${event.odometer_km.toFixed(1)} km`}${event.amount_minor == null ? " · Belegbetrag fehlt" : ` · ${(event.amount_minor / 100).toFixed(2)} €`}</span></div><span class="actions"><button type="button" class="secondary" @click=${() => this.editTankEvent(event)}>Bearbeiten</button><button type="button" class="danger" @click=${() => void this.removeTankEvent(event)}>Löschen</button></span></article>`)}</div></div>`;
+  }
+  private renderModule(module: JournalModuleId, lang: ReturnType<typeof messages>, trip: Trip, content: { overview: unknown; drives: unknown; stays: unknown; expenses: unknown; map: unknown; gpx: unknown; pdf: unknown; tankbook: unknown }, counts: Partial<Record<JournalModuleId, number>>) {
     const labels: Record<JournalModuleId, [string, string]> = {
       overview: [lang.journalOverview ?? "Trip overview", "▣"],
       drives: [lang.journalDrives ?? "Drives and interruptions", "↔"],
@@ -205,7 +242,7 @@ export class JournalCard extends TravelCard {
       tankbook: [lang.module_tankbook ?? "Fuel log", "⛽"],
     };
     const [title, icon] = labels[module];
-    if (module === "tankbook") return this.section(title, icon, undefined, html`<p class="muted">${lang.modulePlannedHint ?? "This module is reserved for a future release. No tank data or provider request is used in this beta."}</p>`);
+    if (module === "tankbook") return this.section(title, icon, counts[module], this.renderTankbook(lang));
     const values: Record<string, unknown> = content;
     return this.section(title, icon, counts[module], values[module]);
   }
@@ -241,12 +278,14 @@ export class JournalCard extends TravelCard {
       map,
       gpx: html`${manager("gpx")}`,
       pdf: html`${manager("pdf")}`,
+      tankbook: this.renderTankbook(lang),
     };
     const modules = orderedJournalModules(this.config.modules, this.config.module_order);
     const moduleCounts: Partial<Record<JournalModuleId, number>> = {
       drives: (snapshot?.drives.length ?? 0) + interruptions.length,
       stays: confirmed.length,
       expenses: snapshot?.expenses?.length ?? 0,
+      tankbook: this.tankbook?.events.length ?? 0,
     };
     return html`<header class="trip-header"><div><p class="eyebrow">${lang.journalOpenTrip ?? "Geöffnete Reise"}</p><h2>${trip.title}</h2><p class="muted">${trip.destination || lang.noDestination} · ${formatTripPeriod(trip, this.hass)} · ${statusLabel(trip.status, this.hass)}${this.vehicleName ? ` · ${this.vehicleName}` : ""}</p><div class="trip-management" @trip-switch=${() => this.closeTrip()}>${manager("trip-actions")}</div></div></header>
       ${modules.map((module) => this.renderModule(module, lang, trip, moduleContent, moduleCounts))}
@@ -281,5 +320,12 @@ JournalCard.styles = [TravelCard.styles, css`
   dialog label { display: grid; gap: 5px; }
   dialog textarea { min-height: 4rem; }
   .dialog-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 4px; }
+  .tankbook { display:grid; gap:12px; min-width:0; }
+  .tankbook-form { padding:12px; border:1px solid var(--divider-color); border-radius:10px; }
+  .tankbook-event, .tankbook-interval { display:flex; justify-content:space-between; align-items:flex-start; gap:10px; padding:10px; margin-top:7px; border-radius:9px; background:var(--secondary-background-color); }
+  .tankbook-event > div, .tankbook-interval { display:grid; gap:3px; min-width:0; }
+  .tankbook-event span, .tankbook-interval span { color:var(--secondary-text-color); font-size:.88em; overflow-wrap:anywhere; }
+  .full-width { grid-column:1/-1; }
+  @media(max-width:600px) { .tankbook-event { flex-direction:column; } .tankbook-event .actions { width:100%; } .tankbook-event .actions button { flex:1; } }
 `] as any;
 defineOnce("camper-travel-journal-journal-card", JournalCard);

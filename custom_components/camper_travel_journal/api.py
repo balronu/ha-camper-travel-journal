@@ -87,7 +87,7 @@ async def _reverse_geocode(hass: HomeAssistant, runtime, latitude: float, longit
         async with session.get(
             _NOMINATIM_URL,
             params={"lat": f"{round(latitude, 3):.3f}", "lon": f"{round(longitude, 3):.3f}", "format": "jsonv2", "zoom": "10", "addressdetails": "1"},
-            headers={"User-Agent": "Camper Travel Journal/0.4.0-beta.3"},
+            headers={"User-Agent": "Camper Travel Journal/0.4.0-beta.4"},
             timeout=5,
         ) as response:
             if response.status != 200:
@@ -523,6 +523,55 @@ if websocket_api is not None:
             connection.send_result(msg["id"], {"stop_id": stop_id})
         except Exception as err: _send_error(connection, msg, err)
 
+    @websocket_api.websocket_command({**_base("camper_travel_journal/list_tankbook")})
+    @websocket_api.async_response
+    async def ws_list_tankbook(hass, connection, msg):
+        try:
+            connection.send_result(msg["id"], await _call(hass, msg, "tankbook_snapshot", msg["vehicle_id"]))
+        except Exception as err: _send_error(connection, msg, err)
+
+    _tank_event_fields = {
+        vol.Required("occurred_at"): str,
+        vol.Required("liters"): vol.Coerce(float),
+        vol.Optional("odometer_km"): vol.Any(vol.Coerce(float), None),
+        vol.Optional("fuel_type", default="diesel"): str,
+        vol.Optional("price_per_liter"): vol.Any(vol.Coerce(float), None),
+        vol.Optional("amount_minor"): vol.Any(vol.Coerce(int), None),
+        vol.Optional("fill_level", default="unknown"): str,
+        vol.Optional("station"): vol.Any(str, None),
+        vol.Optional("note"): vol.Any(str, None),
+        vol.Optional("trip_id"): vol.Any(str, None),
+        vol.Optional("expense_id"): vol.Any(str, None),
+    }
+
+    @websocket_api.websocket_command({**_base("camper_travel_journal/create_tank_event"), **_tank_event_fields})
+    @websocket_api.async_response
+    async def ws_create_tank_event(hass, connection, msg):
+        try:
+            fields = {key: msg[key] for key in ("odometer_km", "fuel_type", "liters", "price_per_liter", "amount_minor", "fill_level", "station", "note", "trip_id", "expense_id") if key in msg}
+            fields["occurred_at"] = _timestamp(msg["occurred_at"])
+            event_id = await _call(hass, msg, "create_tank_event", msg["vehicle_id"], _now(), **fields)
+            connection.send_result(msg["id"], {"event_id": event_id})
+        except Exception as err: _send_error(connection, msg, err)
+
+    @websocket_api.websocket_command({**_base("camper_travel_journal/update_tank_event"), vol.Required("event_id"): str, vol.Optional("occurred_at"): str, vol.Optional("odometer_km"): vol.Any(vol.Coerce(float), None), vol.Optional("fuel_type"): str, vol.Optional("liters"): vol.Coerce(float), vol.Optional("price_per_liter"): vol.Any(vol.Coerce(float), None), vol.Optional("amount_minor"): vol.Any(vol.Coerce(int), None), vol.Optional("fill_level"): str, vol.Optional("station"): vol.Any(str, None), vol.Optional("note"): vol.Any(str, None), vol.Optional("trip_id"): vol.Any(str, None), vol.Optional("expense_id"): vol.Any(str, None)})
+    @websocket_api.async_response
+    async def ws_update_tank_event(hass, connection, msg):
+        try:
+            fields = {key: msg[key] for key in ("odometer_km", "fuel_type", "liters", "price_per_liter", "amount_minor", "fill_level", "station", "note", "trip_id", "expense_id") if key in msg}
+            if "occurred_at" in msg: fields["occurred_at"] = _timestamp(msg["occurred_at"])
+            await _call(hass, msg, "update_tank_event", msg["event_id"], _now(), **fields)
+            connection.send_result(msg["id"], {"success": True})
+        except Exception as err: _send_error(connection, msg, err)
+
+    @websocket_api.websocket_command({**_base("camper_travel_journal/delete_tank_event"), vol.Required("event_id"): str})
+    @websocket_api.async_response
+    async def ws_delete_tank_event(hass, connection, msg):
+        try:
+            await _call(hass, msg, "delete_tank_event", msg["event_id"])
+            connection.send_result(msg["id"], {"success": True})
+        except Exception as err: _send_error(connection, msg, err)
+
     @websocket_api.websocket_command({**_base("camper_travel_journal/create_expense"), vol.Required("trip_id"): str, vol.Optional("occurred_at"): str, vol.Optional("occurred_on"): str, vol.Optional("occurred_time"): str, vol.Required("category"): str, vol.Optional("amount_minor"): vol.Coerce(int), vol.Optional("currency", default="EUR"): str, vol.Optional("note"): vol.Any(str, None), vol.Optional("odometer_km"): vol.Coerce(float), vol.Optional("place_id"): str, vol.Optional("stay_id"): str, vol.Optional("fuel_liters"): vol.Any(vol.Coerce(float), None), vol.Optional("fuel_price_per_liter"): vol.Any(vol.Coerce(float), None), vol.Optional("services", default=[]): [str]})
     @websocket_api.async_response
     async def ws_create_expense(hass, connection, msg):
@@ -652,7 +701,7 @@ if websocket_api is not None:
             connection.send_result(msg["id"], result)
         except Exception as err: _send_error(connection, msg, err)
 
-    COMMANDS = (ws_list_vehicles, ws_export_pdf, ws_list, ws_route, ws_diagnostics, ws_create_trip, ws_update_trip, ws_delete_trip, ws_transition_trip, ws_link_drives, ws_unlink_drive, ws_create_manual_drive, ws_update_manual_drive, ws_delete_manual_drive, ws_delete_drive, ws_create_stop, ws_update_stop, ws_delete_stop, ws_assign_interruption, ws_create_stop_from_interruption, ws_create_expense, ws_update_expense, ws_delete_expense, ws_update_overnight, ws_update_rating, ws_delete_rating, ws_list_stop_suggestions, ws_generate_stop_suggestions, ws_accept_stop_suggestion, ws_dismiss_stop_suggestion, ws_analyze_gpx, ws_import_gpx)
+    COMMANDS = (ws_list_vehicles, ws_export_pdf, ws_list, ws_route, ws_diagnostics, ws_create_trip, ws_update_trip, ws_delete_trip, ws_transition_trip, ws_link_drives, ws_unlink_drive, ws_create_manual_drive, ws_update_manual_drive, ws_delete_manual_drive, ws_delete_drive, ws_create_stop, ws_update_stop, ws_delete_stop, ws_assign_interruption, ws_create_stop_from_interruption, ws_list_tankbook, ws_create_tank_event, ws_update_tank_event, ws_delete_tank_event, ws_create_expense, ws_update_expense, ws_delete_expense, ws_update_overnight, ws_update_rating, ws_delete_rating, ws_list_stop_suggestions, ws_generate_stop_suggestions, ws_accept_stop_suggestion, ws_dismiss_stop_suggestion, ws_analyze_gpx, ws_import_gpx)
 else:
     COMMANDS = ()
 

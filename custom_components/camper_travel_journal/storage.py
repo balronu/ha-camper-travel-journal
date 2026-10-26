@@ -18,10 +18,11 @@ from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 from .fuel import resolve_fuel_values
+from .tankbook import FILL_LEVELS, FUEL_TYPES, calculate_consumption, normalize_tank_values
 from .travel import validate_amount, validate_expense_category, validate_expense_currency, validate_expense_note, validate_expense_services
 from .validation import is_coordinate_label
 
-SCHEMA_VERSION = 14
+SCHEMA_VERSION = 15
 V10_GPX_BACKFILL_MARKER = "v10_gpx_backfill"
 
 
@@ -217,6 +218,8 @@ class SQLiteStore:
                     self._migrate_v13()
                 if previous < 14:
                     self._migrate_v14()
+                if previous < 15:
+                    self._migrate_v15()
                 if self.connection.execute(
                     "SELECT 1 FROM schema_meta WHERE key=?", (V10_GPX_BACKFILL_MARKER,)
                 ).fetchone() is None:
@@ -513,6 +516,32 @@ class SQLiteStore:
         );
         CREATE INDEX IF NOT EXISTS idx_drive_deletion_exclusions_vehicle_time
           ON drive_deletion_exclusions(vehicle_id, started_at, ended_at);
+        """)
+
+    def _migrate_v15(self) -> None:
+        """Add the vehicle-scoped tankbook without rewriting expenses."""
+        if self.connection is None:
+            raise RuntimeError("store is not open")
+        self._execute_migration_script("""
+        CREATE TABLE IF NOT EXISTS tank_events (
+          id TEXT PRIMARY KEY,
+          vehicle_id TEXT NOT NULL REFERENCES vehicles(id) ON DELETE CASCADE,
+          occurred_at TEXT NOT NULL,
+          odometer_km REAL,
+          fuel_type TEXT NOT NULL CHECK(fuel_type IN ('diesel','adblue','other')),
+          liters REAL NOT NULL CHECK(liters > 0),
+          price_per_liter REAL,
+          amount_minor INTEGER,
+          fill_level TEXT NOT NULL DEFAULT 'unknown' CHECK(fill_level IN ('full','partial','unknown')),
+          station TEXT,
+          note TEXT,
+          trip_id TEXT REFERENCES trips(id) ON DELETE SET NULL,
+          expense_id TEXT UNIQUE REFERENCES expenses(id) ON DELETE SET NULL,
+          created_at TEXT NOT NULL,
+          updated_at TEXT NOT NULL
+        );
+        CREATE INDEX IF NOT EXISTS idx_tank_events_vehicle_time ON tank_events(vehicle_id, occurred_at);
+        CREATE INDEX IF NOT EXISTS idx_tank_events_vehicle_fuel_time ON tank_events(vehicle_id, fuel_type, occurred_at);
         """)
 
     def _execute_migration_script(self, script: str) -> None:
@@ -1578,6 +1607,114 @@ class SQLiteStore:
         for expense in expenses:
             expense["services"] = [row[0] for row in self.connection.execute("SELECT service_id FROM expense_service_links WHERE expense_id=? ORDER BY rowid", (expense["id"],)).fetchall()]
         return expenses
+
+    def create_tank_event(self, vehicle_id: str, now: datetime, **fields) -> str:
+        """Create a vehicle-scoped tank event without creating an expense."""
+        if self.connection is None:
+            raise RuntimeError("store is not open")
+        fuel_type = fields.get("fuel_type", "diesel")
+        fill_level = fields.get("fill_level", "unknown")
+        if fuel_type not in FUEL_TYPES:
+            raise ValueError("tankbook_fuel_type_invalid")
+        if fill_level not in FILL_LEVELS:
+            raise ValueError("tankbook_fill_level_invalid")
+        occurred_at = fields.get("occurred_at")
+        if not isinstance(occurred_at, datetime):
+            raise ValueError("tankbook_timestamp_invalid")
+        liters, price, amount = normalize_tank_values(fields.get("liters"), fields.get("price_per_liter"), fields.get("amount_minor"))
+        odometer = fields.get("odometer_km")
+        if odometer is not None and (not isfinite(float(odometer)) or float(odometer) < 0):
+            raise ValueError("tankbook_odometer_invalid")
+        event_id = fields.get("event_id") or str(uuid.uuid4())
+        trip_id = fields.get("trip_id")
+        expense_id = fields.get("expense_id")
+        with self.transaction() as connection:
+            vehicle = connection.execute("SELECT 1 FROM vehicles WHERE id=?", (vehicle_id,)).fetchone()
+            if vehicle is None:
+                raise ValueError("vehicle_not_found")
+            if connection.execute(
+                "SELECT 1 FROM tank_events WHERE vehicle_id=? AND occurred_at=? AND fuel_type=? AND liters=? "
+                "AND COALESCE(amount_minor,-1)=COALESCE(?,-1) LIMIT 1",
+                (vehicle_id, utc_iso(occurred_at), fuel_type, liters, amount),
+            ).fetchone():
+                raise ValueError("tankbook_duplicate")
+            self._validate_tank_links(connection, vehicle_id, trip_id, expense_id)
+            stamp = utc_iso(now)
+            connection.execute(
+                "INSERT INTO tank_events(id,vehicle_id,occurred_at,odometer_km,fuel_type,liters,price_per_liter,amount_minor,fill_level,station,note,trip_id,expense_id,created_at,updated_at) "
+                "VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+                (event_id, vehicle_id, utc_iso(occurred_at), odometer, fuel_type, liters, price, amount, fill_level,
+                 fields.get("station"), fields.get("note"), trip_id, expense_id, stamp, stamp),
+            )
+        return event_id
+
+    @staticmethod
+    def _validate_tank_links(connection, vehicle_id: str, trip_id: str | None, expense_id: str | None) -> None:
+        if trip_id is not None:
+            trip = connection.execute("SELECT vehicle_id FROM trips WHERE id=?", (trip_id,)).fetchone()
+            if trip is None:
+                raise ValueError("trip_not_found")
+            if trip[0] != vehicle_id:
+                raise ValueError("vehicle_mismatch")
+        if expense_id is not None:
+            expense = connection.execute(
+                "SELECT e.category,t.vehicle_id FROM expenses e LEFT JOIN trips t ON t.id=e.trip_id WHERE e.id=?",
+                (expense_id,),
+            ).fetchone()
+            if expense is None:
+                raise ValueError("expense_not_found")
+            if expense[0] != "fuel":
+                raise ValueError("tankbook_expense_not_fuel")
+            if expense[1] != vehicle_id:
+                raise ValueError("vehicle_mismatch")
+
+    def list_tank_events(self, vehicle_id: str) -> list[dict]:
+        if self.connection is None:
+            raise RuntimeError("store is not open")
+        rows = self.connection.execute(
+            "SELECT e.*, t.title AS trip_title FROM tank_events e LEFT JOIN trips t ON t.id=e.trip_id "
+            "WHERE e.vehicle_id=? ORDER BY e.occurred_at DESC, e.id DESC", (vehicle_id,)
+        ).fetchall()
+        return [dict(row) for row in rows]
+
+    def update_tank_event(self, event_id: str, now: datetime, **fields) -> None:
+        if self.connection is None:
+            raise RuntimeError("store is not open")
+        allowed = {"occurred_at", "odometer_km", "fuel_type", "liters", "price_per_liter", "amount_minor", "fill_level", "station", "note", "trip_id", "expense_id"}
+        with self.transaction() as connection:
+            current = connection.execute("SELECT * FROM tank_events WHERE id=?", (event_id,)).fetchone()
+            if current is None:
+                raise ValueError("tankbook_not_found")
+            merged = dict(current)
+            for key, value in fields.items():
+                if key in allowed:
+                    merged[key] = value
+            if isinstance(merged["occurred_at"], datetime):
+                merged["occurred_at"] = utc_iso(merged["occurred_at"])
+            if merged["fuel_type"] not in FUEL_TYPES:
+                raise ValueError("tankbook_fuel_type_invalid")
+            if merged["fill_level"] not in FILL_LEVELS:
+                raise ValueError("tankbook_fill_level_invalid")
+            liters, price, amount = normalize_tank_values(merged["liters"], merged.get("price_per_liter"), merged.get("amount_minor"))
+            if merged.get("odometer_km") is not None and (not isfinite(float(merged["odometer_km"])) or float(merged["odometer_km"]) < 0):
+                raise ValueError("tankbook_odometer_invalid")
+            self._validate_tank_links(connection, current["vehicle_id"], merged.get("trip_id"), merged.get("expense_id"))
+            connection.execute(
+                "UPDATE tank_events SET occurred_at=?,odometer_km=?,fuel_type=?,liters=?,price_per_liter=?,amount_minor=?,fill_level=?,station=?,note=?,trip_id=?,expense_id=?,updated_at=? WHERE id=?",
+                (merged["occurred_at"], merged.get("odometer_km"), merged["fuel_type"], liters, price, amount,
+                 merged["fill_level"], merged.get("station"), merged.get("note"), merged.get("trip_id"), merged.get("expense_id"), utc_iso(now), event_id),
+            )
+
+    def delete_tank_event(self, event_id: str) -> None:
+        with self.transaction() as connection:
+            cursor = connection.execute("DELETE FROM tank_events WHERE id=?", (event_id,))
+            if cursor.rowcount != 1:
+                raise ValueError("tankbook_not_found")
+
+    def tankbook_snapshot(self, vehicle_id: str, *, heater: dict | None = None) -> dict:
+        events = self.list_tank_events(vehicle_id)
+        drives = self.list_drives(vehicle_id)
+        return {"events": events, "consumption": calculate_consumption(events, drives, heater=heater)}
 
     def delete_expense(self, expense_id: str) -> None:
         with self.transaction() as connection:
