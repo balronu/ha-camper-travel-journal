@@ -40,10 +40,10 @@ const interruption = { saved: overnightSaves === 1, overnightCount: card.shadowR
 const driveDeleteButton = card.shadowRoot.querySelector(".drive-delete-icon"); driveDeleteButton?.click();
 await waitFor(() => Boolean(card.shadowRoot.querySelector("dialog.drive-delete-dialog")?.open));
 const driveDialog = card.shadowRoot.querySelector("dialog.drive-delete-dialog");
-const driveDeletePrompt = Boolean(driveDialog?.textContent?.includes("565,3 km") && driveDialog?.textContent?.includes("GPS-Rohpunkte"));
+const driveDeletePrompt = Boolean(driveDialog?.textContent?.includes("565.3 km") && driveDialog?.textContent?.includes("GPS-Rohpunkte"));
 driveDialog?.querySelector("button[type='submit']")?.click();
 await waitFor(() => !card.shadowRoot.querySelector(".drive-delete-icon") && !card.shadowRoot.querySelector("dialog.drive-delete-dialog")?.open);
-const driveDeletion = { prompted: driveDeletePrompt, apiDriveId: deletedDriveId, removedFromList: !card.shadowRoot.textContent.includes("565,3 km") };
+const driveDeletion = { prompted: driveDeletePrompt, apiDriveId: deletedDriveId, removedFromList: !card.shadowRoot.textContent.includes("565.3 km") };
 const actionManager = card.shadowRoot.querySelector(".trip-management camper-travel-journal-manager-card");
 const close = [...(actionManager?.shadowRoot?.querySelectorAll("button") ?? [])].find((button) => button.textContent.includes("Reise wechseln")); close?.click();
 await waitFor(() => Boolean(card.shadowRoot.querySelector(".entry")));
