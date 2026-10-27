@@ -6,7 +6,7 @@
 
 <h1 align="center">Camper Travel Journal</h1>
 <p align="center">Your digital camper travel journal for Home Assistant</p>
-<p align="center"><strong>Stable: v0.4.0</strong></p>
+<p align="center"><strong>Stable: v0.4.1</strong></p>
 
 <p align="center">
   <a href="https://github.com/balronu/ha-camper-travel-journal/releases/latest"><img src="https://img.shields.io/github/v/release/balronu/ha-camper-travel-journal?label=Release" alt="Release"></a>
@@ -59,7 +59,7 @@ mobile browsers and Home Assistant setups is important.
 1. Open **HACS → Integrations → Custom repositories**.
 2. Add `https://github.com/balronu/ha-camper-travel-journal` as an
    **Integration** repository.
-3. Install the stable `v0.4.0` release.
+3. Install the stable `v0.4.1` release.
 4. Restart Home Assistant manually.
 5. Add the integration under **Settings → Devices & services**.
 
@@ -268,11 +268,12 @@ includes expanded statistics, exports and complete Lovelace stop management.
 The map view, central Journal Card and authenticated PDF travel reports are
 part of v0.3.0.
 
-### v0.4.0 – planned only
+### v0.4.1 – compact journal selection
 
-v0.4.0 is planned to provide a more modular journal interface and optional
-interfaces to independent camper integrations. These are planned follow-up
-work and are not part of the current Stable release.
+When no trip is open, the central Journal Card now shows only its title, the
+trip selector, and the **Open trip** and **New trip** actions. The welcome area
+and any expand/collapse interaction are removed; open-trip modules, existing
+YAML configuration, and stored data remain unchanged.
 
 ## Support and contributing
 

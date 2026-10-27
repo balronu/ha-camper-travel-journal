@@ -271,17 +271,28 @@ jobs:
           server_pid=$!
           trap 'kill "$server_pid"' EXIT
           sleep 0.3
-          chromium --headless --no-sandbox --disable-gpu --virtual-time-budget=2000 \
-            --dump-dom http://127.0.0.1:8765/frontend/tests/browser/journal-entry.html >/tmp/camper-travel-journal-journal-dom.html
+          for width in 320 375 390 430 768 1280; do
+            chromium --headless --no-sandbox --disable-gpu --window-size="${width},900" --virtual-time-budget=2000 \
+              --dump-dom http://127.0.0.1:8765/frontend/tests/browser/journal-entry.html \
+              >"/tmp/camper-travel-journal-journal-${width}-dom.html"
+          done
           node - <<'NODE'
           const fs = require('fs');
-          const html = fs.readFileSync('/tmp/camper-travel-journal-journal-dom.html', 'utf8');
-          const match = html.match(/<pre id="result">([\s\S]*?)<\/pre>/);
-          if (!match) throw new Error('journal harness returned no result');
-          const result = JSON.parse(match[1]);
-          if (!result.closed || !result.opened || !result.singleExpenseDisclosure || !result.closedAgain || !result.interruption?.saved || !result.interruption?.overnightCount || !result.interruption?.dialogClosedAfterRefresh) throw new Error(`central journal interruption/expense lifecycle failed: ${JSON.stringify(result)}`);
-          if (result.visibleTemplateLeak) throw new Error('frontend template source leaked into visible DOM');
-          console.log(JSON.stringify(result));
+          const widths = [320, 375, 390, 430, 768, 1280];
+          const results = Object.fromEntries(widths.map((width) => {
+            const html = fs.readFileSync(`/tmp/camper-travel-journal-journal-${width}-dom.html`, 'utf8');
+            const match = html.match(/<pre id="result">([\s\S]*?)<\/pre>/);
+            if (!match) throw new Error(`journal harness returned no result at ${width}px`);
+            return [width, JSON.parse(match[1])];
+          }));
+          for (const [width, result] of Object.entries(results)) {
+            if (!result.closed || !result.closedDetails.overflowFree || !result.closedDetails.touchTargets) throw new Error(`compact journal layout failed at ${width}px: ${JSON.stringify(result)}`);
+            if (Number(width) === 320 && result.closedDetails.actions.some((label) => label.length > 18)) throw new Error(`narrow action labels are not usable at ${width}px`);
+            if (result.visibleTemplateLeak) throw new Error(`frontend template source leaked into visible DOM at ${width}px`);
+          }
+          const result = results[390];
+          if (!result.opened || !result.singleExpenseDisclosure || !result.closedAgain || !result.interruption?.saved || !result.interruption?.overnightCount || !result.interruption?.dialogClosedAfterRefresh) throw new Error(`central journal interruption/expense lifecycle failed: ${JSON.stringify(result)}`);
+          console.log(JSON.stringify(results));
           NODE
       - name: Run central journal trip actions regression
         run: |
