@@ -14,10 +14,10 @@ const bundle = resolve(root, "../custom_components/camper_travel_journal/fronten
 
 describe("frontend release contract", () => {
   it("keeps backend, npm metadata and stable bundle aligned", () => {
-    expect(manifest.version).toBe("0.4.0");
+    expect(manifest.version).toBe("0.4.1");
     expect(pkg.version).toBe(manifest.version);
     expect(existsSync(bundle)).toBe(true);
-  expect(readFileSync(resolve(root, "../custom_components/camper_travel_journal/const.py"), "utf8")).toContain('FRONTEND_VERSION = "0.4.0"');
+  expect(readFileSync(resolve(root, "../custom_components/camper_travel_journal/const.py"), "utf8")).toContain('FRONTEND_VERSION = "0.4.1"');
   const journal = readFileSync(resolve(root, "src/journal-card.ts"), "utf8");
   expect(journal).toContain("Aus Kosten übernehmen");
   expect(journal).toContain("listFuelExpenses");
@@ -212,7 +212,9 @@ describe("frontend release contract", () => {
     const journal = readFileSync(resolve(root, "src/journal-card.ts"), "utf8");
     const manager = readFileSync(resolve(root, "src/manager-card.ts"), "utf8");
     const map = readFileSync(resolve(root, "src/map-card.ts"), "utf8");
-    expect(journal).toContain("Reise auswählen oder neu anlegen");
+    expect(journal).not.toContain("Reise auswählen oder neu anlegen");
+    expect(journal).not.toContain("entry-icon");
+    expect(journal).toContain("Bitte auswählen …");
     expect(journal).toContain("camper-travel-journal-manager-card");
     expect(journal).toContain("camper-travel-journal-map-card");
     expect(journal).toContain("clearActiveTrip");
