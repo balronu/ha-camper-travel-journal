@@ -1,5 +1,21 @@
 # Änderungsprotokoll
 
+## 0.4.1 – Stable
+
+### Deutsch
+
+- Die zentrale Journal Card zeigt ohne geöffnete Reise nur noch „Reisetagebuch“, die kompakte Reiseauswahl sowie „Reise öffnen“ und „Neue Reise“.
+- Wohnmobil-Emoji, Begrüßungsüberschrift, Erklärungstext und unnötige Leerflächen wurden entfernt. Eine Auf-/Zuklappfunktion wird nicht eingeführt.
+- Auswahl und Aktionen sind auf Desktop, Tablet und schmalen mobilen Breiten ohne horizontalen Überlauf und mit mindestens 44 px Touch-Fläche bedienbar.
+- Geöffnete Reisen, Module, Reisewechsel, Reiseerstellung, YAML-Konfigurationen, Schema 15 und bestehende Daten bleiben unverändert.
+
+### English
+
+- When no trip is open, the central Journal Card shows only “Reisetagebuch”, the compact trip selector, and the “Reise öffnen” and “Neue Reise” actions.
+- The camper emoji, welcome heading, explanatory text and unnecessary empty space were removed. No expand/collapse interaction was introduced.
+- Selection and actions remain usable without horizontal overflow on desktop, tablet and narrow mobile widths, with touch targets of at least 44 px.
+- Open trips, modules, trip switching, trip creation, YAML configuration, schema 15 and existing data remain unchanged.
+
 ## 0.4.0 – Stable
 
 ### Deutsch

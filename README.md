@@ -6,7 +6,7 @@
 
 <h1 align="center">Camper Travel Journal</h1>
 <p align="center">Dein digitales Wohnmobil-Reisetagebuch für Home Assistant</p>
-<p align="center"><strong>Stable: v0.4.0</strong></p>
+<p align="center"><strong>Stable: v0.4.1</strong></p>
 
 <p align="center">
   <a href="https://github.com/balronu/ha-camper-travel-journal/releases/latest"><img src="https://img.shields.io/github/v/release/balronu/ha-camper-travel-journal?label=Release" alt="Release"></a>
@@ -100,7 +100,7 @@ bereits vorhandene, bestätigte oder verworfene Vorschläge werden übersprungen
 1. Öffne **HACS → Integrationen → Benutzerdefinierte Repositories**.
 2. Füge `https://github.com/balronu/ha-camper-travel-journal` als Repository
    vom Typ **Integration** hinzu.
-3. Installiere die stabile Version `v0.4.0`.
+3. Installiere die stabile Version `v0.4.1`.
 4. Starte Home Assistant manuell neu.
 5. Füge die Integration unter **Einstellungen → Geräte & Dienste** hinzu.
 
@@ -300,11 +300,12 @@ vollständige Lovelace-Verwaltung von Zwischenstopps. Die Kartenansicht, die
 zentrale Journal Card und der authentifizierte PDF-Reisebericht sind Bestandteil
 von v0.3.0.
 
-### v0.4.0 – ausschließlich geplant
+### v0.4.1 – kompakte Journal-Auswahl
 
-Für v0.4.0 sind eine modularere Journal-Oberfläche und optionale Schnittstellen
-zu eigenständigen Camper-Integrationen vorgesehen. Diese Punkte sind geplante
-Weiterentwicklung und gehören nicht zum aktuellen Stable-Stand.
+Die zentrale Journal Card zeigt ohne geöffnete Reise nur noch Überschrift,
+Reiseauswahl sowie die Aktionen **Reise öffnen** und **Neue Reise**. Die
+Begrüßungsfläche und eine Auf-/Zuklappfunktion entfallen; geöffnete Reisen,
+Module und bestehende YAML-Konfigurationen bleiben unverändert.
 
 ## Support und Mitwirkung
 
