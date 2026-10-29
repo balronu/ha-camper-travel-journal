@@ -20,17 +20,18 @@
 
 ## What is Camper Travel Journal?
 
-Camper Travel Journal collects and organizes camper travel information directly
-in Home Assistant. GPS points, detected drives, trips, stops and expenses are
-stored in an integration-owned local SQLite database. No external cloud service
-is required.
+Camper Travel Journal is a GPS-powered travel journal for Home Assistant. It
+detects drives and stays, manages trips and places, and keeps vehicle expenses,
+including fuel events, in an integration-owned local SQLite database. No
+external cloud service is required.
 
 The project is still actively evolving; practical validation on different
 mobile browsers and Home Assistant setups is important.
 
 ## Features
 
-- GPS recording from a configured `device_tracker`, disabled by default.
+- Automatic GPS drive and stay detection from a configured `device_tracker`,
+  disabled by default.
 - Pending GPS stop suggestions from confirmed `stationary_timeout` evidence;
   a suggestion becomes a stop only after user confirmation.
 - Conservative drive detection with movement thresholds, duplicate filtering,
@@ -47,6 +48,13 @@ mobile browsers and Home Assistant setups is important.
   warnings and explicit target-trip selection.
 - Expense management with stable categories, integer cents and currency checks,
   including optional multi-select water and waste services.
+- Fuel log for diesel, AdBlue and other operating fluids with full-to-full
+  intervals and consumption calculation.
+- Existing fuel expenses can be linked into the fuel log without creating a
+  duplicate cost record.
+- Distance uses the odometer or, when fully covered, a clearly labelled
+  estimated GPS distance. Possible diesel heater use can be included as a
+  separate estimate.
 - German and English user interfaces.
 - A central Journal Card for new dashboards: select, open, edit, resume,
   pause, complete, delete or switch a trip while all trip sections use the
@@ -85,6 +93,17 @@ dismissed suggestions are skipped.
 The **Water & waste services** expense category optionally supports multiple
 services (electricity/shore power, fresh water, grey water, toilet cassette and
 shower). The total is stored once and existing expenses remain unchanged.
+
+### Fuel log and consumption
+
+The fuel log supports **diesel**, **AdBlue** and other operating fluids.
+Consumption intervals are calculated between two full refuels and may include
+partial refuels. If no valid odometer interval is available, a fully covered
+GPS drive distance can be used as an **estimate**; incomplete GPS coverage does
+not produce a seemingly precise value. Diesel consumption includes driving and
+heating by default. A heater is not detected automatically and engine versus
+heater use cannot be separated exactly. Explicit heater data may be entered to
+produce a separate estimate.
 
 ## First setup
 
@@ -172,6 +191,21 @@ ID. With no active trip, the same rule applies to all trips. The selection
 survives refreshes, and title, period, status, metrics and actions always come
 from that selected trip.
 
+## Screenshots
+
+The following anonymized synthetic screenshots show the opened trip context on
+desktop and mobile, plus the travel map:
+
+| View | Preview |
+| --- | --- |
+| Journal Card, desktop | ![Opened Journal Card on desktop](docs/screenshots/dashboard-desktop.png) |
+| Journal Card, mobile | ![Opened Journal Card on mobile](docs/screenshots/journal-mobile.png) |
+| Travel map | ![Travel map with GPS track](docs/screenshots/map.png) |
+
+No separate published screenshots for the fuel log, consumption, or expense
+views are currently included. Private GPS positions and invented product views
+are not published as evidence.
+
 ## GPS recording and GPX import
 
 Live GPS drives are stored idempotently for the same vehicle and GPS points.
@@ -250,12 +284,18 @@ issues or tests.
 
 ## Known limitations
 
-- The scope is focused on the travel journal, drives, expenses and GPX import.
+- The scope is focused on the travel journal, drives, stays, expenses, fuel log,
+  consumption calculation and GPX import.
 - Historical beta changes remain documented in the changelog.
 - Retention calculates candidates but does not automatically delete in this
   version.
 - Mobile Safari/WebKit and productive installations still need practical
   validation.
+- There is no automatic fuel-station detection and no direct integration with
+  the separate **Mobile Fuel Stations** or **Camper Route Planner** projects.
+  Those integrations are not available in v0.4.1.
+- GPS-based consumption is an estimate; no exact value is shown when coverage
+  is insufficient.
 
 Technical details about versioned frontend delivery are documented in the
 [frontend cache documentation](docs/frontend-cache.md); the current project
@@ -291,16 +331,3 @@ should preserve existing data and atomic backend validation.
 ## License
 
 Camper Travel Journal is released under the [MIT License](LICENSE).
-## Fuel costs
-
-For the **Fuel** category, liters and price per liter are optional. When two of
-the three values are entered, the missing value is calculated. Decimal comma
-input is supported; amounts use two decimals and liters/price use up to three.
-Existing fuel costs without these details remain valid.
-
-## Expense notes
-
-Every expense can optionally include a multiline note of up to 2,000
-characters. Newlines and special characters are rendered as safe text in the
-Journal Card and PDF travel report. Existing expenses without a note remain
-valid.
