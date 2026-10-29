@@ -20,11 +20,10 @@
 
 ## Was ist Camper Travel Journal?
 
-Camper Travel Journal sammelt und organisiert die Reiseinformationen deines
-Wohnmobils direkt in Home Assistant. GPS-Punkte, erkannte Fahrten, Reisen,
-Zwischenstopps und Kosten bleiben in einer eigenen lokalen SQLite-Datenbank.
-Die Integration ist für private Home-Assistant-Installationen ausgelegt und
-benötigt keinen externen Cloud-Dienst.
+Camper Travel Journal ist ein GPS-gestütztes Reisetagebuch für Home Assistant.
+Es erkennt Fahrten und Aufenthalte, verwaltet Reisen und Stellplätze und hält
+Fahrzeugkosten einschließlich Tankvorgängen lokal in einer eigenen SQLite-
+Datenbank. Die Integration benötigt keinen externen Cloud-Dienst.
 
 Die Integration ist weiterhin ein aktives Projekt; Praxisvalidierung auf
 verschiedenen mobilen Browsern und in unterschiedlichen Home-Assistant-
@@ -32,8 +31,8 @@ Installationen bleibt wichtig.
 
 ## Funktionen
 
-- GPS-Aufzeichnung über einen konfigurierten `device_tracker`, standardmäßig
-  deaktiviert.
+- Automatische GPS-Fahrten- und Aufenthaltserkennung über einen konfigurierten
+  `device_tracker`, standardmäßig deaktiviert.
 - Pending-GPS-Stoppvorschläge aus bestätigter `stationary_timeout`-Evidenz;
   Vorschläge werden erst nach Nutzerbestätigung als Stopp gespeichert.
 - Konservative Erkennung von Fahrten mit Mindestbewegung, Duplikatfilter,
@@ -50,6 +49,13 @@ Installationen bleibt wichtig.
   Duplikatschutz, Zeitraumwarnungen und expliziter Zielreise.
 - Kostenverwaltung mit stabilen Kategorien, Cent-Beträgen und
   Währungsprüfung.
+- Tankbuch für Diesel, AdBlue und weitere Betriebsstoffe mit Volltankintervallen
+  und Verbrauchsberechnung.
+- Vorhandene Kraftstoffausgaben können verknüpft übernommen werden; dadurch
+  entsteht keine doppelte Kostenbuchung.
+- Die Verbrauchsstrecke stammt vom Kilometerstand oder – mit transparenter
+  Kennzeichnung als Schätzung – aus GPS-Fahrten. Ein möglicher Verbrauch einer
+  Diesel-Standheizung kann separat als Schätzung berücksichtigt werden.
 - Deutsche und englische Benutzeroberfläche.
 - Zentrale Journal Card für neue Dashboards: Reise auswählen, öffnen,
   bearbeiten, fortsetzen, pausieren, beenden, löschen oder wechseln; alle
@@ -69,6 +75,18 @@ Im aktivierbaren Tankbuch können vorhandene Kraftstoffkosten über **Aus Kosten
 übernehmen** als bearbeitbare Tankvorschau übernommen werden. Die ursprüngliche
 Ausgabe wird 1:1 verknüpft; es entsteht keine zweite Kostenbuchung. Bereits
 übernommene Ausgaben sind gekennzeichnet und nicht erneut auswählbar.
+
+### Verbrauch und Tankbuch
+
+Das Tankbuch unterstützt **Diesel**, **AdBlue** und weitere Betriebsstoffe.
+Verbrauchsintervalle werden zwischen zwei Volltankungen berechnet und können
+Teilbetankungen einschließen. Wenn kein gültiger Kilometerstand vorliegt, wird
+eine vollständig abgedeckte GPS-Fahrstrecke als **geschätzte** Alternative
+verwendet; unvollständige GPS-Abdeckung ergibt keinen scheinbar exakten Wert.
+Dieselverbrauch umfasst grundsätzlich Fahren und Heizen. Eine mögliche
+Standheizung wird nicht automatisch erkannt und nicht exakt vom Motorverbrauch
+getrennt. Sie kann nur über ausdrücklich erfasste Heizdaten separat geschätzt
+werden.
 
 ### Bemerkungen zu Kosten
 
@@ -197,6 +215,21 @@ entschieden. Ohne aktive Reise gilt dieselbe Regel für alle Reisen. Die Auswahl
 bleibt bei Aktualisierungen erhalten und zeigt Titel, Zeitraum, Status,
 Kennzahlen und Aktionen immer aus derselben Reise.
 
+## Screenshots
+
+Die folgenden anonymisierten, synthetischen Aufnahmen zeigen den geöffneten
+Reisekontext auf Desktop und Mobil sowie die Reisekarte:
+
+| Ansicht | Vorschau |
+| --- | --- |
+| Journal Card, Desktop | ![Geöffnete Journal Card auf Desktop](docs/screenshots/dashboard-desktop.png) |
+| Journal Card, Mobil | ![Geöffnete Journal Card auf Mobil](docs/screenshots/journal-mobile.png) |
+| Reisekarte | ![Reisekarte mit GPS-Strecke](docs/screenshots/map.png) |
+
+Für Tankbuch, Verbrauch und Kosten liegen in diesem Repository derzeit keine
+separaten veröffentlichten Screenshots vor. Es werden keine privaten GPS-
+Positionen oder erfundenen Ansichten als Produktnachweis veröffentlicht.
+
 ## GPS-Aufzeichnung und GPX-Import
 
 Live-GPS-Fahrten werden bei identischem Fahrzeug und identischen GPS-Punkten
@@ -280,13 +313,18 @@ privaten Koordinaten, Tokens oder unredigierten Logs.
 
 ## Bekannte Einschränkungen
 
-- Der Funktionsumfang ist auf Reisetagebuch, Fahrten, Kosten und den GPX-Import
-  konzentriert.
+- Der Funktionsumfang ist auf Reisetagebuch, Fahrten, Aufenthalte, Kosten,
+  Tankbuch, Verbrauchsberechnung und GPX-Import konzentriert.
 - Historische Beta-Änderungen bleiben im Changelog dokumentiert.
 - Die Retention-Funktion berechnet Kandidaten, löscht in dieser Version aber
   nicht automatisch.
 - Mobile Safari/WebKit und produktive Installationen benötigen weiterhin
   Praxisvalidierung.
+- Es gibt keine automatische Tankstellenerkennung und keine direkte Integration
+  in die eigenständigen Projekte **Mobile Fuel Stations** oder **Camper Route
+  Planner**. Solche Verknüpfungen sind nicht Bestandteil von v0.4.1.
+- GPS-basierter Verbrauch ist eine Schätzung; ohne ausreichende Abdeckung wird
+  kein exakter Verbrauchswert ausgegeben.
 
 Technische Hinweise zur versionierten Frontend-Auslieferung stehen in der
 [Frontend-Cache-Dokumentation](docs/frontend-cache.md); die aktuelle
